@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Airport, AIRPORTS, Currency, CURRENCIES, HOTELS, Hotel, TRANSFER_TYPES } from '../types';
+import { Airport, AIRPORTS, Currency, CURRENCIES } from '../types';
 
 export default function ReservationForm() {
     const router = useRouter();
@@ -438,8 +438,15 @@ export default function ReservationForm() {
                                     </div>
                                     <input
                                         type="number"
-                                        value={formData.luggageCount}
-                                        onChange={e => setFormData(prev => ({ ...prev, luggageCount: parseInt(e.target.value) }))}
+                                        value={Number.isNaN(formData.luggageCount) ? 0 : formData.luggageCount}
+                                        onChange={e => {
+                                            const raw = e.target.value;
+                                            const parsed = parseInt(raw, 10);
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                luggageCount: Number.isNaN(parsed) ? 0 : parsed
+                                            }));
+                                        }}
                                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 pl-10 pr-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
                                         min="0"
                                         required
@@ -451,8 +458,15 @@ export default function ReservationForm() {
                                 <label className="block text-sm font-medium text-gray-700">Fiyat</label>
                                 <input
                                     type="number"
-                                    value={formData.price}
-                                    onChange={e => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) }))}
+                                    value={Number.isNaN(formData.price) ? 0 : formData.price}
+                                    onChange={e => {
+                                        const raw = e.target.value;
+                                        const parsed = parseFloat(raw);
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            price: Number.isNaN(parsed) ? 0 : parsed
+                                        }));
+                                    }}
                                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
                                     min="0"
                                     step="0.01"

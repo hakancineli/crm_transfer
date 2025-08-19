@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Airport, AIRPORTS, Currency, CURRENCIES, HOTELS } from '../types';
+import { Airport, AIRPORTS, Currency, CURRENCIES } from '../types';
 import { formatLocation, formatPassengerName, formatHotelName } from '@/app/utils/textFormatters';
 
 interface EditReservationFormProps {
@@ -302,8 +302,15 @@ export default function EditReservationForm({ voucherNumber, initialData }: Edit
                     <label className="block mb-2">Bagaj Sayısı</label>
                     <input
                         type="number"
-                        value={formData.luggageCount}
-                        onChange={e => setFormData(prev => ({ ...prev, luggageCount: parseInt(e.target.value) }))}
+                        value={Number.isNaN(formData.luggageCount) ? 0 : formData.luggageCount}
+                        onChange={e => {
+                            const raw = e.target.value;
+                            const parsed = parseInt(raw, 10);
+                            setFormData(prev => ({
+                                ...prev,
+                                luggageCount: Number.isNaN(parsed) ? 0 : parsed
+                            }));
+                        }}
                         className="w-full p-2 border rounded"
                         min="0"
                         required
@@ -315,8 +322,15 @@ export default function EditReservationForm({ voucherNumber, initialData }: Edit
                         <label className="block mb-2">Fiyat</label>
                         <input
                             type="number"
-                            value={formData.price}
-                            onChange={e => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) }))}
+                            value={Number.isNaN(formData.price) ? 0 : formData.price}
+                            onChange={e => {
+                                const raw = e.target.value;
+                                const parsed = parseFloat(raw);
+                                setFormData(prev => ({
+                                    ...prev,
+                                    price: Number.isNaN(parsed) ? 0 : parsed
+                                }));
+                            }}
                             className="w-full p-2 border rounded"
                             min="0"
                             step="0.01"

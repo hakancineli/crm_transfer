@@ -58,17 +58,21 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             const response = await fetch('/api/reservations');
             const data = await response.json();
             
-            // Tarihe göre sırala (en yakın tarih en üstte)
-            const sortedData = data.sort((a: Reservation, b: Reservation) => {
-                const dateA = new Date(`${a.date} ${a.time}`).getTime();
-                const dateB = new Date(`${b.date} ${b.time}`).getTime();
-                return dateA - dateB;
-            });
+            // Eğer hata objesi dönerse veya veri dizi değilse, boş dizi kullan
+            const sortedData = Array.isArray(data)
+                ? data.sort((a: Reservation, b: Reservation) => {
+                    const dateA = new Date(`${a.date} ${a.time}`).getTime();
+                    const dateB = new Date(`${b.date} ${b.time}`).getTime();
+                    return dateA - dateB;
+                })
+                : [];
 
             setReservations(sortedData);
             setFilteredReservations(sortedData);
         } catch (error) {
             console.error('Rezervasyonları getirme hatası:', error);
+            setReservations([]);
+            setFilteredReservations([]);
         } finally {
             setIsLoading(false);
         }
