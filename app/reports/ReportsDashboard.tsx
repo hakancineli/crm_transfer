@@ -30,6 +30,7 @@ export default function ReportsDashboard() {
     const [endDate, setEndDate] = useState<string>(format(today, 'yyyy-MM-dd'));
     const [reportData, setReportData] = useState<ReportData | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         fetchReportData();
@@ -37,6 +38,7 @@ export default function ReportsDashboard() {
 
     const fetchReportData = async () => {
         setIsLoading(true);
+        setError(null);
         try {
             const response = await fetch('/api/reports', {
                 method: 'POST',
@@ -44,15 +46,41 @@ export default function ReportsDashboard() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    startDate: startOfDay(new Date(startDate)).toISOString(),
-                    endDate: endOfDay(new Date(endDate)).toISOString(),
+                    // API string tarih (YYYY-MM-DD) bekleyecek
+                    startDate,
+                    endDate,
                 }),
             });
             
             const data = await response.json();
-            setReportData(data);
+
+            if (!response.ok || data?.error) {
+                setReportData(null);
+                setError(data?.error || 'Rapor verisi getirilemedi');
+                return;
+            }
+
+            const safeData: ReportData = {
+                totalRevenueUSD: Number(data.totalRevenueUSD) || 0,
+                totalRevenueTL: Number(data.totalRevenueTL) || 0,
+                usdRate: Number(data.usdRate) || 0,
+                totalTransfers: Number(data.totalTransfers) || 0,
+                paidTransfers: Number(data.paidTransfers) || 0,
+                unpaidTransfers: Number(data.unpaidTransfers) || 0,
+                driverPayments: Number(data.driverPayments) || 0,
+                netIncome: Number(data.netIncome) || 0,
+                transfersByType: {
+                    pickup: Number(data?.transfersByType?.pickup) || 0,
+                    dropoff: Number(data?.transfersByType?.dropoff) || 0,
+                    transfer: Number(data?.transfersByType?.transfer) || 0,
+                },
+                popularRoutes: Array.isArray(data.popularRoutes) ? data.popularRoutes : [],
+            };
+
+            setReportData(safeData);
         } catch (error) {
             console.error('Rapor verisi getirme hatası:', error);
+            setError('Rapor verisi getirme hatası');
         } finally {
             setIsLoading(false);
         }
@@ -95,6 +123,10 @@ export default function ReportsDashboard() {
                 <div className="flex items-center justify-center h-64">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
                 </div>
+            ) : error ? (
+                <div className="bg-white p-6 rounded-lg shadow text-center">
+                    <p className="text-red-600">{error}</p>
+                </div>
             ) : reportData ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {/* Finansal Özet */}
@@ -103,19 +135,19 @@ export default function ReportsDashboard() {
                         <dl className="space-y-4">
                             <div>
                                 <dt className="text-sm text-gray-500">USD Satış Toplamı</dt>
-                                <dd className="text-2xl font-semibold text-green-600">{reportData.totalRevenueUSD.toFixed(2)} USD</dd>
+                                <dd className="text-2xl font-semibold text-green-600">{Number(reportData.totalRevenueUSD || 0).toFixed(2)} USD</dd>
                                 <dt className="text-sm text-gray-500 mt-1">USD/TL Kuru</dt>
-                                <dd className="text-lg font-medium text-gray-600">{reportData.usdRate.toFixed(2)} TL</dd>
+                                <dd className="text-lg font-medium text-gray-600">{Number(reportData.usdRate || 0).toFixed(2)} TL</dd>
                                 <dt className="text-sm text-gray-500 mt-2">TL Karşılığı</dt>
-                                <dd className="text-xl font-semibold text-green-600">{reportData.totalRevenueTL.toFixed(2)} TL</dd>
+                                <dd className="text-xl font-semibold text-green-600">{Number(reportData.totalRevenueTL || 0).toFixed(2)} TL</dd>
                             </div>
                             <div>
                                 <dt className="text-sm text-gray-500">Şoför Hakediş (TL)</dt>
-                                <dd className="text-2xl font-semibold text-red-600">{reportData.driverPayments.toFixed(2)} TL</dd>
+                                <dd className="text-2xl font-semibold text-red-600">{Number(reportData.driverPayments || 0).toFixed(2)} TL</dd>
                             </div>
                             <div>
                                 <dt className="text-sm text-gray-500">Şirket Karı (TL)</dt>
-                                <dd className="text-2xl font-semibold text-blue-600">{reportData.netIncome.toFixed(2)} TL</dd>
+                                <dd className="text-2xl font-semibold text-blue-600">{Number(reportData.netIncome || 0).toFixed(2)} TL</dd>
                             </div>
                         </dl>
                     </div>
@@ -172,7 +204,7 @@ export default function ReportsDashboard() {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {reportData.popularRoutes.map((route, index) => (
+                                    {(reportData.popularRoutes || []).map((route, index) => (
                                         <tr key={index}>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{route.route}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{route.count}</td>

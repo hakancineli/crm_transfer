@@ -16,14 +16,20 @@ async function getUSDRate() {
 export async function POST(request: Request) {
     try {
         const { startDate, endDate } = await request.json();
+
+        // startDate / endDate formatını YYYY-MM-DD kabul edelim
+        if (!startDate || !endDate) {
+            return NextResponse.json({ error: 'Tarih aralığı gerekli' }, { status: 400 });
+        }
         const usdRate = await getUSDRate();
 
         // Tarih aralığındaki tüm rezervasyonları getir
         const reservations = await prisma.reservation.findMany({
             where: {
+                // date alanı string (YYYY-MM-DD). Postgres için doğrudan karşılaştırma yapılabilir.
                 date: {
-                    gte: startDate,
-                    lte: endDate
+                    gte: String(startDate),
+                    lte: String(endDate)
                 }
             },
             include: {
