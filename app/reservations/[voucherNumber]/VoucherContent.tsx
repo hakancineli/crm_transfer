@@ -1,4 +1,4 @@
-use client
+"use client";
 import { AIRPORTS, CURRENCIES } from '@/app/types';
 import { useState } from 'react';
 import Link from 'next/link';
