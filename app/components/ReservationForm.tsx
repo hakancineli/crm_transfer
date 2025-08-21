@@ -16,8 +16,8 @@ export default function ReservationForm() {
     const [formData, setFormData] = useState({
         date: today,
         time: defaultTime,
-        from: '' as Airport | Hotel | string,
-        to: '' as Airport | Hotel | string,
+        from: '' as Airport | string,
+        to: '' as Airport | string,
         flightCode: '',
         passengerNames: [''],
         luggageCount: 0,
