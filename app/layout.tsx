@@ -18,10 +18,10 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <body className={inter.className}>
-        <div className="print:hidden">
+        <div className="print:hidden sticky top-0 z-50">
           <Header />
         </div>
-        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 print:p-0">
+        <main className="max-w-7xl mx-auto pt-20 pb-6 sm:px-6 lg:px-8 print:p-0">
           {children}
         </main>
       </body>
