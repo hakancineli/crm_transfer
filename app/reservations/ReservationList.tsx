@@ -380,27 +380,48 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                 </span>
                                             </td>
                                             <td className="px-2 py-2 text-sm">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                                    reservation.paymentStatus === 'PAID' ? 'bg-green-100 text-green-800' :
-                                                    reservation.paymentStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                                                    'bg-red-100 text-red-800'
-                                                }`}>
-                                                    {reservation.paymentStatus === 'PAID' ? 'Ödendi' :
-                                                     reservation.paymentStatus === 'PENDING' ? 'Bekliyor' : 'Ödenmedi'}
-                                                </span>
-                                                <button
-                                                    onClick={() => {
-                                                        const newStatus = reservation.paymentStatus === 'PAID' ? 'UNPAID' : 'PAID';
-                                                        handlePaymentStatusUpdate(reservation.voucherNumber, newStatus);
-                                                    }}
-                                                    className="ml-2 text-xs text-gray-500 hover:text-gray-700"
-                                                    disabled={updateLoading === reservation.voucherNumber}
-                                                >
-                                                    {reservation.paymentStatus === 'PAID' ? '✗' : '✓'}
-                                                </button>
-                                                {updateLoading === reservation.voucherNumber && (
-                                                    <span className="ml-1 animate-spin">⌛</span>
-                                                )}
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                        reservation.paymentStatus === 'PAID' ? 'bg-green-100 text-green-800' :
+                                                        reservation.paymentStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                                                        'bg-red-100 text-red-800'
+                                                    }` }>
+                                                        {reservation.paymentStatus === 'PAID' ? 'Ödendi' :
+                                                         reservation.paymentStatus === 'PENDING' ? 'Bekliyor' : 'Ödenmedi'}
+                                                    </span>
+                                                    {reservation.paymentStatus === 'PENDING' ? (
+                                                        <div className="flex items-center gap-1">
+                                                            <button
+                                                                onClick={() => handlePaymentStatusUpdate(reservation.voucherNumber, 'PAID')}
+                                                                className="text-xs text-green-600 hover:text-green-800"
+                                                                disabled={updateLoading === reservation.voucherNumber}
+                                                            >
+                                                                ✓
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handlePaymentStatusUpdate(reservation.voucherNumber, 'UNPAID')}
+                                                                className="text-xs text-red-600 hover:text-red-800"
+                                                                disabled={updateLoading === reservation.voucherNumber}
+                                                            >
+                                                                ✗
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => {
+                                                                const newStatus = reservation.paymentStatus === 'PAID' ? 'UNPAID' : 'PAID';
+                                                                handlePaymentStatusUpdate(reservation.voucherNumber, newStatus);
+                                                            }}
+                                                            className="text-xs text-gray-500 hover:text-gray-700"
+                                                            disabled={updateLoading === reservation.voucherNumber}
+                                                        >
+                                                            {reservation.paymentStatus === 'PAID' ? '✗' : '✓'}
+                                                        </button>
+                                                    )}
+                                                    {updateLoading === reservation.voucherNumber && (
+                                                        <span className="ml-1 animate-spin">⌛</span>
+                                                    )}
+                                                </div>
                                             </td>
                                             <td className="px-2 py-2 text-sm font-medium">
                                                 <div className="flex items-center space-x-1">
