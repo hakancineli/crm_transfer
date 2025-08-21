@@ -231,7 +231,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             </div>
 
             {/* Tablo Container */}
-            <div className="bg-white shadow-sm rounded-lg overflow-hidden border border-gray-200">
+            <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-visible">
                 <div>
                     <table className="w-full">
                         <thead>
