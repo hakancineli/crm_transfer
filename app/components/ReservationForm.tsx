@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Airport, AIRPORTS, Currency, CURRENCIES } from '../types';
+import { HOTELS } from '@/app/types';
 
 export default function ReservationForm() {
     const router = useRouter();
