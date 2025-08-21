@@ -204,7 +204,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
     ).length;
 
     return (
-        <div className="w-screen px-4 py-4">
+        <div className="max-w-7xl mx-auto px-4 py-4">
             {/* Transfer Özeti */}
             <div className="bg-white p-4 rounded-lg shadow mb-6">
                 <div className="text-sm text-gray-600">
@@ -232,20 +232,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
 
             {/* Tablo Container */}
             <div className="bg-white shadow-sm rounded-lg overflow-hidden border border-gray-200">
-                <div className="overflow-x-auto">
-                    <table className="w-full table-fixed" style={{ minWidth: '1400px' }}>
-                        <colgroup>
-                            <col className="w-[140px]" /> {/* Voucher */}
-                            <col className="w-[90px]" /> {/* Tip */}
-                            <col className="w-[100px]" /> {/* Tarih */}
-                            <col className="w-[280px]" /> {/* Güzergah */}
-                            <col className="w-[200px]" /> {/* Müşteri */}
-                            <col className="w-[80px]" /> {/* Fiyat */}
-                            <col className="w-[160px]" /> {/* Şoför */}
-                            <col className="w-[90px]" /> {/* Durum */}
-                            <col className="w-[100px]" /> {/* Ödeme */}
-                            <col className="w-[140px]" /> {/* İşlem */}
-                        </colgroup>
+                <div>
+                    <table className="w-full">
                         <thead>
                             <tr className="bg-gray-50">
                                 <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
