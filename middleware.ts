@@ -4,7 +4,8 @@ function parseBasicAuth(header: string | null): { username: string; password: st
 	if (!header || !header.startsWith('Basic ')) return null;
 	try {
 		const base64 = header.replace('Basic ', '');
-		const decoded = Buffer.from(base64, 'base64').toString('utf8');
+		// Use Web API atob in the Edge runtime
+		const decoded = atob(base64);
 		const [username, password] = decoded.split(':');
 		if (!username || !password) return null;
 		return { username, password };
@@ -16,12 +17,11 @@ function parseBasicAuth(header: string | null): { username: string; password: st
 export function middleware(req: NextRequest) {
 	const { pathname } = req.nextUrl;
 
-	// Allow Next.js internals and common public assets
+	// Allow framework internals and assets without auth
 	if (
 		pathname.startsWith('/_next') ||
 		pathname.startsWith('/favicon') ||
-		pathname.startsWith('/public') ||
-		pathname === '/api/health'
+		pathname.startsWith('/public')
 	) {
 		return NextResponse.next();
 	}
@@ -29,8 +29,10 @@ export function middleware(req: NextRequest) {
 	const expected = process.env.BASIC_AUTH || '';
 	const [expectedUser, expectedPass] = expected.split(':');
 	if (!expectedUser || !expectedPass) {
-		// If not configured, allow through (to avoid lockout during setup)
-		return NextResponse.next();
+		// If BASIC_AUTH is missing, still require auth to be safe (use a dummy realm)
+		const res = new NextResponse('Authentication required', { status: 401 });
+		res.headers.set('WWW-Authenticate', 'Basic realm="Protected"');
+		return res;
 	}
 
 	const creds = parseBasicAuth(req.headers.get('authorization'));
@@ -44,5 +46,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-	matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+	matcher: ['/(.*)'],
 };
