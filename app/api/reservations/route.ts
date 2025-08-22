@@ -5,8 +5,8 @@ export async function GET() {
   try {
     const reservations = await prisma.reservation.findMany({
       orderBy: [
-        { date: 'asc' },
-        { time: 'asc' }
+        { date: 'desc' },
+        { time: 'desc' }
       ],
       include: {
         driver: true

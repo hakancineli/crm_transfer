@@ -61,9 +61,10 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             // Eğer hata objesi dönerse veya veri dizi değilse, boş dizi kullan
             const sortedData = Array.isArray(data)
                 ? data.sort((a: Reservation, b: Reservation) => {
-                    const dateA = new Date(`${a.date} ${a.time}`).getTime();
-                    const dateB = new Date(`${b.date} ${b.time}`).getTime();
-                    return dateA - dateB;
+                    const timeA = new Date(`${a.date} ${a.time}`).getTime();
+                    const timeB = new Date(`${b.date} ${b.time}`).getTime();
+                    // Yeni → Eski
+                    return timeB - timeA;
                 })
                 : [];
 
@@ -184,7 +185,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
         const transferTime = new Date(`${dateStr}T${timeStr}`);
         const now = new Date();
         const diffInHours = (transferTime.getTime() - now.getTime()) / (1000 * 60 * 60);
-        return diffInHours >= 0 && diffInHours <= 2;
+        // 1 saat kala uyarı
+        return diffInHours >= 0 && diffInHours <= 1;
     };
 
     if (isLoading) {
