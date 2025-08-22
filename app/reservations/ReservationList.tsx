@@ -296,7 +296,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             className={`transition-colors duration-150 cursor-pointer ${
                                                 isUrgent ? 'bg-red-50 hover:bg-red-100' : 'hover:bg-gray-50'
                                             }`}>
-                                            <td className="px-2 py-2 text-sm font-medium text-blue-600 truncate">
+                                            <td className="px-2 py-2 text-sm font-medium text-blue-600">
                                                 {reservation.voucherNumber}
                                             </td>
                                             <td className="px-2 py-2 text-sm text-gray-900">
