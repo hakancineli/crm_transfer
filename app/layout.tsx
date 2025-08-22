@@ -21,7 +21,7 @@ export default function RootLayout({
         <div className="print:hidden sticky top-0 z-50">
           <Header />
         </div>
-        <main className="max-w-7xl mx-auto pt-20 pb-6 px-4 sm:px-6 lg:px-8 print:p-0">
+        <main className="max-w-7xl mx-auto pt-16 pb-6 px-4 sm:px-6 lg:px-8 print:p-0">
           {children}
         </main>
       </body>
