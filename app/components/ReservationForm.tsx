@@ -84,12 +84,7 @@ export default function ReservationForm() {
         }
     };
 
-    const generateVoucherNumber = () => {
-        const today = new Date();
-        const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
-        const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase();
-        return `VIP${dateStr}-${randomStr}`;
-    };
+
 
     const addPassenger = () => {
         setFormData(prev => ({

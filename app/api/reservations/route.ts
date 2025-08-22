@@ -50,11 +50,20 @@ export async function POST(request: NextRequest) {
             ? JSON.stringify(data.passengerNames)
             : JSON.stringify([]);
 
-        // Voucher numarası oluştur
+        // Voucher numarası oluştur - tarih bazlı sıralı
         const date = new Date();
         const formattedDate = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
-        const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase();
-        const voucherNumber = `VIP${formattedDate}-${randomStr}`;
+        
+        // O günkü rezervasyon sayısını al
+        const todayReservations = await prisma.reservation.findMany({
+            where: {
+                date: data.date
+            }
+        });
+        
+        // Sıradaki numara
+        const nextNumber = todayReservations.length + 1;
+        const voucherNumber = `VIP${formattedDate}-${nextNumber}`;
 
         const reservation = await prisma.reservation.create({
             data: {
