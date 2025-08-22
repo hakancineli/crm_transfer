@@ -233,16 +233,16 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             {/* Tablo Container */}
             <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-visible">
                 <div>
-                    <table className="w-full">
+                    <table className="w-full table-fixed">
                         <thead>
                             <tr className="bg-gray-50">
-                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-28">
                                     Voucher
                                 </th>
-                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">
                                     Tip
                                 </th>
-                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-28">
                                     Tarih
                                 </th>
                                 <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -251,19 +251,19 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Müşteri
                                 </th>
-                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
                                     Fiyat
                                 </th>
-                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-36">
                                     Şoför
                                 </th>
-                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-28">
                                     Durum
                                 </th>
-                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
                                     Ödeme
                                 </th>
-                                <th scope="col" className="px-2 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-2 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-44">
                                     İşlem
                                 </th>
                             </tr>
@@ -296,10 +296,10 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             className={`transition-colors duration-150 cursor-pointer ${
                                                 isUrgent ? 'bg-red-50 hover:bg-red-100' : 'hover:bg-gray-50'
                                             }`}>
-                                            <td className="px-2 py-2 whitespace-nowrap text-sm font-medium text-blue-600">
+                                            <td className="px-2 py-2 text-sm font-medium text-blue-600 truncate">
                                                 {reservation.voucherNumber}
                                             </td>
-                                            <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="px-2 py-2 text-sm text-gray-900">
                                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                                     reservation.from.includes('IST') || reservation.from.includes('SAW') 
                                                         ? 'bg-blue-100 text-blue-800' 
@@ -315,18 +315,18 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     }
                                                 </span>
                                             </td>
-                                            <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="px-2 py-2 text-sm text-gray-900">
                                                 {new Date(reservation.date).toLocaleDateString('tr-TR')}
                                                 <div className={`text-xs ${isUrgent ? 'text-red-600 font-medium animate-pulse' : 'text-gray-500'}`}>
                                                     {reservation.time}
                                                     {isUrgent && ' ⚠️'}
                                                 </div>
                                             </td>
-                                            <td className="px-2 py-2 text-sm text-gray-900">
+                                            <td className="px-2 py-2 text-sm text-gray-900 whitespace-normal break-words">
                                                 <div className="flex flex-col">
                                                     <div className="flex items-center">
                                                         <div className="flex flex-col flex-1">
-                                                            <div className="whitespace-nowrap">{formattedFrom}</div>
+                                                            <div className="whitespace-normal break-words">{formattedFrom}</div>
                                                             {reservation.from.includes('IST') || reservation.from.includes('SAW') ? (
                                                                 <span className="text-xs text-gray-400">
                                                                     {reservation.flightCode && `✈️ ${reservation.flightCode.toUpperCase()}`}
@@ -337,7 +337,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                             <span className="text-gray-400">→</span>
                                                         </div>
                                                         <div className="flex flex-col flex-1">
-                                                            <div className="whitespace-nowrap">{formattedTo}</div>
+                                                            <div className="whitespace-normal break-words">{formattedTo}</div>
                                                             {reservation.to.includes('IST') || reservation.to.includes('SAW') ? (
                                                                 <span className="text-xs text-gray-400">
                                                                     {reservation.flightCode && `✈️ ${reservation.flightCode.toUpperCase()}`}
@@ -347,9 +347,9 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-2 py-2 text-sm text-gray-900">
+                                            <td className="px-2 py-2 text-sm text-gray-900 whitespace-normal break-words">
                                                 <div className="flex flex-col">
-                                                    <div className="font-medium whitespace-nowrap">
+                                                    <div className="font-medium whitespace-normal break-words">
                                                         {formattedPassengerNames.join(', ')}
                                                     </div>
                                                     {reservation.phoneNumber && (
@@ -359,7 +359,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="px-2 py-2 text-sm text-gray-900">
                                                 <div className="font-medium">{reservation.price} {reservation.currency}</div>
                                             </td>
                                             <td className="px-2 py-2 text-sm text-gray-900">
@@ -424,18 +424,18 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                 </div>
                                             </td>
                                             <td className="px-2 py-2 text-sm font-medium">
-                                                <div className="flex items-center space-x-1">
+                                                <div className="flex items-center space-x-1 justify-end">
                                                     {!reservation.driver ? (
                                                         <div className="flex space-x-1">
                                                             <button
                                                                 onClick={() => window.location.href = `/reservations/${reservation.voucherNumber}?edit=driver`}
-                                                                className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                                                                className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
                                                             >
                                                                 Şoför Ata
                                                             </button>
                                                             <Link 
                                                                 href={`/reservations/${reservation.voucherNumber}/edit`}
-                                                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-lg font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                                                className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-lg font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                                                 title="Rezervasyonu Düzenle"
                                                             >
                                                                 ✏️
@@ -445,19 +445,19 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                         <div className="flex space-x-1">
                                                             <Link 
                                                                 href={`/reservations/${reservation.voucherNumber}?view=driver`}
-                                                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-lg font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                                                className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-lg font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                                             >
                                                                 👨‍✈️
                                                             </Link>
                                                             <Link 
                                                                 href={`/reservations/${reservation.voucherNumber}?view=customer`}
-                                                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-lg font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                                                className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-lg font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                                             >
                                                                 🎫
                                                             </Link>
                                                             <Link 
                                                                 href={`/reservations/${reservation.voucherNumber}/edit`}
-                                                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-lg font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                                                className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-lg font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                                                 title="Rezervasyonu Düzenle"
                                                             >
                                                                 ✏️
