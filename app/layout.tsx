@@ -18,9 +18,7 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <body className={inter.className}>
-        <div className="print:hidden sticky top-0 z-50">
-          <Header />
-        </div>
+        <Header />
         <main className="w-full pt-16 pb-6 px-4 sm:px-6 lg:px-8 print:p-0">
           {children}
         </main>
