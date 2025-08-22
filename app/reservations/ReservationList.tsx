@@ -204,7 +204,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
     ).length;
 
     return (
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-4 max-w-7xl">
+        <div className="mx-auto py-4 max-w-7xl">
             {/* Transfer Özeti */}
             <div className="bg-white p-4 rounded-lg shadow mb-6">
                 <div className="text-sm text-gray-600">
