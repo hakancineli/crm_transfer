@@ -15,34 +15,8 @@ function parseBasicAuth(header: string | null): { username: string; password: st
 }
 
 export function middleware(req: NextRequest) {
-	const { pathname } = req.nextUrl;
-
-	// Allow framework internals and assets without auth
-	if (
-		pathname.startsWith('/_next') ||
-		pathname.startsWith('/favicon') ||
-		pathname.startsWith('/public')
-	) {
-		return NextResponse.next();
-	}
-
-	const expected = process.env.BASIC_AUTH || '';
-	const [expectedUser, expectedPass] = expected.split(':');
-	if (!expectedUser || !expectedPass) {
-		// If BASIC_AUTH is missing, still require auth to be safe (use a dummy realm)
-		const res = new NextResponse('Authentication required', { status: 401 });
-		res.headers.set('WWW-Authenticate', 'Basic realm="Protected"');
-		return res;
-	}
-
-	const creds = parseBasicAuth(req.headers.get('authorization'));
-	if (creds && creds.username === expectedUser && creds.password === expectedPass) {
-		return NextResponse.next();
-	}
-
-	const res = new NextResponse('Authentication required', { status: 401 });
-	res.headers.set('WWW-Authenticate', 'Basic realm="Protected"');
-	return res;
+	// Geçici olarak Basic Auth'u kapat
+	return NextResponse.next();
 }
 
 export const config = {
