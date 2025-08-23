@@ -298,12 +298,12 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             className={`transition-all duration-200 cursor-pointer ${
                                                 isUrgent ? 'bg-red-50 hover:bg-red-100 border-l-4 border-red-500' : 'hover:bg-gray-50 hover:shadow-sm'
                                             }`}>
-                                            <td className="px-4 py-4 text-sm font-bold text-blue-700">
-                                                <span className="bg-blue-50 px-2 py-1 rounded-md border border-blue-200">
+                                            <td className="px-4 py-4 text-sm font-bold text-blue-700 align-middle">
+                                                <div className="text-blue-700 font-mono text-xs bg-blue-50 px-2 py-1 rounded border border-blue-200 inline-block">
                                                     {reservation.voucherNumber}
-                                                </span>
+                                                </div>
                                             </td>
-                                            <td className="px-4 py-4 text-sm text-gray-900">
+                                            <td className="px-4 py-4 text-sm text-gray-900 align-middle">
                                                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
                                                     reservation.from.includes('IST') || reservation.from.includes('SAW') 
                                                         ? 'bg-blue-100 text-blue-800' 
@@ -319,14 +319,14 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     }
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-4 text-sm text-gray-900">
+                                            <td className="px-4 py-4 text-sm text-gray-900 align-middle">
                                                 {new Date(reservation.date).toLocaleDateString('tr-TR')}
                                                 <div className={`text-xs ${isUrgent ? 'text-red-600 font-medium animate-pulse' : 'text-gray-500'}`}>
                                                     {reservation.time}
                                                     {isUrgent && ' ⚠️'}
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-4 text-sm text-gray-900 whitespace-normal break-words">
+                                            <td className="px-4 py-4 text-sm text-gray-900 whitespace-normal break-words align-top">
                                                 <div className="flex flex-col">
                                                     <div className="flex items-center">
                                                         <div className="flex flex-col flex-1">
@@ -351,7 +351,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-4 text-sm text-gray-900 whitespace-normal break-words">
+                                            <td className="px-4 py-4 text-sm text-gray-900 whitespace-normal break-words align-top">
                                                 <div className="flex flex-col">
                                                     <div className="font-medium whitespace-normal break-words">
                                                         {formattedPassengerNames.join(', ')}
@@ -363,10 +363,10 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-4 text-sm text-gray-900">
+                                            <td className="px-4 py-4 text-sm text-gray-900 align-middle">
                                                 <div className="font-semibold text-green-600">{reservation.price} {reservation.currency}</div>
                                             </td>
-                                            <td className="px-4 py-4 text-sm text-gray-900">
+                                            <td className="px-4 py-4 text-sm text-gray-900 align-middle">
                                                 {reservation.driver ? (
                                                     <div>
                                                         <div className="font-medium">{reservation.driver.name}</div>
@@ -376,14 +376,14 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     <span className="text-gray-400">-</span>
                                                 )}
                                             </td>
-                                            <td className="px-4 py-4 text-sm">
+                                            <td className="px-4 py-4 text-sm align-middle">
                                                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
                                                     reservation.driver ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-yellow-100 text-yellow-800 border border-yellow-200'
                                                 }`}>
                                                     {reservation.driver ? 'Atandı' : 'Bekliyor'}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-4 text-sm">
+                                            <td className="px-4 py-4 text-sm align-middle">
                                                 <div className="flex items-center gap-2">
                                                     <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
                                                         reservation.paymentStatus === 'PAID' ? 'bg-green-100 text-green-800 border border-green-200' :
@@ -427,7 +427,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-4 text-sm font-medium">
+                                            <td className="px-4 py-4 text-sm font-medium align-middle">
                                                 <div className="flex items-center space-x-2 justify-end">
                                                     {!reservation.driver ? (
                                                         <div className="flex space-x-1">
