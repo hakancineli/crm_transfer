@@ -28,11 +28,11 @@ export function SearchAndFilter({ onSearch, onFilter }: SearchAndFilterProps) {
     };
 
     const getButtonClass = (filter: string) => {
-        const baseClass = "inline-flex items-center px-3 py-1.5 border shadow-sm text-sm font-medium rounded-full transition-colors duration-150";
+        const baseClass = "inline-flex items-center px-4 py-2 border shadow-sm text-sm font-semibold rounded-lg transition-all duration-200";
         return `${baseClass} ${
             activeFilter === filter
-                ? 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200'
-                : 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50'
+                ? 'bg-green-600 text-white border-green-600 hover:bg-green-700 shadow-md'
+                : 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50 hover:border-gray-400'
         }`;
     };
 

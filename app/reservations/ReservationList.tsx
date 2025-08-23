@@ -212,14 +212,14 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                 <div className="text-sm text-gray-600">
                     <span className="font-medium">Toplam {filteredReservations.length} Transfer</span>
                     {filteredReservations.length > 0 && (
-                        <div className="mt-1 flex flex-wrap gap-2">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <div className="mt-2 flex flex-wrap gap-3">
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800 border border-blue-200">
                                 {karsilamaCount} Karşılama
                             </span>
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-orange-100 text-orange-800 border border-orange-200">
                                 {cikisCount} Çıkış
                             </span>
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-800 border border-gray-200">
                                 {araTransferCount} Ara Transfer
                             </span>
                         </div>
@@ -298,8 +298,10 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             className={`transition-all duration-200 cursor-pointer ${
                                                 isUrgent ? 'bg-red-50 hover:bg-red-100 border-l-4 border-red-500' : 'hover:bg-gray-50 hover:shadow-sm'
                                             }`}>
-                                            <td className="px-4 py-4 text-sm font-semibold text-blue-600">
-                                                {reservation.voucherNumber}
+                                            <td className="px-4 py-4 text-sm font-bold text-blue-700">
+                                                <span className="bg-blue-50 px-2 py-1 rounded-md border border-blue-200">
+                                                    {reservation.voucherNumber}
+                                                </span>
                                             </td>
                                             <td className="px-4 py-4 text-sm text-gray-900">
                                                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
@@ -447,19 +449,21 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                         <div className="flex space-x-1">
                                                             <Link 
                                                                 href={`/reservations/${reservation.voucherNumber}?view=driver`}
-                                                                className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-lg font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
+                                                                title="Şoför Voucherı"
                                                             >
                                                                 👨‍✈️
                                                             </Link>
                                                             <Link 
                                                                 href={`/reservations/${reservation.voucherNumber}?view=customer`}
-                                                                className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-lg font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
+                                                                title="Müşteri Voucherı"
                                                             >
                                                                 🎫
                                                             </Link>
                                                             <Link 
                                                                 href={`/reservations/${reservation.voucherNumber}/edit`}
-                                                                className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-lg font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
                                                                 title="Rezervasyonu Düzenle"
                                                             >
                                                                 ✏️
