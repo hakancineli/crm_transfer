@@ -233,44 +233,44 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             </div>
 
             {/* Desktop Tablo */}
-            <div className="hidden lg:block bg-white shadow-sm rounded-lg border border-gray-200 overflow-visible">
+            <div className="hidden lg:block bg-white shadow-lg rounded-xl border border-gray-200 overflow-hidden">
                 <div>
                     <table className="w-full table-fixed">
                         <thead>
-                            <tr className="bg-gray-50">
-                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-28">
+                            <tr className="bg-gradient-to-r from-gray-50 to-gray-100">
+                                <th scope="col" className="px-4 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-28">
                                     Voucher
                                 </th>
-                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">
+                                <th scope="col" className="px-4 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-20">
                                     Tip
                                 </th>
-                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-28">
+                                <th scope="col" className="px-4 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-28">
                                     Tarih
                                 </th>
-                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-4 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Güzergah
                                 </th>
-                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-4 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Müşteri
                                 </th>
-                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
+                                <th scope="col" className="px-4 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-24">
                                     Fiyat
                                 </th>
-                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-36">
+                                <th scope="col" className="px-4 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-36">
                                     Şoför
                                 </th>
-                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-28">
+                                <th scope="col" className="px-4 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-28">
                                     Durum
                                 </th>
-                                <th scope="col" className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+                                <th scope="col" className="px-4 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-32">
                                     Ödeme
                                 </th>
-                                <th scope="col" className="px-2 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-44">
+                                <th scope="col" className="px-4 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider w-44">
                                     İşlem
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-white divide-y divide-gray-100">
                             {filteredReservations.length === 0 ? (
                                 <tr>
                                     <td colSpan={10} className="px-3 py-4 text-center text-gray-500">
@@ -295,14 +295,14 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     window.location.href = `/reservations/${reservation.voucherNumber}`;
                                                 }
                                             }}
-                                            className={`transition-colors duration-150 cursor-pointer ${
-                                                isUrgent ? 'bg-red-50 hover:bg-red-100' : 'hover:bg-gray-50'
+                                            className={`transition-all duration-200 cursor-pointer ${
+                                                isUrgent ? 'bg-red-50 hover:bg-red-100 border-l-4 border-red-500' : 'hover:bg-gray-50 hover:shadow-sm'
                                             }`}>
-                                            <td className="px-2 py-2 text-sm font-medium text-blue-600">
+                                            <td className="px-4 py-4 text-sm font-semibold text-blue-600">
                                                 {reservation.voucherNumber}
                                             </td>
-                                            <td className="px-2 py-2 text-sm text-gray-900">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                            <td className="px-4 py-4 text-sm text-gray-900">
+                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
                                                     reservation.from.includes('IST') || reservation.from.includes('SAW') 
                                                         ? 'bg-blue-100 text-blue-800' 
                                                         : reservation.to.includes('IST') || reservation.to.includes('SAW')
@@ -317,14 +317,14 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     }
                                                 </span>
                                             </td>
-                                            <td className="px-2 py-2 text-sm text-gray-900">
+                                            <td className="px-4 py-4 text-sm text-gray-900">
                                                 {new Date(reservation.date).toLocaleDateString('tr-TR')}
                                                 <div className={`text-xs ${isUrgent ? 'text-red-600 font-medium animate-pulse' : 'text-gray-500'}`}>
                                                     {reservation.time}
                                                     {isUrgent && ' ⚠️'}
                                                 </div>
                                             </td>
-                                            <td className="px-2 py-2 text-sm text-gray-900 whitespace-normal break-words">
+                                            <td className="px-4 py-4 text-sm text-gray-900 whitespace-normal break-words">
                                                 <div className="flex flex-col">
                                                     <div className="flex items-center">
                                                         <div className="flex flex-col flex-1">
@@ -349,7 +349,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-2 py-2 text-sm text-gray-900 whitespace-normal break-words">
+                                            <td className="px-4 py-4 text-sm text-gray-900 whitespace-normal break-words">
                                                 <div className="flex flex-col">
                                                     <div className="font-medium whitespace-normal break-words">
                                                         {formattedPassengerNames.join(', ')}
@@ -361,10 +361,10 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-2 py-2 text-sm text-gray-900">
-                                                <div className="font-medium">{reservation.price} {reservation.currency}</div>
+                                            <td className="px-4 py-4 text-sm text-gray-900">
+                                                <div className="font-semibold text-green-600">{reservation.price} {reservation.currency}</div>
                                             </td>
-                                            <td className="px-2 py-2 text-sm text-gray-900">
+                                            <td className="px-4 py-4 text-sm text-gray-900">
                                                 {reservation.driver ? (
                                                     <div>
                                                         <div className="font-medium">{reservation.driver.name}</div>
@@ -374,19 +374,19 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     <span className="text-gray-400">-</span>
                                                 )}
                                             </td>
-                                            <td className="px-2 py-2 text-sm">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                                    reservation.driver ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                            <td className="px-4 py-4 text-sm">
+                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+                                                    reservation.driver ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-yellow-100 text-yellow-800 border border-yellow-200'
                                                 }`}>
                                                     {reservation.driver ? 'Atandı' : 'Bekliyor'}
                                                 </span>
                                             </td>
-                                            <td className="px-2 py-2 text-sm">
+                                            <td className="px-4 py-4 text-sm">
                                                 <div className="flex items-center gap-2">
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                                        reservation.paymentStatus === 'PAID' ? 'bg-green-100 text-green-800' :
-                                                        reservation.paymentStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                                                        'bg-red-100 text-red-800'
+                                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+                                                        reservation.paymentStatus === 'PAID' ? 'bg-green-100 text-green-800 border border-green-200' :
+                                                        reservation.paymentStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' :
+                                                        'bg-red-100 text-red-800 border border-red-200'
                                                     }` }>
                                                         {reservation.paymentStatus === 'PAID' ? 'Ödendi' :
                                                          reservation.paymentStatus === 'PENDING' ? 'Bekliyor' : 'Ödenmedi'}
@@ -425,13 +425,13 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-2 py-2 text-sm font-medium">
-                                                <div className="flex items-center space-x-1 justify-end">
+                                            <td className="px-4 py-4 text-sm font-medium">
+                                                <div className="flex items-center space-x-2 justify-end">
                                                     {!reservation.driver ? (
                                                         <div className="flex space-x-1">
                                                             <button
                                                                 onClick={() => window.location.href = `/reservations/${reservation.voucherNumber}?edit=driver`}
-                                                                className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                                                                className="inline-flex items-center px-3 py-2 border border-transparent text-xs font-semibold rounded-lg text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 shadow-sm transition-colors"
                                                             >
                                                                 Şoför Ata
                                                             </button>
