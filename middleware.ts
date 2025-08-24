@@ -26,6 +26,18 @@ export function middleware(req: NextRequest) {
 		return NextResponse.next();
 	}
 
+	// Müşteri sayfalarına şifresiz erişim
+	const customerPaths = [
+		'/customer-reservation',
+		'/customer-panel',
+		'/customer-reservation/thank-you'
+	];
+
+	if (customerPaths.some(path => pathname.startsWith(path))) {
+		return NextResponse.next();
+	}
+
+	// Admin sayfaları için Basic Auth gerekli
 	const expected = process.env.BASIC_AUTH || '';
 	const [expectedUser, expectedPass] = expected.split(':');
 	if (!expectedUser || !expectedPass) {
