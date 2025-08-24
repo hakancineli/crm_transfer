@@ -171,7 +171,12 @@ export default function CustomerReservationPage() {
                                     value={formData.date}
                                     onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
                                     min={today}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
+                                    style={{
+                                        WebkitAppearance: 'none',
+                                        MozAppearance: 'none',
+                                        appearance: 'none'
+                                    }}
                                 />
                             </div>
                             <div>
@@ -183,7 +188,12 @@ export default function CustomerReservationPage() {
                                     required
                                     value={formData.time}
                                     onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
+                                    style={{
+                                        WebkitAppearance: 'none',
+                                        MozAppearance: 'none',
+                                        appearance: 'none'
+                                    }}
                                 />
                             </div>
                         </div>
@@ -235,7 +245,7 @@ export default function CustomerReservationPage() {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Nereye *
+                                    {t('customerForm.to')}
                                 </label>
                                 <div className="space-y-2">
                                     <select
