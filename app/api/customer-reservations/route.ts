@@ -31,9 +31,6 @@ export async function GET(request: NextRequest) {
                 luggageCount: true,
                 passengerNames: true,
                 phoneNumber: true,
-                email: true,
-                specialRequests: true,
-                status: true,
                 isReturn: true,
                 returnTransfer: {
                     select: {
