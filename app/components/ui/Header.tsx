@@ -24,7 +24,9 @@ export default function Header() {
                 <div className="flex justify-between h-16">
                     <div className="flex">
                         <div className="flex-shrink-0 flex items-center">
-                            <Link href="/" className="text-xl font-bold text-green-600">{t('header.title')}</Link>
+                            <Link href="/" className="text-xl font-bold text-green-600">
+                                {t('header.title')}
+                            </Link>
                         </div>
                         <div className="hidden md:ml-6 md:flex md:space-x-8">
                             {navigation.map((item) => (
@@ -44,7 +46,6 @@ export default function Header() {
                         </div>
                     </div>
                     
-                    {/* Dil seçici ve mobil menü butonu */}
                     <div className="flex items-center space-x-4">
                         <LanguageSelector />
                         <div className="md:hidden flex items-center">
@@ -64,9 +65,9 @@ export default function Header() {
                                 )}
                             </button>
                         </div>
+                    </div>
                 </div>
 
-                {/* Mobil menü */}
                 {mobileMenuOpen && (
                     <div className="md:hidden">
                         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
