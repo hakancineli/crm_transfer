@@ -4,15 +4,18 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
+import LanguageSelector from '../LanguageSelector';
 
 export default function Header() {
     const pathname = usePathname();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const { t } = useLanguage();
 
     const navigation = [
-        { name: 'Yeni Rezervasyon', href: '/' },
-        { name: 'Tüm Rezervasyonlar', href: '/reservations' },
-        { name: 'Raporlar', href: '/reports' },
+        { name: t('header.newReservation'), href: '/' },
+        { name: t('header.allReservations'), href: '/reservations' },
+        { name: t('header.reports'), href: '/reports' },
     ];
 
     return (
@@ -21,7 +24,7 @@ export default function Header() {
                 <div className="flex justify-between h-16">
                     <div className="flex">
                         <div className="flex-shrink-0 flex items-center">
-                            <Link href="/" className="text-xl font-bold text-green-600">ProTransfer</Link>
+                            <Link href="/" className="text-xl font-bold text-green-600">{t('header.title')}</Link>
                         </div>
                         <div className="hidden md:ml-6 md:flex md:space-x-8">
                             {navigation.map((item) => (
@@ -41,8 +44,10 @@ export default function Header() {
                         </div>
                     </div>
                     
-                    {/* Mobil menü butonu */}
-                    <div className="md:hidden flex items-center">
+                    {/* Dil seçici ve mobil menü butonu */}
+                    <div className="flex items-center space-x-4">
+                        <LanguageSelector />
+                        <div className="md:hidden flex items-center">
                         <button
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                             className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500"

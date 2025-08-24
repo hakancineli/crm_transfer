@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "./components/ui/Header";
+import { LanguageProvider } from "./contexts/LanguageContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,12 +17,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="tr">
+    <html lang="en">
       <body className={inter.className}>
-        <Header />
-        <main className="w-full pt-16 pb-6 px-4 sm:px-6 lg:px-8 print:p-0">
-          {children}
-        </main>
+        <LanguageProvider>
+          <Header />
+          <main className="w-full pt-16 pb-6 px-4 sm:px-6 lg:px-8 print:p-0">
+            {children}
+          </main>
+        </LanguageProvider>
       </body>
     </html>
   );

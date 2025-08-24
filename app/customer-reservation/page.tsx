@@ -4,9 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Airport, AIRPORTS, Currency, CURRENCIES } from '../types';
 import { HOTELS } from '@/app/types';
+import { useLanguage } from '../contexts/LanguageContext';
+import LanguageSelector from '../components/LanguageSelector';
 
 export default function CustomerReservationPage() {
     const router = useRouter();
+    const { t } = useLanguage();
 
     // Bugünün tarihini YYYY-MM-DD formatında al
     const today = new Date().toISOString().split('T')[0];
@@ -145,9 +148,12 @@ export default function CustomerReservationPage() {
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold text-gray-800 mb-2">ProTransfer</h1>
-                    <p className="text-xl text-gray-600">Rezervasyon Talebi</p>
-                    <p className="text-gray-500 mt-2">Transfer talebinizi doldurun, size en uygun fiyatı sunalım</p>
+                    <div className="flex justify-end mb-4">
+                        <LanguageSelector />
+                    </div>
+                    <h1 className="text-4xl font-bold text-gray-800 mb-2">{t('customerForm.title')}</h1>
+                    <p className="text-xl text-gray-600">{t('customerForm.subtitle')}</p>
+                    <p className="text-gray-500 mt-2">{t('customerForm.description')}</p>
                 </div>
 
                 {/* Form */}
