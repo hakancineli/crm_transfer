@@ -260,11 +260,11 @@ export default function CustomerPanelPage() {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="text-sm text-gray-900">
                                                     <div className="font-medium">
-                                                        {formatLocation(reservation.from, AIRPORTS, HOTELS)}
+                                                        {formatLocation(reservation.from)}
                                                     </div>
                                                     <div className="text-gray-500">→</div>
                                                     <div className="font-medium">
-                                                        {formatLocation(reservation.to, AIRPORTS, HOTELS)}
+                                                        {formatLocation(reservation.to)}
                                                     </div>
                                                 </div>
                                             </td>
