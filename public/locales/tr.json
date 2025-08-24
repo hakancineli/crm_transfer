@@ -19,6 +19,7 @@
   "header": {
     "title": "ProTransfer",
     "newReservation": "Yeni Rezervasyon",
+    "customerPanel": "Rezervasyonlarım",
     "allReservations": "Tüm Rezervasyonlar",
     "reports": "Raporlar"
   },
@@ -107,5 +108,21 @@
       "driverWaiting": "Şoför Bekleniyor",
       "all": "Tümü"
     }
+  },
+  "customerPanel": {
+    "title": "Rezervasyonlarım",
+    "subtitle": "Transfer rezervasyonlarınızı görüntüleyin ve takip edin",
+    "searchByPhone": "Telefon Numarası ile Ara",
+    "phonePlaceholder": "Telefon numaranızı girin",
+    "search": "Ara",
+    "searching": "Aranıyor...",
+    "loading": "Yükleniyor...",
+    "noReservations": "Rezervasyon bulunamadı",
+    "voucher": "VOUCHER",
+    "date": "TARİH",
+    "time": "SAAT",
+    "route": "GÜZERGAH",
+    "passengers": "YOLCULAR",
+    "status": "DURUM"
   }
 }

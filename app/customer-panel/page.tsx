@@ -1,0 +1,298 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
+import LanguageSelector from '../components/LanguageSelector';
+import { SearchAndFilter } from '@/app/components/ui/SearchAndFilter';
+import { AIRPORTS, HOTELS, TRANSFER_TYPES } from '@/app/types';
+import { formatLocation, formatPassengerName, formatHotelName } from '@/app/utils/textFormatters';
+
+interface CustomerReservation {
+    id: string;
+    voucherNumber: string;
+    date: string;
+    time: string;
+    from: string;
+    to: string;
+    flightCode?: string;
+    luggageCount?: number;
+    passengerNames: string[];
+    phoneNumber?: string;
+    email?: string;
+    specialRequests?: string;
+    status: string;
+    isReturn: boolean;
+    returnTransfer?: {
+        voucherNumber: string;
+        date: string;
+        time: string;
+    } | null;
+    originalTransfer?: {
+        voucherNumber: string;
+        date: string;
+        time: string;
+    } | null;
+}
+
+export default function CustomerPanelPage() {
+    const { t } = useLanguage();
+    const [reservations, setReservations] = useState<CustomerReservation[]>([]);
+    const [filteredReservations, setFilteredReservations] = useState<CustomerReservation[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [isSearching, setIsSearching] = useState(false);
+
+    const handleSearch = (query: string) => {
+        if (!query.trim()) {
+            setFilteredReservations(reservations);
+            return;
+        }
+
+        const lowercaseQuery = query.toLowerCase();
+        
+        // Tarih formatını kontrol et (YYYY-MM-DD)
+        const isDateSearch = /^\d{4}-\d{2}-\d{2}$/.test(query);
+        
+        const filtered = reservations.filter(reservation => {
+            if (isDateSearch) {
+                return reservation.date === query;
+            }
+
+            // Yolcu isimlerini kontrol et
+            let passengerNames: string[] = [];
+            try {
+                passengerNames = typeof reservation.passengerNames === 'string' 
+                    ? JSON.parse(reservation.passengerNames)
+                    : reservation.passengerNames;
+            } catch (e) {
+                passengerNames = Array.isArray(reservation.passengerNames) 
+                    ? reservation.passengerNames 
+                    : [];
+            }
+
+            return (
+                reservation.voucherNumber.toLowerCase().includes(lowercaseQuery) ||
+                reservation.from.toLowerCase().includes(lowercaseQuery) ||
+                reservation.to.toLowerCase().includes(lowercaseQuery) ||
+                passengerNames.some(name => name.toLowerCase().includes(lowercaseQuery)) ||
+                (reservation.flightCode && reservation.flightCode.toLowerCase().includes(lowercaseQuery))
+            );
+        });
+
+        setFilteredReservations(filtered);
+    };
+
+    const handleFilterChange = (filter: string) => {
+        let filtered: CustomerReservation[] = [];
+        
+        switch (filter) {
+            case 'today':
+                const today = new Date().toISOString().split('T')[0];
+                filtered = reservations.filter(r => r.date === today);
+                break;
+            case 'tomorrow':
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const tomorrowStr = tomorrow.toISOString().split('T')[0];
+                filtered = reservations.filter(r => r.date === tomorrowStr);
+                break;
+            case 'thisWeek':
+                const now = new Date();
+                const weekFromNow = new Date();
+                weekFromNow.setDate(now.getDate() + 7);
+                filtered = reservations.filter(r => {
+                    const reservationDate = new Date(r.date);
+                    return reservationDate >= now && reservationDate <= weekFromNow;
+                });
+                break;
+            default:
+                filtered = reservations;
+                break;
+        }
+        
+        setFilteredReservations(filtered);
+    };
+
+    const searchByPhone = async () => {
+        if (!phoneNumber.trim()) return;
+        
+        setIsSearching(true);
+        try {
+            const response = await fetch(`/api/customer-reservations?phone=${encodeURIComponent(phoneNumber)}`);
+            const data = await response.json();
+            
+            if (Array.isArray(data)) {
+                setReservations(data);
+                setFilteredReservations(data);
+            } else {
+                setReservations([]);
+                setFilteredReservations([]);
+            }
+        } catch (error) {
+            console.error('Telefon ile arama hatası:', error);
+            setReservations([]);
+            setFilteredReservations([]);
+        } finally {
+            setIsSearching(false);
+        }
+    };
+
+    const formatDate = (dateStr: string) => {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('tr-TR');
+    };
+
+    const formatTime = (timeStr: string) => {
+        return timeStr;
+    };
+
+    const getStatusColor = (status: string) => {
+        switch (status?.toLowerCase()) {
+            case 'completed':
+                return 'bg-green-100 text-green-800';
+            case 'cancelled':
+                return 'bg-red-100 text-red-800';
+            case 'pending':
+                return 'bg-yellow-100 text-yellow-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    const getStatusText = (status: string) => {
+        switch (status?.toLowerCase()) {
+            case 'completed':
+                return 'Tamamlandı';
+            case 'cancelled':
+                return 'İptal Edildi';
+            case 'pending':
+                return 'Bekliyor';
+            default:
+                return 'Bilinmiyor';
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-50 py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Header */}
+                <div className="text-center mb-8">
+                    <div className="flex justify-end mb-4">
+                        <LanguageSelector />
+                    </div>
+                    <h1 className="text-4xl font-bold text-gray-800 mb-2">{t('customerPanel.title')}</h1>
+                    <p className="text-xl text-gray-600">{t('customerPanel.subtitle')}</p>
+                </div>
+
+                {/* Telefon ile Arama */}
+                <div className="bg-white rounded-lg shadow p-6 mb-6">
+                    <h2 className="text-lg font-semibold text-gray-800 mb-4">{t('customerPanel.searchByPhone')}</h2>
+                    <div className="flex gap-4">
+                        <input
+                            type="tel"
+                            placeholder={t('customerPanel.phonePlaceholder')}
+                            value={phoneNumber}
+                            onChange={(e) => setPhoneNumber(e.target.value)}
+                            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        <button
+                            onClick={searchByPhone}
+                            disabled={isSearching || !phoneNumber.trim()}
+                            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                            {isSearching ? t('customerPanel.searching') : t('customerPanel.search')}
+                        </button>
+                    </div>
+                </div>
+
+                {/* Filtreler */}
+                <div className="mb-6">
+                    <SearchAndFilter onSearch={handleSearch} onFilterChange={handleFilterChange} />
+                </div>
+
+                {/* Rezervasyon Listesi */}
+                <div className="bg-white rounded-lg shadow overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {t('customerPanel.voucher')}
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {t('customerPanel.date')}
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {t('customerPanel.time')}
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {t('customerPanel.route')}
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {t('customerPanel.passengers')}
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {t('customerPanel.status')}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {filteredReservations.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                                            {isLoading ? t('customerPanel.loading') : t('customerPanel.noReservations')}
+                                        </td>
+                                    </td>
+                                ) : (
+                                    filteredReservations.map((reservation) => (
+                                        <tr key={reservation.id} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className="text-sm font-medium text-gray-900">
+                                                    {reservation.voucherNumber}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {formatDate(reservation.date)}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {formatTime(reservation.time)}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">
+                                                    <div className="font-medium">
+                                                        {formatLocation(reservation.from, AIRPORTS, HOTELS)}
+                                                    </div>
+                                                    <div className="text-gray-500">→</div>
+                                                    <div className="font-medium">
+                                                        {formatLocation(reservation.to, AIRPORTS, HOTELS)}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">
+                                                    {Array.isArray(reservation.passengerNames) 
+                                                        ? reservation.passengerNames.map((name, index) => (
+                                                            <div key={index} className="mb-1">
+                                                                {formatPassengerName(name)}
+                                                            </div>
+                                                        ))
+                                                        : formatPassengerName(reservation.passengerNames as string)
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(reservation.status)}`}>
+                                                    {getStatusText(reservation.status)}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}

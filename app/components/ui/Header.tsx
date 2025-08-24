@@ -14,6 +14,7 @@ export default function Header() {
 
     const navigation = [
         { name: t('header.newReservation'), href: '/' },
+        { name: t('header.customerPanel'), href: '/customer-panel' },
         { name: t('header.allReservations'), href: '/reservations' },
         { name: t('header.reports'), href: '/reports' },
     ];

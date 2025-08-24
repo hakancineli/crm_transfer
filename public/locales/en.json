@@ -19,6 +19,7 @@
   "header": {
     "title": "ProTransfer",
     "newReservation": "New Reservation",
+    "customerPanel": "My Reservations",
     "allReservations": "All Reservations",
     "reports": "Reports"
   },
@@ -107,5 +108,21 @@
       "driverWaiting": "Driver Waiting",
       "all": "All"
     }
+  },
+  "customerPanel": {
+    "title": "My Reservations",
+    "subtitle": "View and track your transfer reservations",
+    "searchByPhone": "Search by Phone Number",
+    "phonePlaceholder": "Enter your phone number",
+    "search": "Search",
+    "searching": "Searching...",
+    "loading": "Loading...",
+    "noReservations": "No reservations found",
+    "voucher": "VOUCHER",
+    "date": "DATE",
+    "time": "TIME",
+    "route": "ROUTE",
+    "passengers": "PASSENGERS",
+    "status": "STATUS"
   }
 }

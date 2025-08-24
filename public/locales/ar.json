@@ -19,6 +19,7 @@
   "header": {
     "title": "برو ترانسفير",
     "newReservation": "حجز جديد",
+    "customerPanel": "حجوزاتي",
     "allReservations": "جميع الحجوزات",
     "reports": "التقارير"
   },
@@ -107,5 +108,21 @@
       "driverWaiting": "في انتظار السائق",
       "all": "الكل"
     }
+  },
+  "customerPanel": {
+    "title": "حجوزاتي",
+    "subtitle": "عرض وتتبع حجوزات النقل الخاصة بك",
+    "searchByPhone": "البحث برقم الهاتف",
+    "phonePlaceholder": "أدخل رقم هاتفك",
+    "search": "بحث",
+    "searching": "جاري البحث...",
+    "loading": "جاري التحميل...",
+    "noReservations": "لم يتم العثور على حجوزات",
+    "voucher": "رقم القسيمة",
+    "date": "التاريخ",
+    "time": "الوقت",
+    "route": "المسار",
+    "passengers": "المسافرون",
+    "status": "الحالة"
   }
 }
