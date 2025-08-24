@@ -251,7 +251,7 @@ export default function CustomerReservationPage() {
                                         }}
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
-                                        <option value="custom">Özel Konum</option>
+                                        <option value="custom">{t('customerForm.customLocation')}</option>
                                         <optgroup label="Havalimanları">
                                             {Object.entries(AIRPORTS).map(([key, value]) => (
                                                 <option key={key} value={key}>{value}</option>
@@ -264,14 +264,14 @@ export default function CustomerReservationPage() {
                                         </optgroup>
                                     </select>
                                     {customTo && (
-                                        <input
-                                            type="text"
-                                            placeholder="Adres veya konum girin"
-                                            value={formData.to}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, to: e.target.value }))}
-                                            required
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        />
+                                                                            <input
+                                        type="text"
+                                        placeholder={t('customerForm.addressPlaceholder')}
+                                        value={formData.to}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, to: e.target.value }))}
+                                        required
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
                                     )}
                                 </div>
                             </div>
@@ -280,11 +280,11 @@ export default function CustomerReservationPage() {
                         {/* Uçuş Bilgisi */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Uçuş Kodu (Opsiyonel)
+                                {t('customerForm.flightCode')}
                             </label>
                             <input
                                 type="text"
-                                placeholder="TK1234"
+                                placeholder={t('customerForm.flightCodePlaceholder')}
                                 value={formData.flightCode}
                                 onChange={(e) => setFormData(prev => ({ ...prev, flightCode: e.target.value }))}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -294,13 +294,13 @@ export default function CustomerReservationPage() {
                         {/* Yolcu Bilgileri */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Yolcu Adları *
+                                {t('customerForm.passengers')}
                             </label>
                             {formData.passengerNames.map((name, index) => (
                                 <div key={index} className="flex gap-2 mb-2">
                                     <input
                                         type="text"
-                                        placeholder={`Yolcu ${index + 1} adı`}
+                                        placeholder={t('customerForm.passengerPlaceholder').replace('{number}', String(index + 1))}
                                         value={name}
                                         onChange={(e) => updatePassengerName(index, e.target.value)}
                                         required
@@ -322,14 +322,14 @@ export default function CustomerReservationPage() {
                                 onClick={addPassenger}
                                 className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                             >
-                                + Yolcu Ekle
+                                {t('customerForm.addPassenger')}
                             </button>
                         </div>
 
                         {/* Bagaj */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Bagaj Sayısı
+                                {t('customerForm.luggage')}
                             </label>
                             <input
                                 type="number"
@@ -344,11 +344,11 @@ export default function CustomerReservationPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Telefon Numarası *
+                                    {t('customerForm.phone')}
                                 </label>
                                 <input
                                     type="tel"
-                                    placeholder="+90 5XX XXX XX XX"
+                                    placeholder={t('customerForm.phonePlaceholder')}
                                     value={formData.phoneNumber}
                                     onChange={(e) => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
                                     required
@@ -357,11 +357,11 @@ export default function CustomerReservationPage() {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    E-posta (Opsiyonel)
+                                    {t('customerForm.email')}
                                 </label>
                                 <input
                                     type="email"
-                                    placeholder="ornek@email.com"
+                                    placeholder={t('customerForm.emailPlaceholder')}
                                     value={formData.email}
                                     onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -372,10 +372,10 @@ export default function CustomerReservationPage() {
                         {/* Özel Talepler */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Özel Talepler (Opsiyonel)
+                                {t('customerForm.specialRequests')}
                             </label>
                             <textarea
-                                placeholder="Özel isteklerinizi buraya yazabilirsiniz..."
+                                placeholder={t('customerForm.specialRequestsPlaceholder')}
                                 value={formData.specialRequests}
                                 onChange={(e) => setFormData(prev => ({ ...prev, specialRequests: e.target.value }))}
                                 rows={3}
@@ -397,14 +397,14 @@ export default function CustomerReservationPage() {
                                 disabled={loading}
                                 className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {loading ? 'Gönderiliyor...' : 'Rezervasyon Talebi Gönder'}
+                                {loading ? t('customerForm.sending') : t('customerForm.submitButton')}
                             </button>
                         </div>
 
                         {/* Bilgi Notu */}
                         <div className="text-center text-sm text-gray-500 bg-gray-50 p-4 rounded-lg">
-                            <p>✅ Rezervasyon talebiniz alındıktan sonra size en uygun fiyatla dönüş yapacağız</p>
-                            <p>📞 Telefon numaranızı doğru girdiğinizden emin olun</p>
+                            <p>{t('customerForm.infoNote1')}</p>
+                            <p>{t('customerForm.infoNote2')}</p>
                         </div>
                     </form>
                 </div>
