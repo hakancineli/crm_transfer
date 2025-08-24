@@ -242,7 +242,7 @@ export default function CustomerPanelPage() {
                                         <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
                                             {isLoading ? t('customerPanel.loading') : t('customerPanel.noReservations')}
                                         </td>
-                                    </td>
+                                    </tr>
                                 ) : (
                                     filteredReservations.map((reservation) => (
                                         <tr key={reservation.id} className="hover:bg-gray-50">
