@@ -307,10 +307,10 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                 <div className="flex flex-col gap-2">
                                                     <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
                                                         reservation.from.includes('IST') || reservation.from.includes('SAW') 
-                                                            ? 'bg-blue-100 text-blue-800' 
+                                                            ? 'bg-green-100 text-green-800 border border-green-200' 
                                                             : reservation.to.includes('IST') || reservation.to.includes('SAW')
-                                                                ? 'bg-orange-100 text-orange-800'
-                                                                : 'bg-gray-100 text-gray-800'
+                                                                ? 'bg-orange-100 text-orange-800 border border-orange-200'
+                                                                : 'bg-gray-100 text-gray-800 border border-gray-200'
                                                     }`}>
                                                         {reservation.from.includes('IST') || reservation.from.includes('SAW') 
                                                             ? 'Karşılama'
