@@ -163,7 +163,7 @@ export default function CustomerReservationPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Transfer Tarihi *
+                                    {t('customerForm.date')}
                                 </label>
                                 <input
                                     type="date"
@@ -176,7 +176,7 @@ export default function CustomerReservationPage() {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Transfer Saati *
+                                    {t('customerForm.time')}
                                 </label>
                                 <input
                                     type="time"
@@ -192,7 +192,7 @@ export default function CustomerReservationPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Nereden *
+                                    {t('customerForm.from')}
                                 </label>
                                 <div className="space-y-2">
                                     <select
@@ -208,7 +208,7 @@ export default function CustomerReservationPage() {
                                         }}
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
-                                        <option value="custom">Özel Konum</option>
+                                        <option value="custom">{t('customerForm.customLocation')}</option>
                                         <optgroup label="Havalimanları">
                                             {Object.entries(AIRPORTS).map(([key, value]) => (
                                                 <option key={key} value={key}>{value}</option>
@@ -223,7 +223,7 @@ export default function CustomerReservationPage() {
                                     {customFrom && (
                                         <input
                                             type="text"
-                                            placeholder="Adres veya konum girin"
+                                            placeholder={t('customerForm.addressPlaceholder')}
                                             value={formData.from}
                                             onChange={(e) => setFormData(prev => ({ ...prev, from: e.target.value }))}
                                             required
