@@ -298,8 +298,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             className={`transition-all duration-200 cursor-pointer ${
                                                 isUrgent ? 'bg-red-50 hover:bg-red-100 border-l-4 border-red-500' : 'hover:bg-gray-50 hover:shadow-sm'
                                             }`}>
-                                            <td className="px-6 py-4 text-sm font-bold text-blue-700 align-middle">
-                                                <div className="text-blue-700 font-mono text-xs bg-blue-50 px-2 py-1 rounded border border-blue-200 inline-block">
+                                            <td className="px-6 py-4 text-sm font-bold text-purple-700 align-middle">
+                                                <div className="text-purple-700 font-mono text-xs bg-purple-50 px-2 py-1 rounded border border-purple-200 inline-block">
                                                     {reservation.voucherNumber}
                                                 </div>
                                             </td>
