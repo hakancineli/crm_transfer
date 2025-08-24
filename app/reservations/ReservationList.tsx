@@ -304,20 +304,22 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-900 align-middle">
-                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                                                    reservation.from.includes('IST') || reservation.from.includes('SAW') 
-                                                        ? 'bg-blue-100 text-blue-800' 
-                                                        : reservation.to.includes('IST') || reservation.to.includes('SAW')
-                                                            ? 'bg-orange-100 text-orange-800'
-                                                            : 'bg-gray-100 text-gray-800'
-                                                }`}>
-                                                    {reservation.from.includes('IST') || reservation.from.includes('SAW') 
-                                                        ? 'Karşılama'
-                                                        : reservation.to.includes('IST') || reservation.to.includes('SAW')
-                                                            ? 'Çıkış'
-                                                            : 'Ara Transfer'
-                                                    }
-                                                </span>
+                                                <div className="flex flex-col gap-2">
+                                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+                                                        reservation.from.includes('IST') || reservation.from.includes('SAW') 
+                                                            ? 'bg-blue-100 text-blue-800' 
+                                                            : reservation.to.includes('IST') || reservation.to.includes('SAW')
+                                                                ? 'bg-orange-100 text-orange-800'
+                                                                : 'bg-gray-100 text-gray-800'
+                                                    }`}>
+                                                        {reservation.from.includes('IST') || reservation.from.includes('SAW') 
+                                                            ? 'Karşılama'
+                                                            : reservation.to.includes('IST') || reservation.to.includes('SAW')
+                                                                ? 'Çıkış'
+                                                                : 'Ara Transfer'
+                                                        }
+                                                    </span>
+                                                </div>
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-900 align-middle">
                                                 {new Date(reservation.date).toLocaleDateString('tr-TR')}
