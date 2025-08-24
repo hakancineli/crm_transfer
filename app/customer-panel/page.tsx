@@ -207,7 +207,7 @@ export default function CustomerPanelPage() {
 
                 {/* Filtreler */}
                 <div className="mb-6">
-                    <SearchAndFilter onSearch={handleSearch} onFilterChange={handleFilterChange} />
+                    <SearchAndFilter onSearch={handleSearch} onFilter={handleFilterChange} />
                 </div>
 
                 {/* Rezervasyon Listesi */}
