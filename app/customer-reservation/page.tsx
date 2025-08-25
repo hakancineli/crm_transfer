@@ -25,7 +25,8 @@ export default function CustomerReservationPage() {
         flightCode: '',
         passengerNames: [''],
         luggageCount: 0,
-        phoneNumber: '',
+        phoneCountryCode: '+90',
+        phoneLocal: '',
         email: '',
         specialRequests: ''
     });
@@ -43,6 +44,7 @@ export default function CustomerReservationPage() {
         setSuccess(false);
 
         try {
+            const phoneNumber = `${formData.phoneCountryCode} ${formData.phoneLocal}`.trim();
             const response = await fetch('/api/reservations', {
                 method: 'POST',
                 headers: {
@@ -58,7 +60,7 @@ export default function CustomerReservationPage() {
                     luggageCount: formData.luggageCount,
                     price: 0, // Müşteri fiyat görmeyecek
                     currency: 'USD',
-                    phoneNumber: formData.phoneNumber,
+                    phoneNumber,
                     email: formData.email,
                     specialRequests: formData.specialRequests,
                     isCustomerRequest: true
@@ -136,7 +138,7 @@ export default function CustomerReservationPage() {
                         Rezervasyon talebiniz başarıyla alındı. En kısa sürede size dönüş yapacağız.
                     </p>
                     <div className="text-sm text-gray-500">
-                        Takip numaranız: <span className="font-mono font-bold text-blue-600">{formData.phoneNumber}</span>
+                        Takip numaranız: <span className="font-mono font-bold text-blue-600">{`${formData.phoneCountryCode} ${formData.phoneLocal}`.trim()}</span>
                     </div>
                 </div>
             </div>
@@ -356,14 +358,40 @@ export default function CustomerReservationPage() {
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     {t('customerForm.phone')}
                                 </label>
-                                <input
-                                    type="tel"
-                                    placeholder={t('customerForm.phonePlaceholder')}
-                                    value={formData.phoneNumber}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
-                                    required
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
+                                <div className="flex gap-2">
+                                    <select
+                                        value={formData.phoneCountryCode}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, phoneCountryCode: e.target.value }))}
+                                        className="w-40 px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                                    >
+                                        <option value="+90">Türkiye (+90)</option>
+                                        <option value="+44">United Kingdom (+44)</option>
+                                        <option value="+1">United States (+1)</option>
+                                        <option value="+971">United Arab Emirates (+971)</option>
+                                        <option value="+966">Saudi Arabia (+966)</option>
+                                        <option value="+49">Germany (+49)</option>
+                                        <option value="+33">France (+33)</option>
+                                        <option value="+7">Russia (+7)</option>
+                                        <option value="+98">Iran (+98)</option>
+                                        <option value="+964">Iraq (+964)</option>
+                                        <option value="+962">Jordan (+962)</option>
+                                        <option value="+961">Lebanon (+961)</option>
+                                        <option value="+20">Egypt (+20)</option>
+                                        <option value="+974">Qatar (+974)</option>
+                                        <option value="+965">Kuwait (+965)</option>
+                                        <option value="+968">Oman (+968)</option>
+                                        <option value="+973">Bahrain (+973)</option>
+                                        <option value="+994">Azerbaijan (+994)</option>
+                                    </select>
+                                    <input
+                                        type="tel"
+                                        placeholder={t('customerForm.phonePlaceholder')}
+                                        value={formData.phoneLocal}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, phoneLocal: e.target.value }))}
+                                        required
+                                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
