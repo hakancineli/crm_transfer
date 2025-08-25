@@ -27,13 +27,16 @@ export default function Header() {
 
     const navigation = isCustomerContext ? customerNavigation : adminNavigation;
 
+    // Logo link'i - müşteri ekranlarında müşteri paneline, admin ekranlarında ana sayfaya
+    const logoHref = isCustomerContext ? '/customer-panel' : '/';
+
     return (
         <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/75 shadow">
             <nav className="w-full px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16">
                     <div className="flex">
                         <div className="flex-shrink-0 flex items-center">
-                            <Link href="/" className="text-xl font-bold text-green-600">
+                            <Link href={logoHref} className="text-xl font-bold text-green-600">
                                 {t('header.title')}
                             </Link>
                         </div>
