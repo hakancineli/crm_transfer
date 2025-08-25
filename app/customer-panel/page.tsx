@@ -255,8 +255,8 @@ export default function CustomerPanelPage() {
                     </div>
                 </div>
 
-                {/* Rezervasyon Listesi */}
-                <div className="bg-white rounded-lg shadow overflow-hidden">
+                {/* Rezervasyon Listesi - Masaüstü Tablo */}
+                <div className="bg-white rounded-lg shadow overflow-hidden hidden md:block">
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
@@ -330,6 +330,42 @@ export default function CustomerPanelPage() {
                             </tbody>
                         </table>
                     </div>
+                </div>
+
+                {/* Rezervasyon Listesi - Mobil Kartlar */}
+                <div className="md:hidden space-y-3">
+                    {filteredReservations.length === 0 ? (
+                        <div className="text-center text-gray-500 py-6 bg-white rounded-lg shadow">{t('customerPanel.noReservations')}</div>
+                    ) : (
+                        filteredReservations.map((reservation) => (
+                            <div key={reservation.id} className="bg-white rounded-lg shadow p-4">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-sm font-semibold text-gray-900">{reservation.voucherNumber}</span>
+                                    <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(reservation.status)}`}>
+                                        {getStatusText(reservation.status, reservation.price)}
+                                    </span>
+                                </div>
+                                <div className="text-sm text-gray-700 mb-1">
+                                    <span className="font-medium">{formatDate(reservation.date)}</span>
+                                    <span className="mx-2">•</span>
+                                    <span>{formatTime(reservation.time)}</span>
+                                </div>
+                                <div className="text-sm text-gray-900 mb-1">
+                                    <div className="font-medium">{formatLocation(reservation.from)}</div>
+                                    <div className="text-gray-400">→</div>
+                                    <div className="font-medium">{formatLocation(reservation.to)}</div>
+                                </div>
+                                <div className="text-sm text-gray-700 mb-2">
+                                    {formatPassengers(reservation.passengerNames)}
+                                </div>
+                                {typeof reservation.price === 'number' && !isNaN(reservation.price) && (
+                                    <div className="text-right text-sm font-semibold text-emerald-700">
+                                        {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: (reservation.currency || 'USD') as any }).format(reservation.price)}
+                                    </div>
+                                )}
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
         </div>
