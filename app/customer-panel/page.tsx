@@ -38,7 +38,7 @@ export default function CustomerPanelPage() {
     const { t } = useLanguage();
     const [reservations, setReservations] = useState<CustomerReservation[]>([]);
     const [filteredReservations, setFilteredReservations] = useState<CustomerReservation[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [phoneCountryCode, setPhoneCountryCode] = useState('+90');
     const [phoneLocal, setPhoneLocal] = useState('');
     const [isSearching, setIsSearching] = useState(false);
@@ -111,6 +111,7 @@ export default function CustomerPanelPage() {
         if (!phoneLocal.trim()) return;
         
         setIsSearching(true);
+        setIsLoading(true);
         try {
             const response = await fetch(`/api/customer-reservations?phone=${encodeURIComponent(composedPhone)}`);
             const data = await response.json();
@@ -128,6 +129,7 @@ export default function CustomerPanelPage() {
             setFilteredReservations([]);
         } finally {
             setIsSearching(false);
+            setIsLoading(false);
         }
     };
 
