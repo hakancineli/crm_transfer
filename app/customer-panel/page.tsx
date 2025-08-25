@@ -37,7 +37,8 @@ export default function CustomerPanelPage() {
     const [reservations, setReservations] = useState<CustomerReservation[]>([]);
     const [filteredReservations, setFilteredReservations] = useState<CustomerReservation[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [phoneNumber, setPhoneNumber] = useState('');
+    const [phoneCountryCode, setPhoneCountryCode] = useState('+90');
+    const [phoneLocal, setPhoneLocal] = useState('');
     const [isSearching, setIsSearching] = useState(false);
 
     const handleSearch = (query: string) => {
@@ -83,11 +84,12 @@ export default function CustomerPanelPage() {
     // Filtreler müşteri panelinde gösterilmez; yalnızca arama kullanılabilir
 
     const searchByPhone = async () => {
-        if (!phoneNumber.trim()) return;
+        const composedPhone = `${phoneCountryCode} ${phoneLocal}`.trim();
+        if (!phoneLocal.trim()) return;
         
         setIsSearching(true);
         try {
-            const response = await fetch(`/api/customer-reservations?phone=${encodeURIComponent(phoneNumber)}`);
+            const response = await fetch(`/api/customer-reservations?phone=${encodeURIComponent(composedPhone)}`);
             const data = await response.json();
             
             if (Array.isArray(data)) {
@@ -105,6 +107,36 @@ export default function CustomerPanelPage() {
             setIsSearching(false);
         }
     };
+
+    // Ülke telefon kodları
+    const COUNTRY_DIAL_CODES = [
+        { code: '+90', label: 'Türkiye (+90)' },
+        { code: '+44', label: 'United Kingdom (+44)' },
+        { code: '+1', label: 'United States (+1)' },
+        { code: '+971', label: 'United Arab Emirates (+971)' },
+        { code: '+966', label: 'Saudi Arabia (+966)' },
+        { code: '+49', label: 'Germany (+49)' },
+        { code: '+33', label: 'France (+33)' },
+        { code: '+39', label: 'Italy (+39)' },
+        { code: '+34', label: 'Spain (+34)' },
+        { code: '+31', label: 'Netherlands (+31)' },
+        { code: '+41', label: 'Switzerland (+41)' },
+        { code: '+43', label: 'Austria (+43)' },
+        { code: '+7', label: 'Russia (+7)' },
+        { code: '+380', label: 'Ukraine (+380)' },
+        { code: '+30', label: 'Greece (+30)' },
+        { code: '+48', label: 'Poland (+48)' },
+        { code: '+36', label: 'Hungary (+36)' },
+        { code: '+40', label: 'Romania (+40)' },
+        { code: '+994', label: 'Azerbaijan (+994)' },
+        { code: '+995', label: 'Georgia (+995)' },
+        { code: '+973', label: 'Bahrain (+973)' },
+        { code: '+974', label: 'Qatar (+974)' },
+        { code: '+965', label: 'Kuwait (+965)' },
+        { code: '+968', label: 'Oman (+968)' },
+        { code: '+962', label: 'Jordan (+962)' },
+        { code: '+961', label: 'Lebanon (+961)' }
+    ];
 
     const formatDate = (dateStr: string) => {
         const date = new Date(dateStr);
@@ -156,17 +188,26 @@ export default function CustomerPanelPage() {
                 {/* Telefon ile Arama */}
                 <div className="bg-white rounded-lg shadow p-6 mb-6">
                     <h2 className="text-lg font-semibold text-gray-800 mb-4">{t('customerPanel.searchByPhone')}</h2>
-                    <div className="flex gap-4">
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        <select
+                            value={phoneCountryCode}
+                            onChange={(e) => setPhoneCountryCode(e.target.value)}
+                            className="w-full sm:w-44 px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                        >
+                            {COUNTRY_DIAL_CODES.map(({ code, label }) => (
+                                <option key={code} value={code}>{label}</option>
+                            ))}
+                        </select>
                         <input
                             type="tel"
                             placeholder={t('customerPanel.phonePlaceholder')}
-                            value={phoneNumber}
-                            onChange={(e) => setPhoneNumber(e.target.value)}
-                            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            value={phoneLocal}
+                            onChange={(e) => setPhoneLocal(e.target.value)}
+                            className="w-full sm:flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                         <button
                             onClick={searchByPhone}
-                            disabled={isSearching || !phoneNumber.trim()}
+                            disabled={isSearching || !phoneLocal.trim()}
                             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
                             {isSearching ? t('customerPanel.searching') : t('customerPanel.search')}
