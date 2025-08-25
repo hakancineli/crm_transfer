@@ -43,6 +43,28 @@ export default function CustomerPanelPage() {
     const [phoneLocal, setPhoneLocal] = useState('');
     const [isSearching, setIsSearching] = useState(false);
 
+    const translateWithFallback = (key: string, fallback: string) => {
+        const val = t(key) as unknown as string;
+        if (!val || typeof val !== 'string') return fallback;
+        // Eğer çeviri anahtarının kendisi dönüyorsa (nokta içeriyorsa) fallback kullan
+        if (val.includes('.') || val.toLowerCase().includes('placeholder')) return fallback;
+        return val;
+    };
+
+    const formatPassengers = (passengerNames: string[] | string) => {
+        let names: string[] = [];
+        try {
+            names = typeof passengerNames === 'string' ? JSON.parse(passengerNames) : passengerNames;
+        } catch {
+            names = Array.isArray(passengerNames) ? passengerNames : [];
+        }
+        return names
+            .map((n) => String(n).trim())
+            .filter(Boolean)
+            .map((n) => n.charAt(0).toUpperCase() + n.slice(1))
+            .join(', ');
+    };
+
     const handleSearch = (query: string) => {
         if (!query.trim()) {
             setFilteredReservations(reservations);
@@ -60,16 +82,15 @@ export default function CustomerPanelPage() {
             }
 
             // Yolcu isimlerini kontrol et
-            let passengerNames: string[] = [];
-            try {
-                passengerNames = typeof reservation.passengerNames === 'string' 
-                    ? JSON.parse(reservation.passengerNames)
-                    : reservation.passengerNames;
-            } catch (e) {
-                passengerNames = Array.isArray(reservation.passengerNames) 
-                    ? reservation.passengerNames 
-                    : [];
-            }
+            const passengerNames = (() => {
+                try {
+                    return typeof reservation.passengerNames === 'string' 
+                        ? JSON.parse(reservation.passengerNames)
+                        : reservation.passengerNames;
+                } catch {
+                    return Array.isArray(reservation.passengerNames) ? reservation.passengerNames : [];
+                }
+            })() as string[];
 
             return (
                 reservation.voucherNumber.toLowerCase().includes(lowercaseQuery) ||
@@ -205,7 +226,7 @@ export default function CustomerPanelPage() {
                         </select>
                         <input
                             type="tel"
-                            placeholder={t('customerPanel.phonePlaceholder')}
+                            placeholder={translateWithFallback('customerPanel.phonePlaceholder', '5XX XXX XX XX')}
                             value={phoneLocal}
                             onChange={(e) => setPhoneLocal(e.target.value)}
                             className="w-full sm:flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -225,7 +246,7 @@ export default function CustomerPanelPage() {
                     <div className="max-w-lg">
                         <input
                             type="text"
-                            placeholder={t('customerPanel.searchPlaceholder') || 'Voucher, güzergah veya yolcu ara...'}
+                            placeholder={translateWithFallback('customerPanel.searchPlaceholder', 'Voucher, güzergah veya yolcu ara...')}
                             className="block w-full px-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
                             onChange={(e) => handleSearch(e.target.value)}
                         />
@@ -259,10 +280,20 @@ export default function CustomerPanelPage() {
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {filteredReservations.length === 0 ? (
+                                {isLoading ? (
                                     <tr>
-                                        <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
-                                            {isLoading ? t('customerPanel.loading') : t('customerPanel.noReservations')}
+                                        <td colSpan={6} className="px-6 py-6">
+                                            <div className="animate-pulse space-y-3">
+                                                <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                                                <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                                                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : filteredReservations.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                                            {t('customerPanel.noReservations')}
                                         </td>
                                     </tr>
                                 ) : (
@@ -281,26 +312,13 @@ export default function CustomerPanelPage() {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="text-sm text-gray-900">
-                                                    <div className="font-medium">
-                                                        {formatLocation(reservation.from)}
-                                                    </div>
-                                                    <div className="text-gray-500">→</div>
-                                                    <div className="font-medium">
-                                                        {formatLocation(reservation.to)}
-                                                    </div>
+                                                    <div className="font-medium">{formatLocation(reservation.from)}</div>
+                                                    <div className="text-gray-400">→</div>
+                                                    <div className="font-medium">{formatLocation(reservation.to)}</div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">
-                                                    {Array.isArray(reservation.passengerNames) 
-                                                        ? reservation.passengerNames.map((name, index) => (
-                                                            <div key={index} className="mb-1">
-                                                                {formatPassengerName(name)}
-                                                            </div>
-                                                        ))
-                                                        : formatPassengerName(reservation.passengerNames as string)
-                                                    }
-                                                </div>
+                                                <div className="text-sm text-gray-900">{formatPassengers(reservation.passengerNames)}</div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-2">
@@ -308,7 +326,7 @@ export default function CustomerPanelPage() {
                                                         {getStatusText(reservation.status, reservation.price)}
                                                     </span>
                                                     {typeof reservation.price === 'number' && !isNaN(reservation.price) && (
-                                                        <span className="text-sm font-medium text-gray-900">
+                                                        <span className="text-sm font-semibold text-emerald-700">
                                                             {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: (reservation.currency || 'USD') as any }).format(reservation.price)}
                                                         </span>
                                                     )}
