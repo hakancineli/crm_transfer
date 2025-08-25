@@ -50,19 +50,32 @@ export async function POST(request: NextRequest) {
             ? JSON.stringify(data.passengerNames)
             : JSON.stringify([]);
 
-        // Voucher numarası oluştur - tarih bazlı sıralı
+        // Voucher numarası oluştur - daha güvenli algoritma
         const date = new Date();
         const formattedDate = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
         
-        // O günkü rezervasyon sayısını al
-        const todayReservations = await prisma.reservation.findMany({
+        // O günkü mevcut voucher numaralarını al
+        const todayVouchers = await prisma.reservation.findMany({
             where: {
-                date: data.date
+                voucherNumber: {
+                    startsWith: `VIP${formattedDate}-`
+                }
+            },
+            select: {
+                voucherNumber: true
             }
         });
         
-        // Sıradaki numara
-        const nextNumber = todayReservations.length + 1;
+        // Sıradaki numarayı bul
+        let nextNumber = 1;
+        if (todayVouchers.length > 0) {
+            const numbers = todayVouchers.map(v => {
+                const match = v.voucherNumber.match(/VIP\d+-(\d+)/);
+                return match ? parseInt(match[1]) : 0;
+            });
+            nextNumber = Math.max(...numbers) + 1;
+        }
+        
         const voucherNumber = `VIP${formattedDate}-${nextNumber}`;
 
         const reservation = await prisma.reservation.create({
