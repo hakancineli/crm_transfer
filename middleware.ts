@@ -16,6 +16,7 @@ function parseBasicAuth(header: string | null): { username: string; password: st
 
 export function middleware(req: NextRequest) {
 	const { pathname } = req.nextUrl;
+    const method = req.method;
 
 	// Allow framework internals and assets without auth
 	if (
@@ -26,15 +27,29 @@ export function middleware(req: NextRequest) {
 		return NextResponse.next();
 	}
 
-	// Müşteri sayfalarına şifresiz erişim
-	const customerPaths = [
+	// Development ortamında tüm sayfalara erişim izni ver
+	if (process.env.NODE_ENV === 'development') {
+		return NextResponse.next();
+	}
+
+	// Müşteri sayfaları ve gerekli API'ler için şifresiz erişim
+	const publicPaths = [
 		'/customer-reservation',
 		'/customer-panel',
-		'/customer-reservation/thank-you'
+		'/customer-reservation/thank-you',
+		'/api/customer-reservations',
+		'/api/reservations',
 	];
 
-	if (customerPaths.some(path => pathname.startsWith(path))) {
-		return NextResponse.next();
+	if (publicPaths.some(path => pathname.startsWith(path))) {
+		// /api/reservations yalnızca GET/POST işlemleri için şifresiz olmalı
+		if (pathname.startsWith('/api/reservations')) {
+			if (method === 'GET' || method === 'POST') {
+				return NextResponse.next();
+			}
+		} else {
+			return NextResponse.next();
+		}
 	}
 
 	// Admin sayfaları için Basic Auth gerekli
