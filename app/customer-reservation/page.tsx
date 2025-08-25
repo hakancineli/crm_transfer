@@ -128,6 +128,45 @@ export default function CustomerReservationPage() {
         return location;
     };
 
+    // Ülke telefon kodları (genişletilmiş listeden bir seçim)
+    const COUNTRY_DIAL_CODES = [
+        { code: '+90', label: 'Türkiye (+90)' },
+        { code: '+44', label: 'United Kingdom (+44)' },
+        { code: '+1', label: 'United States (+1)' },
+        { code: '+971', label: 'United Arab Emirates (+971)' },
+        { code: '+966', label: 'Saudi Arabia (+966)' },
+        { code: '+49', label: 'Germany (+49)' },
+        { code: '+33', label: 'France (+33)' },
+        { code: '+39', label: 'Italy (+39)' },
+        { code: '+34', label: 'Spain (+34)' },
+        { code: '+31', label: 'Netherlands (+31)' },
+        { code: '+41', label: 'Switzerland (+41)' },
+        { code: '+43', label: 'Austria (+43)' },
+        { code: '+7', label: 'Russia (+7)' },
+        { code: '+380', label: 'Ukraine (+380)' },
+        { code: '+30', label: 'Greece (+30)' },
+        { code: '+48', label: 'Poland (+48)' },
+        { code: '+36', label: 'Hungary (+36)' },
+        { code: '+40', label: 'Romania (+40)' },
+        { code: '+994', label: 'Azerbaijan (+994)' },
+        { code: '+995', label: 'Georgia (+995)' },
+        { code: '+374', label: 'Armenia (+374)' },
+        { code: '+973', label: 'Bahrain (+973)' },
+        { code: '+974', label: 'Qatar (+974)' },
+        { code: '+965', label: 'Kuwait (+965)' },
+        { code: '+968', label: 'Oman (+968)' },
+        { code: '+962', label: 'Jordan (+962)' },
+        { code: '+961', label: 'Lebanon (+961)' },
+        { code: '+20', label: 'Egypt (+20)' },
+        { code: '+212', label: 'Morocco (+212)' },
+        { code: '+216', label: 'Tunisia (+216)' },
+        { code: '+218', label: 'Libya (+218)' },
+        { code: '+964', label: 'Iraq (+964)' },
+        { code: '+98', label: 'Iran (+98)' },
+        { code: '+92', label: 'Pakistan (+92)' },
+        { code: '+91', label: 'India (+91)' }
+    ];
+
     if (success) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
@@ -358,30 +397,15 @@ export default function CustomerReservationPage() {
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     {t('customerForm.phone')}
                                 </label>
-                                <div className="flex gap-2">
+                                <div className="flex flex-col sm:flex-row gap-2">
                                     <select
                                         value={formData.phoneCountryCode}
                                         onChange={(e) => setFormData(prev => ({ ...prev, phoneCountryCode: e.target.value }))}
-                                        className="w-40 px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                                        className="w-full sm:w-44 px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                                     >
-                                        <option value="+90">Türkiye (+90)</option>
-                                        <option value="+44">United Kingdom (+44)</option>
-                                        <option value="+1">United States (+1)</option>
-                                        <option value="+971">United Arab Emirates (+971)</option>
-                                        <option value="+966">Saudi Arabia (+966)</option>
-                                        <option value="+49">Germany (+49)</option>
-                                        <option value="+33">France (+33)</option>
-                                        <option value="+7">Russia (+7)</option>
-                                        <option value="+98">Iran (+98)</option>
-                                        <option value="+964">Iraq (+964)</option>
-                                        <option value="+962">Jordan (+962)</option>
-                                        <option value="+961">Lebanon (+961)</option>
-                                        <option value="+20">Egypt (+20)</option>
-                                        <option value="+974">Qatar (+974)</option>
-                                        <option value="+965">Kuwait (+965)</option>
-                                        <option value="+968">Oman (+968)</option>
-                                        <option value="+973">Bahrain (+973)</option>
-                                        <option value="+994">Azerbaijan (+994)</option>
+                                        {COUNTRY_DIAL_CODES.map(({ code, label }) => (
+                                            <option key={code} value={code}>{label}</option>
+                                        ))}
                                     </select>
                                     <input
                                         type="tel"
@@ -389,7 +413,7 @@ export default function CustomerReservationPage() {
                                         value={formData.phoneLocal}
                                         onChange={(e) => setFormData(prev => ({ ...prev, phoneLocal: e.target.value }))}
                                         required
-                                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full sm:flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
                                 </div>
                             </div>
