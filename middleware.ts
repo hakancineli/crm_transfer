@@ -73,5 +73,13 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-	matcher: ['/(.*)'],
+	// Yalnızca admin alanlarını ve ilgili API'leri koru.
+	matcher: [
+		'/',
+		'/reservations/:path*',
+		'/reports/:path*',
+		'/api/reports/:path*',
+		'/api/reservations/:path*',
+		'/api/drivers/:path*',
+	],
 };
