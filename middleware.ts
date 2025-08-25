@@ -18,11 +18,12 @@ export function middleware(req: NextRequest) {
 	const { pathname } = req.nextUrl;
     const method = req.method;
 
-	// Allow framework internals and assets without auth
+	// Allow framework internals and static assets without auth
 	if (
 		pathname.startsWith('/_next') ||
 		pathname.startsWith('/favicon') ||
-		pathname.startsWith('/public')
+		pathname.startsWith('/locales') ||
+		/\.(?:png|jpg|jpeg|gif|svg|ico|css|js|map|txt|woff|woff2|ttf|eot)$/i.test(pathname)
 	) {
 		return NextResponse.next();
 	}
