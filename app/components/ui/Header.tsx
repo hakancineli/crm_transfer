@@ -12,12 +12,20 @@ export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { t } = useLanguage();
 
-    const navigation = [
+    // Müşteri ekranlarında yönetim linklerini gizle
+    const isCustomerContext = pathname.startsWith('/customer-reservation') || pathname.startsWith('/customer-panel');
+
+    const adminNavigation = [
         { name: t('header.newReservation'), href: '/' },
-        { name: t('header.customerPanel'), href: '/customer-panel' },
         { name: t('header.allReservations'), href: '/reservations' },
         { name: t('header.reports'), href: '/reports' },
     ];
+
+    const customerNavigation: { name: string; href: string }[] = [
+        { name: t('header.customerPanel'), href: '/customer-panel' },
+    ];
+
+    const navigation = isCustomerContext ? customerNavigation : adminNavigation;
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/75 shadow">
