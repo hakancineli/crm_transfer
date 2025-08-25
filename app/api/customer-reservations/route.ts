@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/app/lib/prisma';
 
 export async function GET(request: NextRequest) {
     try {
@@ -12,13 +10,18 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Phone number is required' }, { status: 400 });
         }
 
-        // Telefon numarası ile rezervasyonları ara
+        // Telefonu normalize et
+        const normalized = phone.trim();
+        const noSpaces = normalized.replace(/\s+/g, '');
+
+        // Telefon numarası ile rezervasyonları ara (eşleşme öncelikli, sonra contains)
         const reservations = await prisma.reservation.findMany({
             where: {
-                phoneNumber: {
-                    contains: phone,
-                    mode: 'insensitive'
-                }
+                OR: [
+                    { phoneNumber: { equals: normalized } },
+                    { phoneNumber: { equals: noSpaces } },
+                    { phoneNumber: { contains: normalized, mode: 'insensitive' } }
+                ]
             },
             select: {
                 id: true,
@@ -47,9 +50,8 @@ export async function GET(request: NextRequest) {
                     }
                 }
             },
-            orderBy: {
-                date: 'desc'
-            }
+            orderBy: { date: 'desc' },
+            take: 50
         });
 
         // Fiyat bilgilerini gizle
@@ -71,6 +73,6 @@ export async function GET(request: NextRequest) {
             { status: 500 }
         );
     } finally {
-        await prisma.$disconnect();
+        // paylaşılan prisma istemcisi kullanılıyor; disconnect yapılmaz
     }
 }
