@@ -83,6 +83,32 @@ export async function POST(request: NextRequest) {
             }
         });
 
+        // Telegram bildirimi (opsiyonel)
+        const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+        const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+        if (BOT_TOKEN && CHAT_ID) {
+            try {
+                const textLines = [
+                    `Yeni Müşteri Talebi ✅`,
+                    `Voucher: ${voucherNumber}`,
+                    `Tarih: ${data.date} ${data.time}`,
+                    `Güzergah: ${data.from} → ${data.to}`,
+                    `Yolcular: ${(Array.isArray(data.passengerNames) ? data.passengerNames.join(', ') : '') || '-'}`,
+                    `Telefon: ${data.phoneNumber}`,
+                    data.flightCode ? `Uçuş: ${data.flightCode}` : undefined,
+                    data.specialRequests ? `Not: ${data.specialRequests}` : undefined
+                ].filter(Boolean).join('\n');
+
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: CHAT_ID, text: textLines })
+                });
+            } catch (notifyErr) {
+                console.error('Telegram bildirim hatası:', notifyErr);
+            }
+        }
+
         return NextResponse.json({
             ...reservation,
             passengerNames: JSON.parse(passengerNames)
