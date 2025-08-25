@@ -18,9 +18,24 @@ export default function ThankYouPage() {
                     </ul>
                 </div>
 
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-gray-600">
                     <p>Herhangi bir sorunuz varsa:</p>
-                    <p className="font-semibold text-blue-600 mt-1">+90 XXX XXX XX XX</p>
+                    <div className="mt-2 flex flex-col items-center gap-2">
+                        <a
+                            href={`https://wa.me/905545812034?text=${encodeURIComponent('Merhaba, rezervasyon talebim hakkında bilgi almak istiyorum.')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-block px-5 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors w-full text-center"
+                        >
+                            WhatsApp ile mesaj gönder
+                        </a>
+                        <a
+                            href="tel:+905545812034"
+                            className="font-semibold text-blue-600 hover:underline"
+                        >
+                            +90 554 581 20 34
+                        </a>
+                    </div>
                 </div>
 
                 <div className="mt-6">
