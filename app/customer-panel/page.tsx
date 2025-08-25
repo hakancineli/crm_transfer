@@ -282,17 +282,7 @@ export default function CustomerPanelPage() {
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {isLoading ? (
-                                    <tr>
-                                        <td colSpan={6} className="px-6 py-6">
-                                            <div className="animate-pulse space-y-3">
-                                                <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-                                                <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-                                                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ) : filteredReservations.length === 0 ? (
+                                {filteredReservations.length === 0 ? (
                                     <tr>
                                         <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                                             {t('customerPanel.noReservations')}
