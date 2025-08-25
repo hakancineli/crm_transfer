@@ -1,84 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-function parseBasicAuth(header: string | null): { username: string; password: string } | null {
-	if (!header || !header.startsWith('Basic ')) return null;
-	try {
-		const base64 = header.replace('Basic ', '');
-		// Use Web API atob in the Edge runtime
-		const decoded = atob(base64);
-		const [username, password] = decoded.split(':');
-		if (!username || !password) return null;
-		return { username, password };
-	} catch {
-		return null;
-	}
+// Tüm şifre korumalarını kapat: middleware no-op
+export function middleware(_req: NextRequest) {
+	return NextResponse.next();
 }
 
-export function middleware(req: NextRequest) {
-	const { pathname } = req.nextUrl;
-    const method = req.method;
-
-	// Allow framework internals and static assets without auth
-	if (
-		pathname.startsWith('/_next') ||
-		pathname.startsWith('/favicon') ||
-		pathname.startsWith('/locales') ||
-		/\.(?:png|jpg|jpeg|gif|svg|ico|css|js|map|txt|woff|woff2|ttf|eot)$/i.test(pathname)
-	) {
-		return NextResponse.next();
-	}
-
-	// Development ortamında tüm sayfalara erişim izni ver
-	if (process.env.NODE_ENV === 'development') {
-		return NextResponse.next();
-	}
-
-	// Müşteri sayfaları ve gerekli API'ler için şifresiz erişim
-	const publicPaths = [
-		'/customer-reservation',
-		'/customer-panel',
-		'/customer-reservation/thank-you',
-		'/api/customer-reservations',
-		'/api/reservations',
-	];
-
-	if (publicPaths.some(path => pathname.startsWith(path))) {
-		// /api/reservations yalnızca GET/POST işlemleri için şifresiz olmalı
-		if (pathname.startsWith('/api/reservations')) {
-			if (method === 'GET' || method === 'POST') {
-				return NextResponse.next();
-			}
-		} else {
-			return NextResponse.next();
-		}
-	}
-
-	// Admin sayfaları için Basic Auth gerekli
-	const expected = process.env.BASIC_AUTH || '';
-	const [expectedUser, expectedPass] = expected.split(':');
-	// Eğer BASIC_AUTH tanımlı değilse, hiçbir yerde şifre isteme
-	if (!expectedUser || !expectedPass) {
-		return NextResponse.next();
-	}
-
-	const creds = parseBasicAuth(req.headers.get('authorization'));
-	if (creds && creds.username === expectedUser && creds.password === expectedPass) {
-		return NextResponse.next();
-	}
-
-	const res = new NextResponse('Authentication required', { status: 401 });
-	res.headers.set('WWW-Authenticate', 'Basic realm="Protected"');
-	return res;
-}
-
+// Hiçbir route için middleware çalıştırmayı gerektirmiyoruz
 export const config = {
-	// Yalnızca admin alanlarını ve ilgili API'leri koru.
-	matcher: [
-		'/',
-		'/reservations/:path*',
-		'/reports/:path*',
-		'/api/reports/:path*',
-		'/api/reservations/:path*',
-		'/api/drivers/:path*',
-	],
+	matcher: [],
 };
