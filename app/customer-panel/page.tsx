@@ -3,9 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import LanguageSelector from '../components/LanguageSelector';
-import { SearchAndFilter } from '@/app/components/ui/SearchAndFilter';
-import { AIRPORTS, HOTELS, TRANSFER_TYPES } from '@/app/types';
-import { formatLocation, formatPassengerName, formatHotelName } from '@/app/utils/textFormatters';
+import { formatLocation, formatPassengerName } from '@/app/utils/textFormatters';
 
 interface CustomerReservation {
     id: string;
@@ -82,36 +80,7 @@ export default function CustomerPanelPage() {
         setFilteredReservations(filtered);
     };
 
-    const handleFilterChange = (filter: string) => {
-        let filtered: CustomerReservation[] = [];
-        
-        switch (filter) {
-            case 'today':
-                const today = new Date().toISOString().split('T')[0];
-                filtered = reservations.filter(r => r.date === today);
-                break;
-            case 'tomorrow':
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                const tomorrowStr = tomorrow.toISOString().split('T')[0];
-                filtered = reservations.filter(r => r.date === tomorrowStr);
-                break;
-            case 'thisWeek':
-                const now = new Date();
-                const weekFromNow = new Date();
-                weekFromNow.setDate(now.getDate() + 7);
-                filtered = reservations.filter(r => {
-                    const reservationDate = new Date(r.date);
-                    return reservationDate >= now && reservationDate <= weekFromNow;
-                });
-                break;
-            default:
-                filtered = reservations;
-                break;
-        }
-        
-        setFilteredReservations(filtered);
-    };
+    // Filtreler müşteri panelinde gösterilmez; yalnızca arama kullanılabilir
 
     const searchByPhone = async () => {
         if (!phoneNumber.trim()) return;
@@ -205,9 +174,16 @@ export default function CustomerPanelPage() {
                     </div>
                 </div>
 
-                {/* Filtreler */}
+                {/* Yalnızca arama kutusu */}
                 <div className="mb-6">
-                    <SearchAndFilter onSearch={handleSearch} onFilter={handleFilterChange} />
+                    <div className="max-w-lg">
+                        <input
+                            type="text"
+                            placeholder={t('customerPanel.searchPlaceholder') || 'Voucher, güzergah veya yolcu ara...'}
+                            className="block w-full px-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                            onChange={(e) => handleSearch(e.target.value)}
+                        />
+                    </div>
                 </div>
 
                 {/* Rezervasyon Listesi */}
