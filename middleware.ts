@@ -56,11 +56,9 @@ export function middleware(req: NextRequest) {
 	// Admin sayfaları için Basic Auth gerekli
 	const expected = process.env.BASIC_AUTH || '';
 	const [expectedUser, expectedPass] = expected.split(':');
+	// Eğer BASIC_AUTH tanımlı değilse, hiçbir yerde şifre isteme
 	if (!expectedUser || !expectedPass) {
-		// If BASIC_AUTH is missing, still require auth to be safe (use a dummy realm)
-		const res = new NextResponse('Authentication required', { status: 401 });
-		res.headers.set('WWW-Authenticate', 'Basic realm="Protected"');
-		return res;
+		return NextResponse.next();
 	}
 
 	const creds = parseBasicAuth(req.headers.get('authorization'));
