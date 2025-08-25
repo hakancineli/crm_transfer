@@ -16,6 +16,8 @@ interface CustomerReservation {
     luggageCount?: number;
     passengerNames: string[];
     phoneNumber?: string;
+    price?: number | null;
+    currency?: string | null;
     email?: string;
     specialRequests?: string;
     status: string;
@@ -160,7 +162,10 @@ export default function CustomerPanelPage() {
         }
     };
 
-    const getStatusText = (status: string) => {
+    const getStatusText = (status: string, price?: number | null) => {
+        if (typeof price === 'number' && !isNaN(price)) {
+            return 'Onaylandı';
+        }
         switch (status?.toLowerCase()) {
             case 'completed':
                 return 'Tamamlandı';
@@ -298,9 +303,16 @@ export default function CustomerPanelPage() {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(reservation.status)}`}>
-                                                    {getStatusText(reservation.status)}
-                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(reservation.status)}`}>
+                                                        {getStatusText(reservation.status, reservation.price)}
+                                                    </span>
+                                                    {typeof reservation.price === 'number' && !isNaN(reservation.price) && (
+                                                        <span className="text-sm font-medium text-gray-900">
+                                                            {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: (reservation.currency || 'USD') as any }).format(reservation.price)}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </td>
                                         </tr>
                                     ))

@@ -34,6 +34,8 @@ export async function GET(request: NextRequest) {
                 luggageCount: true,
                 passengerNames: true,
                 phoneNumber: true,
+                price: true,
+                currency: true,
                 isReturn: true,
                 returnTransfer: {
                     select: {
@@ -54,18 +56,7 @@ export async function GET(request: NextRequest) {
             take: 50
         });
 
-        // Fiyat bilgilerini gizle
-        const sanitizedReservations = reservations.map(reservation => ({
-            ...reservation,
-            // Fiyat bilgileri gösterilmiyor
-            price: undefined,
-            currency: undefined,
-            driverFee: undefined,
-            driver: undefined,
-            paymentStatus: undefined
-        }));
-
-        return NextResponse.json(sanitizedReservations);
+        return NextResponse.json(reservations);
     } catch (error) {
         console.error('Müşteri rezervasyon arama hatası:', error);
         return NextResponse.json(
