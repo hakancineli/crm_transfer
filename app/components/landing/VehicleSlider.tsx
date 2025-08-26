@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const images = [
   '/vehicles/vito-1.jpg',
@@ -18,9 +18,6 @@ const images = [
   '/vehicles/vito-12.jpg',
 ];
 
-const transparent1x1 =
-  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/epb7OQAAAAASUVORK5CYII=';
-
 export default function VehicleSlider() {
   const [index, setIndex] = useState(0);
 
@@ -34,36 +31,27 @@ export default function VehicleSlider() {
   const goPrev = () => setIndex((prev) => (prev - 1 + images.length) % images.length);
   const goNext = () => setIndex((prev) => (prev + 1) % images.length);
 
-  const eagerSet = useMemo(() => {
-    const next = (index + 1) % images.length;
-    const prev = (index - 1 + images.length) % images.length;
-    return new Set([images[index], images[next], images[prev]]);
-  }, [index]);
-
   return (
     <div className="relative w-full overflow-hidden rounded-xl border bg-white shadow">
-      <div
-        className="flex transition-transform duration-700"
-        style={{ transform: `translateX(-${index * 100}%)`, width: `${images.length * 100}%` }}
-      >
-        {images.map((src) => {
-          const isEager = eagerSet.has(src);
-          return (
-            <div key={src} className="relative w-full shrink-0 aspect-video max-h-[420px] sm:max-h-[480px] lg:max-h-[520px] bg-white">
-              <Image
-                src={src}
-                alt="Mercedes Vito VIP"
-                fill
-                className="object-contain object-center"
-                sizes="100vw"
-                priority={isEager}
-                loading={isEager ? 'eager' : 'lazy'}
-                placeholder="blur"
-                blurDataURL={transparent1x1}
-              />
-            </div>
-          );
-        })}
+      <div className="relative aspect-video max-h-[420px] sm:max-h-[480px] lg:max-h-[520px]">
+        {images.map((src, i) => (
+          <div
+            key={src}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              i === index ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <Image
+              src={src}
+              alt="Mercedes Vito VIP"
+              fill
+              className="object-contain object-center"
+              sizes="100vw"
+              priority={i < 3}
+              loading={i < 3 ? 'eager' : 'lazy'}
+            />
+          </div>
+        ))}
       </div>
 
       <button

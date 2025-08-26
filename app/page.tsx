@@ -1,37 +1,42 @@
+'use client';
+
 import Link from 'next/link';
+import { useLanguage } from '../contexts/LanguageContext';
 import VehicleSlider from './components/landing/VehicleSlider';
 
 export default function HomePage() {
+  const { t } = useLanguage();
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <section className="relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div>
-              <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900">İstanbul’da VIP Havalimanı Transferi</h1>
-              <p className="mt-4 text-lg text-gray-600">IST/SAW ↔ Otel/Adres arası konforlu, güvenli ve zamanında transfer. 7/24 hizmet, sabit fiyat, profesyonel şoförler.</p>
+              <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900">{t('landing.title')}</h1>
+              <p className="mt-4 text-lg text-gray-600">{t('landing.description')}</p>
               <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                <Link href="/customer-reservation" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition">Rezervasyon Talebi Gönder</Link>
-                <a href={`https://wa.me/905545812034?text=${encodeURIComponent('Merhaba, VIP transfer için bilgi/fiyat almak istiyorum.')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white text-green-700 border border-green-200 hover:border-green-300 hover:bg-green-50 transition">WhatsApp’tan Yaz</a>
+                <Link href="/customer-reservation" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition">{t('landing.sendRequest')}</Link>
+                <a href={`https://wa.me/905545812034?text=${encodeURIComponent(t('landing.whatsappMessage'))}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white text-green-700 border border-green-200 hover:border-green-300 hover:bg-green-50 transition">{t('landing.whatsappWrite')}</a>
               </div>
               <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm text-gray-700">
-                <div className="p-3 rounded-lg bg-white shadow border">7/24 Hizmet</div>
-                <div className="p-3 rounded-lg bg-white shadow border">Sabit Fiyat</div>
-                <div className="p-3 rounded-lg bg-white shadow border">Profesyonel Şoför</div>
-                <div className="p-3 rounded-lg bg-white shadow border">6 Kişi / 6 Bagaj</div>
+                <div className="p-3 rounded-lg bg-white shadow border">{t('landing.service24h')}</div>
+                <div className="p-3 rounded-lg bg-white shadow border">{t('landing.fixedPrice')}</div>
+                <div className="p-3 rounded-lg bg-white shadow border">{t('landing.professionalDriver')}</div>
+                <div className="p-3 rounded-lg bg-white shadow border">{t('landing.capacity')}</div>
               </div>
             </div>
             <div className="lg:pl-8">
               <VehicleSlider />
               <div className="bg-white border rounded-2xl shadow p-6 mt-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Neden ProTransfer?</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('landing.whyProTransfer')}</h2>
                 <ul className="space-y-3 text-gray-700">
-                  <li>• Uçuş takibi ve gecikme toleransı</li>
-                  <li>• Karşılama hizmeti ve bagaj desteği</li>
-                  <li>• Bebek koltuğu ve özel taleplere hızlı cevap</li>
-                  <li>• Kurumsal sözleşmeli transfer seçenekleri</li>
+                  <li>• {t('landing.flightTracking')}</li>
+                  <li>• {t('landing.meetGreet')}</li>
+                  <li>• {t('landing.childSeat')}</li>
+                  <li>• {t('landing.corporateOptions')}</li>
                 </ul>
-                <div className="mt-6 text-sm text-gray-500">Talep sonrası fiyatı WhatsApp ile iletiyoruz. Fiyatlar trafik/süreye göre değişmez.</div>
+                <div className="mt-6 text-sm text-gray-500">{t('landing.priceNote')}</div>
               </div>
             </div>
           </div>
@@ -42,45 +47,86 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white border rounded-xl p-6 shadow-sm">
-              <h3 className="font-semibold text-gray-900 mb-2">Müşteri Yorumları</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">{t('landing.customerReviews')}</h3>
               <div className="space-y-4 text-gray-700">
                 <div>
-                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">Google Yorumu</span></div>
-                  <p>“Gece geç saatte indik, şoför bizi kapıda karşıladı. Çok konforlu bir yolculuktu.”</p>
+                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">{t('landing.googleReview')}</span></div>
+                  <p>"{t('landing.review1')}"</p>
                 </div>
                 <div>
-                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">Google Yorumu</span></div>
-                  <p>“Çocuk koltuğu talebimizi hazırlamışlardı, çok profesyonel ekip.”</p>
+                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">{t('landing.googleReview')}</span></div>
+                  <p>"{t('landing.review2')}"</p>
                 </div>
                 <div>
-                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">Google Yorumu</span></div>
-                  <p>“Uçuşumuz rötarlıydı, beklediler ve iletişimleri harikaydı.”</p>
+                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">{t('landing.googleReview')}</span></div>
+                  <p>"{t('landing.review3')}"</p>
                 </div>
                 <div>
-                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">Google Yorumu</span></div>
-                  <p>“Araç tertemizdi, sürüş güvenli ve rahattı. Tavsiye ederim.”</p>
+                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">{t('landing.googleReview')}</span></div>
+                  <p>"{t('landing.review4')}"</p>
                 </div>
                 <div>
-                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">Google Yorumu</span></div>
-                  <p>“İstanbul’daki taksi sorununa çok iyi çözüm; fiyatlar da gayet iyi.”</p>
+                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">{t('landing.googleReview')}</span></div>
+                  <p>"{t('landing.review5')}"</p>
                 </div>
                 <div>
-                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">Google Yorumu</span></div>
-                  <p>“Keşke daha önce sizinle çalışmaya başlasaydım.”</p>
+                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">{t('landing.googleReview')}</span></div>
+                  <p>"{t('landing.review6')}"</p>
                 </div>
               </div>
             </div>
             <div className="bg-white border rounded-xl p-6 shadow-sm">
-              <h3 className="font-semibold text-gray-900 mb-2">SSS</h3>
-              <p className="text-gray-600">Uçuş gecikmelerinde ek ücret yansıtılmaz, planınızı biz uyarlarız.</p>
+              <h3 className="font-semibold text-gray-900 mb-2">{t('landing.faq')}</h3>
+              <div className="space-y-4 text-gray-600 text-sm">
+                <div>
+                  <p className="font-medium">{t('landing.faq1.question')}</p>
+                  <p className="mt-1">{t('landing.faq1.answer')}</p>
+                </div>
+                <div>
+                  <p className="font-medium">{t('landing.faq2.question')}</p>
+                  <p className="mt-1">{t('landing.faq2.answer')}</p>
+                </div>
+                <div>
+                  <p className="font-medium">{t('landing.faq3.question')}</p>
+                  <p className="mt-1">{t('landing.faq3.answer')}</p>
+                </div>
+                <div>
+                  <p className="font-medium">{t('landing.faq4.question')}</p>
+                  <p className="mt-1">{t('landing.faq4.answer')}</p>
+                </div>
+                <div>
+                  <p className="font-medium">{t('landing.faq5.question')}</p>
+                  <p className="mt-1">{t('landing.faq5.answer')}</p>
+                </div>
+                <div>
+                  <p className="font-medium">{t('landing.faq6.question')}</p>
+                  <p className="mt-1">{t('landing.faq6.answer')}</p>
+                </div>
+                <div>
+                  <p className="font-medium">{t('landing.faq7.question')}</p>
+                  <p className="mt-1">{t('landing.faq7.answer')}</p>
+                </div>
+                <div>
+                  <p className="font-medium">{t('landing.faq8.question')}</p>
+                  <p className="mt-1">{t('landing.faq8.answer')}</p>
+                </div>
+                <div>
+                  <p className="font-medium">{t('landing.faq9.question')}</p>
+                  <p className="mt-1">{t('landing.faq9.answer')}</p>
+                </div>
+                <div>
+                  <p className="font-medium">{t('landing.faq10.question')}</p>
+                  <p className="mt-1">{t('landing.faq10.answer')}</p>
+                </div>
+              </div>
             </div>
             <div className="bg-white border rounded-xl p-6 shadow-sm">
-              <h3 className="font-semibold text-gray-900 mb-2">İletişim</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">{t('landing.contact')}</h3>
               <div className="text-gray-600 space-y-2">
-                <p>Hızlı bilgi için WhatsApp: +90 554 581 20 34 - +90 554 581 20 34</p>
-                <p>İstanbul Havalimanı (IST)</p>
-                <p>Sabiha Gökçen Havalimanı (SAW)</p>
-                <p>Beşiktaş, İstanbul</p>
+                <p>{t('landing.contactWhatsApp')}: +90 554 581 20 34 - +90 554 581 20 34</p>
+                <p>{t('landing.airportIST')}</p>
+                <p>{t('landing.airportSAW')}</p>
+                <p>{t('landing.beşiktaş')}</p>
               </div>
             </div>
           </div>
@@ -91,19 +137,19 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Günlük Şoförlü Araç Kiralama</h2>
-              <p className="mt-3 text-gray-600">İstanbul içi iş toplantıları, şehir turu veya gün boyu ulaşım ihtiyaçlarınız için saatlik/günlük şoförlü araç kiralama hizmeti. Esnek rota, bekleme dahil.</p>
+              <h2 className="text-2xl font-bold text-gray-900">{t('landing.dailyChauffeur.title')}</h2>
+              <p className="mt-3 text-gray-600">{t('landing.dailyChauffeur.description')}</p>
               <ul className="mt-4 list-disc list-inside text-gray-700 space-y-1">
-                <li>Vito VIP ve sedan seçenekleri</li>
-                <li>Günlük 8-10 saat kullanım</li>
-                <li>Türkçe/İngilizce bilen profesyonel şoförler</li>
+                <li>{t('landing.dailyChauffeur.feature1')}</li>
+                <li>{t('landing.dailyChauffeur.feature2')}</li>
+                <li>{t('landing.dailyChauffeur.feature3')}</li>
               </ul>
               <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                <a href={`https://wa.me/905545812034?text=${encodeURIComponent('Merhaba, günlük şoförlü araç kiralama için teklif almak istiyorum.')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition">WhatsApp’tan Teklif Al</a>
+                <a href={`https://wa.me/905545812034?text=${encodeURIComponent(t('landing.dailyChauffeur.whatsappMessage'))}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition">{t('landing.dailyChauffeur.whatsappCTA')}</a>
               </div>
             </div>
             <div className="bg-gray-50 border rounded-2xl p-6 text-gray-600">
-              <div className="text-sm">Örnek paket: İstanbul içi 10 saat, 150 km dahil.</div>
+              <div className="text-sm">{t('landing.dailyChauffeur.example')}</div>
             </div>
           </div>
         </div>
@@ -111,11 +157,11 @@ export default function HomePage() {
 
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-bold text-gray-900">Hazır mısınız?</h2>
-          <p className="mt-2 text-gray-600">Talebinizi 1 dakikada iletin, ekibimiz size hemen dönüş yapsın.</p>
+          <h2 className="text-2xl font-bold text-gray-900">{t('landing.ready.title')}</h2>
+          <p className="mt-2 text-gray-600">{t('landing.ready.description')}</p>
           <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/customer-reservation" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition">Rezervasyon Talebi Gönder</Link>
-            <a href={`https://wa.me/905545812034?text=${encodeURIComponent('Merhaba, VIP transfer için bilgi/fiyat almak istiyorum.')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white text-green-700 border border-green-200 hover:border-green-300 hover:bg-green-50 transition">WhatsApp’tan Yaz</a>
+            <Link href="/customer-reservation" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition">{t('landing.sendRequest')}</Link>
+            <a href={`https://wa.me/905545812034?text=${encodeURIComponent(t('landing.whatsappMessage'))}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white text-green-700 border border-green-200 hover:border-green-300 hover:bg-green-50 transition">{t('landing.whatsappWrite')}</a>
           </div>
         </div>
       </section>

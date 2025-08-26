@@ -24,32 +24,23 @@
     "reports": "Raporlar"
   },
   "customerForm": {
-    "title": "ProTransfer",
-    "subtitle": "Rezervasyon Talebi",
-    "description": "Transfer talebinizi doldurun, size en uygun fiyatı sunalım",
-    "date": "Transfer Tarihi *",
-    "time": "Transfer Saati *",
-    "from": "Nereden *",
-    "to": "Nereye *",
-    "customLocation": "Özel Konum",
-    "addressPlaceholder": "Adres veya konum girin",
-    "flightCode": "Uçuş Kodu (Opsiyonel)",
-    "flightCodePlaceholder": "TK1234",
-    "passengers": "Yolcu Adları *",
-    "passengerPlaceholder": "Yolcu {number} adı",
-    "addPassenger": "+ Yolcu Ekle",
-    "removePassenger": "Kaldır",
-    "luggage": "Bagaj Sayısı",
-    "phone": "Telefon Numarası *",
-    "phonePlaceholder": "+90 5XX XXX XX XX",
-    "email": "E-posta (Opsiyonel)",
-    "emailPlaceholder": "ornek@email.com",
-    "specialRequests": "Özel Talepler (Opsiyonel)",
-    "specialRequestsPlaceholder": "Özel isteklerinizi buraya yazabilirsiniz...",
-    "submitButton": "Rezervasyon Talebi Gönder",
-    "sending": "Gönderiliyor...",
-    "infoNote1": "✅ Rezervasyon talebiniz alındıktan sonra size en uygun fiyatla dönüş yapacağız",
-    "infoNote2": "📞 Telefon numaranızı doğru girdiğinizden emin olun"
+    "title": "VIP Havalimanı Transfer Talebi",
+    "subtitle": "VIP transfer hizmetiniz için aşağıdaki formu doldurun",
+    "name": "Ad Soyad",
+    "phone": "Telefon Numarası",
+    "email": "E-posta Adresi",
+    "date": "Transfer Tarihi",
+    "time": "Transfer Saati",
+    "flightNumber": "Uçuş Numarası",
+    "airport": "Havalimanı",
+    "pickupLocation": "Alış Yeri",
+    "dropoffLocation": "Bırakış Yeri",
+    "passengers": "Yolcu Sayısı",
+    "specialRequests": "Özel Talepler",
+    "submit": "Talep Gönder",
+    "loading": "Gönderiliyor...",
+    "success": "Talep başarıyla gönderildi!",
+    "error": "Talep gönderilemedi. Lütfen tekrar deneyin."
   },
   "thankYou": {
     "title": "Teşekkürler!",
@@ -124,5 +115,96 @@
     "route": "GÜZERGAH",
     "passengers": "YOLCULAR",
     "status": "DURUM"
+  },
+  "navigation": {
+    "newReservation": "Yeni Rezervasyon",
+    "allReservations": "Tüm Rezervasyonlar",
+    "reports": "Raporlar",
+    "drivers": "Şoförler"
+  },
+  "landing": {
+    "title": "İstanbul'da VIP Havalimanı Transferi",
+    "description": "IST/SAW ↔ Otel/Adres arası konforlu, güvenli ve zamanında transfer. 7/24 hizmet, sabit fiyat, profesyonel şoförler.",
+    "sendRequest": "Rezervasyon Talebi Gönder",
+    "whatsappWrite": "WhatsApp'tan Yaz",
+    "whatsappMessage": "Merhaba, VIP transfer için bilgi/fiyat almak istiyorum.",
+    "service24h": "7/24 Hizmet",
+    "fixedPrice": "Sabit Fiyat",
+    "professionalDriver": "Profesyonel Şoför",
+    "capacity": "6 Kişi / 6 Bagaj",
+    "whyProTransfer": "Neden ProTransfer?",
+    "flightTracking": "Uçuş takibi ve gecikme toleransı",
+    "meetGreet": "Karşılama hizmeti ve bagaj desteği",
+    "childSeat": "Bebek koltuğu ve özel taleplere hızlı cevap",
+    "corporateOptions": "Kurumsal sözleşmeli transfer seçenekleri",
+    "priceNote": "Talep sonrası fiyatı WhatsApp ile iletiyoruz. Fiyatlar trafik/süreye göre değişmez.",
+    "customerReviews": "Müşteri Yorumları",
+    "googleReview": "Google Yorumu",
+    "review1": "Gece geç saatte indik, şoför bizi kapıda karşıladı. Çok konforlu bir yolculuktu.",
+    "review2": "Çocuk koltuğu talebimizi hazırlamışlardı, çok profesyonel ekip.",
+    "review3": "Uçuşumuz rötarlıydı, beklediler ve iletişimleri harikaydı.",
+    "review4": "Araç tertemizdi, sürüş güvenli ve rahattı. Tavsiye ederim.",
+    "review5": "İstanbul'daki taksi sorununa çok iyi çözüm; fiyatlar da gayet iyi.",
+    "review6": "Keşke daha önce sizinle çalışmaya başlasaydım.",
+    "faq": "SSS",
+    "faq1": {
+      "question": "1. Havalimanı transferini nasıl rezerve edebilirim?",
+      "answer": "Web sitemiz üzerinden 'Rezervasyon Talebi Gönder' butonuna tıklayın, formu doldurarak veya WhatsApp hattımızdan bize ulaşarak rezervasyon yapabilirsiniz."
+    },
+    "faq2": {
+      "question": "2. Rezervasyon için hangi bilgiler gerekli?",
+      "answer": "Uçuş bilgileri (uçuş kodu), varış/çıkış havalimanı, otel/adres bilgisi ve yolcu sayısı ve yolcu isimleri yeterlidir."
+    },
+    "faq3": {
+      "question": "3. Araçlarınız hangi model?",
+      "answer": "Tüm araçlarımız lüks VIP Mercedes Vito'dur. 6 kişilik ve 6 orta boy valiz kapasitesi var, konforlu ve geniş iç hacme sahiptir."
+    },
+    "faq4": {
+      "question": "4. Sürücüleriniz hangi dilleri konuşuyor?",
+      "answer": "Sürücülerimiz Türkçe ve İngilizce konuşmaktadır. Talebe göre Arapça konuşan şoför de ayarlanabilir."
+    },
+    "faq5": {
+      "question": "5. Uçağım gecikirse ne olur?",
+      "answer": "Uçuş numaranızı takip ediyoruz. Gecikme olması durumunda şoförünüz sizi bekler, ek ücret alınmaz."
+    },
+    "faq6": {
+      "question": "6. Bagaj limiti var mı?",
+      "answer": "Her VIP aracımızda 6 yolcu + 6 büyük valiz kapasitesi vardır."
+    },
+    "faq7": {
+      "question": "7. Ödeme yöntemleri nelerdir?",
+      "answer": "Şimdilik nakit ödeme ve İban havale kabul ediyoruz. Yakında online kredi kartı ödemesi de eklenecektir."
+    },
+    "faq8": {
+      "question": "8. Transfer süresi ne kadar sürüyor?",
+      "answer": "İstanbul Havalimanı–şehir merkezi ortalama 40–60 dakika, Sabiha Gökçen–şehir merkezi ortalama 60–90 dakika sürmektedir (trafik durumuna göre değişir)."
+    },
+    "faq9": {
+      "question": "9. Karşılama hizmetiniz var mı?",
+      "answer": "Evet, şoförümüz sizi havalimanı çıkışında isminizin yazılı olduğu tabela ile karşılar."
+    },
+    "faq10": {
+      "question": "10. Son dakika rezervasyon yapabilir miyim?",
+      "answer": "Evet, uçuşunuzdan en az 1 saat önce rezervasyon yapabilirsiniz."
+    },
+    "contact": "İletişim",
+    "contactWhatsApp": "Hızlı bilgi için WhatsApp",
+    "airportIST": "İstanbul Havalimanı (IST)",
+    "airportSAW": "Sabiha Gökçen Havalimanı (SAW)",
+    "beşiktaş": "Beşiktaş, İstanbul",
+    "dailyChauffeur": {
+      "title": "Günlük Şoförlü Araç Kiralama",
+      "description": "İstanbul içi iş toplantıları, şehir turu veya gün boyu ulaşım ihtiyaçlarınız için saatlik/günlük şoförlü araç kiralama hizmeti. Esnek rota, bekleme dahil.",
+      "feature1": "Vito VIP ve sedan seçenekleri",
+      "feature2": "Günlük 8-10 saat kullanım",
+      "feature3": "Türkçe/İngilizce bilen profesyonel şoförler",
+      "whatsappMessage": "Merhaba, günlük şoförlü araç kiralama için teklif almak istiyorum.",
+      "whatsappCTA": "WhatsApp'tan Teklif Al",
+      "example": "Örnek paket: İstanbul içi 10 saat, 150 km dahil."
+    },
+    "ready": {
+      "title": "Hazır mısınız?",
+      "description": "Talebinizi 1 dakikada iletin, ekibimiz size hemen dönüş yapsın."
+    }
   }
 }

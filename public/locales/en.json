@@ -24,32 +24,23 @@
     "reports": "Reports"
   },
   "customerForm": {
-    "title": "ProTransfer",
-    "subtitle": "Reservation Request",
-    "description": "Fill out your transfer request, we'll offer you the best price",
-    "date": "Transfer Date *",
-    "time": "Transfer Time *",
-    "from": "From *",
-    "to": "To *",
-    "customLocation": "Custom Location",
-    "addressPlaceholder": "Enter address or location",
-    "flightCode": "Flight Code (Optional)",
-    "flightCodePlaceholder": "TK1234",
-    "passengers": "Passenger Names *",
-    "passengerPlaceholder": "Passenger {number} name",
-    "addPassenger": "+ Add Passenger",
-    "removePassenger": "Remove",
-    "luggage": "Number of Luggage",
-    "phone": "Phone Number *",
-    "phonePlaceholder": "+90 5XX XXX XX XX",
-    "email": "Email (Optional)",
-    "emailPlaceholder": "example@email.com",
-    "specialRequests": "Special Requests (Optional)",
-    "specialRequestsPlaceholder": "Write your special requests here...",
-    "submitButton": "Send Reservation Request",
-    "sending": "Sending...",
-    "infoNote1": "✅ After receiving your reservation request, we'll get back to you with the best price",
-    "infoNote2": "📞 Make sure to enter your phone number correctly"
+    "title": "VIP Airport Transfer Request",
+    "subtitle": "Fill out the form below to request your VIP transfer service",
+    "name": "Full Name",
+    "phone": "Phone Number",
+    "email": "Email Address",
+    "date": "Transfer Date",
+    "time": "Transfer Time",
+    "flightNumber": "Flight Number",
+    "airport": "Airport",
+    "pickupLocation": "Pickup Location",
+    "dropoffLocation": "Dropoff Location",
+    "passengers": "Number of Passengers",
+    "specialRequests": "Special Requests",
+    "submit": "Send Request",
+    "loading": "Sending...",
+    "success": "Request sent successfully!",
+    "error": "Failed to send request. Please try again."
   },
   "thankYou": {
     "title": "Thank You!",
@@ -111,18 +102,104 @@
   },
   "customerPanel": {
     "title": "My Reservations",
-    "subtitle": "View and track your transfer reservations",
     "searchByPhone": "Search by Phone Number",
-    "phonePlaceholder": "Enter your phone number",
     "search": "Search",
-    "searching": "Searching...",
-    "loading": "Loading...",
-    "noReservations": "No reservations found",
-    "voucher": "VOUCHER",
-    "date": "DATE",
-    "time": "TIME",
-    "route": "ROUTE",
-    "passengers": "PASSENGERS",
-    "status": "STATUS"
+    "noResults": "No reservations found",
+    "loading": "Searching...",
+    "voucherNumber": "Voucher Number",
+    "date": "Date",
+    "time": "Time",
+    "pickup": "Pickup",
+    "dropoff": "Dropoff",
+    "passengers": "Passengers",
+    "status": "Status",
+    "price": "Price",
+    "confirmed": "Confirmed",
+    "pending": "Pending"
+  },
+  "landing": {
+    "title": "VIP Airport Transfer in Istanbul",
+    "description": "Comfortable, safe and timely transfer between IST/SAW ↔ Hotel/Address. 24/7 service, fixed price, professional drivers.",
+    "sendRequest": "Send Reservation Request",
+    "whatsappWrite": "Write on WhatsApp",
+    "whatsappMessage": "Hello, I would like to get information/price for VIP transfer.",
+    "service24h": "24/7 Service",
+    "fixedPrice": "Fixed Price",
+    "professionalDriver": "Professional Driver",
+    "capacity": "6 People / 6 Luggage",
+    "whyProTransfer": "Why ProTransfer?",
+    "flightTracking": "Flight tracking and delay tolerance",
+    "meetGreet": "Meet & greet service and luggage support",
+    "childSeat": "Child seat and quick response to special requests",
+    "corporateOptions": "Corporate contracted transfer options",
+    "priceNote": "We communicate the price via WhatsApp after the request. Prices do not change based on traffic/duration.",
+    "customerReviews": "Customer Reviews",
+    "googleReview": "Google Review",
+    "review1": "We arrived late at night, the driver met us at the door. It was a very comfortable journey.",
+    "review2": "They had prepared our child seat request, very professional team.",
+    "review3": "Our flight was delayed, they waited and their communication was wonderful.",
+    "review4": "The vehicle was spotless, the ride was safe and comfortable. I recommend.",
+    "review5": "Very good solution to Istanbul's taxi problem; prices are also very good.",
+    "review6": "I wish I had started working with you earlier.",
+    "faq": "FAQ",
+    "faq1": {
+      "question": "1. How can I reserve airport transfer?",
+      "answer": "Click 'Send Reservation Request' on our website, fill out the form, or contact us via WhatsApp to make a reservation."
+    },
+    "faq2": {
+      "question": "2. What information is required for reservation?",
+      "answer": "Flight information (flight code), arrival/departure airport, hotel/address information, number of passengers and passenger names are sufficient."
+    },
+    "faq3": {
+      "question": "3. What model are your vehicles?",
+      "answer": "All our vehicles are luxury VIP Mercedes Vito. 6 passengers and 6 medium-sized suitcase capacity, comfortable and spacious interior."
+    },
+    "faq4": {
+      "question": "4. What languages do your drivers speak?",
+      "answer": "Our drivers speak Turkish and English. Arabic-speaking driver can be arranged upon request."
+    },
+    "faq5": {
+      "question": "5. What happens if my flight is delayed?",
+      "answer": "We track your flight number. In case of delay, your driver will wait for you, no extra charge."
+    },
+    "faq6": {
+      "question": "6. Is there a luggage limit?",
+      "answer": "Each VIP vehicle has 6 passengers + 6 large suitcase capacity."
+    },
+    "faq7": {
+      "question": "7. What are the payment methods?",
+      "answer": "We currently accept cash payment and IBAN transfer. Online credit card payment will be added soon."
+    },
+    "faq8": {
+      "question": "8. How long does the transfer take?",
+      "answer": "Istanbul Airport-city center takes 40-60 minutes on average, Sabiha Gokcen-city center takes 60-90 minutes on average (varies according to traffic)."
+    },
+    "faq9": {
+      "question": "9. Do you have meet & greet service?",
+      "answer": "Yes, our driver meets you at the airport exit with a sign with your name."
+    },
+    "faq10": {
+      "question": "10. Can I make a last-minute reservation?",
+      "answer": "Yes, you can make a reservation at least 1 hour before your flight."
+    },
+    "contact": "Contact",
+    "contactWhatsApp": "Quick info via WhatsApp",
+    "airportIST": "Istanbul Airport (IST)",
+    "airportSAW": "Sabiha Gokcen Airport (SAW)",
+    "beşiktaş": "Beşiktaş, Istanbul",
+    "dailyChauffeur": {
+      "title": "Daily Chauffeur-Driven Car Rental",
+      "description": "Hourly/daily chauffeur-driven car rental service for business meetings, city tours or all-day transportation needs in Istanbul. Flexible route, waiting included.",
+      "feature1": "Vito VIP and sedan options",
+      "feature2": "Daily 8-10 hours usage",
+      "feature3": "Professional drivers speaking Turkish/English",
+      "whatsappMessage": "Hello, I would like to get a quote for daily chauffeur-driven car rental.",
+      "whatsappCTA": "Get Quote via WhatsApp",
+      "example": "Example package: 10 hours in Istanbul, 150 km included."
+    },
+    "ready": {
+      "title": "Ready?",
+      "description": "Send your request in 1 minute, our team will get back to you immediately."
+    }
   }
 }
