@@ -1,11 +1,17 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Airport, AIRPORTS, Currency, CURRENCIES } from '../types';
 import { HOTELS } from '@/app/types';
 import { useLanguage } from '../contexts/LanguageContext';
 import LanguageSelector from '../components/LanguageSelector';
+
+declare global {
+  interface Window {
+    google: any;
+  }
+}
 
 export default function CustomerReservationPage() {
     const router = useRouter();
@@ -39,8 +45,131 @@ export default function CustomerReservationPage() {
     const [currency, setCurrency] = useState<Currency>('TRY' as Currency);
     const [fxTRY, setFxTRY] = useState<number>(1);
     const [calculatingDistance, setCalculatingDistance] = useState(false);
+    const [fromAddress, setFromAddress] = useState('');
+    const [toAddress, setToAddress] = useState('');
 
-    // Fetch TRY-based FX (USD->TRY) is already in reports API; for simplicity keep static here (can be wired later)
+    // Refs for Google Places Autocomplete
+    const fromInputRef = useRef<HTMLInputElement>(null);
+    const toInputRef = useRef<HTMLInputElement>(null);
+
+    // Load Google Maps API
+    useEffect(() => {
+        const loadGoogleMapsAPI = () => {
+            if (window.google) return;
+
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places`;
+            script.async = true;
+            script.defer = true;
+            script.onload = initializeGooglePlaces;
+            document.head.appendChild(script);
+        };
+
+        loadGoogleMapsAPI();
+    }, []);
+
+    const initializeGooglePlaces = () => {
+        if (!window.google || !fromInputRef.current || !toInputRef.current) return;
+
+        // Initialize From autocomplete
+        const fromAutocomplete = new window.google.maps.places.Autocomplete(fromInputRef.current, {
+            types: ['address'],
+            componentRestrictions: { country: 'tr' }
+        });
+
+        // Initialize To autocomplete
+        const toAutocomplete = new window.google.maps.places.Autocomplete(toInputRef.current, {
+            types: ['address'],
+            componentRestrictions: { country: 'tr' }
+        });
+
+        // Listen for place selection
+        fromAutocomplete.addListener('place_changed', () => {
+            const place = fromAutocomplete.getPlace();
+            if (place.formatted_address) {
+                setFromAddress(place.formatted_address);
+                calculateDistance();
+            }
+        });
+
+        toAutocomplete.addListener('place_changed', () => {
+            const place = toAutocomplete.getPlace();
+            if (place.formatted_address) {
+                setToAddress(place.formatted_address);
+                calculateDistance();
+            }
+        });
+    };
+
+    const calculateDistance = async () => {
+        if (!fromAddress || !toAddress || !window.google) return;
+
+        setCalculatingDistance(true);
+        try {
+            const service = new window.google.maps.DistanceMatrixService();
+            
+            const request = {
+                origins: [fromAddress],
+                destinations: [toAddress],
+                travelMode: window.google.maps.TravelMode.DRIVING,
+                unitSystem: window.google.maps.UnitSystem.METRIC
+            };
+
+            service.getDistanceMatrix(request, (response: any, status: string) => {
+                if (status === 'OK' && response.rows[0].elements[0].status === 'OK') {
+                    const distance = response.rows[0].elements[0].distance.value / 1000; // Convert to km
+                    setDistanceKm(Math.round(distance));
+                } else {
+                    console.error('Distance calculation failed:', status);
+                }
+                setCalculatingDistance(false);
+            });
+        } catch (error) {
+            console.error('Distance calculation error:', error);
+            setCalculatingDistance(false);
+        }
+    };
+
+    // Auto-calculate distance when both addresses are filled
+    useEffect(() => {
+        if (!customFrom && !customTo && formData.from && formData.to) {
+            setCalculatingDistance(true);
+            try {
+                const fromLocation = AIRPORTS[formData.from as Airport] || formData.from;
+                const toLocation = AIRPORTS[formData.to as Airport] || formData.to;
+                
+                // For now, use a simple estimation based on known routes
+                let estimatedDistance = 0;
+                
+                // Istanbul airport routes
+                if (fromLocation.includes('İstanbul') || toLocation.includes('İstanbul')) {
+                    if (fromLocation.includes('Sabiha') || toLocation.includes('Sabiha')) {
+                        estimatedDistance = 45; // SAW to city center
+                    } else {
+                        estimatedDistance = 35; // IST to city center
+                    }
+                }
+                // Izmir routes
+                else if (fromLocation.includes('İzmir') || toLocation.includes('İzmir')) {
+                    estimatedDistance = 25; // ADB to city center
+                }
+                // Antalya routes
+                else if (fromLocation.includes('Antalya') || toLocation.includes('Antalya')) {
+                    estimatedDistance = 15; // AYT to city center
+                }
+                // Custom addresses - rough estimation
+                else {
+                    estimatedDistance = 20; // Default for custom addresses
+                }
+                
+                setDistanceKm(estimatedDistance);
+            } catch (error) {
+                console.error('Distance calculation error:', error);
+            } finally {
+                setCalculatingDistance(false);
+            }
+        }
+    }, [formData.from, formData.to, customFrom, customTo]);
 
     const basePriceTRY = useMemo(() => {
         if (distanceKm <= 10) return 700;
@@ -58,52 +187,6 @@ export default function CustomerReservationPage() {
         if (currency === 'EUR' && fxTRY > 0) return +(basePriceTRY / fxTRY * 0.92).toFixed(2); // rough factor; to be replaced by real FX
         return basePriceTRY;
     }, [basePriceTRY, currency, fxTRY]);
-
-    // Auto-calculate distance when both addresses are filled
-    useEffect(() => {
-        const calculateDistance = async () => {
-            if (!customFrom && !customTo && formData.from && formData.to) {
-                setCalculatingDistance(true);
-                try {
-                    const fromLocation = AIRPORTS[formData.from as Airport] || formData.from;
-                    const toLocation = AIRPORTS[formData.to as Airport] || formData.to;
-                    
-                    // For now, use a simple estimation based on known routes
-                    // In production, integrate with Google Maps Distance Matrix API
-                    let estimatedDistance = 0;
-                    
-                    // Istanbul airport routes
-                    if (fromLocation.includes('İstanbul') || toLocation.includes('İstanbul')) {
-                        if (fromLocation.includes('Sabiha') || toLocation.includes('Sabiha')) {
-                            estimatedDistance = 45; // SAW to city center
-                        } else {
-                            estimatedDistance = 35; // IST to city center
-                        }
-                    }
-                    // Izmir routes
-                    else if (fromLocation.includes('İzmir') || toLocation.includes('İzmir')) {
-                        estimatedDistance = 25; // ADB to city center
-                    }
-                    // Antalya routes
-                    else if (fromLocation.includes('Antalya') || toLocation.includes('Antalya')) {
-                        estimatedDistance = 15; // AYT to city center
-                    }
-                    // Custom addresses - rough estimation
-                    else {
-                        estimatedDistance = 20; // Default for custom addresses
-                    }
-                    
-                    setDistanceKm(estimatedDistance);
-                } catch (error) {
-                    console.error('Distance calculation error:', error);
-                } finally {
-                    setCalculatingDistance(false);
-                }
-            }
-        };
-
-        calculateDistance();
-    }, [formData.from, formData.to, customFrom, customTo]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -346,10 +429,11 @@ export default function CustomerReservationPage() {
                                     </select>
                                     {customFrom && (
                                         <input
+                                            ref={fromInputRef}
                                             type="text"
                                             placeholder={t('customerForm.addressPlaceholder')}
-                                            value={formData.from}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, from: e.target.value }))}
+                                            value={fromAddress}
+                                            onChange={(e) => setFromAddress(e.target.value)}
                                             required
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         />
@@ -389,10 +473,11 @@ export default function CustomerReservationPage() {
                                     </select>
                                     {customTo && (
                                         <input
+                                        ref={toInputRef}
                                         type="text"
                                         placeholder={t('customerForm.addressPlaceholder')}
-                                        value={formData.to}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, to: e.target.value }))}
+                                        value={toAddress}
+                                        onChange={(e) => setToAddress(e.target.value)}
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
@@ -432,7 +517,6 @@ export default function CustomerReservationPage() {
                                     <div className="text-2xl font-bold">{priceInSelected} {currency}</div>
                                 </div>
                             </div>
-                            <div className="text-xs text-gray-500 mt-2">Not: Fiyat aralıkları 0-10km 700₺, 0-20km 1200₺, 0-35km 1500₺, 0-50km 2000₺, 0-60km 2500₺ şeklindedir.</div>
                         </div>
 
                         {/* Uçuş Bilgisi */}
