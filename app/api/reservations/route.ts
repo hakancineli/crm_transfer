@@ -112,13 +112,18 @@ export async function POST(request: NextRequest) {
                     data.specialRequests ? `Not: ${data.specialRequests}` : undefined
                 ].filter(Boolean).join('\n');
 
-                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                const tgRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: CHAT_ID, text: textLines })
+                    body: JSON.stringify({ chat_id: String(CHAT_ID), text: textLines })
                 });
+
+                if (!tgRes.ok) {
+                    const errText = await tgRes.text();
+                    console.error('Telegram bildirim hatası (response):', errText);
+                }
             } catch (notifyErr) {
-                console.error('Telegram bildirim hatası:', notifyErr);
+                console.error('Telegram bildirim hatası (fetch):', notifyErr);
             }
         }
 
