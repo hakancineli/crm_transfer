@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import VehicleSlider from './components/landing/VehicleSlider';
 
 export default function HomePage() {
   return (
@@ -21,7 +22,8 @@ export default function HomePage() {
               </div>
             </div>
             <div className="lg:pl-8">
-              <div className="bg-white border rounded-2xl shadow p-6">
+              <VehicleSlider />
+              <div className="bg-white border rounded-2xl shadow p-6 mt-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Neden ProTransfer?</h2>
                 <ul className="space-y-3 text-gray-700">
                   <li>• Uçuş takibi ve gecikme toleransı</li>
