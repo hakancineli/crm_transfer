@@ -60,6 +60,14 @@ export default function HomePage() {
                   <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">Google Yorumu</span></div>
                   <p>“Araç tertemizdi, sürüş güvenli ve rahattı. Tavsiye ederim.”</p>
                 </div>
+                <div>
+                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">Google Yorumu</span></div>
+                  <p>“İstanbul’daki taksi sorununa çok iyi çözüm; fiyatlar da gayet iyi.”</p>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">Google Yorumu</span></div>
+                  <p>“Keşke daha önce sizinle çalışmaya başlasaydım.”</p>
+                </div>
               </div>
             </div>
             <div className="bg-white border rounded-xl p-6 shadow-sm">
