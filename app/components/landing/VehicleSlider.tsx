@@ -28,18 +28,43 @@ export default function VehicleSlider() {
     return () => clearInterval(id);
   }, []);
 
+  const goPrev = () => setIndex((prev) => (prev - 1 + images.length) % images.length);
+  const goNext = () => setIndex((prev) => (prev + 1) % images.length);
+
   return (
     <div className="relative w-full overflow-hidden rounded-xl border bg-white shadow">
       <div
         className="flex transition-transform duration-700"
         style={{ transform: `translateX(-${index * 100}%)`, width: `${images.length * 100}%` }}
       >
-        {images.map((src) => (
-          <div key={src} className="relative w-full shrink-0 h-56 sm:h-64 md:h-72 lg:h-80 xl:h-96 bg-black">
-            <Image src={src} alt="Mercedes Vito VIP" fill className="object-contain object-center" sizes="(max-width: 1280px) 100vw, 600px" />
+        {images.map((src, i) => (
+          <div key={src} className="relative w-full shrink-0 h-56 sm:h-64 md:h-72 lg:h-80 xl:h-96 bg-white">
+            <Image
+              src={src}
+              alt="Mercedes Vito VIP"
+              fill
+              className="object-contain object-center"
+              sizes="(max-width: 1280px) 100vw, 600px"
+              priority={i === 0}
+            />
           </div>
         ))}
       </div>
+
+      {/* Edge click areas for navigation */}
+      <button
+        type="button"
+        aria-label="Önceki"
+        onClick={goPrev}
+        className="absolute left-0 top-0 h-full w-1/5 cursor-pointer bg-transparent hover:bg-black/5 transition-colors"
+      />
+      <button
+        type="button"
+        aria-label="Sonraki"
+        onClick={goNext}
+        className="absolute right-0 top-0 h-full w-1/5 cursor-pointer bg-transparent hover:bg-black/5 transition-colors"
+      />
+
       <div className="absolute inset-x-0 bottom-2 flex items-center justify-center gap-2">
         {images.map((_, i) => (
           <button
