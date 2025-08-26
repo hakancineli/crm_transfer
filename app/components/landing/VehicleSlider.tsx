@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const images = [
   '/vehicles/vito-1.jpg',
@@ -18,8 +18,12 @@ const images = [
   '/vehicles/vito-12.jpg',
 ];
 
+const transparent1x1 =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/epb7OQAAAAASUVORK5CYII=';
+
 export default function VehicleSlider() {
   const [index, setIndex] = useState(0);
+  const [loaded, setLoaded] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -31,24 +35,38 @@ export default function VehicleSlider() {
   const goPrev = () => setIndex((prev) => (prev - 1 + images.length) % images.length);
   const goNext = () => setIndex((prev) => (prev + 1) % images.length);
 
+  const eagerSet = useMemo(() => {
+    const next = (index + 1) % images.length;
+    const prev = (index - 1 + images.length) % images.length;
+    return new Set([images[index], images[next], images[prev]]);
+  }, [index]);
+
   return (
     <div className="relative w-full overflow-hidden rounded-xl border bg-white shadow">
       <div
         className="flex transition-transform duration-700"
         style={{ transform: `translateX(-${index * 100}%)`, width: `${images.length * 100}%` }}
       >
-        {images.map((src, i) => (
-          <div key={src} className="relative w-full shrink-0 aspect-video max-h-[420px] sm:max-h-[480px] lg:max-h-[520px] bg-neutral-900">
-            <Image
-              src={src}
-              alt="Mercedes Vito VIP"
-              fill
-              className="object-contain object-center"
-              sizes="(max-width: 1280px) 100vw, 600px"
-              priority={i === 0}
-            />
-          </div>
-        ))}
+        {images.map((src, i) => {
+          const isEager = eagerSet.has(src);
+          const isLoaded = loaded[src];
+          return (
+            <div key={src} className="relative w-full shrink-0 aspect-video max-h-[420px] sm:max-h-[480px] lg:max-h-[520px] bg-neutral-900">
+              <Image
+                src={src}
+                alt="Mercedes Vito VIP"
+                fill
+                className={`object-contain object-center transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+                sizes="100vw"
+                priority={isEager}
+                loading={isEager ? 'eager' : 'lazy'}
+                placeholder="blur"
+                blurDataURL={transparent1x1}
+                onLoad={() => setLoaded((s) => ({ ...s, [src]: true }))}
+              />
+            </div>
+          );
+        })}
       </div>
 
       <button
