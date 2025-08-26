@@ -38,7 +38,7 @@ export default function VehicleSlider() {
         style={{ transform: `translateX(-${index * 100}%)`, width: `${images.length * 100}%` }}
       >
         {images.map((src, i) => (
-          <div key={src} className="relative w-full shrink-0 h-56 sm:h-64 md:h-72 lg:h-80 xl:h-96 bg-white">
+          <div key={src} className="relative w-full shrink-0 aspect-video max-h-[420px] sm:max-h-[480px] lg:max-h-[520px] bg-neutral-900">
             <Image
               src={src}
               alt="Mercedes Vito VIP"
@@ -51,7 +51,6 @@ export default function VehicleSlider() {
         ))}
       </div>
 
-      {/* Edge click areas for navigation */}
       <button
         type="button"
         aria-label="Önceki"
