@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Airport, AIRPORTS, Currency, CURRENCIES } from '../types';
 import { HOTELS } from '@/app/types';
@@ -37,7 +37,8 @@ export default function CustomerReservationPage() {
     // Pricing calculator state
     const [distanceKm, setDistanceKm] = useState<number>(0);
     const [currency, setCurrency] = useState<Currency>('TRY' as Currency);
-    const [fxTRY, setFxTRY] = useState<number>(1); // TRY base; if non-TRY selected, convert
+    const [fxTRY, setFxTRY] = useState<number>(1);
+    const [calculatingDistance, setCalculatingDistance] = useState(false);
 
     // Fetch TRY-based FX (USD->TRY) is already in reports API; for simplicity keep static here (can be wired later)
 
@@ -57,6 +58,52 @@ export default function CustomerReservationPage() {
         if (currency === 'EUR' && fxTRY > 0) return +(basePriceTRY / fxTRY * 0.92).toFixed(2); // rough factor; to be replaced by real FX
         return basePriceTRY;
     }, [basePriceTRY, currency, fxTRY]);
+
+    // Auto-calculate distance when both addresses are filled
+    useEffect(() => {
+        const calculateDistance = async () => {
+            if (!customFrom && !customTo && formData.from && formData.to) {
+                setCalculatingDistance(true);
+                try {
+                    const fromLocation = AIRPORTS[formData.from as Airport] || formData.from;
+                    const toLocation = AIRPORTS[formData.to as Airport] || formData.to;
+                    
+                    // For now, use a simple estimation based on known routes
+                    // In production, integrate with Google Maps Distance Matrix API
+                    let estimatedDistance = 0;
+                    
+                    // Istanbul airport routes
+                    if (fromLocation.includes('İstanbul') || toLocation.includes('İstanbul')) {
+                        if (fromLocation.includes('Sabiha') || toLocation.includes('Sabiha')) {
+                            estimatedDistance = 45; // SAW to city center
+                        } else {
+                            estimatedDistance = 35; // IST to city center
+                        }
+                    }
+                    // Izmir routes
+                    else if (fromLocation.includes('İzmir') || toLocation.includes('İzmir')) {
+                        estimatedDistance = 25; // ADB to city center
+                    }
+                    // Antalya routes
+                    else if (fromLocation.includes('Antalya') || toLocation.includes('Antalya')) {
+                        estimatedDistance = 15; // AYT to city center
+                    }
+                    // Custom addresses - rough estimation
+                    else {
+                        estimatedDistance = 20; // Default for custom addresses
+                    }
+                    
+                    setDistanceKm(estimatedDistance);
+                } catch (error) {
+                    console.error('Distance calculation error:', error);
+                } finally {
+                    setCalculatingDistance(false);
+                }
+            }
+        };
+
+        calculateDistance();
+    }, [formData.from, formData.to, customFrom, customTo]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -359,7 +406,18 @@ export default function CustomerReservationPage() {
                             <div className="flex flex-col md:flex-row items-center gap-4">
                                 <div className="flex-1">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Mesafe (km)</label>
-                                    <input type="number" min={0} value={distanceKm} onChange={(e)=>setDistanceKm(parseFloat(e.target.value)||0)} className="w-full px-3 py-2 border rounded-lg" />
+                                    <div className="flex items-center gap-2">
+                                        <input 
+                                            type="number" 
+                                            min={0} 
+                                            value={distanceKm} 
+                                            onChange={(e)=>setDistanceKm(parseFloat(e.target.value)||0)} 
+                                            className="flex-1 px-3 py-2 border rounded-lg" 
+                                        />
+                                        {calculatingDistance && (
+                                            <div className="text-sm text-blue-600">Hesaplanıyor...</div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Para Birimi</label>
