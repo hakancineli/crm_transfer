@@ -68,7 +68,17 @@ export default function CustomerReservationPage() {
             });
 
             if (!response.ok) {
-                throw new Error('Rezervasyon talebi gönderilemedi');
+                let message = 'Rezervasyon talebi gönderilemedi';
+                try {
+                    const data = await response.json();
+                    if (data?.error) message = data.error;
+                } catch {
+                    try {
+                        const text = await response.text();
+                        if (text) message = text;
+                    } catch {}
+                }
+                throw new Error(message);
             }
 
             const result = await response.json();
