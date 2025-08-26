@@ -14,6 +14,8 @@ const images = [
   '/vehicles/vito-8.jpg',
   '/vehicles/vito-9.jpg',
   '/vehicles/vito-10.jpg',
+  '/vehicles/vito-11.jpg',
+  '/vehicles/vito-12.jpg',
 ];
 
 export default function VehicleSlider() {
