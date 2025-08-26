@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Airport, AIRPORTS, Currency, CURRENCIES } from '../types';
 import { HOTELS } from '@/app/types';
@@ -11,10 +11,7 @@ export default function CustomerReservationPage() {
     const router = useRouter();
     const { t } = useLanguage();
 
-    // Bugünün tarihini YYYY-MM-DD formatında al
     const today = new Date().toISOString().split('T')[0];
-    
-    // Son saati ayarla (23:59)
     const defaultTime = '23:59';
 
     const [formData, setFormData] = useState({
@@ -37,6 +34,30 @@ export default function CustomerReservationPage() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
 
+    // Pricing calculator state
+    const [distanceKm, setDistanceKm] = useState<number>(0);
+    const [currency, setCurrency] = useState<Currency>('TRY' as Currency);
+    const [fxTRY, setFxTRY] = useState<number>(1); // TRY base; if non-TRY selected, convert
+
+    // Fetch TRY-based FX (USD->TRY) is already in reports API; for simplicity keep static here (can be wired later)
+
+    const basePriceTRY = useMemo(() => {
+        if (distanceKm <= 10) return 700;
+        if (distanceKm <= 20) return 1200;
+        if (distanceKm <= 35) return 1500;
+        if (distanceKm <= 50) return 2000;
+        if (distanceKm <= 60) return 2500;
+        return 2500;
+    }, [distanceKm]);
+
+    const priceInSelected = useMemo(() => {
+        if (currency === 'TRY') return basePriceTRY;
+        // simple conversion using fxTRY as TRY per selected unit
+        if (currency === 'USD' && fxTRY > 0) return +(basePriceTRY / fxTRY).toFixed(2);
+        if (currency === 'EUR' && fxTRY > 0) return +(basePriceTRY / fxTRY * 0.92).toFixed(2); // rough factor; to be replaced by real FX
+        return basePriceTRY;
+    }, [basePriceTRY, currency, fxTRY]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -58,8 +79,8 @@ export default function CustomerReservationPage() {
                     flightCode: formData.flightCode,
                     passengerNames: formData.passengerNames,
                     luggageCount: formData.luggageCount,
-                    price: 0, // Müşteri fiyat görmeyecek
-                    currency: 'USD',
+                    price: 0,
+                    currency: currency,
                     phoneNumber,
                     email: formData.email,
                     specialRequests: formData.specialRequests,
@@ -83,17 +104,13 @@ export default function CustomerReservationPage() {
 
             const result = await response.json();
             setSuccess(true);
-            
-            // Sunucuyu yeniden başlat
+
             try {
-                await fetch('/api/restart', {
-                    method: 'POST',
-                });
+                await fetch('/api/restart', { method: 'POST' });
             } catch (error) {
                 console.error('Sunucu yeniden başlatılamadı:', error);
             }
 
-            // Müşteriye teşekkür sayfasına yönlendir
             setTimeout(() => {
                 router.push('/customer-reservation/thank-you');
             }, 2000);
@@ -132,13 +149,12 @@ export default function CustomerReservationPage() {
     };
 
     const formatLocation = (location: string) => {
-        if (location.includes('IST') || location.includes('SAW')) {
+        if (location.includes('IST') || location.includes('SAW') || location.includes('ADB') || location.includes('AYT')) {
             return location;
         }
         return location;
     };
 
-    // Ülke telefon kodları (genişletilmiş listeden bir seçim)
     const COUNTRY_DIAL_CODES = [
         { code: '+90', label: 'Türkiye (+90)' },
         { code: '+44', label: 'United Kingdom (+44)' },
@@ -325,7 +341,7 @@ export default function CustomerReservationPage() {
                                         </optgroup>
                                     </select>
                                     {customTo && (
-                                                                            <input
+                                        <input
                                         type="text"
                                         placeholder={t('customerForm.addressPlaceholder')}
                                         value={formData.to}
@@ -336,6 +352,29 @@ export default function CustomerReservationPage() {
                                     )}
                                 </div>
                             </div>
+                        </div>
+
+                        {/* Pricing Calculator */}
+                        <div className="rounded-xl border bg-gray-50 p-4">
+                            <div className="flex flex-col md:flex-row items-center gap-4">
+                                <div className="flex-1">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Mesafe (km)</label>
+                                    <input type="number" min={0} value={distanceKm} onChange={(e)=>setDistanceKm(parseFloat(e.target.value)||0)} className="w-full px-3 py-2 border rounded-lg" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Para Birimi</label>
+                                    <select value={currency} onChange={(e)=>setCurrency(e.target.value as Currency)} className="px-3 py-2 border rounded-lg">
+                                        {Object.keys(CURRENCIES).map((c)=> (
+                                            <option key={c} value={c}>{c}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="text-right md:w-56">
+                                    <div className="text-xs text-gray-500">Tahmini Fiyat</div>
+                                    <div className="text-2xl font-bold">{priceInSelected} {currency}</div>
+                                </div>
+                            </div>
+                            <div className="text-xs text-gray-500 mt-2">Not: Fiyat aralıkları 0-10km 700₺, 0-20km 1200₺, 0-35km 1500₺, 0-50km 2000₺, 0-60km 2500₺ şeklindedir.</div>
                         </div>
 
                         {/* Uçuş Bilgisi */}
@@ -455,14 +494,12 @@ export default function CustomerReservationPage() {
                             />
                         </div>
 
-                        {/* Hata ve Başarı Mesajları */}
                         {error && (
                             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
                                 {error}
                             </div>
                         )}
 
-                        {/* Gönder Butonu */}
                         <div className="text-center">
                             <button
                                 type="submit"
@@ -473,7 +510,6 @@ export default function CustomerReservationPage() {
                             </button>
                         </div>
 
-                        {/* Bilgi Notu */}
                         <div className="text-center text-sm text-gray-500 bg-gray-50 p-4 rounded-lg">
                             <p>{t('customerForm.infoNote1')}</p>
                             <p>{t('customerForm.infoNote2')}</p>
