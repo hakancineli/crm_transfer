@@ -58,7 +58,7 @@ export default function CustomerReservationPage() {
             if (window.google) return;
 
             const script = document.createElement('script');
-            script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places`;
+            script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDukos1he2nZib7AuKMZyHvCTyntZrvlzk&libraries=places`;
             script.async = true;
             script.defer = true;
             script.onload = initializeGooglePlaces;
