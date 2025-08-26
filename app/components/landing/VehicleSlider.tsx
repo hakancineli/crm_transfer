@@ -27,7 +27,7 @@ export default function VehicleSlider() {
   useEffect(() => {
     const id = setInterval(() => {
       setIndex((prev) => (prev + 1) % images.length);
-    }, 4000);
+    }, 7000);
     return () => clearInterval(id);
   }, []);
 
