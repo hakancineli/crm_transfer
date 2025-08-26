@@ -4,15 +4,11 @@ export function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
 	// Admin sayfaları için şifre koruması
-	const adminRoutes = ['/reservations', '/reports', '/drivers'];
-	const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route));
+	const isAdminRoute = pathname.startsWith('/admin') || pathname.startsWith('/reservations') || pathname.startsWith('/reports') || pathname.startsWith('/drivers');
 
 	if (isAdminRoute) {
-		// Basit şifre kontrolü - session'da admin flag var mı?
 		const adminSession = request.cookies.get('admin-auth');
-		
 		if (!adminSession || adminSession.value !== 'true') {
-			// Admin giriş sayfasına yönlendir
 			return NextResponse.redirect(new URL('/admin-login', request.url));
 		}
 	}
@@ -21,5 +17,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-	matcher: ['/reservations/:path*', '/reports/:path*', '/drivers/:path*', '/admin-login']
+	matcher: ['/((?!_next/static|_next/image|favicon.ico|public).*)']
 };

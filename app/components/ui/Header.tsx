@@ -12,11 +12,11 @@ export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { t } = useLanguage();
 
-    // Müşteri ekranlarında yönetim linklerini gizle
-    const isCustomerContext = pathname.startsWith('/customer-reservation') || pathname.startsWith('/customer-panel');
+    // Müşteri ekranlarında yönetim linklerini gizle (ana sayfa dahil)
+    const isCustomerContext = pathname === '/' || pathname.startsWith('/customer-reservation') || pathname.startsWith('/customer-panel');
 
     const adminNavigation = [
-        { name: t('header.newReservation'), href: '/' },
+        { name: t('header.newReservation'), href: '/admin/new-reservation' },
         { name: t('header.allReservations'), href: '/reservations' },
         { name: t('header.reports'), href: '/reports' },
     ];
@@ -27,8 +27,8 @@ export default function Header() {
 
     const navigation = isCustomerContext ? customerNavigation : adminNavigation;
 
-    // Logo link'i - müşteri ekranlarında müşteri paneline, admin ekranlarında ana sayfaya
-    const logoHref = isCustomerContext ? '/customer-panel' : '/';
+    // Logo link'i - müşteri ekranlarında müşteri paneline/landing'e, admin ekranlarında ana sayfaya
+    const logoHref = isCustomerContext ? '/' : '/';
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/75 shadow">
