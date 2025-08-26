@@ -35,8 +35,8 @@ export default function VehicleSlider() {
         style={{ transform: `translateX(-${index * 100}%)`, width: `${images.length * 100}%` }}
       >
         {images.map((src) => (
-          <div key={src} className="relative w-full shrink-0 h-56 sm:h-64 md:h-72 lg:h-80 xl:h-96">
-            <Image src={src} alt="Mercedes Vito VIP" fill className="object-cover object-center" sizes="(max-width: 1280px) 100vw, 600px" />
+          <div key={src} className="relative w-full shrink-0 h-56 sm:h-64 md:h-72 lg:h-80 xl:h-96 bg-black">
+            <Image src={src} alt="Mercedes Vito VIP" fill className="object-contain object-center" sizes="(max-width: 1280px) 100vw, 600px" />
           </div>
         ))}
       </div>
