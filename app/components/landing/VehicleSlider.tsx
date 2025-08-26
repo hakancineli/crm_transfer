@@ -29,23 +29,23 @@ export default function VehicleSlider() {
   }, []);
 
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl border bg-white shadow">
+    <div className="relative w-full overflow-hidden rounded-xl border bg-white shadow">
       <div
         className="flex transition-transform duration-700"
         style={{ transform: `translateX(-${index * 100}%)`, width: `${images.length * 100}%` }}
       >
         {images.map((src) => (
-          <div key={src} className="relative w-full shrink-0 aspect-[16/9]">
-            <Image src={src} alt="Mercedes Vito VIP" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 600px" />
+          <div key={src} className="relative w-full shrink-0 h-56 sm:h-64 md:h-72 lg:h-80 xl:h-96">
+            <Image src={src} alt="Mercedes Vito VIP" fill className="object-cover object-center" sizes="(max-width: 1280px) 100vw, 600px" />
           </div>
         ))}
       </div>
-      <div className="absolute inset-x-0 bottom-3 flex items-center justify-center gap-2">
+      <div className="absolute inset-x-0 bottom-2 flex items-center justify-center gap-2">
         {images.map((_, i) => (
           <button
             key={i}
             onClick={() => setIndex(i)}
-            className={`h-2 w-2 rounded-full ${i === index ? 'bg-green-600' : 'bg-gray-300'}`}
+            className={`h-1.5 w-1.5 rounded-full ${i === index ? 'bg-green-600' : 'bg-gray-300'}`}
             aria-label={`Slide ${i + 1}`}
           />
         ))}
