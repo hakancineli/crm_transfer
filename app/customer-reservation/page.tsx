@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useLanguage } from '@/app/contexts/LanguageContext';
 
 type Currency = 'TRY' | 'USD' | 'EUR' | 'SAR';
 
 export default function CustomerReservationPage() {
+  const { t } = useLanguage();
   const [date, setDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState<string>('23:59');
   const [from, setFrom] = useState<string>('');
@@ -201,22 +203,22 @@ export default function CustomerReservationPage() {
           )}
 
           <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start md:items-center">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Transfer Date</label>
+                <label className="block text-sm font-medium text-gray-700">{t('customerForm.transferDate') || 'Transfer Date'}</label>
                 <input type="date" value={date} onChange={e => setDate(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500" required />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Transfer Time</label>
+                <label className="block text-sm font-medium text-gray-700">{t('customerForm.transferTime') || 'Transfer Time'}</label>
                 <input type="time" value={time} onChange={e => setTime(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500" required />
               </div>
             </div>
           </div>
 
           <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start md:items-center">
               <div>
-                <label className="block text-sm font-medium text-gray-700">From</label>
+                <label className="block text-sm font-medium text-gray-700">{t('customerForm.from') || 'From'}</label>
                 <input
                   ref={fromInputRef}
                   type="text"
@@ -227,7 +229,7 @@ export default function CustomerReservationPage() {
                     if (fromDebounceRef.current) window.clearTimeout(fromDebounceRef.current);
                     fromDebounceRef.current = window.setTimeout(() => requestPredictions(v, 'from'), 150);
                   }}
-                  placeholder="Adres yazın (örn. Şirinevler)"
+                  placeholder={t('customerForm.fromPlaceholder') || 'Adres yazın (örn. Şirinevler)'}
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
                   autoComplete="off"
                   autoCorrect="off"
@@ -253,7 +255,7 @@ export default function CustomerReservationPage() {
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">To</label>
+                <label className="block text-sm font-medium text-gray-700">{t('customerForm.to') || 'To'}</label>
                 <input
                   ref={toInputRef}
                   type="text"
@@ -264,7 +266,7 @@ export default function CustomerReservationPage() {
                     if (toDebounceRef.current) window.clearTimeout(toDebounceRef.current);
                     toDebounceRef.current = window.setTimeout(() => requestPredictions(v, 'to'), 150);
                   }}
-                  placeholder="Adres yazın (örn. Havalimanı)"
+                  placeholder={t('customerForm.toPlaceholder') || 'Adres yazın (örn. Havalimanı)'}
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
                   autoComplete="off"
                   autoCorrect="off"
@@ -340,6 +342,7 @@ export default function CustomerReservationPage() {
                 </div>
               ))}
               <button type="button" onClick={addPassenger} className="px-3 py-2 border rounded-md text-sm">+ Yolcu ekle</button>
+              <p className="text-xs text-gray-600">Lütfen tüm yolcuların pasaporttaki tam isimlerini giriniz.</p>
             </div>
 
             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
