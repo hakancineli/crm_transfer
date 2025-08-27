@@ -19,6 +19,8 @@ export default function CustomerReservationPage() {
 
   const fromInputRef = useRef<HTMLInputElement | null>(null);
   const toInputRef = useRef<HTMLInputElement | null>(null);
+  const [fromPredictions, setFromPredictions] = useState<Array<{ description: string }>>([]);
+  const [toPredictions, setToPredictions] = useState<Array<{ description: string }>>([]);
 
   // Load Google Maps JS Places and attach Autocomplete
   useEffect(() => {
@@ -63,9 +65,39 @@ export default function CustomerReservationPage() {
     s.async = true;
     s.defer = true;
     s.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=tr`;
-    s.onload = initAutocomplete;
+    s.onload = () => {
+      initAutocomplete();
+      // retry a few times in case widget couldn't bind instantly
+      let attempts = 0;
+      const i = window.setInterval(() => {
+        attempts += 1;
+        initAutocomplete();
+        if (attempts > 5) window.clearInterval(i);
+      }, 500);
+    };
     document.head.appendChild(s);
   }, []);
+
+  // Fallback: manual predictions via AutocompleteService
+  const requestPredictions = (value: string, which: 'from' | 'to') => {
+    setError('');
+    if (!value || value.length < 2) {
+      if (which === 'from') setFromPredictions([]);
+      else setToPredictions([]);
+      return;
+    }
+    const g = (window as any).google;
+    if (!g?.maps?.places?.AutocompleteService) return; // wait for script
+    const service = new g.maps.places.AutocompleteService();
+    service.getPlacePredictions(
+      { input: value, componentRestrictions: { country: ['tr'] } },
+      (preds: Array<{ description: string }> | null) => {
+        const list = preds || [];
+        if (which === 'from') setFromPredictions(list);
+        else setToPredictions(list);
+      }
+    );
+  };
 
   const addPassenger = () => setPassengers(prev => [...prev, '']);
   const updatePassenger = (i: number, v: string) => setPassengers(prev => prev.map((p, idx) => (idx === i ? v : p)));
@@ -122,7 +154,11 @@ export default function CustomerReservationPage() {
                   ref={fromInputRef}
                   type="text"
                   value={from}
-                  onChange={e => setFrom(e.target.value)}
+                  onChange={e => {
+                    const v = e.target.value;
+                    setFrom(v);
+                    requestPredictions(v, 'from');
+                  }}
                   placeholder="Adres yazın (örn. Şirinevler)"
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
                   autoComplete="new-password"
@@ -132,6 +168,20 @@ export default function CustomerReservationPage() {
                   name="from-address"
                   required
                 />
+                {fromPredictions.length > 0 && (
+                  <div className="mt-1 border border-gray-200 rounded-md bg-white shadow-sm max-h-60 overflow-auto z-10 relative">
+                    {fromPredictions.map((p, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => { setFrom(p.description); setFromPredictions([]); }}
+                        className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
+                      >
+                        {p.description}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">To</label>
@@ -139,7 +189,11 @@ export default function CustomerReservationPage() {
                   ref={toInputRef}
                   type="text"
                   value={to}
-                  onChange={e => setTo(e.target.value)}
+                  onChange={e => {
+                    const v = e.target.value;
+                    setTo(v);
+                    requestPredictions(v, 'to');
+                  }}
                   placeholder="Adres yazın (örn. Havalimanı)"
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
                   autoComplete="new-password"
@@ -149,6 +203,20 @@ export default function CustomerReservationPage() {
                   name="to-address"
                   required
                 />
+                {toPredictions.length > 0 && (
+                  <div className="mt-1 border border-gray-200 rounded-md bg-white shadow-sm max-h-60 overflow-auto z-10 relative">
+                    {toPredictions.map((p, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => { setTo(p.description); setToPredictions([]); }}
+                        className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
+                      >
+                        {p.description}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
