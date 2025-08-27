@@ -28,7 +28,8 @@ export default function CustomerReservationPage() {
     function initAutocomplete() {
       if (typeof window === 'undefined' || !(window as any).google?.maps?.places) return;
 
-      const options: google.maps.places.AutocompleteOptions = {
+      // Avoid direct typing against global `google` namespace during SSR
+      const options: any = {
         fields: ['formatted_address', 'geometry', 'name'],
         componentRestrictions: { country: ['tr'] },
         types: ['geocode']
