@@ -113,17 +113,32 @@ export default function CustomerPanelPage() {
         setIsSearching(true);
         setIsLoading(true);
         try {
-            // Use the same endpoint as customer form
-            const response = await fetch(`/api/reservations?phone=${encodeURIComponent(composedPhone)}`);
-            const data = await response.json();
+            // Try multiple phone formats for better matching
+            const phoneVariations = [
+                composedPhone, // +90 5545812035
+                phoneLocal, // 5545812035 (just the local part)
+                phoneLocal.replace(/\s+/g, ''), // 5545812035 (no spaces)
+                `+90${phoneLocal}`, // +905545812035
+                `90${phoneLocal}`, // 905545812035
+                `0${phoneLocal}` // 05545812035
+            ];
+
+            let foundReservations = [];
             
-            if (Array.isArray(data)) {
-                setReservations(data);
-                setFilteredReservations(data);
-            } else {
-                setReservations([]);
-                setFilteredReservations([]);
+            // Try each phone format until we find results
+            for (const phoneFormat of phoneVariations) {
+                const response = await fetch(`/api/reservations?phone=${encodeURIComponent(phoneFormat)}`);
+                const data = await response.json();
+                
+                if (Array.isArray(data) && data.length > 0) {
+                    foundReservations = data;
+                    break;
+                }
             }
+            
+            setReservations(foundReservations);
+            setFilteredReservations(foundReservations);
+            
         } catch (error) {
             console.error('Telefon ile arama hatası:', error);
             setReservations([]);
