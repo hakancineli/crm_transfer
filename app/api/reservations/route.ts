@@ -137,6 +137,7 @@ export async function POST(request: NextRequest) {
                 price: data.price,
                 currency: data.currency,
                 phoneNumber: data.phoneNumber,
+                distanceKm: data.distanceKm,
                 voucherNumber,
                 driverId: null,
                 driverFee: null

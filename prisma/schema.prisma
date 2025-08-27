@@ -33,6 +33,7 @@ model Reservation {
   price         Float
   currency      String
   phoneNumber   String?  // Yeni alan
+  distanceKm    Float?   // Mesafe (km)
   voucherNumber String   @unique
   driverFee     Float?   // Sürücü hakediş tutarı (opsiyonel)
   driverId      String?  // Sürücü ID (opsiyonel)

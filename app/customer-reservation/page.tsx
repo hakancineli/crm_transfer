@@ -171,7 +171,19 @@ export default function CustomerReservationPage() {
       const res = await fetch('/api/reservations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date, time, from, to, flightCode, passengerNames: passengers, luggageCount, price: 0, currency, phoneNumber: phone })
+        body: JSON.stringify({ 
+          date, 
+          time, 
+          from, 
+          to, 
+          flightCode, 
+          passengerNames: passengers, 
+          luggageCount, 
+          price: estimatedPriceTRY || 0, 
+          currency, 
+          phoneNumber: phone,
+          distanceKm: distanceKm || null
+        })
       });
       if (!res.ok) {
         const text = await res.text();

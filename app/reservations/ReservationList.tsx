@@ -367,6 +367,11 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-900 align-middle">
                                                 <div className="font-semibold text-green-600">{reservation.price} {reservation.currency}</div>
+                                                {reservation.distanceKm && (
+                                                    <div className="text-xs text-gray-500">
+                                                        {reservation.distanceKm.toFixed(1)} km
+                                                    </div>
+                                                )}
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-900 align-middle">
                                                 {reservation.driver ? (
