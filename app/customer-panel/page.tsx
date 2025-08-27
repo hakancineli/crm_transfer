@@ -113,7 +113,8 @@ export default function CustomerPanelPage() {
         setIsSearching(true);
         setIsLoading(true);
         try {
-            const response = await fetch(`/api/customer-reservations?phone=${encodeURIComponent(composedPhone)}`);
+            // Use the same endpoint as customer form
+            const response = await fetch(`/api/reservations?phone=${encodeURIComponent(composedPhone)}`);
             const data = await response.json();
             
             if (Array.isArray(data)) {

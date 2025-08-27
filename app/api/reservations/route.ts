@@ -1,8 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const phone = searchParams.get('phone');
+
+    // If phone parameter is provided, search by phone number
+    if (phone) {
+      const normalized = phone.trim();
+      const noSpaces = normalized.replace(/\s+/g, '');
+
+      const reservations = await prisma.reservation.findMany({
+        where: {
+          OR: [
+            { phoneNumber: { equals: normalized } },
+            { phoneNumber: { equals: noSpaces } },
+            { phoneNumber: { contains: normalized, mode: 'insensitive' } }
+          ]
+        },
+        orderBy: [
+          { date: 'desc' },
+          { time: 'desc' }
+        ],
+        include: {
+          driver: true
+        }
+      });
+
+      // Parse passenger names for each reservation
+      const parsedReservations = reservations.map(reservation => {
+        try {
+          return {
+            ...reservation,
+            passengerNames: JSON.parse(reservation.passengerNames || '[]'),
+            createdAt: reservation.createdAt.toISOString()
+          };
+        } catch (error) {
+          console.error('Yolcu isimleri parse hatası:', error);
+          return {
+            ...reservation,
+            passengerNames: [],
+            createdAt: reservation.createdAt.toISOString()
+          };
+        }
+      });
+
+      return NextResponse.json(parsedReservations);
+    }
+
+    // If no phone parameter, return all reservations (admin panel)
     const reservations = await prisma.reservation.findMany({
       orderBy: [
         { date: 'desc' },
