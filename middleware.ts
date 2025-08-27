@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 export function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
-	// Admin sayfaları için şifre koruması
-	const isAdminRoute = pathname.startsWith('/admin') || pathname.startsWith('/reservations') || pathname.startsWith('/reports') || pathname.startsWith('/drivers');
+	// Admin sayfaları için şifre koruması (admin-login hariç)
+	const isAdminRoute = (pathname.startsWith('/admin') || pathname.startsWith('/reservations') || pathname.startsWith('/reports') || pathname.startsWith('/drivers')) && !pathname.startsWith('/admin-login');
 
 	if (isAdminRoute) {
 		const adminSession = request.cookies.get('admin-auth');
