@@ -58,7 +58,8 @@ export default function CustomerReservationPage() {
             if (window.google) return;
 
             const script = document.createElement('script');
-            script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDukos1he2nZib7AuKMZyHvCTyntZrvlzk&libraries=places`;
+            // Force Turkish suggestions and ensure Places library is loaded
+            script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDukos1he2nZib7AuKMZyHvCTyntZrvlzk&libraries=places&language=tr&region=TR`;
             script.async = true;
             script.defer = true;
             script.onload = initializeGooglePlaces;
@@ -73,14 +74,14 @@ export default function CustomerReservationPage() {
 
         // Initialize From autocomplete
         const fromAutocomplete = new window.google.maps.places.Autocomplete(fromInputRef.current, {
-            types: ['address'],
-            componentRestrictions: { country: 'tr' }
+            fields: ['formatted_address', 'geometry'],
+            componentRestrictions: { country: ['tr'] }
         });
 
         // Initialize To autocomplete
         const toAutocomplete = new window.google.maps.places.Autocomplete(toInputRef.current, {
-            types: ['address'],
-            componentRestrictions: { country: 'tr' }
+            fields: ['formatted_address', 'geometry'],
+            componentRestrictions: { country: ['tr'] }
         });
 
         // Listen for place selection
@@ -432,6 +433,8 @@ export default function CustomerReservationPage() {
                                             ref={fromInputRef}
                                             type="text"
                                             placeholder={t('customerForm.addressPlaceholder')}
+                        autoComplete="off"
+                        inputMode="text"
                                             value={fromAddress}
                                             onChange={(e) => setFromAddress(e.target.value)}
                                             required
@@ -476,6 +479,8 @@ export default function CustomerReservationPage() {
                                         ref={toInputRef}
                                         type="text"
                                         placeholder={t('customerForm.addressPlaceholder')}
+                        autoComplete="off"
+                        inputMode="text"
                                         value={toAddress}
                                         onChange={(e) => setToAddress(e.target.value)}
                                         required
