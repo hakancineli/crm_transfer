@@ -317,13 +317,13 @@ export default function CustomerReservationPage() {
           </div>
 
           <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Flight Code (optional)</label>
+                <label className="block text-sm font-medium text-gray-700">{t('customerForm.flightCode') || 'Flight Code (optional)'}</label>
                 <input type="text" value={flightCode} onChange={e => setFlightCode(e.target.value)} placeholder="TK1234" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Currency</label>
+                <label className="block text-sm font-medium text-gray-700">{t('customerForm.currency') || 'Currency'}</label>
                 <select value={currency} onChange={e => setCurrency(e.target.value as Currency)} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500">
                   <option value="TRY">TRY</option>
                   <option value="USD">USD</option>
@@ -348,13 +348,23 @@ export default function CustomerReservationPage() {
               <p className="text-xs text-gray-600">Lütfen tüm yolcuların pasaporttaki tam isimlerini giriniz.</p>
             </div>
 
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Number of Luggage</label>
-                <input type="number" min={0} value={Number.isNaN(luggageCount) ? 0 : luggageCount} onChange={e => setLuggageCount(Number.isNaN(parseInt(e.target.value, 10)) ? 0 : parseInt(e.target.value, 10))} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500" />
+                <label className="block text-sm font-medium text-gray-700">{t('customerForm.luggage') || 'Number of Luggage'}</label>
+                <input 
+                  type="number" 
+                  min={0} 
+                  value={luggageCount === 0 ? '' : luggageCount} 
+                  onChange={e => {
+                    const value = e.target.value;
+                    const numValue = value === '' ? 0 : parseInt(value, 10);
+                    setLuggageCount(Number.isNaN(numValue) ? 0 : numValue);
+                  }}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500" 
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Phone</label>
+                <label className="block text-sm font-medium text-gray-700">{t('customerForm.phone') || 'Phone'}</label>
                 <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="0554 581 20 34" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500" required />
               </div>
             </div>
