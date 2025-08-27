@@ -16,7 +16,7 @@ export default function CustomerReservationPage() {
   const [phone, setPhone] = useState<string>('');
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [debug, setDebug] = useState<{ hasKey: boolean; script: boolean; googleReady: boolean; lastPredFrom: number; lastPredTo: number }>({ hasKey: false, script: false, googleReady: false, lastPredFrom: 0, lastPredTo: 0 });
+  const [debug, setDebug] = useState<{ hasKey: boolean; script: boolean; googleReady: boolean; lastPredFrom: number; lastPredTo: number; lastStatus?: string }>({ hasKey: false, script: false, googleReady: false, lastPredFrom: 0, lastPredTo: 0 });
 
   const fromInputRef = useRef<HTMLInputElement | null>(null);
   const toInputRef = useRef<HTMLInputElement | null>(null);
@@ -103,13 +103,17 @@ export default function CustomerReservationPage() {
     const g = (window as any).google;
     if (!g?.maps?.places?.AutocompleteService) return; // wait for script
     const service = new g.maps.places.AutocompleteService();
+    const sessionToken = g.maps.places.AutocompleteSessionToken ? new g.maps.places.AutocompleteSessionToken() : undefined;
     service.getPlacePredictions(
-      { input: value, componentRestrictions: { country: ['tr'] } },
-      (preds: Array<{ description: string }> | null) => {
+      { input: value, componentRestrictions: { country: ['tr'] }, sessionToken, language: 'tr', region: 'TR' },
+      (preds: Array<{ description: string }> | null, status: string) => {
         const list = preds || [];
         if (which === 'from') setFromPredictions(list);
         else setToPredictions(list);
-        setDebug(prev => ({ ...prev, lastPredFrom: which === 'from' ? list.length : prev.lastPredFrom, lastPredTo: which === 'to' ? list.length : prev.lastPredTo }));
+        setDebug(prev => ({ ...prev, lastPredFrom: which === 'from' ? list.length : prev.lastPredFrom, lastPredTo: which === 'to' ? list.length : prev.lastPredTo, lastStatus: status }));
+        if (status && status !== 'OK') {
+          console.warn('Places getPlacePredictions status:', status);
+        }
       }
     );
   };
@@ -150,6 +154,7 @@ export default function CustomerReservationPage() {
             <div>Script tag injected: {String(debug.script)}</div>
             <div>google.maps.places ready: {String(debug.googleReady)}</div>
             <div>Predictions counts — from: {debug.lastPredFrom}, to: {debug.lastPredTo}</div>
+            {debug.lastStatus && <div>Places status: {debug.lastStatus}</div>}
           </div>
         )}
         <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
