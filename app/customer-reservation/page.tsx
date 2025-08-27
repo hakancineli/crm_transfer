@@ -217,7 +217,7 @@ export default function CustomerReservationPage() {
           </div>
 
           <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start md:items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">{t('customerForm.from') || 'From'}</label>
                 <input
@@ -277,14 +277,6 @@ export default function CustomerReservationPage() {
                   name="to-address-no-autofill"
                   required
                 />
-                {(from && to) && (
-                  <div className="mt-3 text-sm text-gray-700 flex items-center gap-3">
-                    <span className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-2 py-1">{estimating || distanceKm === null ? 'Hesaplanıyor…' : `${distanceKm.toFixed(1)} km`}</span>
-                    {estimatedPriceTRY !== null && (
-                      <span className="inline-flex items-center rounded-md border border-green-200 bg-green-50 px-2 py-1 font-medium text-green-700">Tahmini Fiyat: {estimatedPriceTRY.toLocaleString('tr-TR')} TRY</span>
-                    )}
-                  </div>
-                )}
                 {toPredictions.length > 0 && (
                   <div className="mt-1 border border-gray-200 rounded-md bg-white shadow-sm max-h-60 overflow-auto z-10 relative">
                     {toPredictions.map((p, idx) => (
@@ -301,6 +293,16 @@ export default function CustomerReservationPage() {
                 )}
               </div>
             </div>
+
+            {/* Distance and price display - moved outside grid for proper alignment */}
+            {(from && to) && (
+              <div className="mt-4 text-sm text-gray-700 flex items-center gap-3">
+                <span className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-2 py-1">{estimating || distanceKm === null ? 'Hesaplanıyor…' : `${distanceKm.toFixed(1)} km`}</span>
+                {estimatedPriceTRY !== null && (
+                  <span className="inline-flex items-center rounded-md border border-green-200 bg-green-50 px-2 py-1 font-medium text-green-700">Tahmini Fiyat: {estimatedPriceTRY.toLocaleString('tr-TR')} TRY</span>
+                )}
+              </div>
+            )}
 
             {/* Basit fiyatlandırma bilgilendirmesi */}
             <div className="mt-4 text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded p-3">
