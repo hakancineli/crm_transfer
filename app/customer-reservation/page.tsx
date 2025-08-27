@@ -114,12 +114,12 @@ export default function CustomerReservationPage() {
     if (km <= 0) return 700; // minimal
     if (km <= 10) return 700;
     if (km <= 20) return 1200;
-    if (km <= 35) return 1500;
-    if (km <= 50) return 2000;
-    if (km <= 60) return 2500;
-    // beyond 60: simple increment per 10km
+    if (km <= 40) return 1500;
+    if (km <= 50) return 1800;
+    if (km <= 60) return 2300;
+    // beyond 60 km: +300 TRY per each additional 10 km block
     const extraBlocks = Math.ceil((km - 60) / 10);
-    return 2500 + extraBlocks * 300; // extendable rule
+    return 2300 + extraBlocks * 300;
   }
 
   // Calculate distance when both addresses present
@@ -299,7 +299,16 @@ export default function CustomerReservationPage() {
               </div>
             </div>
 
-            {/* Mesafe hesaplayıcı ALANI KALDIRILDI */}
+            {/* Basit fiyatlandırma bilgilendirmesi */}
+            <div className="mt-4 text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded p-3">
+              <div className="font-medium text-gray-700 mb-1">Fiyat nasıl hesaplanır?</div>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Önce iki adres arası mesafe Google Haritalar ile hesaplanır.</li>
+                <li>Mesafeye göre sabit dilimler uygulanır: 0–10 km: 700 TRY, 0–20 km: 1200 TRY, 0–40 km: 1500 TRY, 0–50 km: 1800 TRY, 0–60 km: 2300 TRY.</li>
+                <li>60 km üzeri her +10 km için +300 TRY eklenir.</li>
+                <li>Bu, tahmini fiyattır; trafik/rota farklılıklarına göre değişebilir.</li>
+              </ul>
+            </div>
           </div>
 
           <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
