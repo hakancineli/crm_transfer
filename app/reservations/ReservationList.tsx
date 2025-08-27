@@ -18,6 +18,7 @@ interface Reservation {
     passengerNames: string[];
     price: number;
     currency: string;
+    distanceKm?: number;
     driverFee?: number;
     phoneNumber?: string;
     isReturn: boolean;

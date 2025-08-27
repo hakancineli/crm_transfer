@@ -18,6 +18,7 @@ export interface Reservation {
     luggageCount: number;
     price: number;
     currency: Currency;
+    distanceKm?: number;
     voucherNumber: string;
     createdAt: Date;
 }
