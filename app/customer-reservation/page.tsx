@@ -22,6 +22,8 @@ export default function CustomerReservationPage() {
   const toInputRef = useRef<HTMLInputElement | null>(null);
   const [fromPredictions, setFromPredictions] = useState<Array<{ description: string }>>([]);
   const [toPredictions, setToPredictions] = useState<Array<{ description: string }>>([]);
+  const fromDebounceRef = useRef<number | undefined>(undefined);
+  const toDebounceRef = useRef<number | undefined>(undefined);
 
   // Load Google Maps JS Places and attach Autocomplete
   useEffect(() => {
@@ -95,7 +97,7 @@ export default function CustomerReservationPage() {
   // Fallback: manual predictions via AutocompleteService
   const requestPredictions = (value: string, which: 'from' | 'to') => {
     setError('');
-    if (!value || value.length < 2) {
+    if (!value || value.length < 1) {
       if (which === 'from') setFromPredictions([]);
       else setToPredictions([]);
       return;
@@ -186,7 +188,8 @@ export default function CustomerReservationPage() {
                   onChange={e => {
                     const v = e.target.value;
                     setFrom(v);
-                    requestPredictions(v, 'from');
+                    if (fromDebounceRef.current) window.clearTimeout(fromDebounceRef.current);
+                    fromDebounceRef.current = window.setTimeout(() => requestPredictions(v, 'from'), 150);
                   }}
                   placeholder="Adres yazın (örn. Şirinevler)"
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
@@ -221,7 +224,8 @@ export default function CustomerReservationPage() {
                   onChange={e => {
                     const v = e.target.value;
                     setTo(v);
-                    requestPredictions(v, 'to');
+                    if (toDebounceRef.current) window.clearTimeout(toDebounceRef.current);
+                    toDebounceRef.current = window.setTimeout(() => requestPredictions(v, 'to'), 150);
                   }}
                   placeholder="Adres yazın (örn. Havalimanı)"
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
