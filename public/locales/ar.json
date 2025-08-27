@@ -39,6 +39,7 @@
     "flightNumber": "رقم الرحلة",
     "flightCode": "رمز الرحلة (اختياري)",
     "flightCodePlaceholder": "TK1234",
+    "currency": "العملة",
     "airport": "المطار",
     "pickupLocation": "مكان الاستلام",
     "dropoffLocation": "مكان التسليم",

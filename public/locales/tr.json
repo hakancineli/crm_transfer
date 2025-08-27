@@ -43,6 +43,7 @@
     "flightNumber": "Uçuş Numarası",
     "flightCode": "Uçuş Kodu (Opsiyonel)",
     "flightCodePlaceholder": "TK1234",
+    "currency": "Para Birimi",
     "airport": "Havalimanı",
     "pickupLocation": "Alış Yeri",
     "dropoffLocation": "Bırakış Yeri",

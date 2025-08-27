@@ -39,6 +39,7 @@
     "flightNumber": "Flight Number",
     "flightCode": "Flight Code (Optional)",
     "flightCodePlaceholder": "TK1234",
+    "currency": "Currency",
     "airport": "Airport",
     "pickupLocation": "Pickup Location",
     "dropoffLocation": "Dropoff Location",
