@@ -17,6 +17,9 @@ export default function CustomerReservationPage() {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [debug, setDebug] = useState<{ hasKey: boolean; script: boolean; googleReady: boolean; lastPredFrom: number; lastPredTo: number; lastStatus?: string }>({ hasKey: false, script: false, googleReady: false, lastPredFrom: 0, lastPredTo: 0 });
+  const [distanceKm, setDistanceKm] = useState<number | null>(null);
+  const [estimating, setEstimating] = useState<boolean>(false);
+  const [estimatedPriceTRY, setEstimatedPriceTRY] = useState<number | null>(null);
 
   const fromInputRef = useRef<HTMLInputElement | null>(null);
   const toInputRef = useRef<HTMLInputElement | null>(null);
@@ -105,6 +108,53 @@ export default function CustomerReservationPage() {
       }
     );
   };
+
+  // Price slabs in TRY
+  function getPriceFromKm(km: number): number | null {
+    if (km <= 0) return 700; // minimal
+    if (km <= 10) return 700;
+    if (km <= 20) return 1200;
+    if (km <= 35) return 1500;
+    if (km <= 50) return 2000;
+    if (km <= 60) return 2500;
+    // beyond 60: simple increment per 10km
+    const extraBlocks = Math.ceil((km - 60) / 10);
+    return 2500 + extraBlocks * 300; // extendable rule
+  }
+
+  // Calculate distance when both addresses present
+  useEffect(() => {
+    const g = (window as any).google;
+    if (!from || !to || !g?.maps?.DistanceMatrixService) return;
+    let cancelled = false;
+    setEstimating(true);
+    const svc = new g.maps.DistanceMatrixService();
+    svc.getDistanceMatrix({
+      origins: [from],
+      destinations: [to],
+      travelMode: g.maps.TravelMode.DRIVING,
+      unitSystem: g.maps.UnitSystem.METRIC,
+      language: 'tr',
+      region: 'TR'
+    }, (res: any, status: string) => {
+      if (cancelled) return;
+      try {
+        if (status === 'OK' && res?.rows?.[0]?.elements?.[0]?.status === 'OK') {
+          const meters = res.rows[0].elements[0].distance.value as number;
+          const km = meters / 1000;
+          setDistanceKm(km);
+          setEstimatedPriceTRY(getPriceFromKm(km));
+        } else {
+          setDistanceKm(null);
+          setEstimatedPriceTRY(null);
+          console.warn('DistanceMatrix status:', status, res?.rows?.[0]?.elements?.[0]?.status);
+        }
+      } finally {
+        setEstimating(false);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [from, to]);
 
   const addPassenger = () => setPassengers(prev => [...prev, '']);
   const updatePassenger = (i: number, v: string) => setPassengers(prev => prev.map((p, idx) => (idx === i ? v : p)));
@@ -224,6 +274,14 @@ export default function CustomerReservationPage() {
                   name="to-address-no-autofill"
                   required
                 />
+                {(from && to) && (
+                  <div className="mt-3 text-sm text-gray-700 flex items-center gap-3">
+                    <span className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-2 py-1">{estimating || distanceKm === null ? 'Hesaplanıyor…' : `${distanceKm.toFixed(1)} km`}</span>
+                    {estimatedPriceTRY !== null && (
+                      <span className="inline-flex items-center rounded-md border border-green-200 bg-green-50 px-2 py-1 font-medium text-green-700">Tahmini Fiyat: {estimatedPriceTRY.toLocaleString('tr-TR')} TRY</span>
+                    )}
+                  </div>
+                )}
                 {toPredictions.length > 0 && (
                   <div className="mt-1 border border-gray-200 rounded-md bg-white shadow-sm max-h-60 overflow-auto z-10 relative">
                     {toPredictions.map((p, idx) => (
