@@ -47,22 +47,8 @@ export default function CustomerReservationPage() {
         types: ['geocode']
       };
 
-      if (fromInputRef.current) {
-        const ac = new (window as any).google.maps.places.Autocomplete(fromInputRef.current, options);
-        ac.addListener('place_changed', () => {
-          const place = ac.getPlace();
-          const value = place?.formatted_address || place?.name || fromInputRef.current?.value || '';
-          setFrom(value);
-        });
-      }
-      if (toInputRef.current) {
-        const ac = new (window as any).google.maps.places.Autocomplete(toInputRef.current, options);
-        ac.addListener('place_changed', () => {
-          const place = ac.getPlace();
-          const value = place?.formatted_address || place?.name || toInputRef.current?.value || '';
-          setTo(value);
-        });
-      }
+      // We intentionally skip binding native Autocomplete to avoid any browser autofill/IME conflicts.
+      // Fallback prediction dropdown below is used instead.
     }
 
     const scriptId = 'gmaps-places-script';
@@ -193,11 +179,12 @@ export default function CustomerReservationPage() {
                   }}
                   placeholder="Adres yazın (örn. Şirinevler)"
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
-                  autoComplete="new-password"
+                  autoComplete="off"
                   autoCorrect="off"
                   autoCapitalize="off"
                   spellCheck={false}
-                  name="from-address"
+                  inputMode="search"
+                  name="from-address-no-autofill"
                   required
                 />
                 {fromPredictions.length > 0 && (
@@ -229,11 +216,12 @@ export default function CustomerReservationPage() {
                   }}
                   placeholder="Adres yazın (örn. Havalimanı)"
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
-                  autoComplete="new-password"
+                  autoComplete="off"
                   autoCorrect="off"
                   autoCapitalize="off"
                   spellCheck={false}
-                  name="to-address"
+                  inputMode="search"
+                  name="to-address-no-autofill"
                   required
                 />
                 {toPredictions.length > 0 && (
