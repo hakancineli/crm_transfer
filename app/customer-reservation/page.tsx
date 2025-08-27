@@ -16,6 +16,7 @@ export default function CustomerReservationPage() {
   const [phone, setPhone] = useState<string>('');
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [debug, setDebug] = useState<{ hasKey: boolean; script: boolean; googleReady: boolean; lastPredFrom: number; lastPredTo: number }>({ hasKey: false, script: false, googleReady: false, lastPredFrom: 0, lastPredTo: 0 });
 
   const fromInputRef = useRef<HTMLInputElement | null>(null);
   const toInputRef = useRef<HTMLInputElement | null>(null);
@@ -25,10 +26,17 @@ export default function CustomerReservationPage() {
   // Load Google Maps JS Places and attach Autocomplete
   useEffect(() => {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || process.env.GOOGLE_MAPS_API_KEY;
+    const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : undefined;
+    const enableDebug = params?.get('debug') === '1';
+    if (enableDebug) setDebug(prev => ({ ...prev, hasKey: Boolean(apiKey) }));
     if (!apiKey) return; // avoid client crash if key missing
 
     function initAutocomplete() {
-      if (typeof window === 'undefined' || !(window as any).google?.maps?.places) return;
+      if (typeof window === 'undefined' || !(window as any).google?.maps?.places) {
+        if (enableDebug) setDebug(prev => ({ ...prev, googleReady: false }));
+        return;
+      }
+      if (enableDebug) setDebug(prev => ({ ...prev, googleReady: true }));
 
       // Avoid direct typing against global `google` namespace during SSR
       const options: any = {
@@ -57,6 +65,7 @@ export default function CustomerReservationPage() {
 
     const scriptId = 'gmaps-places-script';
     if (document.getElementById(scriptId)) {
+      if (enableDebug) setDebug(prev => ({ ...prev, script: true }));
       initAutocomplete();
       return;
     }
@@ -75,7 +84,12 @@ export default function CustomerReservationPage() {
         if (attempts > 5) window.clearInterval(i);
       }, 500);
     };
+    s.onerror = () => {
+      if (enableDebug) setDebug(prev => ({ ...prev, script: false }));
+      console.error('Google Maps script failed to load');
+    };
     document.head.appendChild(s);
+    if (enableDebug) setDebug(prev => ({ ...prev, script: true }));
   }, []);
 
   // Fallback: manual predictions via AutocompleteService
@@ -95,6 +109,7 @@ export default function CustomerReservationPage() {
         const list = preds || [];
         if (which === 'from') setFromPredictions(list);
         else setToPredictions(list);
+        setDebug(prev => ({ ...prev, lastPredFrom: which === 'from' ? list.length : prev.lastPredFrom, lastPredTo: which === 'to' ? list.length : prev.lastPredTo }));
       }
     );
   };
@@ -128,6 +143,15 @@ export default function CustomerReservationPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-6">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Debug panel: add ?debug=1 to URL to show */}
+        {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('debug') === '1' && (
+          <div className="mb-3 text-xs text-gray-700 bg-yellow-50 border border-yellow-200 rounded p-2">
+            <div>API key present: {String(debug.hasKey)}</div>
+            <div>Script tag injected: {String(debug.script)}</div>
+            <div>google.maps.places ready: {String(debug.googleReady)}</div>
+            <div>Predictions counts — from: {debug.lastPredFrom}, to: {debug.lastPredTo}</div>
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-md p-2 text-sm text-red-700">{error}</div>
