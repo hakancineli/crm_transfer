@@ -54,6 +54,13 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
         fetchReservations();
     }, []);
 
+    // Default filter to today's reservations
+    useEffect(() => {
+        if (reservations.length > 0) {
+            handleFilter('today');
+        }
+    }, [reservations]);
+
     const fetchReservations = async () => {
         try {
             const response = await fetch('/api/reservations');
@@ -78,6 +85,37 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
         } finally {
             setIsLoading(false);
         }
+    };
+
+    // Format phone number with country code detection
+    const formatPhoneNumber = (phone: string): string => {
+        if (!phone) return '';
+        
+        // Remove all non-digit characters except +
+        const cleanPhone = phone.replace(/[^\d+]/g, '');
+        
+        // If already has country code, return as is
+        if (cleanPhone.startsWith('+')) {
+            return cleanPhone;
+        }
+        
+        // If starts with 0, remove it and add +90 (Turkey)
+        if (cleanPhone.startsWith('0')) {
+            return `+90${cleanPhone.substring(1)}`;
+        }
+        
+        // If 10 digits (Turkish mobile), add +90
+        if (cleanPhone.length === 10) {
+            return `+90${cleanPhone}`;
+        }
+        
+        // If 11 digits and starts with 5 (Turkish mobile), add +90
+        if (cleanPhone.length === 11 && cleanPhone.startsWith('5')) {
+            return `+90${cleanPhone}`;
+        }
+        
+        // Default: assume Turkish number and add +90
+        return `+90${cleanPhone}`;
     };
 
     const handleSearch = (query: string) => {
@@ -361,7 +399,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     </div>
                                                     {reservation.phoneNumber && (
                                                         <div className="text-xs text-gray-500">
-                                                            {reservation.phoneNumber}
+                                                            {formatPhoneNumber(reservation.phoneNumber)}
                                                         </div>
                                                     )}
                                                 </div>
@@ -572,7 +610,9 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                     <div className="text-sm text-gray-600 mb-1">Müşteri:</div>
                                     <div className="text-sm font-medium">{formattedPassengerNames.join(', ')}</div>
                                     {reservation.phoneNumber && (
-                                        <div className="text-xs text-gray-500">{reservation.phoneNumber}</div>
+                                        <div className="text-xs text-gray-500">
+                                            {formatPhoneNumber(reservation.phoneNumber)}
+                                        </div>
                                     )}
                                 </div>
 

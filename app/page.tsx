@@ -140,7 +140,7 @@ export default function HomePage() {
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8 items-center">
-      <div>
+            <div>
               <h2 className="text-2xl font-bold text-gray-900">{t('landing.dailyChauffeur.title')}</h2>
               <p className="mt-3 text-gray-600">{t('landing.dailyChauffeur.description')}</p>
               <ul className="mt-4 list-disc list-inside text-gray-700 space-y-1">
@@ -156,7 +156,43 @@ export default function HomePage() {
               <div className="text-sm">{t('landing.dailyChauffeur.example')}</div>
             </div>
           </div>
-      </div>
+        </div>
+      </section>
+
+      <section className="py-12 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">Şehirler Arası Transfer</h2>
+              <p className="mt-3 text-gray-600">İstanbul'dan diğer şehirlere, şehirler arası konforlu ve güvenli transfer hizmeti. Uzun mesafe yolculuklar için özel araçlar ve profesyonel şoförler.</p>
+              <ul className="mt-4 list-disc list-inside text-gray-700 space-y-1">
+                <li>İstanbul → Ankara, İzmir, Bursa, Antalya</li>
+                <li>VIP Mercedes Vito ve lüks sedan seçenekleri</li>
+                <li>7/24 hizmet, esnek kalkış saatleri</li>
+                <li>Bagaj kapasitesi ve konforlu seyahat</li>
+              </ul>
+              <div className="mt-6">
+                <a href="https://wa.me/905545812034?text=Merhaba, şehirler arası transfer için fiyat almak istiyorum." target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition">
+                  WhatsApp'tan Fiyat Al
+                </a>
+              </div>
+            </div>
+            <div className="bg-white border rounded-2xl p-6 text-gray-600">
+              <div className="text-sm">
+                <div className="font-medium text-gray-700 mb-2">Örnek Güzergahlar:</div>
+                <ul className="space-y-1 text-sm">
+                  <li>• İstanbul → Ankara: 450 km</li>
+                  <li>• İstanbul → İzmir: 480 km</li>
+                  <li>• İstanbul → Bursa: 155 km</li>
+                  <li>• İstanbul → Antalya: 485 km</li>
+                </ul>
+                <div className="mt-3 text-xs text-gray-500">
+                  Mesafe ve araç tipine göre fiyatlandırma yapılır. Detaylı bilgi için WhatsApp'tan iletişime geçin.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section className="py-12 bg-white">

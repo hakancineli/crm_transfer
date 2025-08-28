@@ -8,7 +8,7 @@ interface SearchAndFilterProps {
 }
 
 export function SearchAndFilter({ onSearch, onFilter }: SearchAndFilterProps) {
-    const [activeFilter, setActiveFilter] = useState('all');
+    const [activeFilter, setActiveFilter] = useState('today');
     const [searchQuery, setSearchQuery] = useState('');
     const [searchDate, setSearchDate] = useState('');
 
