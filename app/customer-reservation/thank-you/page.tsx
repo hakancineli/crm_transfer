@@ -8,11 +8,40 @@ export default function ThankYouPage() {
                     Rezervasyon talebiniz başarıyla alındı. Fiyatınız seçtiğiniz para biriminde hesaplandı ve kaydedildi.
                 </p>
                 
+                {/* Voucher Number Display */}
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                    <h2 className="font-semibold text-green-800 mb-2">Rezervasyon Bilgileri</h2>
+                    <div className="text-sm text-green-700">
+                        <p className="mb-2">Voucher numaranız:</p>
+                        <div className="text-lg font-mono font-bold text-green-800 bg-white px-3 py-2 rounded border">
+                            {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('voucher') || 'XXXXXX'}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Reservation Lookup Info */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <h2 className="font-semibold text-blue-800 mb-2">Rezervasyon Durumu</h2>
+                    <p className="text-sm text-blue-700 mb-2">
+                        Rezervasyon durumunuzu sorgulamak için:
+                    </p>
+                    <ul className="text-xs text-blue-600 text-left space-y-1 mb-3">
+                        <li>• Voucher numaranızı kullanarak</li>
+                        <li>• Telefon numaranızla</li>
+                    </ul>
+                    <a 
+                        href="/customer-reservation" 
+                        className="inline-flex items-center justify-center w-full px-4 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition text-sm"
+                    >
+                        Rezervasyon Durumu Sorgula
+                    </a>
+                </div>
+                
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                     <h2 className="font-semibold text-blue-800 mb-2">Sonraki Adımlar:</h2>
                     <ul className="text-sm text-blue-700 text-left space-y-1">
                         <li>• Talebiniz onaylandı ve fiyat belirlendi</li>
-                        <li>• Seçtiğiniz para biriminde (TRY/USD/EUR/SAR) fiyat kaydedildi</li>
+                        <li>• Seçtiğiniz para biriminde (TRY/USD/EUR) fiyat kaydedildi</li>
                         <li>• Telefon ile bilgilendirme yapılacak</li>
                         <li>• Onayınız sonrası rezervasyon tamamlanacak</li>
                     </ul>

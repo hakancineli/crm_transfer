@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 
-type Currency = 'TRY' | 'USD' | 'EUR' | 'SAR';
+type Currency = 'TRY' | 'USD' | 'EUR';
 
 export default function CustomerReservationPage() {
   const { t } = useLanguage();
@@ -123,13 +123,12 @@ export default function CustomerReservationPage() {
         const next: Partial<Record<Currency, number>> = {
           TRY: 1,
           USD: data?.rates?.USD ?? undefined,
-          EUR: data?.rates?.EUR ?? undefined,
-          SAR: data?.rates?.SAR ?? undefined
+          EUR: data?.rates?.EUR ?? undefined
         };
         setFxRates(next);
       } catch (err) {
         setFxError('Kur bilgisi alınamadı');
-        setFxRates({ TRY: 1, USD: 0.03, EUR: 0.03, SAR: 0.11 });
+        setFxRates({ TRY: 1, USD: 0.03, EUR: 0.03 });
       }
     }
     fetchFx();
@@ -231,7 +230,10 @@ export default function CustomerReservationPage() {
         const text = await res.text();
         throw new Error(text || 'Request failed');
       }
-      window.location.href = '/customer-reservation/thank-you';
+      
+      const result = await res.json();
+      // Redirect to thank you page with voucher number
+      window.location.href = `/customer-reservation/thank-you?voucher=${result.voucherNumber}`;
     } catch (err: any) {
       setError(err?.message || 'Bir hata oluştu');
     } finally {
@@ -399,7 +401,6 @@ export default function CustomerReservationPage() {
                   <option value="TRY">TRY</option>
                   <option value="USD">USD</option>
                   <option value="EUR">EUR</option>
-                  <option value="SAR">SAR</option>
                 </select>
               </div>
             </div>
