@@ -22,6 +22,8 @@ export default function CustomerReservationPage() {
   const [distanceKm, setDistanceKm] = useState<number | null>(null);
   const [estimating, setEstimating] = useState<boolean>(false);
   const [estimatedPriceTRY, setEstimatedPriceTRY] = useState<number | null>(null);
+  const [fxRates, setFxRates] = useState<Partial<Record<Currency, number>>>({});
+  const [fxError, setFxError] = useState<string>('');
 
   const fromInputRef = useRef<HTMLInputElement | null>(null);
   const toInputRef = useRef<HTMLInputElement | null>(null);
@@ -111,6 +113,36 @@ export default function CustomerReservationPage() {
     );
   };
 
+  // Kur bilgilerini çek (TRY bazlı)
+  useEffect(() => {
+    async function fetchFx() {
+      try {
+        setFxError('');
+        const res = await fetch('https://api.exchangerate-api.com/v4/latest/TRY');
+        const data = await res.json();
+        const next: Partial<Record<Currency, number>> = {
+          TRY: 1,
+          USD: data?.rates?.USD ?? undefined,
+          EUR: data?.rates?.EUR ?? undefined,
+          SAR: data?.rates?.SAR ?? undefined
+        };
+        setFxRates(next);
+      } catch (err) {
+        setFxError('Kur bilgisi alınamadı');
+        setFxRates({ TRY: 1, USD: 0.03, EUR: 0.03, SAR: 0.11 });
+      }
+    }
+    fetchFx();
+  }, []);
+
+  const convertFromTRY = (amountTRY: number | null, to: Currency): number | null => {
+    if (amountTRY == null) return null;
+    if (to === 'TRY') return amountTRY;
+    const rate = fxRates[to];
+    if (!rate || rate <= 0) return null;
+    return amountTRY * rate;
+  };
+
   // Price slabs in TRY
   function getPriceFromKm(km: number): number | null {
     if (km <= 0) return 800; // minimal
@@ -172,6 +204,12 @@ export default function CustomerReservationPage() {
     setSubmitting(true);
     setError('');
     try {
+      const priceToSubmit = (() => {
+        if (estimatedPriceTRY == null) return 0;
+        const converted = convertFromTRY(estimatedPriceTRY, currency);
+        return converted == null ? estimatedPriceTRY : converted;
+      })();
+
       const res = await fetch('/api/reservations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -183,7 +221,7 @@ export default function CustomerReservationPage() {
           flightCode, 
           passengerNames: passengers, 
           luggageCount, 
-          price: estimatedPriceTRY || 0, 
+          price: priceToSubmit, 
           currency, 
           phoneNumber: phone,
           distanceKm: distanceKm || null
@@ -315,7 +353,15 @@ export default function CustomerReservationPage() {
               <div className="mt-4 text-sm text-gray-700 flex items-center gap-3">
                 <span className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-2 py-1">{estimating || distanceKm === null ? 'Hesaplanıyor…' : `${distanceKm.toFixed(1)} km`}</span>
                 {estimatedPriceTRY !== null && (
-                  <span className="inline-flex items-center rounded-md border border-green-200 bg-green-50 px-2 py-1 font-medium text-green-700">Tahmini Fiyat: {estimatedPriceTRY.toLocaleString('tr-TR')} TRY</span>
+                  <>
+                    <span className="inline-flex items-center rounded-md border border-green-200 bg-green-50 px-2 py-1 font-medium text-green-700">Tahmini Fiyat: {estimatedPriceTRY.toLocaleString('tr-TR')} TRY</span>
+                    {currency !== 'TRY' && (
+                      <span className="inline-flex items-center rounded-md border border-blue-200 bg-blue-50 px-2 py-1 font-medium text-blue-700">≈ {(() => {
+                        const converted = convertFromTRY(estimatedPriceTRY, currency);
+                        return converted != null ? converted.toLocaleString('tr-TR', { maximumFractionDigits: 2 }) : '-';
+                      })()} {currency}</span>
+                    )}
+                  </>
                 )}
               </div>
             )}
