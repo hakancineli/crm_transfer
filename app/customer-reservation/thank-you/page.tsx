@@ -1,4 +1,19 @@
+import { useState, useEffect } from 'react';
+
 export default function ThankYouPage() {
+    const [voucherNumber, setVoucherNumber] = useState<string>('XXXXXX');
+
+    useEffect(() => {
+        // Get voucher number from URL params
+        if (typeof window !== 'undefined') {
+            const urlParams = new URLSearchParams(window.location.search);
+            const voucher = urlParams.get('voucher');
+            if (voucher) {
+                setVoucherNumber(voucher);
+            }
+        }
+    }, []);
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
@@ -14,7 +29,7 @@ export default function ThankYouPage() {
                     <div className="text-sm text-green-700">
                         <p className="mb-2">Voucher numaranız:</p>
                         <div className="text-lg font-mono font-bold text-green-800 bg-white px-3 py-2 rounded border">
-                            {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('voucher') || 'XXXXXX'}
+                            {voucherNumber}
                         </div>
                     </div>
                 </div>
@@ -30,7 +45,7 @@ export default function ThankYouPage() {
                         <li>• Telefon numaranızla</li>
                     </ul>
                     <a 
-                        href="/customer-reservation" 
+                        href="/reservation-lookup" 
                         className="inline-flex items-center justify-center w-full px-4 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition text-sm"
                     >
                         Rezervasyon Durumu Sorgula
