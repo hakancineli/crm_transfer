@@ -5,47 +5,38 @@ export default function ThankYouPage() {
                 <div className="text-6xl mb-4">✅</div>
                 <h1 className="text-2xl font-bold text-gray-800 mb-4">Teşekkürler!</h1>
                 <p className="text-gray-600 mb-6">
-                    Rezervasyon talebiniz başarıyla alındı. En kısa sürede size dönüş yapacağız.
+                    Rezervasyon talebiniz başarıyla alındı. Fiyatınız seçtiğiniz para biriminde hesaplandı ve kaydedildi.
                 </p>
                 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                     <h2 className="font-semibold text-blue-800 mb-2">Sonraki Adımlar:</h2>
                     <ul className="text-sm text-blue-700 text-left space-y-1">
-                        <li>• Talebinizi değerlendiriyoruz</li>
-                        <li>• Size en uygun fiyatı sunuyoruz</li>
-                        <li>• Telefon ile bilgilendirme yapıyoruz</li>
-                        <li>• Onayınız sonrası rezervasyonu tamamlıyoruz</li>
+                        <li>• Talebiniz onaylandı ve fiyat belirlendi</li>
+                        <li>• Seçtiğiniz para biriminde (TRY/USD/EUR/SAR) fiyat kaydedildi</li>
+                        <li>• Telefon ile bilgilendirme yapılacak</li>
+                        <li>• Onayınız sonrası rezervasyon tamamlanacak</li>
                     </ul>
                 </div>
 
-                <div className="text-sm text-gray-600">
-                    <p>Herhangi bir sorunuz varsa:</p>
-                    <div className="mt-2 flex flex-col items-center gap-2">
-                        <a
-                            href={`https://wa.me/905545812034?text=${encodeURIComponent('Merhaba, rezervasyon talebim hakkında bilgi almak istiyorum.')}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-block px-5 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors w-full text-center"
-                        >
-                            WhatsApp ile mesaj gönder
-                        </a>
-                        <a
-                            href="tel:+905545812034"
-                            className="font-semibold text-blue-600 hover:underline"
-                        >
-                            +90 554 581 20 34
-                        </a>
-                    </div>
+                <div className="text-sm text-gray-600 mb-6">
+                    <p className="mb-2">Herhangi bir sorunuz varsa:</p>
+                    <a 
+                        href="https://wa.me/905545812034?text=Merhaba, rezervasyon talebim hakkında bilgi almak istiyorum." 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center w-full px-4 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition mb-4"
+                    >
+                        WhatsApp ile mesaj gönder
+                    </a>
+                    <p className="text-xs text-gray-500">+90 554 581 20 34</p>
                 </div>
 
-                <div className="mt-6">
-                    <a 
-                        href="/customer-reservation" 
-                        className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                        Yeni Talep Oluştur
-                    </a>
-                </div>
+                <a 
+                    href="/customer-reservation" 
+                    className="inline-flex items-center justify-center w-full px-4 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+                >
+                    Yeni Talep Oluştur
+                </a>
             </div>
         </div>
     );

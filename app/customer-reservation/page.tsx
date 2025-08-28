@@ -350,41 +350,40 @@ export default function CustomerReservationPage() {
 
             {/* Distance and price display - moved outside grid for proper alignment */}
             {(from && to) && (
-              <div className="mt-4 text-sm text-gray-700 flex items-center gap-3">
+              <div className="mt-3 text-sm text-gray-700 flex items-center gap-3">
                 <span className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-2 py-1">{estimating || distanceKm === null ? 'Hesaplanıyor…' : `${distanceKm.toFixed(1)} km`}</span>
                 {estimatedPriceTRY !== null && (
                   <>
                     <span className="inline-flex items-center rounded-md border border-green-200 bg-green-50 px-2 py-1 font-medium text-green-700">Tahmini Fiyat: {estimatedPriceTRY.toLocaleString('tr-TR')} TRY</span>
                     {currency !== 'TRY' && (
-                      <span className="inline-flex items-center rounded-md border border-blue-200 bg-blue-50 px-2 py-1 font-medium text-blue-700">≈ {(() => {
-                        const converted = convertFromTRY(estimatedPriceTRY, currency);
-                        return converted != null ? converted.toLocaleString('tr-TR', { maximumFractionDigits: 2 }) : '-';
-                      })()} {currency}</span>
+                      <span className="inline-flex items-center rounded-md border border-blue-200 bg-blue-50 px-2 py-1 font-medium text-blue-700">
+                        ≈ {(() => {
+                          const converted = convertFromTRY(estimatedPriceTRY, currency);
+                          return converted != null ? converted.toLocaleString('tr-TR', { maximumFractionDigits: 2 }) : '-';
+                        })()} {currency}
+                      </span>
                     )}
                   </>
                 )}
               </div>
             )}
 
-            {/* Basit fiyatlandırma bilgilendirmesi */}
-            <div className="mt-4 text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded p-3">
+            {/* Compact fiyatlandırma bilgilendirmesi */}
+            <div className="mt-3 text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded p-2">
               <div className="font-medium text-gray-700 mb-1">Fiyat nasıl hesaplanır?</div>
-              <ul className="list-disc pl-5 space-y-1">
-                <li>Önce iki adres arası mesafe Google Haritalar ile hesaplanır.</li>
-                <li>Mesafeye göre sabit dilimler uygulanır:</li>
-                <li>0–10 km: 800 TRY</li>
-                <li>11–20 km: 1100 TRY</li>
-                <li>21–30 km: 1400 TRY</li>
-                <li>31–40 km: 1500 TRY</li>
-                <li>41–45 km: 1700 TRY</li>
-                <li>46–50 km: 1850 TRY</li>
-                <li>51–60 km: 2200 TRY</li>
-                <li>61–70 km: 2300 TRY</li>
-                <li>71–80 km: 2400 TRY</li>
-                <li>81–90 km: 2500 TRY</li>
-                <li>90 km üzeri her +10 km için +300 TRY eklenir.</li>
-                <li>Bu, tahmini fiyattır; trafik/rota farklılıklarına göre değişebilir.</li>
-              </ul>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                <div>0–10 km: 800 TRY</div>
+                <div>11–20 km: 1100 TRY</div>
+                <div>21–30 km: 1400 TRY</div>
+                <div>31–40 km: 1500 TRY</div>
+                <div>41–45 km: 1700 TRY</div>
+                <div>46–50 km: 1850 TRY</div>
+                <div>51–60 km: 2200 TRY</div>
+                <div>61–70 km: 2300 TRY</div>
+                <div>71–80 km: 2400 TRY</div>
+                <div>81–90 km: 2500 TRY</div>
+              </div>
+              <div className="mt-1 text-gray-500">90 km üzeri her +10 km için +300 TRY eklenir. Bu tahmini fiyattır.</div>
             </div>
           </div>
 
