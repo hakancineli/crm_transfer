@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { SearchAndFilter } from '@/app/components/ui/SearchAndFilter';
 import { AIRPORTS, HOTELS, TRANSFER_TYPES } from '@/app/types';
 import { formatLocation, formatPassengerName, formatHotelName } from '@/app/utils/textFormatters';
+import ReturnTransferModal from '@/app/components/ReturnTransferModal';
 
 interface Reservation {
     id: string;
@@ -49,6 +50,10 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
     const [filteredReservations, setFilteredReservations] = useState<Reservation[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [updateLoading, setUpdateLoading] = useState<string | null>(null);
+    const [returnTransferModal, setReturnTransferModal] = useState<{
+        isOpen: boolean;
+        reservation: any;
+    }>({ isOpen: false, reservation: null });
 
     useEffect(() => {
         fetchReservations();
@@ -483,6 +488,13 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                             >
                                                                 Şoför Ata
                                                             </button>
+                                                            <button
+                                                                onClick={() => setReturnTransferModal({ isOpen: true, reservation })}
+                                                                className="inline-flex items-center px-3 py-2 border border-transparent text-xs font-semibold rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm transition-colors"
+                                                                title="Dönüş Transferi Ekle"
+                                                            >
+                                                                🔄
+                                                            </button>
                                                             <Link 
                                                                 href={`/reservations/${reservation.voucherNumber}/edit`}
                                                                 className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-lg font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
@@ -493,23 +505,30 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                         </div>
                                                     ) : (
                                                         <div className="flex space-x-1">
+                                                            <button
+                                                                onClick={() => setReturnTransferModal({ isOpen: true, reservation })}
+                                                                className="w-8 h-8 flex items-center justify-center border border-transparent text-lg font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 shadow-sm transition-colors"
+                                                                title="Dönüş Transferi Ekle"
+                                                            >
+                                                                🔄
+                                                            </button>
                                                             <Link 
                                                                 href={`/reservations/${reservation.voucherNumber}?view=driver`}
-                                                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
+                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
                                                                 title="Şoför Voucherı"
                                                             >
                                                                 👨‍✈️
                                                             </Link>
                                                             <Link 
                                                                 href={`/reservations/${reservation.voucherNumber}?view=customer`}
-                                                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
+                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
                                                                 title="Müşteri Voucherı"
                                                             >
                                                                 🎫
                                                             </Link>
                                                             <Link 
                                                                 href={`/reservations/${reservation.voucherNumber}/edit`}
-                                                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
+                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
                                                                 title="Rezervasyonu Düzenle"
                                                             >
                                                                 ✏️
@@ -697,6 +716,12 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             >
                                                 Şoför Ata
                                             </button>
+                                            <button
+                                                onClick={() => setReturnTransferModal({ isOpen: true, reservation })}
+                                                className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded text-white bg-green-600 hover:bg-green-700"
+                                            >
+                                                🔄 Dönüş
+                                            </button>
                                             <Link 
                                                 href={`/reservations/${reservation.voucherNumber}/edit`}
                                                 className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
@@ -706,6 +731,12 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                         </>
                                     ) : (
                                         <>
+                                            <button
+                                                onClick={() => setReturnTransferModal({ isOpen: true, reservation })}
+                                                className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded text-white bg-green-600 hover:bg-green-700"
+                                            >
+                                                🔄 Dönüş
+                                            </button>
                                             <Link 
                                                 href={`/reservations/${reservation.voucherNumber}?view=driver`}
                                                 className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
@@ -733,5 +764,18 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                 )}
             </div>
         </div>
+
+        {/* Return Transfer Modal */}
+        {returnTransferModal.isOpen && returnTransferModal.reservation && (
+            <ReturnTransferModal
+                isOpen={returnTransferModal.isOpen}
+                onClose={() => setReturnTransferModal({ isOpen: false, reservation: null })}
+                originalReservation={returnTransferModal.reservation}
+                onSuccess={() => {
+                    fetchReservations(); // Refresh the list
+                    setReturnTransferModal({ isOpen: false, reservation: null });
+                }}
+            />
+        )}
     );
 }
