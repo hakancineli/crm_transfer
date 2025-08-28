@@ -10,13 +10,18 @@ export async function GET(request: NextRequest) {
     if (phone) {
       const normalized = phone.trim();
       const noSpaces = normalized.replace(/\s+/g, '');
+      const digitsOnly = normalized.replace(/\D+/g, ''); // keep only numbers
+      const digitsNoLeadingZero = digitsOnly.replace(/^0+/, '');
 
       const reservations = await prisma.reservation.findMany({
         where: {
           OR: [
             { phoneNumber: { equals: normalized } },
             { phoneNumber: { equals: noSpaces } },
-            { phoneNumber: { contains: normalized, mode: 'insensitive' } }
+            { phoneNumber: { contains: normalized, mode: 'insensitive' } },
+            { phoneNumber: { contains: digitsOnly, mode: 'insensitive' } },
+            { phoneNumber: { contains: digitsNoLeadingZero, mode: 'insensitive' } },
+            { phoneNumber: { contains: `+${digitsNoLeadingZero}`, mode: 'insensitive' } }
           ]
         },
         orderBy: [

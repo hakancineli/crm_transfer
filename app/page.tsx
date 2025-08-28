@@ -35,6 +35,10 @@ export default function HomePage() {
                   <li>• {t('landing.meetGreet')}</li>
                   <li>• {t('landing.childSeat')}</li>
                   <li>• {t('landing.corporateOptions')}</li>
+                  <li>• Uçuş takibi ve gecikme toleransı</li>
+                  <li>• Karşılama hizmeti ve bagaj desteği</li>
+                  <li>• Bebek koltuğu ve özel taleplere hızlı cevap</li>
+                  <li>• Kurumsal sözleşmeli transfer seçenekleri</li>
                 </ul>
                 <div className="mt-6 text-sm text-gray-500">{t('landing.priceNote')}</div>
               </div>
@@ -122,11 +126,21 @@ export default function HomePage() {
             </div>
             <div className="bg-white border rounded-xl p-6 shadow-sm">
               <h3 className="font-semibold text-gray-900 mb-2">{t('landing.contact')}</h3>
-              <div className="text-gray-600 space-y-2">
-                <p>{t('landing.contactWhatsApp')}: +90 554 581 20 34 - +90 554 581 20 34</p>
-                <p>{t('landing.airportIST')}</p>
-                <p>{t('landing.airportSAW')}</p>
-                <p>{t('landing.beşiktaş')}</p>
+              <div className="text-gray-600 space-y-3 text-sm">
+                <div>
+                  <div className="font-medium">WhatsApp</div>
+                  <a className="text-green-700 hover:underline" href="https://wa.me/905545812034" target="_blank" rel="noopener noreferrer">+90 554 581 20 34</a>
+                </div>
+                <div>
+                  <div className="font-medium">Telefon</div>
+                  <a className="hover:underline" href="tel:+905545812034">+90 554 581 20 34</a>
+                </div>
+                <div>
+                  <div className="font-medium">Adresler</div>
+                  <p>İstanbul Havalimanı (IST)</p>
+                  <p>Sabiha Gökçen Havalimanı (SAW)</p>
+                  <p>Beşiktaş, İstanbul</p>
+                </div>
               </div>
             </div>
           </div>
@@ -136,7 +150,7 @@ export default function HomePage() {
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div>
+      <div>
               <h2 className="text-2xl font-bold text-gray-900">{t('landing.dailyChauffeur.title')}</h2>
               <p className="mt-3 text-gray-600">{t('landing.dailyChauffeur.description')}</p>
               <ul className="mt-4 list-disc list-inside text-gray-700 space-y-1">
@@ -152,7 +166,7 @@ export default function HomePage() {
               <div className="text-sm">{t('landing.dailyChauffeur.example')}</div>
             </div>
           </div>
-        </div>
+      </div>
       </section>
 
       <section className="py-12 bg-white">
@@ -162,8 +176,8 @@ export default function HomePage() {
           <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/customer-reservation" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition">{t('landing.sendRequest')}</Link>
             <a href={`https://wa.me/905545812034?text=${encodeURIComponent(t('landing.whatsappMessage'))}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white text-green-700 border border-green-200 hover:border-green-300 hover:bg-green-50 transition">{t('landing.whatsappWrite')}</a>
-          </div>
-        </div>
+      </div>
+    </div>
       </section>
     </main>
   );
