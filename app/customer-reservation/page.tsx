@@ -117,8 +117,9 @@ export default function CustomerReservationPage() {
     if (km <= 10) return 800;
     if (km <= 20) return 1100;
     if (km <= 30) return 1400;
-    if (km <= 40) return 1700;
-    if (km <= 50) return 1850;
+    if (km <= 40) return 1500; // updated
+    if (km <= 45) return 1700; // updated
+    if (km <= 50) return 1850; // updated
     if (km <= 60) return 2200;
     if (km <= 70) return 2300;
     if (km <= 80) return 2400;
@@ -324,7 +325,17 @@ export default function CustomerReservationPage() {
               <div className="font-medium text-gray-700 mb-1">Fiyat nasıl hesaplanır?</div>
               <ul className="list-disc pl-5 space-y-1">
                 <li>Önce iki adres arası mesafe Google Haritalar ile hesaplanır.</li>
-                <li>Mesafeye göre sabit dilimler uygulanır: 0–10 km: 800 TRY, 0–20 km: 1100 TRY, 0–30 km: 1400 TRY, 0–40 km: 1700 TRY, 0–50 km: 1850 TRY, 0–60 km: 2200 TRY, 0–70 km: 2300 TRY, 0–80 km: 2400 TRY, 0–90 km: 2500 TRY.</li>
+                <li>Mesafeye göre sabit dilimler uygulanır:</li>
+                <li>0–10 km: 800 TRY</li>
+                <li>11–20 km: 1100 TRY</li>
+                <li>21–30 km: 1400 TRY</li>
+                <li>31–40 km: 1500 TRY</li>
+                <li>41–45 km: 1700 TRY</li>
+                <li>46–50 km: 1850 TRY</li>
+                <li>51–60 km: 2200 TRY</li>
+                <li>61–70 km: 2300 TRY</li>
+                <li>71–80 km: 2400 TRY</li>
+                <li>81–90 km: 2500 TRY</li>
                 <li>90 km üzeri her +10 km için +300 TRY eklenir.</li>
                 <li>Bu, tahmini fiyattır; trafik/rota farklılıklarına göre değişebilir.</li>
               </ul>

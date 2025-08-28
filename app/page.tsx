@@ -54,31 +54,19 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white border rounded-xl p-6 shadow-sm">
               <h3 className="font-semibold text-gray-900 mb-2">{t('landing.customerReviews')}</h3>
-              <div className="space-y-4 text-gray-700">
-                <div>
-                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">{t('landing.googleReview')}</span></div>
-                  <p>"{t('landing.review1')}"</p>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">{t('landing.googleReview')}</span></div>
-                  <p>"{t('landing.review2')}"</p>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">{t('landing.googleReview')}</span></div>
-                  <p>"{t('landing.review3')}"</p>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">{t('landing.googleReview')}</span></div>
-                  <p>"{t('landing.review4')}"</p>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">{t('landing.googleReview')}</span></div>
-                  <p>"{t('landing.review5')}"</p>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">{t('landing.googleReview')}</span></div>
-                  <p>"{t('landing.review6')}"</p>
-                </div>
+              <div className="space-y-4 text-gray-700 max-h-[42rem] overflow-auto pr-2">
+                {[...Array(30)].map((_, idx) => {
+                  const key = `landing.review${idx + 1}`;
+                  const text = t(key);
+                  // t returns the key itself when missing – skip missing keys gracefully
+                  if (text === key) return null;
+                  return (
+                    <div key={key}>
+                      <div className="flex items-center gap-2"><div className="text-yellow-400">★★★★★</div><span className="text-xs text-gray-500">{t('landing.googleReview')}</span></div>
+                      <p>"{text}"</p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
             <div className="bg-white border rounded-xl p-6 shadow-sm">
