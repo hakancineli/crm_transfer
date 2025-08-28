@@ -40,7 +40,9 @@ export default function HomePage() {
                   <li>• Bebek koltuğu ve özel taleplere hızlı cevap</li>
                   <li>• Kurumsal sözleşmeli transfer seçenekleri</li>
                 </ul>
-                <div className="mt-6 text-sm text-gray-500">{t('landing.priceNote')}</div>
+                <div className="mt-6 text-sm text-gray-700">
+                  Konumları girdiğiniz anda ücretinizi anında görün. Sabit fiyat, sürpriz yok.
+                </div>
               </div>
             </div>
           </div>
