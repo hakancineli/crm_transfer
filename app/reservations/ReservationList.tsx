@@ -249,7 +249,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
         (!r.to.includes('IST') && !r.to.includes('SAW'))
     ).length;
 
-    return (
+    return (<>
         <div className="w-full py-4">
             {/* Transfer Özeti */}
             <div className="bg-white p-4 rounded-lg shadow mb-6">
@@ -775,5 +775,5 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                 }}
             />
         ) : null}
-    );
+    </>);
 }
