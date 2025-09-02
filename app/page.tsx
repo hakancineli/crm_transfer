@@ -13,8 +13,12 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div>
-              <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900">{t('landing.title')}</h1>
-              <p className="mt-4 text-lg text-gray-600">{t('landing.description')}</p>
+              <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900">
+                İstanbul Havalimanı Transfer & VIP Transfer Hizmeti
+              </h1>
+              <p className="mt-4 text-lg text-gray-600">
+                İstanbul Havalimanı (IST) ve Sabiha Gökçen (SAW) transfer hizmeti. 7/24 VIP Mercedes Vito, lüks sedan ve şehirler arası transfer. Sabit fiyat garantisi, uçuş takibi, karşılama hizmeti.
+              </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-3">
                 <Link href="/customer-reservation" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition">{t('landing.sendRequest')}</Link>
                 <a href={`https://wa.me/905545812034?text=${encodeURIComponent(t('landing.whatsappMessage'))}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white text-green-700 border border-green-200 hover:border-green-300 hover:bg-green-50 transition">{t('landing.whatsappWrite')}</a>
@@ -196,14 +200,42 @@ export default function HomePage() {
       </section>
 
       <section className="py-12 bg-white">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Service",
+              "name": "İstanbul Havalimanı Transfer Hizmeti",
+              "description": "İstanbul Havalimanı (IST) ve Sabiha Gökçen (SAW) VIP transfer hizmeti",
+              "provider": {
+                "@type": "LocalBusiness",
+                "name": "ProTransfer",
+                "address": {
+                  "@type": "PostalAddress",
+                  "addressLocality": "İstanbul",
+                  "addressCountry": "TR"
+                },
+                "telephone": "+905545812034",
+                "url": "https://www.protransfer.com.tr"
+              },
+              "areaServed": {
+                "@type": "City",
+                "name": "İstanbul"
+              },
+              "serviceType": "Transfer Service",
+              "priceRange": "800-5000 TRY"
+            })
+          }}
+        />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl font-bold text-gray-900">{t('landing.ready.title')}</h2>
           <p className="mt-2 text-gray-600">{t('landing.ready.description')}</p>
           <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/customer-reservation" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition">{t('landing.sendRequest')}</Link>
             <a href={`https://wa.me/905545812034?text=${encodeURIComponent(t('landing.whatsappMessage'))}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white text-green-700 border border-green-200 hover:border-green-300 hover:bg-green-50 transition">{t('landing.whatsappWrite')}</a>
-      </div>
-    </div>
+          </div>
+        </div>
       </section>
     </main>
   );
