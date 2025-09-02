@@ -1,0 +1,18 @@
+{
+  "name": "ProTransfer - İstanbul Transfer Hizmeti",
+  "short_name": "ProTransfer",
+  "description": "İstanbul Havalimanı ve Sabiha Gökçen transfer hizmeti",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "icons": [
+    { "src": "/logo.svg", "sizes": "512x512", "type": "image/svg+xml" }
+  ],
+  "categories": ["travel", "transportation"],
+  "lang": "tr",
+  "dir": "ltr",
+  "orientation": "portrait-primary"
+}
+
+
