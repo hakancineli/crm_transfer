@@ -764,18 +764,16 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                 )}
             </div>
         </div>
-
-        {/* Return Transfer Modal */}
-        {returnTransferModal.isOpen && returnTransferModal.reservation && (
+        {returnTransferModal.isOpen && returnTransferModal.reservation ? (
             <ReturnTransferModal
                 isOpen={returnTransferModal.isOpen}
                 onClose={() => setReturnTransferModal({ isOpen: false, reservation: null })}
                 originalReservation={returnTransferModal.reservation}
                 onSuccess={() => {
-                    fetchReservations(); // Refresh the list
+                    fetchReservations();
                     setReturnTransferModal({ isOpen: false, reservation: null });
                 }}
             />
-        )}
+        ) : null}
     );
 }
