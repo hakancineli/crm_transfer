@@ -65,7 +65,8 @@ export async function POST(request: NextRequest) {
                 driverId: null,
                 driverFee: null,
                 isReturn: true,
-                returnTransfer: null,
+                // Prisma nested relation alanı olduğundan null gönderme
+                // yerine hiç göndermiyoruz
                 originalTransfer: {
                     voucherNumber: originalReservation.voucherNumber,
                     date: originalReservation.date,
