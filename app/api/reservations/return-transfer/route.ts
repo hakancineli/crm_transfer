@@ -68,9 +68,7 @@ export async function POST(request: NextRequest) {
                 // Prisma nested relation alanı olduğundan null gönderme
                 // yerine hiç göndermiyoruz
                 originalTransfer: {
-                    voucherNumber: originalReservation.voucherNumber,
-                    date: originalReservation.date,
-                    time: originalReservation.time
+                    connect: { voucherNumber: originalReservation.voucherNumber }
                 }
             }
         });
@@ -80,9 +78,7 @@ export async function POST(request: NextRequest) {
             where: { voucherNumber: originalVoucherNumber },
             data: {
                 returnTransfer: {
-                    voucherNumber: returnVoucherNumber,
-                    date: returnDate,
-                    time: returnTime
+                    connect: { voucherNumber: returnVoucherNumber }
                 }
             }
         });
