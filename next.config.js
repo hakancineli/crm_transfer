@@ -30,6 +30,11 @@ const nextConfig = {
         destination: '/customer-reservation',
         permanent: true,
       },
+      {
+        source: '/reservations',
+        destination: '/customer-reservation',
+        permanent: true,
+      },
     ]
   },
 }

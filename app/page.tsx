@@ -22,6 +22,9 @@ export default function HomePage() {
                 <a href="https://wa.me/905545812034?text=Merhaba, transfer hizmeti hakkında bilgi almak istiyorum." target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white text-green-700 border border-green-200 hover:border-green-300 hover:bg-green-50 transition">
                   WhatsApp'tan Yaz
                 </a>
+                <Link href="/blog" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-gray-900 text-white font-semibold hover:bg-gray-800 transition">
+                  Blog
+                </Link>
               </div>
               <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm text-gray-700">
                 <div className="p-3 rounded-lg bg-white shadow border">7/24 Hizmet</div>
