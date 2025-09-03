@@ -495,6 +495,13 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                             >
                                                                 🔄
                                                             </button>
+                                                            <button
+                                                                onClick={() => setReturnTransferModal({ isOpen: true, reservation })}
+                                                                className="inline-flex items-center px-3 py-2 border border-transparent text-xs font-semibold rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm transition-colors"
+                                                                title="Dönüş Transferi Ekle"
+                                                            >
+                                                                🔄
+                                                            </button>
                                                             <Link 
                                                                 href={`/reservations/${reservation.voucherNumber}/edit`}
                                                                 className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-lg font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"

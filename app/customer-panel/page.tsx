@@ -1,389 +1,73 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
-import LanguageSelector from '../components/LanguageSelector';
-import { formatLocation, formatPassengerName } from '@/app/utils/textFormatters';
-
-interface CustomerReservation {
-    id: string;
-    voucherNumber: string;
-    date: string;
-    time: string;
-    from: string;
-    to: string;
-    flightCode?: string;
-    luggageCount?: number;
-    passengerNames: string[];
-    phoneNumber?: string;
-    price?: number | null;
-    currency?: string | null;
-    email?: string;
-    specialRequests?: string;
-    status: string;
-    isReturn: boolean;
-    returnTransfer?: {
-        voucherNumber: string;
-        date: string;
-        time: string;
-    } | null;
-    originalTransfer?: {
-        voucherNumber: string;
-        date: string;
-        time: string;
-    } | null;
-}
+import { useState } from 'react';
 
 export default function CustomerPanelPage() {
-    const { t } = useLanguage();
-    const [reservations, setReservations] = useState<CustomerReservation[]>([]);
-    const [filteredReservations, setFilteredReservations] = useState<CustomerReservation[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [phoneCountryCode, setPhoneCountryCode] = useState('+90');
-    const [phoneLocal, setPhoneLocal] = useState('');
-    const [isSearching, setIsSearching] = useState(false);
+  const [phone, setPhone] = useState('');
+  const [results, setResults] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>('');
 
-    const translateWithFallback = (key: string, fallback: string) => {
-        const val = t(key) as unknown as string;
-        if (!val || typeof val !== 'string') return fallback;
-        // Eğer çeviri anahtarının kendisi dönüyorsa (nokta içeriyorsa) fallback kullan
-        if (val.includes('.') || val.toLowerCase().includes('placeholder')) return fallback;
-        return val;
-    };
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setResults([]);
+    try {
+      const res = await fetch(`/api/reservations?phone=${encodeURIComponent(phone)}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || 'Arama başarısız');
+      setResults(Array.isArray(data) ? data : []);
+    } catch (err: any) {
+      setError(err?.message || 'Bir hata oluştu');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const formatPassengers = (passengerNames: string[] | string) => {
-        let names: string[] = [];
-        try {
-            names = typeof passengerNames === 'string' ? JSON.parse(passengerNames) : passengerNames;
-        } catch {
-            names = Array.isArray(passengerNames) ? passengerNames : [];
-        }
-        return names
-            .map((n) => String(n).trim())
-            .filter(Boolean)
-            .map((n) => n.charAt(0).toUpperCase() + n.slice(1))
-            .join(', ');
-    };
-
-    const handleSearch = (query: string) => {
-        if (!query.trim()) {
-            setFilteredReservations(reservations);
-            return;
-        }
-
-        const lowercaseQuery = query.toLowerCase();
-        
-        // Tarih formatını kontrol et (YYYY-MM-DD)
-        const isDateSearch = /^\d{4}-\d{2}-\d{2}$/.test(query);
-        
-        const filtered = reservations.filter(reservation => {
-            if (isDateSearch) {
-                return reservation.date === query;
-            }
-
-            // Yolcu isimlerini kontrol et
-            const passengerNames = (() => {
-                try {
-                    return typeof reservation.passengerNames === 'string' 
-                        ? JSON.parse(reservation.passengerNames)
-                        : reservation.passengerNames;
-                } catch {
-                    return Array.isArray(reservation.passengerNames) ? reservation.passengerNames : [];
-                }
-            })() as string[];
-
-            return (
-                reservation.voucherNumber.toLowerCase().includes(lowercaseQuery) ||
-                reservation.from.toLowerCase().includes(lowercaseQuery) ||
-                reservation.to.toLowerCase().includes(lowercaseQuery) ||
-                passengerNames.some(name => name.toLowerCase().includes(lowercaseQuery)) ||
-                (reservation.flightCode && reservation.flightCode.toLowerCase().includes(lowercaseQuery))
-            );
-        });
-
-        setFilteredReservations(filtered);
-    };
-
-    // Filtreler müşteri panelinde gösterilmez; yalnızca arama kullanılabilir
-
-    const searchByPhone = async () => {
-        const composedPhone = `${phoneCountryCode} ${phoneLocal}`.trim();
-        if (!phoneLocal.trim()) return;
-        
-        setIsSearching(true);
-        setIsLoading(true);
-        try {
-            // Try multiple phone formats for better matching
-            const phoneVariations = [
-                composedPhone, // +90 5545812035
-                phoneLocal, // 5545812035 (just the local part)
-                phoneLocal.replace(/\s+/g, ''), // 5545812035 (no spaces)
-                `+90${phoneLocal}`, // +905545812035
-                `90${phoneLocal}`, // 905545812035
-                `0${phoneLocal}` // 05545812035
-            ];
-
-            let foundReservations = [];
-            
-            // Try each phone format until we find results
-            for (const phoneFormat of phoneVariations) {
-                const response = await fetch(`/api/reservations?phone=${encodeURIComponent(phoneFormat)}`);
-                const data = await response.json();
-                
-                if (Array.isArray(data) && data.length > 0) {
-                    foundReservations = data;
-                    break;
-                }
-            }
-            
-            setReservations(foundReservations);
-            setFilteredReservations(foundReservations);
-            
-        } catch (error) {
-            console.error('Telefon ile arama hatası:', error);
-            setReservations([]);
-            setFilteredReservations([]);
-        } finally {
-            setIsSearching(false);
-            setIsLoading(false);
-        }
-    };
-
-    // Ülke telefon kodları
-    const COUNTRY_DIAL_CODES = [
-        { code: '+90', label: 'Türkiye (+90)' },
-        { code: '+44', label: 'United Kingdom (+44)' },
-        { code: '+1', label: 'United States (+1)' },
-        { code: '+971', label: 'United Arab Emirates (+971)' },
-        { code: '+966', label: 'Saudi Arabia (+966)' },
-        { code: '+49', label: 'Germany (+49)' },
-        { code: '+33', label: 'France (+33)' },
-        { code: '+39', label: 'Italy (+39)' },
-        { code: '+34', label: 'Spain (+34)' },
-        { code: '+31', label: 'Netherlands (+31)' },
-        { code: '+41', label: 'Switzerland (+41)' },
-        { code: '+43', label: 'Austria (+43)' },
-        { code: '+7', label: 'Russia (+7)' },
-        { code: '+380', label: 'Ukraine (+380)' },
-        { code: '+30', label: 'Greece (+30)' },
-        { code: '+48', label: 'Poland (+48)' },
-        { code: '+36', label: 'Hungary (+36)' },
-        { code: '+40', label: 'Romania (+40)' },
-        { code: '+994', label: 'Azerbaijan (+994)' },
-        { code: '+995', label: 'Georgia (+995)' },
-        { code: '+973', label: 'Bahrain (+973)' },
-        { code: '+974', label: 'Qatar (+974)' },
-        { code: '+965', label: 'Kuwait (+965)' },
-        { code: '+968', label: 'Oman (+968)' },
-        { code: '+962', label: 'Jordan (+962)' },
-        { code: '+961', label: 'Lebanon (+961)' }
-    ];
-
-    const formatDate = (dateStr: string) => {
-        const date = new Date(dateStr);
-        return date.toLocaleDateString('tr-TR');
-    };
-
-    const formatTime = (timeStr: string) => {
-        return timeStr;
-    };
-
-    const getStatusColor = (status: string) => {
-        switch (status?.toLowerCase()) {
-            case 'completed':
-                return 'bg-green-100 text-green-800';
-            case 'cancelled':
-                return 'bg-red-100 text-red-800';
-            case 'pending':
-                return 'bg-yellow-100 text-yellow-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
-        }
-    };
-
-    const getStatusText = (status: string, price?: number | null) => {
-        if (typeof price === 'number' && !isNaN(price)) {
-            return 'Onaylandı';
-        }
-        switch (status?.toLowerCase()) {
-            case 'completed':
-                return 'Tamamlandı';
-            case 'cancelled':
-                return 'İptal Edildi';
-            case 'pending':
-                return 'Bekliyor';
-            default:
-                return 'Bilinmiyor';
-        }
-    };
-
-    return (
-        <div className="min-h-screen bg-gray-50 py-8">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Header */}
-                <div className="text-center mb-8">
-                    <div className="flex justify-end mb-4">
-                        <LanguageSelector />
-                    </div>
-                    <h1 className="text-4xl font-bold text-gray-800 mb-2">{t('customerPanel.title')}</h1>
-                    <p className="text-xl text-gray-600">{t('customerPanel.subtitle')}</p>
-                </div>
-
-                {/* Telefon ile Arama */}
-                <div className="bg-white rounded-lg shadow p-6 mb-6">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-4">{t('customerPanel.searchByPhone')}</h2>
-                    <div className="flex flex-col sm:flex-row gap-3">
-                        <select
-                            value={phoneCountryCode}
-                            onChange={(e) => setPhoneCountryCode(e.target.value)}
-                            className="w-full sm:w-44 px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                        >
-                            {COUNTRY_DIAL_CODES.map(({ code, label }) => (
-                                <option key={code} value={code}>{label}</option>
-                            ))}
-                        </select>
-                        <input
-                            type="tel"
-                            placeholder={translateWithFallback('customerPanel.phonePlaceholder', '5XX XXX XX XX')}
-                            value={phoneLocal}
-                            onChange={(e) => setPhoneLocal(e.target.value)}
-                            className="w-full sm:flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                        <button
-                            onClick={searchByPhone}
-                            disabled={isSearching || !phoneLocal.trim()}
-                            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                            {isSearching ? t('customerPanel.searching') : t('customerPanel.search')}
-                        </button>
-                    </div>
-                </div>
-
-                {/* Yalnızca arama kutusu */}
-                <div className="mb-6">
-                    <div className="max-w-lg">
-                        <input
-                            type="text"
-                            placeholder={translateWithFallback('customerPanel.searchPlaceholder', 'Voucher, güzergah veya yolcu ara...')}
-                            className="block w-full px-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                            onChange={(e) => handleSearch(e.target.value)}
-                        />
-                    </div>
-                </div>
-
-                {/* Rezervasyon Listesi - Masaüstü Tablo */}
-                <div className="bg-white rounded-lg shadow overflow-hidden hidden md:block">
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        {t('customerPanel.voucher')}
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        {t('customerPanel.date')}
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        {t('customerPanel.time')}
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        {t('customerPanel.route')}
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        {t('customerPanel.passengers')}
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        {t('customerPanel.status')}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {filteredReservations.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                                            {t('customerPanel.noReservations')}
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    filteredReservations.map((reservation) => (
-                                        <tr key={reservation.id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="text-sm font-medium text-gray-900">
-                                                    {reservation.voucherNumber}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {formatDate(reservation.date)}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {formatTime(reservation.time)}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">
-                                                    <div className="font-medium">{formatLocation(reservation.from)}</div>
-                                                    <div className="text-gray-400">→</div>
-                                                    <div className="font-medium">{formatLocation(reservation.to)}</div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{formatPassengers(reservation.passengerNames)}</div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="flex items-center gap-2">
-                                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(reservation.status)}`}>
-                                                        {getStatusText(reservation.status, reservation.price)}
-                                                    </span>
-                                                    {typeof reservation.price === 'number' && !isNaN(reservation.price) && (
-                                                        <span className="text-sm font-semibold text-emerald-700">
-                                                            {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: (reservation.currency || 'USD') as any }).format(reservation.price)}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                {/* Rezervasyon Listesi - Mobil Kartlar */}
-                <div className="md:hidden space-y-3">
-                    {filteredReservations.length === 0 ? (
-                        <div className="text-center text-gray-500 py-6 bg-white rounded-lg shadow">{t('customerPanel.noReservations')}</div>
-                    ) : (
-                        filteredReservations.map((reservation) => (
-                            <div key={reservation.id} className="bg-white rounded-lg shadow p-4">
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm font-semibold text-gray-900">{reservation.voucherNumber}</span>
-                                    <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(reservation.status)}`}>
-                                        {getStatusText(reservation.status, reservation.price)}
-                                    </span>
-                                </div>
-                                <div className="text-sm text-gray-700 mb-1">
-                                    <span className="font-medium">{formatDate(reservation.date)}</span>
-                                    <span className="mx-2">•</span>
-                                    <span>{formatTime(reservation.time)}</span>
-                                </div>
-                                <div className="text-sm text-gray-900 mb-1">
-                                    <div className="font-medium">{formatLocation(reservation.from)}</div>
-                                    <div className="text-gray-400">→</div>
-                                    <div className="font-medium">{formatLocation(reservation.to)}</div>
-                                </div>
-                                <div className="text-sm text-gray-700 mb-2">
-                                    {formatPassengers(reservation.passengerNames)}
-                                </div>
-                                {typeof reservation.price === 'number' && !isNaN(reservation.price) && (
-                                    <div className="text-right text-sm font-semibold text-emerald-700">
-                                        {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: (reservation.currency || 'USD') as any }).format(reservation.price)}
-                                    </div>
-                                )}
-                            </div>
-                        ))
-                    )}
-                </div>
-            </div>
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-2xl mx-auto bg-white rounded-xl shadow p-6">
+        <h1 className="text-xl font-semibold mb-4">Rezervasyon Sorgulama</h1>
+        <form onSubmit={handleSearch} className="flex gap-2 mb-4">
+          <input
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="Telefon numarası"
+            className="flex-1 border border-gray-300 rounded-md px-3 py-2"
+            required
+          />
+          <button type="submit" disabled={loading} className="px-4 py-2 bg-green-600 text-white rounded-md">
+            {loading ? 'Aranıyor...' : 'Ara'}
+          </button>
+        </form>
+        {error && <div className="text-red-600 text-sm mb-3">{error}</div>}
+        <div className="space-y-2">
+          {results.length === 0 && !loading ? (
+            <div className="text-gray-500 text-sm">Sonuç yok</div>
+          ) : (
+            results.map((r) => (
+              <div key={r.id} className="border rounded-md p-3">
+                <div className="text-sm text-gray-600">Voucher</div>
+                <div className="font-medium">{r.voucherNumber}</div>
+                <div className="text-sm text-gray-600 mt-1">Tarih / Saat</div>
+                <div className="font-medium">{r.date} {r.time}</div>
+                <div className="text-sm text-gray-600 mt-1">Güzergah</div>
+                <div className="font-medium">{r.from} → {r.to}</div>
+                {r.price != null && r.currency && (
+                  <div className="text-sm text-gray-600 mt-1">Fiyat</div>
+                )}
+                {r.price != null && r.currency && (
+                  <div className="font-medium">{r.price} {r.currency}</div>
+                )}
+              </div>
+            ))
+          )}
         </div>
-    );
+      </div>
+    </div>
+  );
 }
+
+

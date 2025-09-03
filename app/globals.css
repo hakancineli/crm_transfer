@@ -2,6 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
+/* SEO and Performance Optimizations */
+@layer base {
+  /* Critical CSS for above-the-fold content */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: Arial, Helvetica, sans-serif;
+    /* Optimize for performance */
+    text-rendering: optimizeSpeed;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Focus styles for accessibility */
+  *:focus {
+    outline: 2px solid #16a34a;
+    outline-offset: 2px;
+  }
+  
+  /* Skip to content link for accessibility */
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: #16a34a;
+    color: white;
+    padding: 8px;
+    text-decoration: none;
+    border-radius: 4px;
+    z-index: 1000;
+  }
+  
+  .skip-link:focus {
+    top: 6px;
+  }
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

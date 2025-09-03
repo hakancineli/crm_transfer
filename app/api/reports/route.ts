@@ -1,99 +1,38 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { Reservation } from '@prisma/client';
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
 
-async function getUSDRate() {
-    try {
-        const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-        const data = await response.json();
-        return data.rates.TRY;
-    } catch (error) {
-        console.error('USD kuru alınamadı:', error);
-        return 31.50; // Fallback kur
+const prisma = new PrismaClient();
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const startDate = searchParams.get('startDate');
+    const endDate = searchParams.get('endDate');
+
+    const where: any = {};
+    
+    if (startDate && endDate) {
+      where.date = {
+        gte: new Date(startDate),
+        lte: new Date(endDate)
+      };
     }
+
+    const reservations = await prisma.reservation.findMany({
+      where,
+      orderBy: { date: 'desc' }
+    });
+
+    const totalRevenue = reservations.reduce((sum, res) => sum + (res.price || 0), 0);
+    const totalReservations = reservations.length;
+
+    return NextResponse.json({
+      reservations,
+      totalRevenue,
+      totalReservations
+    });
+  } catch (error) {
+    console.error('Reports API error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
-
-export async function POST(request: Request) {
-    try {
-        const { startDate, endDate } = await request.json();
-
-        // startDate / endDate formatını YYYY-MM-DD kabul edelim
-        if (!startDate || !endDate) {
-            return NextResponse.json({ error: 'Tarih aralığı gerekli' }, { status: 400 });
-        }
-        const usdRate = await getUSDRate();
-
-        // Tarih aralığındaki tüm rezervasyonları getir
-        const reservations = await prisma.reservation.findMany({
-            where: {
-                // date alanı string (YYYY-MM-DD). Postgres için doğrudan karşılaştırma yapılabilir.
-                date: {
-                    gte: String(startDate),
-                    lte: String(endDate)
-                }
-            },
-            include: {
-                driver: true
-            }
-        });
-
-        // Toplam gelir (USD -> TL)
-        const totalRevenueUSD = reservations.reduce((sum: number, res: any) => {
-            if (res.currency === 'USD') {
-                return sum + res.price;
-            }
-            return sum;
-        }, 0);
-
-        const totalRevenueTL = reservations.reduce((sum: number, res: any) => {
-            if (res.currency === 'USD') {
-                return sum + (res.price * usdRate);
-            }
-            return sum + res.price;
-        }, 0);
-
-        // Şoför ödemeleri (TL)
-        const driverPayments = reservations.reduce((sum: number, res: any) => sum + (res.driverFee || 0), 0);
-
-        // Transfer tipleri
-        const transfersByType = {
-            pickup: reservations.filter((r: Reservation) => r.from.includes('IST') || r.from.includes('SAW')).length,
-            dropoff: reservations.filter((r: Reservation) => r.to.includes('IST') || r.to.includes('SAW')).length,
-            transfer: reservations.filter((r: Reservation) => 
-                (!r.from.includes('IST') && !r.from.includes('SAW')) && 
-                (!r.to.includes('IST') && !r.to.includes('SAW'))
-            ).length
-        };
-
-        // Popüler rotalar
-        const routes = reservations.map((r: Reservation) => `${r.from} → ${r.to}`);
-        const routeCounts = routes.reduce((acc: { [key: string]: number }, route: string) => {
-            acc[route] = (acc[route] || 0) + 1;
-            return acc;
-        }, {});
-
-        const popularRoutes = Object.entries(routeCounts)
-            .map(([route, count]) => ({ route, count }))
-            .sort((a, b) => b.count - a.count)
-            .slice(0, 10);
-
-        return NextResponse.json({
-            totalRevenueUSD,
-            totalRevenueTL,
-            usdRate,
-            totalTransfers: reservations.length,
-            paidTransfers: reservations.filter(r => r.paymentStatus === 'PAID').length,
-            unpaidTransfers: reservations.filter(r => r.paymentStatus === 'UNPAID').length,
-            driverPayments,
-            netIncome: totalRevenueTL - driverPayments,
-            transfersByType,
-            popularRoutes
-        });
-    } catch (error) {
-        console.error('Rapor verisi getirme hatası:', error);
-        return NextResponse.json(
-            { error: 'Rapor verisi getirilemedi' },
-            { status: 500 }
-        );
-    }
-} 

@@ -4,9 +4,10 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useState, useRef, useEffect } from 'react';
 
 const languages = [
+  { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
   { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'ar', name: 'العربية', flag: '🇸🇦' },
-  { code: 'tr', name: 'Türkçe', flag: '🇹🇷' }
+  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' }
 ];
 
 export default function LanguageSelector() {
@@ -28,7 +29,7 @@ export default function LanguageSelector() {
   }, []);
 
   const handleLanguageChange = (langCode: string) => {
-    setLanguage(langCode as 'en' | 'ar' | 'tr');
+    setLanguage(langCode as 'tr' | 'en' | 'de' | 'fr');
     setIsOpen(false);
   };
 

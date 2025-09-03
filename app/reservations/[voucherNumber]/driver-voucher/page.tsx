@@ -1,9 +1,7 @@
 import VoucherContent from '../VoucherContent';
 
 interface PageParams {
-	params: {
-		voucherNumber: string;
-	};
+	params: { voucherNumber: string };
 }
 
 async function fetchReservation(voucherNumber: string): Promise<any | null> {
@@ -19,7 +17,6 @@ async function fetchReservation(voucherNumber: string): Promise<any | null> {
 
 export default async function DriverVoucherPage({ params }: PageParams) {
 	const reservation = await fetchReservation(params.voucherNumber);
-
 	if (!reservation) {
 		return (
 			<div className="p-6">
@@ -29,25 +26,13 @@ export default async function DriverVoucherPage({ params }: PageParams) {
 			</div>
 		);
 	}
-
 	const passengerNames = Array.isArray(reservation.passengerNames)
 		? reservation.passengerNames
 		: typeof reservation.passengerNames === 'string'
 			? (() => {
-				try {
-					return JSON.parse(reservation.passengerNames);
-				} catch {
-					return [];
-				}
+				try { return JSON.parse(reservation.passengerNames); } catch { return []; }
 			})()
 			: [];
-
-	const normalized = {
-		...reservation,
-		passengerNames: passengerNames as string[],
-		driverFee: reservation.driverFee ?? undefined,
-		isReturn: !!reservation.isReturn,
-	};
-
+	const normalized = { ...reservation, passengerNames, driverFee: reservation.driverFee ?? undefined, isReturn: !!reservation.isReturn };
 	return <VoucherContent reservation={normalized} isDriverVoucher />;
 }

@@ -65,7 +65,6 @@ export async function POST(request: NextRequest) {
                 driverId: null,
                 driverFee: null,
                 isReturn: true,
-                returnTransfer: null,
                 originalTransfer: {
                     voucherNumber: originalReservation.voucherNumber,
                     date: originalReservation.date,

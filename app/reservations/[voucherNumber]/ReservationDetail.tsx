@@ -20,9 +20,9 @@ interface ReservationDetailProps {
         time: string;
         from: string;
         to: string;
-        flightCode: string;
+        flightCode?: string | null;
         passengerNames: string[] | string;
-        luggageCount: number;
+        luggageCount?: number | null;
         price: number;
         currency: string;
         voucherNumber: string;

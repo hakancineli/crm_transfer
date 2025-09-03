@@ -1,82 +1,81 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
 
-const images = [
-  '/vehicles/vito-1.jpg',
-  '/vehicles/vito-2.jpg',
-  '/vehicles/vito-3.jpg',
-  '/vehicles/vito-4.jpg',
-  '/vehicles/vito-5.jpg',
-  '/vehicles/vito-6.jpg',
-  '/vehicles/vito-7.jpg',
-  '/vehicles/vito-8.jpg',
-  '/vehicles/vito-9.jpg',
-  '/vehicles/vito-10.jpg',
-  '/vehicles/vito-11.jpg',
-  '/vehicles/vito-12.jpg',
+const vehicles = [
+  {
+    id: 1,
+    name: 'Mercedes Vito',
+    image: '/vehicles/vito-1.jpg',
+    alt: 'Mercedes Vito VIP transfer aracı'
+  },
+  {
+    id: 2,
+    name: 'Mercedes Vito Premium',
+    image: '/vehicles/vito-2.jpg',
+    alt: 'Mercedes Vito Premium VIP transfer aracı'
+  },
+  {
+    id: 3,
+    name: 'Lüks Sedan',
+    image: '/vehicles/vito-3.jpg',
+    alt: 'Lüks sedan VIP transfer aracı'
+  }
 ];
 
 export default function VehicleSlider() {
-  const [index, setIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    const id = setInterval(() => {
-      setIndex((prev) => (prev + 1) % images.length);
-    }, 7000);
-    return () => clearInterval(id);
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % vehicles.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  const goPrev = () => setIndex((prev) => (prev - 1 + images.length) % images.length);
-  const goNext = () => setIndex((prev) => (prev + 1) % images.length);
-
   return (
-    <div className="relative w-full overflow-hidden rounded-xl border bg-white shadow">
-      <div className="relative aspect-video max-h-[420px] sm:max-h-[480px] lg:max-h-[520px]">
-        {images.map((src, i) => (
+    <div className="relative overflow-hidden rounded-2xl shadow-lg">
+      <div className="aspect-[4/3] relative">
+        {vehicles.map((vehicle, index) => (
           <div
-            key={src}
+            key={vehicle.id}
             className={`absolute inset-0 transition-opacity duration-1000 ${
-              i === index ? 'opacity-100' : 'opacity-0'
+              index === currentIndex ? 'opacity-100' : 'opacity-0'
             }`}
           >
             <Image
-              src={src}
-              alt="Mercedes Vito VIP"
+              src={vehicle.image}
+              alt={vehicle.alt}
               fill
-              className="object-contain object-center"
-              sizes="100vw"
-              priority={i < 3}
-              loading={i < 3 ? 'eager' : 'lazy'}
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority={index === 0}
+              quality={85}
             />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+              <h3 className="text-white font-semibold text-lg">{vehicle.name}</h3>
+              <p className="text-white/90 text-sm">VIP Transfer Hizmeti</p>
+            </div>
           </div>
         ))}
       </div>
-
-      <button
-        type="button"
-        aria-label="Önceki"
-        onClick={goPrev}
-        className="absolute left-0 top-0 h-full w-1/5 cursor-pointer bg-transparent hover:bg-black/5 transition-colors"
-      />
-      <button
-        type="button"
-        aria-label="Sonraki"
-        onClick={goNext}
-        className="absolute right-0 top-0 h-full w-1/5 cursor-pointer bg-transparent hover:bg-black/5 transition-colors"
-      />
-
-      <div className="absolute inset-x-0 bottom-2 flex items-center justify-center gap-2">
-        {images.map((_, i) => (
+      
+      <div className="absolute bottom-4 right-4 flex space-x-2">
+        {vehicles.map((_, index) => (
           <button
-            key={i}
-            onClick={() => setIndex(i)}
-            className={`h-1.5 w-1.5 rounded-full ${i === index ? 'bg-green-600' : 'bg-gray-300'}`}
-            aria-label={`Slide ${i + 1}`}
+            key={index}
+            onClick={() => setCurrentIndex(index)}
+            className={`w-2 h-2 rounded-full transition-colors ${
+              index === currentIndex ? 'bg-white' : 'bg-white/50'
+            }`}
+            aria-label={`Go to slide ${index + 1}`}
           />
         ))}
       </div>
     </div>
   );
 }
+
+

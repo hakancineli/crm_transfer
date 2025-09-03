@@ -1,49 +1,52 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Prisma schema recreated to restore datasource and models used by the app
 
 generator client {
   provider = "prisma-client-js"
 }
 
+// Use SQLite locally; can be overridden in env
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model Driver {
-  id            String        @id @default(uuid())
-  name          String
-  phoneNumber   String?
-  reservations  Reservation[]
-  createdAt     DateTime      @default(now())
+model Reservation {
+  id              String   @id @default(cuid())
+  voucherNumber   String   @unique
+  date            String
+  time            String
+  from            String
+  to              String
+  flightCode      String?
+  luggageCount    Int?
+  passengerNames  String   // stored as JSON string in DB
+  price           Float
+  currency        String
+  phoneNumber     String?
+  distanceKm      Float?
+  paymentStatus   String   @default("PENDING")
+
+  driverId        String?
+  driver          Driver?  @relation(fields: [driverId], references: [id])
+  driverFee       Float?
+
+  isReturn        Boolean  @default(false)
+  returnTransfer  Json?
+  originalTransfer Json?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
-model Reservation {
-  id            String   @id @default(uuid())
-  date          String
-  time          String
-  from          String
-  to            String
-  flightCode    String
-  passengerNames String  // JSON string olarak saklayacağız
-  luggageCount  Int
-  price         Float
-  currency      String
-  phoneNumber   String?  // Yeni alan
-  distanceKm    Float?   // Mesafe (km)
-  voucherNumber String   @unique
-  driverFee     Float?   // Sürücü hakediş tutarı (opsiyonel)
-  driverId      String?  // Sürücü ID (opsiyonel)
-  driver        Driver?  @relation(fields: [driverId], references: [id])
-  paymentStatus String   @default("PENDING") // PENDING, RECEIVED, NOT_RECEIVED
-  createdAt     DateTime @default(now())
-  
-  // Dönüş transferi ilişkisi
-  returnTransferId String?   @unique // Dönüş transferinin ID'si
-  returnTransfer   Reservation? @relation("ReturnTransfer", fields: [returnTransferId], references: [id])
-  originalTransfer Reservation? @relation("ReturnTransfer")
-  isReturn        Boolean     @default(false) // Dönüş transferi olup olmadığını belirten alan
+model Driver {
+  id          String         @id @default(cuid())
+  name        String
+  phoneNumber String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  reservations Reservation[]
 }
+
+

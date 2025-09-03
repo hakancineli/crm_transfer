@@ -53,7 +53,7 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
                         mode="range"
                         defaultMonth={date?.from}
                         selected={{ from: date.from, to: date.to }}
-                        onSelect={(newDate) => {
+                        onSelect={(newDate: any) => {
                             if (newDate?.from && newDate?.to) {
                                 const updatedDate = {
                                     from: newDate.from,

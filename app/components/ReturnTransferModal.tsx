@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface ReturnTransferModalProps {
     isOpen: boolean;
@@ -27,12 +27,12 @@ export default function ReturnTransferModal({
     const [error, setError] = useState('');
 
     // Set default return date to tomorrow
-    useState(() => {
+    useEffect(() => {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         setReturnDate(tomorrow.toISOString().split('T')[0]);
         setReturnTime('09:00'); // Default time
-    });
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

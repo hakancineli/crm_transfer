@@ -18,7 +18,7 @@ interface DriverAssignFormProps {
         from: string;
         to: string;
         passengerNames: string | string[]; // Dizi veya string tipi olacak şekilde değiştirildi
-        luggageCount: number;
+        luggageCount?: number | null;
     };
     onAssign?: (driverId: string, driverFee: number) => Promise<void>;
 }
@@ -211,7 +211,7 @@ export default function DriverAssignForm({ reservation, onAssign }: DriverAssign
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-500">Yolcu & Bagaj</p>
-                                    <p className="font-medium mt-1">{getPassengerCount()} Yolcu, {reservation.luggageCount} Bagaj</p>
+                                    <p className="font-medium mt-1">{getPassengerCount()} Yolcu, {reservation.luggageCount ?? 0} Bagaj</p>
                                 </div>
                                 <div className="col-span-2">
                                     <p className="text-sm text-gray-500">Güzergah</p>

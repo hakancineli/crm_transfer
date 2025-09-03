@@ -1,43 +1,57 @@
-import { getReservation } from '@/app/actions/reservations';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 import ReservationDetail from './ReservationDetail';
-import { redirect } from 'next/navigation';
 
-async function ReservationPage({
-    params,
-    searchParams
-}: {
-    params: { voucherNumber: string },
-    searchParams: { [key: string]: string | undefined }
-}) {
-    const voucherNumber = params.voucherNumber;
-    const viewMode = searchParams.view;
-    const editMode = searchParams.edit;
-    const reservation = await getReservation(voucherNumber);
+export default function VoucherPage() {
+  const params = useParams();
+  const voucherNumber = params.voucherNumber as string;
+  const [reservation, setReservation] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-    // Eğer edit=true parametresi varsa, düzenleme sayfasına yönlendir
-    if (editMode === 'true') {
-        redirect(`/reservations/${voucherNumber}/edit`);
+  useEffect(() => {
+    if (voucherNumber) {
+      fetch(`/api/reservations/${voucherNumber}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            setError(data.error);
+          } else {
+            setReservation(data);
+          }
+        })
+        .catch(err => {
+          setError('Rezervasyon bulunamadı');
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
+  }, [voucherNumber]);
 
-    if (!reservation) {
-        return (
-            <div className="min-h-screen bg-gray-50 py-8">
-                <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-4">Rezervasyon Bulunamadı</h1>
-                    <p className="text-gray-600">Bu voucher numarasına ait rezervasyon bulunamadı.</p>
-                </div>
-            </div>
-        );
-    }
-
+  if (loading) {
     return (
-        <ReservationDetail
-            reservation={reservation}
-            isDriverVoucher={viewMode === 'driver'}
-            isEditMode={!!editMode}
-            editType={editMode as 'customer' | 'driver'}
-        />
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
     );
-}
+  }
 
-export default ReservationPage; 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-semibold text-gray-900 mb-4">Hata</h1>
+          <p className="text-gray-600">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return reservation ? <ReservationDetail reservation={reservation} /> : null;
+}

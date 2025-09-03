@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 import { prisma } from '@/app/lib/prisma';
 
 export async function GET(request: NextRequest) {
@@ -37,20 +38,8 @@ export async function GET(request: NextRequest) {
                 price: true,
                 currency: true,
                 isReturn: true,
-                returnTransfer: {
-                    select: {
-                        voucherNumber: true,
-                        date: true,
-                        time: true
-                    }
-                },
-                originalTransfer: {
-                    select: {
-                        voucherNumber: true,
-                        date: true,
-                        time: true
-                    }
-                }
+                returnTransfer: true,
+                originalTransfer: true
             },
             orderBy: { date: 'desc' },
             take: 50

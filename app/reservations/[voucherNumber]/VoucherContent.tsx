@@ -10,8 +10,8 @@ interface VoucherContentProps {
         time: string;
         from: string;
         to: string;
-        flightCode?: string;
-        luggageCount?: number;
+        flightCode?: string | null;
+        luggageCount?: number | null;
         passengerNames: string[];
         price: number;
         currency: string;
@@ -24,7 +24,7 @@ interface VoucherContentProps {
             time: string;
             from: string;
             to: string;
-            flightCode?: string;
+            flightCode?: string | null;
         } | null;
         originalTransfer?: {
             voucherNumber: string;
@@ -32,7 +32,7 @@ interface VoucherContentProps {
             time: string;
             from: string;
             to: string;
-            flightCode?: string;
+            flightCode?: string | null;
         } | null;
     };
     isDriverVoucher?: boolean;
@@ -246,11 +246,11 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                         <div className="space-y-2 text-sm">
                             <div className="flex justify-between items-center py-1 border-b border-gray-100">
                                 <span className="text-gray-600">{t.flightCode}:</span>
-                                <span className="font-medium">{reservation.flightCode}</span>
+                                <span className="font-medium">{reservation.flightCode ?? '-'}</span>
                             </div>
                             <div className="flex justify-between items-center py-1">
                                 <span className="text-gray-600">{t.luggage}:</span>
-                                <span className="font-medium">{reservation.luggageCount}</span>
+                                <span className="font-medium">{reservation.luggageCount ?? 0}</span>
                             </div>
                         </div>
                     </div>
@@ -288,7 +288,7 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                         </div>
                         <div className="flex justify-between items-center">
                             <span className="text-gray-600">{t.luggageCount}:</span>
-                            <span className="font-medium">{reservation.luggageCount} {t.piece}</span>
+                            <span className="font-medium">{reservation.luggageCount ?? 0} {t.piece}</span>
                         </div>
                         {reservation.phoneNumber && (
                             <div className="flex justify-between items-center">
