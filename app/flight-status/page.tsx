@@ -92,7 +92,7 @@ export default function FlightStatusPage() {
 
   // Uçuş çağırma fonksiyonu
   const handleFlightLookup = async () => {
-    if (!lookupFlightCode.trim() || !lookupDate) return;
+    if (!lookupFlightCode.trim()) return;
 
     setLookupLoading(true);
     setLookupError(null);
