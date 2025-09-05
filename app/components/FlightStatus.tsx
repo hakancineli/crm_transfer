@@ -106,7 +106,7 @@ export default function FlightStatus({
         )}
       </div>
       
-      {relevantInfo.gate && (
+      {'gate' in relevantInfo && relevantInfo.gate && (
         <div className="text-xs text-gray-500">
           Kapı: {relevantInfo.gate}
         </div>
