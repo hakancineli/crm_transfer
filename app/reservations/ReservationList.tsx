@@ -323,6 +323,9 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-36">
                                     Şoför
                                 </th>
+                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-32">
+                                    Uçuş Durumu
+                                </th>
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-28">
                                     Durum
                                 </th>
@@ -337,7 +340,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                         <tbody className="bg-white divide-y divide-gray-100">
                             {filteredReservations.length === 0 ? (
                                 <tr>
-                                    <td colSpan={10} className="px-3 py-4 text-center text-gray-500">
+                                    <td colSpan={11} className="px-3 py-4 text-center text-gray-500">
                                         Rezervasyon bulunamadı
                                     </td>
                                 </tr>
@@ -393,52 +396,35 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-900 whitespace-normal break-words align-top">
-                                                <div className="flex flex-col">
+                                                <div className="flex flex-col space-y-2">
+                                                    {/* Güzergah Bilgisi - Temiz ve Düzenli */}
                                                     <div className="flex items-center">
                                                         <div className="flex flex-col flex-1">
-                                                            <div className="whitespace-normal break-words">{formattedFrom}</div>
-                                                            {reservation.from.includes('IST') || reservation.from.includes('SAW') ? (
-                                                                <div className="mt-1">
-                                                                    {reservation.flightCode && (
-                                                                        <div className="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-1 rounded border border-blue-200 mb-1">
-                                                                            ✈️ {reservation.flightCode.toUpperCase()}
-                                                                        </div>
-                                                                    )}
-                                                                    {reservation.flightCode && (
-                                                                        <FlightStatus 
-                                                                            flightCode={reservation.flightCode}
-                                                                            reservationDate={reservation.date}
-                                                                            reservationTime={reservation.time}
-                                                                            isArrival={true}
-                                                                        />
-                                                                    )}
-                                                                </div>
-                                                            ) : null}
+                                                            <div className="whitespace-normal break-words text-sm font-medium text-gray-900">
+                                                                {formattedFrom}
+                                                            </div>
                                                         </div>
                                                         <div className="flex items-center justify-center w-8">
-                                                            <span className="text-gray-400">→</span>
+                                                            <span className="text-gray-400 text-lg">→</span>
                                                         </div>
                                                         <div className="flex flex-col flex-1">
-                                                            <div className="whitespace-normal break-words">{formattedTo}</div>
-                                                            {reservation.to.includes('IST') || reservation.to.includes('SAW') ? (
-                                                                <div className="mt-1">
-                                                                    {reservation.flightCode && (
-                                                                        <div className="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-1 rounded border border-blue-200 mb-1">
-                                                                            ✈️ {reservation.flightCode.toUpperCase()}
-                                                                        </div>
-                                                                    )}
-                                                                    {reservation.flightCode && (
-                                                                        <FlightStatus 
-                                                                            flightCode={reservation.flightCode}
-                                                                            reservationDate={reservation.date}
-                                                                            reservationTime={reservation.time}
-                                                                            isArrival={false}
-                                                                        />
-                                                                    )}
-                                                                </div>
-                                                            ) : null}
+                                                            <div className="whitespace-normal break-words text-sm font-medium text-gray-900">
+                                                                {formattedTo}
+                                                            </div>
                                                         </div>
                                                     </div>
+                                                    
+                                                    {/* Uçuş Kodu - Ayrı Bir Bölümde */}
+                                                    {reservation.flightCode && (
+                                                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-2">
+                                                            <div className="flex items-center space-x-2">
+                                                                <span className="text-blue-600 text-xs font-medium">✈️ Uçuş:</span>
+                                                                <span className="text-blue-800 text-xs font-mono bg-blue-100 px-2 py-1 rounded">
+                                                                    {reservation.flightCode.toUpperCase()}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-900 whitespace-normal break-words align-top">
@@ -469,6 +455,18 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     </div>
                                                 ) : (
                                                     <span className="text-gray-400">-</span>
+                                                )}
+                                            </td>
+                                            <td className="px-6 py-4 text-sm align-middle">
+                                                {reservation.flightCode ? (
+                                                    <FlightStatus 
+                                                        flightCode={reservation.flightCode}
+                                                        reservationDate={reservation.date}
+                                                        reservationTime={reservation.time}
+                                                        isArrival={reservation.from.includes('IST') || reservation.from.includes('SAW')}
+                                                    />
+                                                ) : (
+                                                    <span className="text-gray-400 text-xs">-</span>
                                                 )}
                                             </td>
                                             <td className="px-6 py-4 text-sm align-middle">

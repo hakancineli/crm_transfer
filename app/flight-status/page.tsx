@@ -15,8 +15,10 @@ interface FlightStatusData {
 
 export default function FlightStatusPage() {
   const [flights, setFlights] = useState<FlightStatusData[]>([]);
+  const [filteredFlights, setFilteredFlights] = useState<FlightStatusData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchFlightStatus();
@@ -52,6 +54,7 @@ export default function FlightStatusPage() {
       }
 
       setFlights(flightData);
+      setFilteredFlights(flightData);
     } catch (err) {
       console.error('Uçuş durumu yüklenirken hata:', err);
       setError('Uçuş durumları yüklenirken bir hata oluştu');
@@ -62,6 +65,23 @@ export default function FlightStatusPage() {
 
   const refreshStatus = async () => {
     await fetchFlightStatus();
+  };
+
+  // Arama fonksiyonu
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+    if (term.trim() === '') {
+      setFilteredFlights(flights);
+    } else {
+      const filtered = flights.filter(flight => 
+        flight.flightCode.toLowerCase().includes(term.toLowerCase()) ||
+        flight.voucherNumber.toLowerCase().includes(term.toLowerCase()) ||
+        flight.passengerNames.some(name => name.toLowerCase().includes(term.toLowerCase())) ||
+        flight.from.toLowerCase().includes(term.toLowerCase()) ||
+        flight.to.toLowerCase().includes(term.toLowerCase())
+      );
+      setFilteredFlights(filtered);
+    }
   };
 
   if (loading) {
@@ -77,7 +97,7 @@ export default function FlightStatusPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center mb-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Uçuş Durumu Takibi</h1>
               <p className="mt-2 text-sm text-gray-600">
@@ -90,6 +110,39 @@ export default function FlightStatusPage() {
             >
               🔄 Yenile
             </button>
+          </div>
+
+          {/* Arama Kutusu */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div className="flex items-center space-x-4">
+              <div className="flex-1">
+                <label htmlFor="flight-search" className="block text-sm font-medium text-gray-700 mb-2">
+                  Uçuş Ara
+                </label>
+                <input
+                  id="flight-search"
+                  type="text"
+                  placeholder="Uçuş kodu, voucher numarası, yolcu adı veya güzergah ara..."
+                  value={searchTerm}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                />
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-500">
+                  {filteredFlights.length} / {flights.length} uçuş
+                </span>
+                {searchTerm && (
+                  <button
+                    onClick={() => handleSearch('')}
+                    className="text-gray-400 hover:text-gray-600"
+                    title="Temizle"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -107,7 +160,7 @@ export default function FlightStatusPage() {
 
         {/* Flight Status Cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {flights.map((flight) => (
+          {filteredFlights.map((flight) => (
             <div key={flight.voucherNumber} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               {/* Flight Header */}
               <div className="flex justify-between items-start mb-4">
@@ -185,6 +238,22 @@ export default function FlightStatusPage() {
             </div>
           ))}
         </div>
+
+        {filteredFlights.length === 0 && flights.length > 0 && (
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-6xl mb-4">🔍</div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Arama Sonucu Bulunamadı</h3>
+            <p className="text-gray-500">
+              "{searchTerm}" araması için sonuç bulunamadı.
+            </p>
+            <button
+              onClick={() => handleSearch('')}
+              className="mt-4 text-green-600 hover:text-green-700 font-medium"
+            >
+              Tüm uçuşları göster
+            </button>
+          </div>
+        )}
 
         {flights.length === 0 && (
           <div className="text-center py-12">
