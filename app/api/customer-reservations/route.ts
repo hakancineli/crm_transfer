@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
                 OR: [
                     { phoneNumber: { equals: normalized } },
                     { phoneNumber: { equals: noSpaces } },
-                    { phoneNumber: { contains: normalized, mode: 'insensitive' } }
+                    { phoneNumber: { contains: normalized } }
                 ]
             },
             select: {
