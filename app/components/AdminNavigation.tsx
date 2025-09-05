@@ -20,14 +20,8 @@ const AdminNavigation = () => {
       description: 'Tüm rezervasyonları yönet'
     },
     {
-      name: 'Kullanıcılar',
-      href: '/admin/users',
-      icon: '👤',
-      description: 'Kullanıcı yönetimi'
-    },
-    {
       name: 'Yeni Rezervasyon',
-      href: '/admin/new-reservation',
+      href: '/new-reservation',
       icon: '➕',
       description: 'Yeni rezervasyon oluştur'
     },
@@ -109,6 +103,18 @@ const AdminNavigation = () => {
             <div className="text-sm font-medium text-gray-900">Admin User</div>
             <div className="text-xs text-gray-500">admin@protransfer.com</div>
           </div>
+          <button
+            onClick={() => {
+              if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
+                // Çıkış yap
+                window.location.href = '/';
+              }
+            }}
+            className="text-red-600 hover:text-red-800 text-sm font-medium"
+            title="Çıkış Yap"
+          >
+            🚪
+          </button>
         </div>
       </div>
     </div>

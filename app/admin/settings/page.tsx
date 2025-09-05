@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState({
@@ -191,6 +192,20 @@ export default function SettingsPage() {
                 </label>
               </div>
             </div>
+          </div>
+
+          {/* Kullanıcı Yönetimi */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Kullanıcı Yönetimi</h3>
+              <Link 
+                href="/admin/users"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                👤 Kullanıcıları Yönet
+              </Link>
+            </div>
+            <p className="text-gray-600">Sistem kullanıcılarını oluşturun, düzenleyin ve yönetin.</p>
           </div>
 
           {/* Danger Zone */}
