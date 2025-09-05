@@ -19,6 +19,13 @@ export default function FlightStatusPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Uçuş çağırma için state'ler
+  const [lookupFlightCode, setLookupFlightCode] = useState('');
+  const [lookupDate, setLookupDate] = useState(new Date().toISOString().split('T')[0]);
+  const [lookupLoading, setLookupLoading] = useState(false);
+  const [lookupResult, setLookupResult] = useState<FlightInfo | null>(null);
+  const [lookupError, setLookupError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchFlightStatus();
@@ -84,6 +91,29 @@ export default function FlightStatusPage() {
     }
   };
 
+  // Uçuş çağırma fonksiyonu
+  const handleFlightLookup = async () => {
+    if (!lookupFlightCode.trim() || !lookupDate) return;
+
+    setLookupLoading(true);
+    setLookupError(null);
+    setLookupResult(null);
+
+    try {
+      const flightInfo = await FlightTracker.getFlightInfo(lookupFlightCode.trim(), lookupDate);
+      if (flightInfo) {
+        setLookupResult(flightInfo);
+      } else {
+        setLookupError('Uçuş bulunamadı. Lütfen uçuş kodunu ve tarihi kontrol edin.');
+      }
+    } catch (err) {
+      console.error('Uçuş arama hatası:', err);
+      setLookupError('Uçuş bilgisi alınırken bir hata oluştu.');
+    } finally {
+      setLookupLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -114,33 +144,80 @@ export default function FlightStatusPage() {
 
           {/* Arama Kutusu */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <div className="flex items-center space-x-4">
-              <div className="flex-1">
-                <label htmlFor="flight-search" className="block text-sm font-medium text-gray-700 mb-2">
-                  Uçuş Ara
-                </label>
-                <input
-                  id="flight-search"
-                  type="text"
-                  placeholder="Uçuş kodu, voucher numarası, yolcu adı veya güzergah ara..."
-                  value={searchTerm}
-                  onChange={(e) => handleSearch(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                />
+            <div className="space-y-4">
+              {/* Rezervasyon Arama */}
+              <div className="flex items-center space-x-4">
+                <div className="flex-1">
+                  <label htmlFor="flight-search" className="block text-sm font-medium text-gray-700 mb-2">
+                    Rezervasyonlarda Ara
+                  </label>
+                  <input
+                    id="flight-search"
+                    type="text"
+                    placeholder="Uçuş kodu, voucher numarası, yolcu adı veya güzergah ara..."
+                    value={searchTerm}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-500">
+                    {filteredFlights.length} / {flights.length} uçuş
+                  </span>
+                  {searchTerm && (
+                    <button
+                      onClick={() => handleSearch('')}
+                      className="text-gray-400 hover:text-gray-600"
+                      title="Temizle"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-500">
-                  {filteredFlights.length} / {flights.length} uçuş
-                </span>
-                {searchTerm && (
-                  <button
-                    onClick={() => handleSearch('')}
-                    className="text-gray-400 hover:text-gray-600"
-                    title="Temizle"
-                  >
-                    ✕
-                  </button>
-                )}
+
+              {/* Uçuş Çağırma */}
+              <div className="border-t pt-4">
+                <div className="flex items-center space-x-4">
+                  <div className="flex-1">
+                    <label htmlFor="flight-lookup" className="block text-sm font-medium text-gray-700 mb-2">
+                      Uçuş Çağır
+                    </label>
+                    <div className="flex space-x-2">
+                      <input
+                        id="flight-lookup"
+                        type="text"
+                        placeholder="Uçuş kodu girin (örn: TK123)"
+                        value={lookupFlightCode}
+                        onChange={(e) => setLookupFlightCode(e.target.value)}
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      <input
+                        type="date"
+                        value={lookupDate}
+                        onChange={(e) => setLookupDate(e.target.value)}
+                        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      <button
+                        onClick={handleFlightLookup}
+                        disabled={!lookupFlightCode || !lookupDate || lookupLoading}
+                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center space-x-2"
+                      >
+                        {lookupLoading ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                            <span>Aranıyor...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>🔍</span>
+                            <span>Ara</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -154,6 +231,162 @@ export default function FlightStatusPage() {
                 <h3 className="text-sm font-medium text-red-800">Hata</h3>
                 <p className="mt-1 text-sm text-red-700">{error}</p>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Uçuş Çağırma Sonuçları */}
+        {lookupError && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex">
+              <div className="text-red-400">⚠️</div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">Uçuş Bulunamadı</h3>
+                <p className="mt-1 text-sm text-red-700">{lookupError}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {lookupResult && (
+          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-blue-900">
+                  {lookupResult.flightNumber} - {lookupResult.airline}
+                </h3>
+                <p className="text-sm text-blue-700">
+                  {lookupDate} tarihinde aranan uçuş
+                </p>
+              </div>
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                FlightTracker.getFlightStatusColor(lookupResult.status)
+              }`}>
+                {FlightTracker.getFlightStatusText(lookupResult.status)}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Kalkış Bilgileri */}
+              <div className="bg-white rounded-lg p-4 border border-blue-200">
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                  <span className="text-green-600 mr-2">✈️</span>
+                  Kalkış
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Havaalanı:</span>
+                    <span className="font-medium">{lookupResult.departure.airport}</span>
+                  </div>
+                  {lookupResult.departure.terminal && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Terminal:</span>
+                      <span className="font-medium">{lookupResult.departure.terminal}</span>
+                    </div>
+                  )}
+                  {lookupResult.departure.gate && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Kapı:</span>
+                      <span className="font-medium">{lookupResult.departure.gate}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Planlanan:</span>
+                    <span className="font-medium">
+                      {FlightTracker.formatTime(lookupResult.departure.scheduled)}
+                    </span>
+                  </div>
+                  {lookupResult.departure.actual && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Gerçek:</span>
+                      <span className="font-medium">
+                        {FlightTracker.formatTime(lookupResult.departure.actual)}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Durum:</span>
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      lookupResult.departure.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
+                      lookupResult.departure.status === 'delayed' ? 'bg-yellow-100 text-yellow-800' :
+                      lookupResult.departure.status === 'boarding' ? 'bg-orange-100 text-orange-800' :
+                      lookupResult.departure.status === 'departed' ? 'bg-green-100 text-green-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {FlightTracker.getFlightStatusText(lookupResult.departure.status)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Varış Bilgileri */}
+              <div className="bg-white rounded-lg p-4 border border-blue-200">
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                  <span className="text-blue-600 mr-2">🏁</span>
+                  Varış
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Havaalanı:</span>
+                    <span className="font-medium">{lookupResult.arrival.airport}</span>
+                  </div>
+                  {lookupResult.arrival.terminal && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Terminal:</span>
+                      <span className="font-medium">{lookupResult.arrival.terminal}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Planlanan:</span>
+                    <span className="font-medium">
+                      {FlightTracker.formatTime(lookupResult.arrival.scheduled)}
+                    </span>
+                  </div>
+                  {lookupResult.arrival.actual && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Gerçek:</span>
+                      <span className="font-medium">
+                        {FlightTracker.formatTime(lookupResult.arrival.actual)}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Durum:</span>
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      lookupResult.arrival.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
+                      lookupResult.arrival.status === 'delayed' ? 'bg-yellow-100 text-yellow-800' :
+                      lookupResult.arrival.status === 'arrived' ? 'bg-green-100 text-green-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {FlightTracker.getFlightStatusText(lookupResult.arrival.status)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {lookupResult.delay && lookupResult.delay > 0 && (
+              <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <div className="flex items-center">
+                  <span className="text-yellow-600 mr-2">⚠️</span>
+                  <span className="text-yellow-800 font-medium">
+                    {lookupResult.delay} dakika gecikme
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={() => {
+                  setLookupResult(null);
+                  setLookupError(null);
+                  setLookupFlightCode('');
+                }}
+                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Kapat
+              </button>
             </div>
           </div>
         )}
