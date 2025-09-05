@@ -20,6 +20,12 @@ const AdminNavigation = () => {
       description: 'Tüm rezervasyonları yönet'
     },
     {
+      name: 'Kullanıcılar',
+      href: '/admin/users',
+      icon: '👤',
+      description: 'Kullanıcı yönetimi'
+    },
+    {
       name: 'Yeni Rezervasyon',
       href: '/admin/new-reservation',
       icon: '➕',

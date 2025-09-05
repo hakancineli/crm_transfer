@@ -29,7 +29,14 @@ export async function GET(request: NextRequest) {
           { time: 'desc' }
         ],
         include: {
-          driver: true
+          driver: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              username: true
+            }
+          }
         }
       });
 

@@ -21,6 +21,28 @@ model Driver {
   createdAt     DateTime      @default(now())
 }
 
+model User {
+  id            String        @id @default(uuid())
+  username      String        @unique
+  email         String        @unique
+  password      String
+  name          String
+  role          UserRole      @default(SELLER)
+  isActive      Boolean       @default(true)
+  createdBy     String?       // Süperkullanıcı tarafından oluşturulan
+  creator       User?         @relation("UserCreator", fields: [createdBy], references: [id])
+  createdUsers  User[]        @relation("UserCreator")
+  reservations  Reservation[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+enum UserRole {
+  SUPERUSER
+  OPERATOR
+  SELLER
+}
+
 model Reservation {
   id            String   @id @default(uuid())
   date          String
@@ -38,6 +60,8 @@ model Reservation {
   driverFee     Float?   // Sürücü hakediş tutarı (opsiyonel)
   driverId      String?  // Sürücü ID (opsiyonel)
   driver        Driver?  @relation(fields: [driverId], references: [id])
+  userId        String?  // Rezervasyonu oluşturan kullanıcı
+  user          User?    @relation(fields: [userId], references: [id])
   paymentStatus String   @default("PENDING") // PENDING, RECEIVED, NOT_RECEIVED
   createdAt     DateTime @default(now())
   
