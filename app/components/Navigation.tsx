@@ -18,6 +18,13 @@ const Navigation = () => {
       </Link>
       
       <Link
+        href="/flight-status"
+        className="flex-1 text-center px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700"
+      >
+        Uçuş Durumu
+      </Link>
+      
+      <Link
         href="/reports"
         className="flex-1 text-center px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
       >

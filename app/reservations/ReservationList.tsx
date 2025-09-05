@@ -6,6 +6,7 @@ import { SearchAndFilter } from '@/app/components/ui/SearchAndFilter';
 import { AIRPORTS, HOTELS, TRANSFER_TYPES } from '@/app/types';
 import { formatLocation, formatPassengerName, formatHotelName } from '@/app/utils/textFormatters';
 import ReturnTransferModal from '@/app/components/ReturnTransferModal';
+import FlightStatus from '@/app/components/FlightStatus';
 
 interface Reservation {
     id: string;
@@ -59,10 +60,10 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
         fetchReservations();
     }, []);
 
-    // Default filter to today's reservations
+    // Default filter to all reservations
     useEffect(() => {
         if (reservations.length > 0) {
-            handleFilter('today');
+            handleFilter('all');
         }
     }, [reservations]);
 
@@ -169,6 +170,9 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
         nextWeek.setDate(nextWeek.getDate() + 7);
 
         switch (filter) {
+            case 'all':
+                // Tüm rezervasyonları göster
+                break;
             case 'assigned':
                 filtered = filtered.filter(r => r.driver);
                 break;
@@ -216,10 +220,26 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                 throw new Error('Ödeme durumu güncellenemedi');
             }
 
-            // Listeyi yenile
-            await fetchReservations();
+            // Sadece local state'i güncelle, sayfayı yenileme
+            setReservations(prevReservations => 
+                prevReservations.map(reservation => 
+                    reservation.voucherNumber === voucherNumber 
+                        ? { ...reservation, paymentStatus: newStatus }
+                        : reservation
+                )
+            );
+            
+            // Filtrelenmiş listeyi de güncelle
+            setFilteredReservations(prevFiltered => 
+                prevFiltered.map(reservation => 
+                    reservation.voucherNumber === voucherNumber 
+                        ? { ...reservation, paymentStatus: newStatus }
+                        : reservation
+                )
+            );
         } catch (error) {
             console.error('Ödeme durumu güncelleme hatası:', error);
+            alert('Ödeme durumu güncellenirken bir hata oluştu');
         } finally {
             setUpdateLoading(null);
         }
@@ -378,9 +398,21 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                         <div className="flex flex-col flex-1">
                                                             <div className="whitespace-normal break-words">{formattedFrom}</div>
                                                             {reservation.from.includes('IST') || reservation.from.includes('SAW') ? (
-                                                                <span className="text-xs text-gray-400">
-                                                                    {reservation.flightCode && `✈️ ${reservation.flightCode.toUpperCase()}`}
-                                                                </span>
+                                                                <div className="mt-1">
+                                                                    {reservation.flightCode && (
+                                                                        <div className="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-1 rounded border border-blue-200 mb-1">
+                                                                            ✈️ {reservation.flightCode.toUpperCase()}
+                                                                        </div>
+                                                                    )}
+                                                                    {reservation.flightCode && (
+                                                                        <FlightStatus 
+                                                                            flightCode={reservation.flightCode}
+                                                                            reservationDate={reservation.date}
+                                                                            reservationTime={reservation.time}
+                                                                            isArrival={true}
+                                                                        />
+                                                                    )}
+                                                                </div>
                                                             ) : null}
                                                         </div>
                                                         <div className="flex items-center justify-center w-8">
@@ -389,9 +421,21 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                         <div className="flex flex-col flex-1">
                                                             <div className="whitespace-normal break-words">{formattedTo}</div>
                                                             {reservation.to.includes('IST') || reservation.to.includes('SAW') ? (
-                                                                <span className="text-xs text-gray-400">
-                                                                    {reservation.flightCode && `✈️ ${reservation.flightCode.toUpperCase()}`}
-                                                                </span>
+                                                                <div className="mt-1">
+                                                                    {reservation.flightCode && (
+                                                                        <div className="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-1 rounded border border-blue-200 mb-1">
+                                                                            ✈️ {reservation.flightCode.toUpperCase()}
+                                                                        </div>
+                                                                    )}
+                                                                    {reservation.flightCode && (
+                                                                        <FlightStatus 
+                                                                            flightCode={reservation.flightCode}
+                                                                            reservationDate={reservation.date}
+                                                                            reservationTime={reservation.time}
+                                                                            isArrival={false}
+                                                                        />
+                                                                    )}
+                                                                </div>
                                                             ) : null}
                                                         </div>
                                                     </div>
@@ -617,8 +661,16 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             <span className="flex-1">{formattedTo}</span>
                                         </div>
                                         {reservation.flightCode && (
-                                            <div className="text-xs text-gray-500 mt-1">
-                                                ✈️ {reservation.flightCode.toUpperCase()}
+                                            <div className="mt-1">
+                                                <div className="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-1 rounded border border-blue-200 mb-1">
+                                                    ✈️ {reservation.flightCode.toUpperCase()}
+                                                </div>
+                                                <FlightStatus 
+                                                    flightCode={reservation.flightCode}
+                                                    reservationDate={reservation.date}
+                                                    reservationTime={reservation.time}
+                                                    isArrival={reservation.from.includes('IST') || reservation.from.includes('SAW')}
+                                                />
                                             </div>
                                         )}
                                     </div>

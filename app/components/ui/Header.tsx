@@ -16,9 +16,9 @@ export default function Header() {
     const isCustomerContext = pathname === '/' || pathname.startsWith('/customer-reservation') || pathname.startsWith('/customer-panel');
 
     const adminNavigation = [
-        { name: t('header.newReservation'), href: '/admin/new-reservation' },
+        { name: t('header.newReservation'), href: '/new-reservation' },
         { name: t('header.allReservations'), href: '/reservations' },
-        { name: t('header.reports'), href: '/reports' },
+        { name: 'Admin Panel', href: '/admin' },
     ];
 
     const customerNavigation: { name: string; href: string }[] = [

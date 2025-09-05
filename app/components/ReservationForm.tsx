@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Airport, AIRPORTS, Currency, CURRENCIES } from '../types';
 import { HOTELS } from '@/app/types';
+import GoogleMapsPlacesInput from './GoogleMapsPlacesInput';
 
 export default function ReservationForm() {
     const router = useRouter();
@@ -241,12 +242,10 @@ export default function ReservationForm() {
                                         </optgroup>
                                     </select>
                                 ) : (
-                                    <input
-                                        type="text"
+                                    <GoogleMapsPlacesInput
                                         value={formData.from}
-                                        onChange={e => setFormData(prev => ({ ...prev, from: e.target.value }))}
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                                        placeholder="Özel adres giriniz"
+                                        onChange={(value) => setFormData(prev => ({ ...prev, from: value }))}
+                                        placeholder="Adres arayın veya giriniz..."
                                         required
                                     />
                                 )}
@@ -325,12 +324,10 @@ export default function ReservationForm() {
                                         </optgroup>
                                     </select>
                                 ) : (
-                                    <input
-                                        type="text"
+                                    <GoogleMapsPlacesInput
                                         value={formData.to}
-                                        onChange={e => setFormData(prev => ({ ...prev, to: e.target.value }))}
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                                        placeholder="Özel adres giriniz"
+                                        onChange={(value) => setFormData(prev => ({ ...prev, to: value }))}
+                                        placeholder="Adres arayın veya giriniz..."
                                         required
                                     />
                                 )}
