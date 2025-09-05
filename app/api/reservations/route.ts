@@ -18,10 +18,10 @@ export async function GET(request: NextRequest) {
           OR: [
             { phoneNumber: { equals: normalized } },
             { phoneNumber: { equals: noSpaces } },
-            { phoneNumber: { contains: normalized, mode: 'insensitive' } },
-            { phoneNumber: { contains: digitsOnly, mode: 'insensitive' } },
-            { phoneNumber: { contains: digitsNoLeadingZero, mode: 'insensitive' } },
-            { phoneNumber: { contains: `+${digitsNoLeadingZero}`, mode: 'insensitive' } }
+            { phoneNumber: { contains: normalized } },
+            { phoneNumber: { contains: digitsOnly } },
+            { phoneNumber: { contains: digitsNoLeadingZero } },
+            { phoneNumber: { contains: `+${digitsNoLeadingZero}` } }
           ]
         },
         orderBy: [
