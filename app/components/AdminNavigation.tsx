@@ -50,6 +50,12 @@ const AdminNavigation = () => {
       description: 'Müşteri yönetimi'
     },
     {
+      name: 'Son Aktiviteler',
+      href: '/admin/activities',
+      icon: '📋',
+      description: 'Sistem logları ve aktiviteler'
+    },
+    {
       name: 'Ayarlar',
       href: '/admin/settings',
       icon: '⚙️',
@@ -106,14 +112,29 @@ const AdminNavigation = () => {
           <button
             onClick={() => {
               if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
-                // Çıkış yap
+                // Activity log
+                fetch('/api/activities', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    userId: 'admin', // This should be dynamic
+                    action: 'LOGOUT',
+                    entityType: 'SYSTEM',
+                    description: 'Admin çıkış yaptı',
+                    ipAddress: '127.0.0.1' // This should be dynamic
+                  })
+                }).catch(console.error);
+                
+                // Clear session and redirect
+                localStorage.clear();
+                sessionStorage.clear();
                 window.location.href = '/';
               }
             }}
-            className="text-red-600 hover:text-red-800 text-sm font-medium"
+            className="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded hover:bg-red-50"
             title="Çıkış Yap"
           >
-            🚪
+            🚪 Çıkış
           </button>
         </div>
       </div>

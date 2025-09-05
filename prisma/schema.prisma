@@ -33,8 +33,23 @@ model User {
   creator       User?         @relation("UserCreator", fields: [createdBy], references: [id])
   createdUsers  User[]        @relation("UserCreator")
   reservations  Reservation[]
+  activities    Activity[]    @relation("UserActivities")
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+}
+
+model Activity {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation("UserActivities", fields: [userId], references: [id])
+  action        String   // CREATE, UPDATE, DELETE, LOGIN, LOGOUT
+  entityType    String   // USER, RESERVATION, DRIVER, etc.
+  entityId      String?  // ID of the affected entity
+  description   String   // Human readable description
+  details       Json?    // Additional details as JSON
+  ipAddress     String?
+  userAgent     String?
+  createdAt     DateTime @default(now())
 }
 
 enum UserRole {

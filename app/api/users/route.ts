@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { ActivityLogger } from '@/app/lib/activityLogger';
 
 const prisma = new PrismaClient();
 
@@ -96,6 +97,22 @@ export async function POST(request: NextRequest) {
         isActive: true,
         createdAt: true
       }
+    });
+
+    // Activity log
+    await ActivityLogger.logActivity({
+      userId: createdBy || 'system',
+      action: 'CREATE',
+      entityType: 'USER',
+      entityId: user.id,
+      description: `Yeni kullanıcı oluşturuldu: ${user.name} (${user.username})`,
+      details: {
+        username: user.username,
+        email: user.email,
+        role: user.role
+      },
+      ipAddress: request.headers.get('x-forwarded-for') || '127.0.0.1',
+      userAgent: request.headers.get('user-agent') || ''
     });
 
     return NextResponse.json(user, { status: 201 });
