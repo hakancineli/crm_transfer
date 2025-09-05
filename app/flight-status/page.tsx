@@ -22,7 +22,6 @@ export default function FlightStatusPage() {
   
   // Uçuş çağırma için state'ler
   const [lookupFlightCode, setLookupFlightCode] = useState('');
-  const [lookupDate, setLookupDate] = useState(new Date().toISOString().split('T')[0]);
   const [lookupLoading, setLookupLoading] = useState(false);
   const [lookupResult, setLookupResult] = useState<FlightInfo | null>(null);
   const [lookupError, setLookupError] = useState<string | null>(null);
@@ -100,11 +99,11 @@ export default function FlightStatusPage() {
     setLookupResult(null);
 
     try {
-      const flightInfo = await FlightTracker.getFlightInfo(lookupFlightCode.trim(), lookupDate);
+      const flightInfo = await FlightTracker.getFlightInfo(lookupFlightCode.trim());
       if (flightInfo) {
         setLookupResult(flightInfo);
       } else {
-        setLookupError('Uçuş bulunamadı. Lütfen uçuş kodunu ve tarihi kontrol edin.');
+        setLookupError('Uçuş bulunamadı. Lütfen uçuş kodunu kontrol edin.');
       }
     } catch (err) {
       console.error('Uçuş arama hatası:', err);
@@ -192,15 +191,9 @@ export default function FlightStatusPage() {
                         onChange={(e) => setLookupFlightCode(e.target.value)}
                         className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
-                      <input
-                        type="date"
-                        value={lookupDate}
-                        onChange={(e) => setLookupDate(e.target.value)}
-                        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
                       <button
                         onClick={handleFlightLookup}
-                        disabled={!lookupFlightCode || !lookupDate || lookupLoading}
+                        disabled={!lookupFlightCode || lookupLoading}
                         className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center space-x-2"
                       >
                         {lookupLoading ? (
@@ -256,7 +249,7 @@ export default function FlightStatusPage() {
                   {lookupResult.flightNumber} - {lookupResult.airline}
                 </h3>
                 <p className="text-sm text-blue-700">
-                  {lookupDate} tarihinde aranan uçuş
+                  Aranan uçuş bilgisi
                 </p>
               </div>
               <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
