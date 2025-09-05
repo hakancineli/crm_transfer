@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
           gte: today.toISOString().split('T')[0]
         },
         flightCode: {
-          isNot: null
+          not: ""
         }
       },
       select: {
