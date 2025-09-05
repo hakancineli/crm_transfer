@@ -23,7 +23,7 @@ export class ActivityLogger {
           entityType: data.entityType,
           entityId: data.entityId,
           description: data.description,
-          details: data.details ? JSON.stringify(data.details) : null,
+          details: data.details || undefined,
           ipAddress: data.ipAddress,
           userAgent: data.userAgent,
         },
