@@ -282,7 +282,7 @@ export default function HotelPricePoolPage() {
                 type="text"
                 placeholder="Şehir ara..."
                 value={searchParams.city}
-                onChange={(e) => setSearchParams(prev => ({ ...prev, city: e.target.value }))}
+                onChange={(e) => setSearchParams((prev: any) => ({ ...prev, city: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -293,7 +293,7 @@ export default function HotelPricePoolPage() {
               <input
                 type="date"
                 value={searchParams.checkin}
-                onChange={(e) => setSearchParams(prev => ({ ...prev, checkin: e.target.value }))}
+                onChange={(e) => setSearchParams((prev: any) => ({ ...prev, checkin: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -304,7 +304,7 @@ export default function HotelPricePoolPage() {
               <input
                 type="date"
                 value={searchParams.checkout}
-                onChange={(e) => setSearchParams(prev => ({ ...prev, checkout: e.target.value }))}
+                onChange={(e) => setSearchParams((prev: any) => ({ ...prev, checkout: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -314,7 +314,7 @@ export default function HotelPricePoolPage() {
               </label>
               <select
                 value={searchParams.stars}
-                onChange={(e) => setSearchParams(prev => ({ ...prev, stars: e.target.value }))}
+                onChange={(e) => setSearchParams((prev: any) => ({ ...prev, stars: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">Tümü</option>
@@ -606,7 +606,7 @@ function AddToPricePoolModal({
                     type="text"
                     placeholder="Şehir adı"
                     value={searchParams.city}
-                    onChange={(e) => setSearchParams(prev => ({ ...prev, city: e.target.value }))}
+                    onChange={(e) => setSearchParams((prev: any) => ({ ...prev, city: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
@@ -617,7 +617,7 @@ function AddToPricePoolModal({
                   <input
                     type="date"
                     value={searchParams.checkin}
-                    onChange={(e) => setSearchParams(prev => ({ ...prev, checkin: e.target.value }))}
+                    onChange={(e) => setSearchParams((prev: any) => ({ ...prev, checkin: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
@@ -628,7 +628,7 @@ function AddToPricePoolModal({
                   <input
                     type="date"
                     value={searchParams.checkout}
-                    onChange={(e) => setSearchParams(prev => ({ ...prev, checkout: e.target.value }))}
+                    onChange={(e) => setSearchParams((prev: any) => ({ ...prev, checkout: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
