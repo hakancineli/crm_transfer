@@ -267,12 +267,20 @@ export default function HotelReservationsPage() {
             <h1 className="text-3xl font-bold text-gray-900">
               🏨 Konaklama Rezervasyonları
             </h1>
-            <Link
-              href="/accommodation"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              ➕ Yeni Rezervasyon
-            </Link>
+            <div className="flex space-x-4">
+              <Link
+                href="/accommodation"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                ➕ Yeni Rezervasyon
+              </Link>
+              <Link
+                href="/accommodation/reports"
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              >
+                📊 Raporlar
+              </Link>
+            </div>
           </div>
           <p className="text-gray-600">
             Tüm otel rezervasyonlarını yönetin ve takip edin
