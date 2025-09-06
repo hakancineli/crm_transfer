@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -16,58 +16,61 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Kullanıcıyı bul
+    // Find user by username
     const user = await prisma.user.findUnique({
       where: { username },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        name: true,
-        role: true,
-        isActive: true,
-        password: true
+      include: {
+        permissions: true
       }
     });
 
-    if (!user || !user.isActive) {
+    if (!user) {
       return NextResponse.json(
-        { error: 'Geçersiz kullanıcı adı veya şifre' },
+        { error: 'Kullanıcı bulunamadı' },
         { status: 401 }
       );
     }
 
-    // Şifreyi kontrol et
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
+    if (!user.isActive) {
       return NextResponse.json(
-        { error: 'Geçersiz kullanıcı adı veya şifre' },
+        { error: 'Hesap deaktif' },
         { status: 401 }
       );
     }
 
-    // JWT token oluştur
+    // Check password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return NextResponse.json(
+        { error: 'Geçersiz şifre' },
+        { status: 401 }
+      );
+    }
+
+    // Generate JWT token
     const token = jwt.sign(
-      {
-        userId: user.id,
-        username: user.username,
-        role: user.role
+      { 
+        userId: user.id, 
+        username: user.username, 
+        role: user.role 
       },
       process.env.JWT_SECRET || 'your-secret-key',
       { expiresIn: '24h' }
     );
 
-    // Şifreyi response'dan çıkar
+    // Return user data without password
     const { password: _, ...userWithoutPassword } = user;
 
     return NextResponse.json({
+      message: 'Giriş başarılı',
       user: userWithoutPassword,
       token
     });
+
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json(
-      { error: 'Giriş yapılamadı' },
+      { error: 'Sunucu hatası' },
       { status: 500 }
     );
   }

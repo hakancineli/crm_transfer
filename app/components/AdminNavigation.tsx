@@ -3,19 +3,12 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { canViewReports, canViewAccounting, canManageUsers, canManageActivities } from '@/app/lib/permissions';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 const AdminNavigation = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [userRole, setUserRole] = useState('SUPERUSER'); // Default to superuser for now
-
-  useEffect(() => {
-    // Get user role from localStorage or context
-    const user = localStorage.getItem('user');
-    if (user) {
-      const userData = JSON.parse(user);
-      setUserRole(userData.role || 'SUPERUSER');
-    }
-  }, []);
+  const { user, logout } = useAuth();
+  const userRole = user?.role || 'SUPERUSER';
 
   const menuItems = [
     {
@@ -130,33 +123,23 @@ const AdminNavigation = () => {
       <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-            <span className="text-gray-600 text-sm font-medium">A</span>
+            <span className="text-gray-600 text-sm font-medium">
+              {user?.name?.charAt(0) || 'A'}
+            </span>
           </div>
           <div className="flex-1">
-            <div className="text-sm font-medium text-gray-900">Admin User</div>
-            <div className="text-xs text-gray-500">admin@protransfer.com</div>
+            <div className="text-sm font-medium text-gray-900">
+              {user?.name || 'Admin User'}
+            </div>
+            <div className="text-xs text-gray-500">
+              {user?.email || 'admin@protransfer.com'}
+            </div>
           </div>
         </div>
         <button
           onClick={() => {
             if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
-              // Activity log
-              fetch('/api/activities', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  userId: 'admin', // This should be dynamic
-                  action: 'LOGOUT',
-                  entityType: 'SYSTEM',
-                  description: 'Admin çıkış yaptı',
-                  ipAddress: '127.0.0.1' // This should be dynamic
-                })
-              }).catch(console.error);
-              
-              // Clear session and redirect
-              localStorage.clear();
-              sessionStorage.clear();
-              window.location.href = '/';
+              logout();
             }
           }}
           className="w-full mt-3 text-red-600 hover:text-red-800 text-sm font-medium px-3 py-2 rounded-lg hover:bg-red-50 border border-red-200 hover:border-red-300 transition-colors"
