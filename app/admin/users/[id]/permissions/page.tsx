@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { PERMISSIONS, PERMISSION_LABELS } from '@/app/lib/permissions';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { canManageUsers } from '@/app/lib/permissions';
 
 interface User {
   id: string;
@@ -24,6 +26,7 @@ interface UserPermission {
 export default function UserPermissionsPage() {
   const params = useParams();
   const router = useRouter();
+  const { user: currentUser } = useAuth();
   const userId = params.id as string;
   
   const [user, setUser] = useState<User | null>(null);
@@ -32,10 +35,16 @@ export default function UserPermissionsPage() {
   const [permissions, setPermissions] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
+    // Check if current user has permission to manage users
+    if (currentUser && !canManageUsers(currentUser.role)) {
+      window.location.href = '/admin';
+      return;
+    }
+    
     if (userId) {
       fetchUser();
     }
-  }, [userId]);
+  }, [userId, currentUser]);
 
   const fetchUser = async () => {
     try {
@@ -122,6 +131,31 @@ export default function UserPermissionsPage() {
       description: permissionInfo[permission]?.description || permission
     };
   };
+
+  // Check permissions before rendering
+  if (currentUser && !canManageUsers(currentUser.role)) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">
+                Yetkisiz Erişim
+              </h3>
+              <div className="mt-2 text-sm text-red-700">
+                <p>Bu sayfaya erişim yetkiniz bulunmamaktadır. Sadece süperkullanıcılar kullanıcı yetkilerini yönetebilir.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
