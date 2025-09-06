@@ -22,11 +22,14 @@ export default function AccommodationPage() {
     // Tenant bilgilerini al
     const fetchTenant = async () => {
       try {
+        console.log('Fetching tenant...');
         // Mock tenant - gerçek uygulamada subdomain'den alınacak
         const mockTenant = await TenantService.getTenantBySubdomain('demo');
+        console.log('Tenant fetched:', mockTenant);
         setTenant(mockTenant);
       } catch (error) {
         console.error('Error fetching tenant:', error);
+        setError('Tenant bilgileri yüklenemedi');
       }
     };
 
@@ -127,46 +130,8 @@ export default function AccommodationPage() {
     }
   };
 
-  // Konaklama modülü kontrolü
-  if (!tenant) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-blue-500 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-900">Yükleniyor...</h2>
-        </div>
-      </div>
-    );
-  }
-
-  const hasAccommodationModule = tenant.modules?.some(tm => 
-    tm.moduleId === 'accommodation' && tm.isEnabled
-  );
-
-  // Geçici olarak modül kontrolünü devre dışı bırak
-  const isModuleActive = true; // hasAccommodationModule;
-
-  if (!isModuleActive) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto text-center">
-          <div className="text-6xl mb-4">🔒</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Konaklama Modülü Aktif Değil
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Bu özelliği kullanmak için konaklama modülünün aktif olması gerekiyor.
-          </p>
-          <button
-            onClick={() => window.history.back()}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            Geri Dön
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // Geçici olarak tüm kontrolleri devre dışı bırak - sadece test için
+  console.log('Rendering accommodation page...');
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -223,6 +188,23 @@ export default function AccommodationPage() {
             </div>
           </div>
         )}
+
+        {/* Debug Info */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 max-w-2xl mx-auto">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <span className="text-blue-400 text-xl">ℹ️</span>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-blue-800">Debug Info</h3>
+              <div className="mt-2 text-sm text-blue-700">
+                <p>Tenant: {tenant ? 'Loaded' : 'Not loaded'}</p>
+                <p>Current Step: {currentStep}</p>
+                <p>Loading: {loading ? 'Yes' : 'No'}</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Loading */}
         {loading && (
