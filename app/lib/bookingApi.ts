@@ -70,6 +70,8 @@ export class BookingApiService {
   // Otel arama
   static async searchHotels(params: HotelSearchParams): Promise<Hotel[]> {
     try {
+      console.log('🔍 HOTEL SEARCH CALLED - FORCE RETURNING ISTANBUL HOTELS');
+      
       // Mock data - gerçek API entegrasyonu için Booking.com API kullanılacak
       const mockHotels: Hotel[] = [
         {
@@ -164,7 +166,8 @@ export class BookingApiService {
         }
       ];
 
-      // GEÇİCİ ÇÖZÜM: Tüm filtreleri devre dışı bırak - sadece Istanbul otellerini döndür
+      // ZORLA ISTANBUL OTELLERİNİ DÖNDÜR - TEST İÇİN
+      console.log('🚨 FORCE RETURNING ISTANBUL HOTELS - TEST MODE');
       console.log('Search params:', params);
       console.log('All hotels:', mockHotels.map(h => h.city));
       
@@ -173,8 +176,9 @@ export class BookingApiService {
         hotel.city.toLowerCase().includes('istanbul')
       );
       
-      console.log('Istanbul hotels found:', istanbulHotels.length);
-      console.log('Hotel names:', istanbulHotels.map(h => h.name));
+      console.log('✅ Istanbul hotels found:', istanbulHotels.length);
+      console.log('✅ Hotel names:', istanbulHotels.map(h => h.name));
+      console.log('✅ RETURNING HOTELS:', istanbulHotels);
       
       return istanbulHotels;
     } catch (error) {
