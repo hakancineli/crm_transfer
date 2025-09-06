@@ -53,6 +53,23 @@ export class BookingApiReal {
       // Gerçek uygulamada burada Booking.com API'sine istek atılacak
       console.log('🔍 Booking.com API - Otel Arama:', params);
       
+      // Gerçek API çağrısı (şu anda mock)
+      // const response = await fetch(`${this.API_BASE_URL}/hotels`, {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     'Authorization': `Bearer ${this.API_KEY}`
+      //   },
+      //   body: JSON.stringify({
+      //     city: params.city,
+      //     checkin: params.checkin,
+      //     checkout: params.checkout,
+      //     adults: params.adults,
+      //     children: params.children,
+      //     rooms: params.rooms
+      //   })
+      // });
+      
       const mockHotels: BookingHotel[] = [
         {
           id: 'hotel_1',
@@ -157,7 +174,7 @@ export class BookingApiReal {
           bedType: 'Double Bed',
           size: '25 m²',
           view: 'City View',
-          basePrice: 120,
+          basePrice: 127.50,
           currency: 'EUR',
           cancellationPolicy: 'Free cancellation until 24 hours before check-in',
           breakfastIncluded: false,
@@ -172,7 +189,7 @@ export class BookingApiReal {
           bedType: 'King Bed',
           size: '35 m²',
           view: 'Sea View',
-          basePrice: 180,
+          basePrice: 189.75,
           currency: 'EUR',
           cancellationPolicy: 'Free cancellation until 24 hours before check-in',
           breakfastIncluded: true,
@@ -187,7 +204,7 @@ export class BookingApiReal {
           bedType: 'King Bed',
           size: '60 m²',
           view: 'Sea View',
-          basePrice: 350,
+          basePrice: 342.80,
           currency: 'EUR',
           cancellationPolicy: 'Free cancellation until 48 hours before check-in',
           breakfastIncluded: true,
