@@ -7,7 +7,11 @@ import { useEmoji } from '@/app/contexts/EmojiContext';
 import { useModule } from '@/app/hooks/useModule';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 
-const AdminNavigation = () => {
+interface AdminNavigationProps {
+  onClose?: () => void;
+}
+
+const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const { user, logout } = useAuth();
@@ -141,7 +145,20 @@ const AdminNavigation = () => {
   }));
 
   return (
-    <div className="bg-white shadow-lg border-r border-gray-200 h-screen w-64 fixed left-0 top-16 z-40 flex flex-col">
+    <div className="bg-white shadow-lg border-r border-gray-200 h-screen w-64 fixed left-0 top-0 z-40 flex flex-col lg:top-16">
+      {/* Mobile Close Button */}
+      <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200">
+        <span className="text-lg font-semibold text-gray-900">ProTransfer</span>
+        <button
+          onClick={onClose}
+          className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+        >
+          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
       {/* Navigation */}
       <nav className="p-4 space-y-2 pt-6 flex-1 overflow-y-auto">
         {menuItems.map((item) => {
@@ -179,6 +196,7 @@ const AdminNavigation = () => {
             <Link
               key={item.name}
               href={item.href}
+              onClick={() => onClose && onClose()}
               className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
             >
               <span className="text-2xl">{isClient && emojisEnabled ? item.icon : ''}</span>

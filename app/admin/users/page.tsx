@@ -195,18 +195,19 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-4 lg:p-6">
       <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Kullanıcı Yönetimi</h1>
         <button
           onClick={() => setShowCreateForm(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm lg:text-base"
         >
           Yeni Kullanıcı
         </button>
       </div>
 
-      {/* Kullanıcı Listesi */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
+      {/* Kullanıcı Listesi - Desktop */}
+      <div className="hidden lg:block bg-white shadow rounded-lg overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -297,10 +298,73 @@ export default function UsersPage() {
         </table>
       </div>
 
+      {/* Kullanıcı Listesi - Mobile */}
+      <div className="lg:hidden space-y-4">
+        {users.map((user) => (
+          <div key={user.id} className="bg-white shadow rounded-lg p-4">
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <div className="text-lg font-medium text-gray-900">{user.name}</div>
+                <div className="text-sm text-gray-500">{user.username}</div>
+                <div className="text-sm text-gray-500">{user.email}</div>
+              </div>
+              <div className="flex flex-col space-y-1">
+                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(user.role)}`}>
+                  {getRoleText(user.role)}
+                </span>
+                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                  user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                }`}>
+                  {user.isActive ? 'Aktif' : 'Pasif'}
+                </span>
+              </div>
+            </div>
+            
+            <div className="flex justify-between items-center text-sm text-gray-500 mb-3">
+              <span>Rezervasyon: {user._count.reservations}</span>
+              <span>{new Date(user.createdAt).toLocaleDateString('tr-TR')}</span>
+            </div>
+            
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => {
+                  setEditingUser(user);
+                  setFormData({
+                    username: user.username,
+                    email: user.email,
+                    password: '',
+                    name: user.name,
+                    role: user.role,
+                    isActive: user.isActive
+                  });
+                }}
+                className="text-blue-600 hover:text-blue-900 text-sm px-3 py-1 border border-blue-200 rounded"
+              >
+                Düzenle
+              </button>
+              <button
+                onClick={() => window.location.href = `/admin/users/${user.id}/permissions`}
+                className="text-blue-600 hover:text-blue-900 text-sm px-3 py-1 border border-blue-200 rounded"
+              >
+                🔐 Yetkiler
+              </button>
+              {user.role !== 'SUPERUSER' && (
+                <button
+                  onClick={() => handleDeleteUser(user.id)}
+                  className="text-red-600 hover:text-red-900 text-sm px-3 py-1 border border-red-200 rounded"
+                >
+                  Sil
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Kullanıcı Oluşturma Formu */}
       {showCreateForm && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+          <div className="relative top-20 mx-auto p-5 border w-96 max-w-[calc(100vw-2rem)] shadow-lg rounded-md bg-white">
             <h3 className="text-lg font-bold text-gray-900 mb-4">Yeni Kullanıcı</h3>
             <form onSubmit={handleCreateUser}>
               <div className="space-y-4">
