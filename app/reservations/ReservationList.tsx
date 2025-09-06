@@ -166,10 +166,20 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
         
         // Apply permission-based filtering first
         if (user) {
-            if (canViewAllReservations(user.role)) {
+            // Check if user has VIEW_ALL_RESERVATIONS permission
+            const hasViewAllPermission = user.permissions?.some(p => 
+                p.permission === 'VIEW_ALL_RESERVATIONS' && p.isActive
+            );
+            
+            // Check if user has VIEW_OWN_SALES permission
+            const hasViewOwnPermission = user.permissions?.some(p => 
+                p.permission === 'VIEW_OWN_SALES' && p.isActive
+            );
+            
+            if (hasViewAllPermission) {
                 // User can see all reservations
                 filtered = [...reservations];
-            } else if (canViewOwnSales(user.role)) {
+            } else if (hasViewOwnPermission) {
                 // User can only see their own reservations
                 filtered = reservations.filter(reservation => reservation.user?.id === user.id);
             } else {

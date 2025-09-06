@@ -10,6 +10,10 @@ interface User {
   name: string;
   role: string;
   isActive: boolean;
+  permissions?: {
+    permission: string;
+    isActive: boolean;
+  }[];
 }
 
 interface AuthContextType {
