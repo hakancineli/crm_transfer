@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
 
     const prisma = new PrismaClient();
 
-    // Test verilerini oluştur
+    // Mevcut rezervasyonları production'a aktar
     const testData = {
       tenants: [
         {
