@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useEmoji } from '@/app/contexts/EmojiContext';
 import { TenantService } from '@/app/lib/tenant';
 import { BookingApiService, Hotel } from '@/app/lib/bookingApi';
 import { VoucherUtils } from '@/app/lib/voucherUtils';
@@ -13,6 +14,7 @@ import HotelBookingConfirmation from '@/app/components/HotelBookingConfirmation'
 
 export default function AccommodationPage() {
   const { user } = useAuth();
+  const { emojisEnabled } = useEmoji();
   const [currentStep, setCurrentStep] = useState<'form' | 'search' | 'booking'>('form');
   const [requestData, setRequestData] = useState<any>(null);
   const [hotels, setHotels] = useState<Hotel[]>([]);
@@ -188,7 +190,7 @@ export default function AccommodationPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            🏨 Konaklama Yönetimi
+            {emojisEnabled ? '🏨 ' : ''}Konaklama Yönetimi
           </h1>
           <p className="text-gray-600 mb-6">
             Müşterileriniz için en uygun otelleri bulun ve rezervasyon yapın
@@ -198,7 +200,7 @@ export default function AccommodationPage() {
               href="/accommodation/reservations"
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
-              📋 Tüm Rezervasyonları Görüntüle
+              {emojisEnabled ? '📋 ' : ''}Tüm Rezervasyonları Görüntüle
             </Link>
           </div>
         </div>

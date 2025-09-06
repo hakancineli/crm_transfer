@@ -1,210 +1,187 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { useEmoji } from '@/app/contexts/EmojiContext';
+
+interface ModuleSettings {
+  transfer: boolean;
+  accommodation: boolean;
+  flight: boolean;
+}
 
 export default function SettingsPage() {
-  const [settings, setSettings] = useState({
-    companyName: 'ProTransfer',
-    companyEmail: 'info@protransfer.com',
-    companyPhone: '+90 212 555 0123',
-    defaultCurrency: 'USD',
-    timezone: 'Europe/Istanbul',
-    notificationEmail: true,
-    notificationSMS: false,
-    notificationWhatsApp: true,
-    autoAssignDriver: false,
-    requirePaymentConfirmation: true
+  const { emojisEnabled } = useEmoji();
+  const [modules, setModules] = useState<ModuleSettings>({
+    transfer: true, // Transfer her zaman aktif
+    accommodation: false,
+    flight: false
   });
+  const [loading, setLoading] = useState(false);
 
-  const handleSave = () => {
-    // Ayarları kaydet
-    console.log('Ayarlar kaydedildi:', settings);
-    alert('Ayarlar başarıyla kaydedildi!');
+  useEffect(() => {
+    // LocalStorage'dan modül ayarlarını yükle
+    const saved = localStorage.getItem('moduleSettings');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setModules(prev => ({ ...prev, ...parsed }));
+      } catch (error) {
+        console.error('Modül ayarları yüklenirken hata:', error);
+      }
+    }
+  }, []);
+
+  const toggleModule = async (moduleName: keyof ModuleSettings) => {
+    if (moduleName === 'transfer') return; // Transfer modülü kapatılamaz
+    
+    setLoading(true);
+    try {
+      const newModules = {
+        ...modules,
+        [moduleName]: !modules[moduleName]
+      };
+      
+      setModules(newModules);
+      localStorage.setItem('moduleSettings', JSON.stringify(newModules));
+      
+      // Sayfayı yenile (modül değişikliklerini uygulamak için)
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Modül durumu güncellenirken hata:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getModuleInfo = (moduleName: keyof ModuleSettings) => {
+    const moduleInfo = {
+      transfer: {
+        name: 'Transfer Modülü',
+        description: 'Temel transfer işlemleri (her zaman aktif)',
+        icon: '🚗',
+        color: 'green'
+      },
+      accommodation: {
+        name: 'Konaklama Modülü',
+        description: 'Otel rezervasyon ve fiyat havuzu',
+        icon: '🏨',
+        color: 'blue'
+      },
+      flight: {
+        name: 'Uçuş Modülü',
+        description: 'Uçuş rezervasyon ve takip',
+        icon: '✈️',
+        color: 'purple'
+      }
+    };
+    
+    return moduleInfo[moduleName];
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="px-6 py-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Sistem Ayarları</h1>
-              <p className="mt-1 text-sm text-gray-600">
-                Sistem ayarlarını yapılandırın ve yönetin
-              </p>
-            </div>
-            <button
-              onClick={handleSave}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-            >
-              💾 Ayarları Kaydet
-            </button>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h1 className="text-2xl font-bold text-gray-900">
+              {emojisEnabled ? '⚙️ ' : ''}Modül Ayarları
+            </h1>
+            <p className="mt-2 text-sm text-gray-600">
+              Hangi modüllerin aktif olacağını belirleyin
+            </p>
           </div>
-        </div>
-      </div>
-
-      <div className="p-6">
-        <div className="max-w-4xl mx-auto space-y-8">
-          {/* Company Settings */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Şirket Bilgileri</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Şirket Adı
-                </label>
-                <input
-                  type="text"
-                  value={settings.companyName}
-                  onChange={(e) => setSettings({ ...settings, companyName: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  E-posta
-                </label>
-                <input
-                  type="email"
-                  value={settings.companyEmail}
-                  onChange={(e) => setSettings({ ...settings, companyEmail: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Telefon
-                </label>
-                <input
-                  type="tel"
-                  value={settings.companyPhone}
-                  onChange={(e) => setSettings({ ...settings, companyPhone: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Varsayılan Para Birimi
-                </label>
-                <select
-                  value={settings.defaultCurrency}
-                  onChange={(e) => setSettings({ ...settings, defaultCurrency: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                >
-                  <option value="USD">USD - Amerikan Doları</option>
-                  <option value="EUR">EUR - Euro</option>
-                  <option value="TRY">TRY - Türk Lirası</option>
-                  <option value="GBP">GBP - İngiliz Sterlini</option>
-                </select>
-              </div>
+          
+          <div className="p-6">
+            <div className="space-y-6">
+              {Object.keys(modules).map((moduleName) => {
+                const module = moduleName as keyof ModuleSettings;
+                const info = getModuleInfo(module);
+                const isEnabled = modules[module];
+                const isDisabled = module === 'transfer';
+                
+                return (
+                  <div
+                    key={module}
+                    className={`border rounded-lg p-6 transition-all duration-200 ${
+                      isEnabled 
+                        ? `border-${info.color}-200 bg-${info.color}-50` 
+                        : 'border-gray-200 bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl ${
+                          isEnabled 
+                            ? `bg-${info.color}-100 text-${info.color}-600` 
+                            : 'bg-gray-100 text-gray-400'
+                        }`}>
+                          {emojisEnabled ? info.icon : '📦'}
+                        </div>
+                        <div>
+                          <h3 className={`text-lg font-semibold ${
+                            isEnabled ? 'text-gray-900' : 'text-gray-500'
+                          }`}>
+                            {info.name}
+                          </h3>
+                          <p className={`text-sm ${
+                            isEnabled ? 'text-gray-600' : 'text-gray-400'
+                          }`}>
+                            {info.description}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-3">
+                        {isDisabled && (
+                          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                            Zorunlu
+                          </span>
+                        )}
+                        
+                        <button
+                          onClick={() => toggleModule(module)}
+                          disabled={isDisabled || loading}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-${info.color}-500 focus:ring-offset-2 ${
+                            isEnabled 
+                              ? `bg-${info.color}-600` 
+                              : 'bg-gray-200'
+                          } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                        >
+                          <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                              isEnabled ? 'translate-x-6' : 'translate-x-1'
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
+                    
+                    {isEnabled && (
+                      <div className="mt-4 p-3 bg-white rounded border border-gray-200">
+                        <div className="flex items-center space-x-2 text-sm text-green-600">
+                          <span>{emojisEnabled ? '✅' : '✓'}</span>
+                          <span>Modül aktif - Tüm özellikler kullanılabilir</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-          </div>
-
-          {/* Notification Settings */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Bildirim Ayarları</h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
+            
+            <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="flex items-start space-x-3">
+                <div className="text-blue-600 text-lg">{emojisEnabled ? '💡' : 'ℹ️'}</div>
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900">E-posta Bildirimleri</h4>
-                  <p className="text-sm text-gray-500">Rezervasyon onayları ve güncellemeler için e-posta gönder</p>
+                  <h4 className="font-medium text-blue-900">Modül Yönetimi</h4>
+                  <p className="text-sm text-blue-700 mt-1">
+                    Modül durumunu değiştirdikten sonra sayfa otomatik olarak yenilenecek. 
+                    Deaktif edilen modüller menüde görünmeyecek ve erişilemeyecektir.
+                  </p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={settings.notificationEmail}
-                    onChange={(e) => setSettings({ ...settings, notificationEmail: e.target.checked })}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                </label>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-sm font-medium text-gray-900">SMS Bildirimleri</h4>
-                  <p className="text-sm text-gray-500">Önemli güncellemeler için SMS gönder</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={settings.notificationSMS}
-                    onChange={(e) => setSettings({ ...settings, notificationSMS: e.target.checked })}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                </label>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-sm font-medium text-gray-900">WhatsApp Bildirimleri</h4>
-                  <p className="text-sm text-gray-500">Müşterilerle WhatsApp üzerinden iletişim kur</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={settings.notificationWhatsApp}
-                    onChange={(e) => setSettings({ ...settings, notificationWhatsApp: e.target.checked })}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          {/* System Settings */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Sistem Ayarları</h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-sm font-medium text-gray-900">Otomatik Şoför Atama</h4>
-                  <p className="text-sm text-gray-500">Yeni rezervasyonlara otomatik olarak şoför ata</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={settings.autoAssignDriver}
-                    onChange={(e) => setSettings({ ...settings, autoAssignDriver: e.target.checked })}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                </label>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-sm font-medium text-gray-900">Ödeme Onayı Gerekli</h4>
-                  <p className="text-sm text-gray-500">Transfer öncesi ödeme onayı zorunlu olsun</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={settings.requirePaymentConfirmation}
-                    onChange={(e) => setSettings({ ...settings, requirePaymentConfirmation: e.target.checked })}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                </label>
-              </div>
-            </div>
-          </div>
-
-
-          {/* Danger Zone */}
-          <div className="bg-red-50 rounded-lg border border-red-200 p-6">
-            <h3 className="text-lg font-semibold text-red-900 mb-4">Tehlikeli Bölge</h3>
-            <div className="space-y-4">
-              <div>
-                <h4 className="text-sm font-medium text-red-900">Veritabanını Sıfırla</h4>
-                <p className="text-sm text-red-700">Tüm verileri siler ve sistemi sıfırlar. Bu işlem geri alınamaz!</p>
-                <button className="mt-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
-                  🗑️ Veritabanını Sıfırla
-                </button>
               </div>
             </div>
           </div>

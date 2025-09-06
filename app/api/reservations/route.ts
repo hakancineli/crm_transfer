@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
+    console.log('API: Rezervasyonlar getiriliyor...');
     const { searchParams } = new URL(request.url);
     const phone = searchParams.get('phone');
 
@@ -62,6 +63,7 @@ export async function GET(request: NextRequest) {
     }
 
     // If no phone parameter, return all reservations (admin panel)
+    console.log('API: Tüm rezervasyonlar getiriliyor...');
     const reservations = await prisma.reservation.findMany({
       orderBy: [
         { date: 'desc' },
@@ -71,6 +73,7 @@ export async function GET(request: NextRequest) {
         driver: true
       }
     });
+    console.log('API: Bulunan rezervasyon sayısı:', reservations.length);
 
     // Her rezervasyon için yolcu isimlerini parse et
     const parsedReservations = reservations.map(reservation => {

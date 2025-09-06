@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useEmoji } from '../contexts/EmojiContext';
 
 interface DashboardStats {
   totalReservations: number;
@@ -15,6 +16,10 @@ interface DashboardStats {
 }
 
 export default function AdminDashboard() {
+  const { emojisEnabled } = useEmoji();
+  
+  console.log('Admin Dashboard - Emojis enabled:', emojisEnabled);
+  
   const [stats, setStats] = useState<DashboardStats>({
     totalReservations: 0,
     todayReservations: 0,
@@ -100,7 +105,7 @@ export default function AdminDashboard() {
                 onClick={fetchDashboardStats}
                 className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
               >
-                🔄 Yenile
+                {emojisEnabled ? '🔄 ' : ''}Yenile
               </button>
             </div>
           </div>
@@ -115,7 +120,7 @@ export default function AdminDashboard() {
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <span className="text-blue-600 text-lg">📋</span>
+                  <span className="text-blue-600 text-lg">{emojisEnabled ? '📋' : '📄'}</span>
                 </div>
               </div>
               <div className="ml-4">
@@ -130,7 +135,7 @@ export default function AdminDashboard() {
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                  <span className="text-green-600 text-lg">📅</span>
+                  <span className="text-green-600 text-lg">{emojisEnabled ? '📅' : '📆'}</span>
                 </div>
               </div>
               <div className="ml-4">
@@ -145,7 +150,7 @@ export default function AdminDashboard() {
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
-                  <span className="text-yellow-600 text-lg">💰</span>
+                  <span className="text-yellow-600 text-lg">{emojisEnabled ? '💰' : '$'}</span>
                 </div>
               </div>
               <div className="ml-4">
@@ -160,7 +165,7 @@ export default function AdminDashboard() {
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <span className="text-purple-600 text-lg">💵</span>
+                  <span className="text-purple-600 text-lg">{emojisEnabled ? '💵' : '€'}</span>
                 </div>
               </div>
               <div className="ml-4">
@@ -235,17 +240,17 @@ export default function AdminDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Hızlı İşlemler */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Hızlı İşlemler - Transfer */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Hızlı İşlemler</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Transfer İşlemleri</h3>
             <div className="grid grid-cols-2 gap-4">
               <Link
                 href="/new-reservation"
                 className="flex items-center justify-center p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
               >
                 <div className="text-center">
-                  <div className="text-2xl mb-2">➕</div>
+                  <div className="text-2xl mb-2">{emojisEnabled ? '➕' : '+'}</div>
                   <div className="text-sm font-medium text-green-800">Yeni Rezervasyon</div>
                 </div>
               </Link>
@@ -255,7 +260,7 @@ export default function AdminDashboard() {
                 className="flex items-center justify-center p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
               >
                 <div className="text-center">
-                  <div className="text-2xl mb-2">📋</div>
+                  <div className="text-2xl mb-2">{emojisEnabled ? '📋' : '📄'}</div>
                   <div className="text-sm font-medium text-blue-800">Rezervasyonlar</div>
                 </div>
               </Link>
@@ -265,7 +270,7 @@ export default function AdminDashboard() {
                 className="flex items-center justify-center p-4 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
               >
                 <div className="text-center">
-                  <div className="text-2xl mb-2">✈️</div>
+                  <div className="text-2xl mb-2">{emojisEnabled ? '✈️' : '🛫'}</div>
                   <div className="text-sm font-medium text-orange-800">Uçuş Durumu</div>
                 </div>
               </Link>
@@ -275,8 +280,54 @@ export default function AdminDashboard() {
                 className="flex items-center justify-center p-4 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors"
               >
                 <div className="text-center">
-                  <div className="text-2xl mb-2">📊</div>
+                  <div className="text-2xl mb-2">{emojisEnabled ? '📊' : '📈'}</div>
                   <div className="text-sm font-medium text-purple-800">Raporlar</div>
+                </div>
+              </Link>
+            </div>
+          </div>
+
+          {/* Hızlı İşlemler - Konaklama */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Konaklama İşlemleri</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <Link
+                href="/accommodation"
+                className="flex items-center justify-center p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+              >
+                <div className="text-center">
+                  <div className="text-2xl mb-2">{emojisEnabled ? '🏨' : '🏢'}</div>
+                  <div className="text-sm font-medium text-blue-800">Otel Rezervasyonu</div>
+                </div>
+              </Link>
+              
+              <Link
+                href="/accommodation/price-pool"
+                className="flex items-center justify-center p-4 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
+              >
+                <div className="text-center">
+                  <div className="text-2xl mb-2">{emojisEnabled ? '💰' : '$'}</div>
+                  <div className="text-sm font-medium text-orange-800">Fiyat Havuzu</div>
+                </div>
+              </Link>
+              
+              <Link
+                href="/accommodation/reservations"
+                className="flex items-center justify-center p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
+              >
+                <div className="text-center">
+                  <div className="text-2xl mb-2">{emojisEnabled ? '📋' : '📄'}</div>
+                  <div className="text-sm font-medium text-green-800">Otel Rezervasyonları</div>
+                </div>
+              </Link>
+              
+              <Link
+                href="/accommodation/reports"
+                className="flex items-center justify-center p-4 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors"
+              >
+                <div className="text-center">
+                  <div className="text-2xl mb-2">{emojisEnabled ? '📊' : '📈'}</div>
+                  <div className="text-sm font-medium text-purple-800">Konaklama Raporları</div>
                 </div>
               </Link>
             </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useEmoji } from '@/app/contexts/EmojiContext';
 import Link from 'next/link';
 import { BookingApiReal } from '@/app/lib/bookingApiReal';
 
@@ -41,6 +42,7 @@ interface PricePoolItem {
 
 export default function HotelPricePoolPage() {
   const { user } = useAuth();
+  const { emojisEnabled } = useEmoji();
   const [pricePool, setPricePool] = useState<PricePoolItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -246,20 +248,20 @@ export default function HotelPricePoolPage() {
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-3xl font-bold text-gray-900">
-              🏨 Otel Fiyat Havuzu
+              {emojisEnabled ? '🏨 ' : ''}Otel Fiyat Havuzu
             </h1>
             <div className="flex space-x-4">
               <button
                 onClick={() => setShowAddForm(true)}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
               >
-                ➕ Yeni Fiyat Ekle
+                {emojisEnabled ? '➕ ' : ''}Yeni Fiyat Ekle
               </button>
               <Link
                 href="/accommodation/reservations"
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
-                📋 Rezervasyonlar
+                {emojisEnabled ? '📋 ' : ''}Rezervasyonlar
               </Link>
             </div>
           </div>
@@ -336,7 +338,7 @@ export default function HotelPricePoolPage() {
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           {pricePool.length === 0 ? (
             <div className="text-center py-12">
-              <div className="text-6xl mb-4">🏨</div>
+              <div className="text-6xl mb-4">{emojisEnabled ? '🏨' : ''}</div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 Fiyat havuzunda otel bulunamadı
               </h3>
@@ -452,7 +454,7 @@ export default function HotelPricePoolPage() {
                             }}
                             className="text-green-600 hover:text-green-900"
                           >
-                            📋 Rezervasyon
+                            {emojisEnabled ? '📋 ' : ''}Rezervasyon
                           </button>
                           <button
                             onClick={() => {
@@ -510,6 +512,7 @@ function AddToPricePoolModal({
   setPricingData,
   onProfitPercentageChange
 }: any) {
+  const { emojisEnabled } = useEmoji();
   const [hotels, setHotels] = useState<any[]>([]);
   const [rooms, setRooms] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -580,7 +583,7 @@ function AddToPricePoolModal({
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900">
-              ➕ Fiyat Havuzuna Ekle
+              {emojisEnabled ? '➕ ' : ''}Fiyat Havuzuna Ekle
             </h2>
             <button
               onClick={onClose}
@@ -644,7 +647,7 @@ function AddToPricePoolModal({
             {/* Hotel Selection */}
             {hotels.length > 0 && (
               <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">🏨 Otel Seçin</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{emojisEnabled ? '🏨 ' : ''}Otel Seçin</h3>
                 <div className="space-y-2 max-h-40 overflow-y-auto">
                   {hotels.map((hotel) => (
                     <div
@@ -707,7 +710,7 @@ function AddToPricePoolModal({
             {/* Pricing */}
             {selectedRoom && (
               <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">💰 Fiyatlandırma</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{emojisEnabled ? '💰 ' : ''}Fiyatlandırma</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">

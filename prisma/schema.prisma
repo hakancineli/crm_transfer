@@ -9,8 +9,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 // Multi-tenant yapısı
@@ -43,7 +43,7 @@ model Module {
   isActive      Boolean       @default(true)
   priceMonthly  Float         @default(0)
   priceYearly   Float         @default(0)
-  features      String[]      @default([])
+  features      String        @default("[]")
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   
@@ -60,7 +60,7 @@ model TenantModule {
   isEnabled   Boolean  @default(false)
   activatedAt DateTime?
   expiresAt   DateTime?
-  features    String[] @default([])
+  features    String   @default("[]")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
@@ -77,7 +77,7 @@ model TenantUser {
   tenantId    String
   userId      String
   role        String   @default("USER")
-  permissions String[] @default([])
+  permissions String   @default("[]")
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -203,7 +203,7 @@ model HotelRequest {
   budget          Float?
   roomType        String?  // Single, Double, Suite, etc.
   breakfast       Boolean  @default(false)
-  amenities       String[] @default([])
+  amenities       String   @default("[]")
   specialRequests String?
   status          String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, CANCELLED
   assignedTo      String?  // User ID who is handling this request
@@ -267,13 +267,13 @@ model HotelPricePool {
   hotelRating     Float
   hotelStars      Int
   hotelImage      String?
-  hotelAmenities  String[]  @default([])
+  hotelAmenities  String    @default("[]")
   
   // Oda bilgileri
   roomType        String
   roomName        String
   roomDescription String?
-  roomAmenities   String[]  @default([])
+  roomAmenities   String    @default("[]")
   maxOccupancy    Int
   bedType         String
   roomSize        String?

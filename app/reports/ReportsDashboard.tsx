@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { startOfDay, endOfDay, format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useEmoji } from '@/app/contexts/EmojiContext';
 
 interface ReportData {
     totalRevenueUSD: number;
@@ -27,6 +28,7 @@ interface ReportData {
 
 export default function ReportsDashboard() {
     const { user } = useAuth();
+    const { emojisEnabled } = useEmoji();
     const today = new Date();
     const [startDate, setStartDate] = useState<string>(format(today, 'yyyy-MM-dd'));
     const [endDate, setEndDate] = useState<string>(format(today, 'yyyy-MM-dd'));
@@ -183,7 +185,7 @@ export default function ReportsDashboard() {
                         <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 h-96 flex flex-col relative z-10">
                             <div className="flex items-center mb-6">
                                 <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mr-4">
-                                    <span className="text-green-600 text-2xl">💰</span>
+                                    <span className="text-green-600 text-2xl">{emojisEnabled ? '💰' : ''}</span>
                                 </div>
                                 <h3 className="text-xl font-semibold text-gray-900">Finansal Özet</h3>
                             </div>
@@ -194,7 +196,7 @@ export default function ReportsDashboard() {
                                             <p className="text-sm text-green-700 font-medium">USD Satış Toplamı</p>
                                             <p className="text-2xl font-bold text-green-800">{Number(reportData.totalRevenueUSD || 0).toFixed(2)} USD</p>
                                         </div>
-                                        <span className="text-green-600 text-2xl">💵</span>
+                                        <span className="text-green-600 text-2xl">{emojisEnabled ? '💵' : ''}</span>
                                     </div>
                                 </div>
                                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
@@ -203,7 +205,7 @@ export default function ReportsDashboard() {
                                             <p className="text-sm text-blue-700 font-medium">USD/TL Kuru</p>
                                             <p className="text-lg font-semibold text-blue-800">{Number(reportData.usdRate || 0).toFixed(2)} TL</p>
                                         </div>
-                                        <span className="text-blue-600 text-xl">📈</span>
+                                        <span className="text-blue-600 text-xl">{emojisEnabled ? '📈' : ''}</span>
                                     </div>
                                 </div>
                                 <div className="bg-green-50 p-4 rounded-lg border border-green-200">
@@ -233,7 +235,7 @@ export default function ReportsDashboard() {
                                             <p className="text-sm text-gray-700 font-medium">Toplam Transfer</p>
                                             <p className="text-3xl font-bold text-gray-900">{reportData.totalTransfers}</p>
                                         </div>
-                                        <span className="text-gray-600 text-3xl">📊</span>
+                                        <span className="text-gray-600 text-3xl">{emojisEnabled ? '📊' : ''}</span>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
@@ -265,7 +267,7 @@ export default function ReportsDashboard() {
                         <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 h-96 flex flex-col relative z-10">
                             <div className="flex items-center mb-6">
                                 <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mr-4">
-                                    <span className="text-purple-600 text-2xl">🎯</span>
+                                    <span className="text-purple-600 text-2xl">{emojisEnabled ? '🎯' : ''}</span>
                                 </div>
                                 <h3 className="text-xl font-semibold text-gray-900">Transfer Tipleri</h3>
                             </div>
@@ -295,7 +297,7 @@ export default function ReportsDashboard() {
                         <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 h-96 flex flex-col relative z-10">
                             <div className="flex items-center mb-6">
                                 <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mr-4">
-                                    <span className="text-orange-600 text-2xl">💰</span>
+                                    <span className="text-orange-600 text-2xl">{emojisEnabled ? '💰' : ''}</span>
                                 </div>
                                 <h3 className="text-xl font-semibold text-gray-900">Hakediş ve Kar</h3>
                             </div>
@@ -329,7 +331,7 @@ export default function ReportsDashboard() {
                                                 }%
                                             </p>
                                         </div>
-                                        <span className="text-gray-600 text-xl">📊</span>
+                                        <span className="text-gray-600 text-xl">{emojisEnabled ? '📊' : ''}</span>
                                     </div>
                                 </div>
                             </div>
@@ -355,7 +357,7 @@ export default function ReportsDashboard() {
                                             </th>
                                             <th className="px-6 py-4 text-right text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                                 <div className="flex items-center justify-end">
-                                                    <span className="mr-2">📊</span>
+                                                    <span className="mr-2">{emojisEnabled ? '📊' : ''}</span>
                                                     Transfer Sayısı
                                                 </div>
                                             </th>
@@ -385,7 +387,7 @@ export default function ReportsDashboard() {
                 ) : (
                     <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 text-center">
                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <span className="text-gray-600 text-2xl">📊</span>
+                            <span className="text-gray-600 text-2xl">{emojisEnabled ? '📊' : ''}</span>
                         </div>
                         <h3 className="text-lg font-semibold text-gray-800 mb-2">Rapor Hazır</h3>
                         <p className="text-gray-600">Rapor görüntülemek için tarih aralığı seçin</p>

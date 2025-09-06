@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "./components/ui/Header";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { AuthProvider } from "./contexts/AuthContext";
+import { EmojiProvider } from "./contexts/EmojiContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -71,10 +72,12 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <LanguageProvider>
-            <Header />
-            <main className="w-full pt-16 pb-6 px-4 sm:px-6 lg:px-8 print:p-0">
-              {children}
-            </main>
+            <EmojiProvider>
+              <Header />
+              <main className="w-full pt-16 pb-6 px-4 sm:px-6 lg:px-8 print:p-0">
+                {children}
+              </main>
+            </EmojiProvider>
           </LanguageProvider>
         </AuthProvider>
       </body>

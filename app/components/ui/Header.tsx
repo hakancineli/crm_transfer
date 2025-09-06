@@ -5,12 +5,18 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { useEmoji } from '../../contexts/EmojiContext';
 import LanguageSelector from '../LanguageSelector';
 
 export default function Header() {
     const pathname = usePathname();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { t } = useLanguage();
+    const { user, logout, isAuthenticated } = useAuth();
+    const { emojisEnabled } = useEmoji();
+    
+    console.log('Header - isAuthenticated:', isAuthenticated, 'user:', user, 'isCustomerContext:', pathname === '/' || pathname.startsWith('/customer-reservation') || pathname.startsWith('/customer-panel'));
 
     // Müşteri ekranlarında yönetim linklerini gizle (ana sayfa dahil)
     const isCustomerContext = pathname === '/' || pathname.startsWith('/customer-reservation') || pathname.startsWith('/customer-panel');
@@ -65,6 +71,34 @@ export default function Header() {
                     
                     <div className="flex items-center space-x-4">
                         <LanguageSelector />
+                        
+                        {/* Kullanıcı bilgileri ve çıkış butonu */}
+                        {!isCustomerContext && (
+                            <div className="hidden md:flex items-center space-x-3">
+                                {isAuthenticated && user ? (
+                                    <>
+                                        <div className="text-sm text-gray-600">
+                                            <span className="font-medium">{user.name}</span>
+                                            <span className="text-gray-400 ml-1">({user.email})</span>
+                                        </div>
+                                        <button
+                                            onClick={logout}
+                                            className="bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700 transition-colors"
+                                        >
+                                            {emojisEnabled ? '🚪 ' : ''}Çıkış
+                                        </button>
+                                    </>
+                                ) : (
+                                    <Link
+                                        href="/admin-login"
+                                        className="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700 transition-colors"
+                                    >
+                                        {emojisEnabled ? '🔑 ' : ''}Giriş
+                                    </Link>
+                                )}
+                            </div>
+                        )}
+                        
                         <div className="md:hidden flex items-center">
                             <button
                                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -103,6 +137,25 @@ export default function Header() {
                                     {item.name}
                                 </Link>
                             ))}
+                            
+                            {/* Mobil çıkış butonu */}
+                            {isAuthenticated && user && !isCustomerContext && (
+                                <div className="border-t border-gray-200 pt-2 mt-2">
+                                    <div className="px-3 py-2 text-sm text-gray-600">
+                                        <span className="font-medium">{user.name}</span>
+                                        <span className="text-gray-400 ml-1">({user.email})</span>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            logout();
+                                            setMobileMenuOpen(false);
+                                        }}
+                                        className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50 hover:text-red-700"
+                                    >
+                                        {emojisEnabled ? '🚪 ' : ''}Çıkış
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
