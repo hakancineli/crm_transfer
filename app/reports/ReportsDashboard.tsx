@@ -224,15 +224,6 @@ export default function ReportsDashboard() {
                                         <span className="text-red-600 text-xl">👨‍✈️</span>
                                     </div>
                                 </div>
-                                <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-sm text-purple-700 font-medium">Şirket Karı</p>
-                                            <p className="text-xl font-bold text-purple-800">{Number(reportData.netIncome || 0).toFixed(2)} TL</p>
-                                        </div>
-                                        <span className="text-purple-600 text-xl">🏢</span>
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
@@ -337,7 +328,7 @@ export default function ReportsDashboard() {
                                 <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <p className="text-sm text-gray-700 font-medium">Transfer Başına</p>
+                                            <p className="text-sm text-gray-700 font-medium">Ortalama Hakediş</p>
                                             <p className="text-xl font-bold text-gray-900">
                                                 {reportData.totalTransfers > 0 
                                                     ? (Number(reportData.driverPayments || 0) / reportData.totalTransfers).toFixed(2)
