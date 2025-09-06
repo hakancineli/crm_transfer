@@ -80,22 +80,9 @@ const AdminNavigation = () => {
   ];
 
   return (
-    <div className="bg-white shadow-lg border-r border-gray-200 min-h-screen w-64 fixed left-0 top-0 z-40 overflow-y-auto">
-      {/* Logo */}
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-lg">A</span>
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
-            <p className="text-xs text-gray-500">ProTransfer</p>
-          </div>
-        </div>
-      </div>
-
+    <div className="bg-white shadow-lg border-r border-gray-200 min-h-screen w-64 fixed left-0 top-16 z-40 overflow-y-auto">
       {/* Navigation */}
-      <nav className="p-4 space-y-2">
+      <nav className="p-4 space-y-2 pt-6">
         {menuItems.map((item) => {
           // Check if item should be shown based on user permissions
           let shouldShow = true;
