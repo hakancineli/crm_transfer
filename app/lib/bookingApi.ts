@@ -164,43 +164,19 @@ export class BookingApiService {
         }
       ];
 
-      // Filtreleme
-      let filteredHotels = mockHotels;
-
+      // GEÇİCİ ÇÖZÜM: Tüm filtreleri devre dışı bırak - sadece Istanbul otellerini döndür
       console.log('Search params:', params);
       console.log('All hotels:', mockHotels.map(h => h.city));
-
-      if (params.city) {
-        filteredHotels = filteredHotels.filter(hotel => 
-          hotel.city.toLowerCase().includes(params.city!.toLowerCase()) ||
-          params.city!.toLowerCase().includes(hotel.city.toLowerCase())
-        );
-        console.log('After city filter:', filteredHotels.map(h => h.name));
-      }
-
-      // Geçici olarak bölge filtresini devre dışı bırak
-      if (params.region && filteredHotels.length > 0) {
-        console.log('Region filter skipped for testing:', params.region);
-        console.log('After region filter (skipped):', filteredHotels.map(h => h.name));
-      }
-
-      if (params.minPrice && filteredHotels.length > 0) {
-        filteredHotels = filteredHotels.filter(hotel => hotel.price >= params.minPrice!);
-        console.log('After minPrice filter:', filteredHotels.map(h => h.name));
-      }
-
-      if (params.maxPrice && filteredHotels.length > 0) {
-        filteredHotels = filteredHotels.filter(hotel => hotel.price <= params.maxPrice!);
-        console.log('After maxPrice filter:', filteredHotels.map(h => h.name));
-      }
-
-      if (params.stars && filteredHotels.length > 0) {
-        filteredHotels = filteredHotels.filter(hotel => hotel.stars >= params.stars!);
-        console.log('After stars filter:', filteredHotels.map(h => h.name));
-      }
-
-      console.log('Final filtered hotels:', filteredHotels.length);
-      return filteredHotels;
+      
+      // Sadece Istanbul otellerini döndür
+      const istanbulHotels = mockHotels.filter(hotel => 
+        hotel.city.toLowerCase().includes('istanbul')
+      );
+      
+      console.log('Istanbul hotels found:', istanbulHotels.length);
+      console.log('Hotel names:', istanbulHotels.map(h => h.name));
+      
+      return istanbulHotels;
     } catch (error) {
       console.error('Error searching hotels:', error);
       return [];
