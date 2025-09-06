@@ -65,7 +65,7 @@ export async function PUT(
           userId: superuser.id, // Use superuser as the actor
           action: 'UPDATE',
           entityType: 'USER_PERMISSIONS',
-          entityId: userId,
+          entityId: id,
           description: `${user.name} kullanıcısının yetkileri güncellendi`,
           details: {
             permissions: Object.entries(permissions).filter(([_, isActive]) => isActive).map(([permission, _]) => permission)

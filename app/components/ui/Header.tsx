@@ -31,13 +31,18 @@ export default function Header() {
     const logoHref = isCustomerContext ? '/' : '/';
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/75 shadow">
+        <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/75 shadow-sm border-b border-gray-200">
             <nav className="w-full px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between h-16">
-                    <div className="flex">
-                        <div className="flex-shrink-0 flex items-center">
-                            <Link href={logoHref} className="text-xl font-bold text-green-600">
-                                {t('header.title')}
+                <div className="flex justify-between items-center h-16">
+                    <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                            <Link href={logoHref} className="flex items-center space-x-2">
+                                <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+                                    <span className="text-white font-bold text-lg">P</span>
+                                </div>
+                                <span className="text-xl font-bold text-green-600">
+                                    {t('header.title')}
+                                </span>
                             </Link>
                         </div>
                         <div className="hidden md:ml-6 md:flex md:space-x-8">

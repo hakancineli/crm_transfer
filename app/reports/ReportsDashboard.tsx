@@ -128,127 +128,242 @@ export default function ReportsDashboard() {
     }
 
     return (
-        <div className="space-y-6">
-            {/* Tarih Aralığı Seçici */}
-            <div className="bg-white p-4 rounded-lg shadow">
-                <h2 className="text-lg font-medium text-gray-900 mb-4">Tarih Aralığı Seçin</h2>
-                <div className="flex gap-4 items-center">
-                    <div className="flex-1">
-                        <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
-                            Başlangıç Tarihi
-                        </label>
-                        <input
-                            type="date"
-                            id="startDate"
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                        />
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+            <div className="max-w-7xl mx-auto space-y-8">
+                {/* Header */}
+                <div className="text-center">
+                    <h1 className="text-4xl font-bold text-gray-900 mb-2">📊 Raporlar ve Muhasebe</h1>
+                    <p className="text-lg text-gray-600">Finansal raporlar, transfer istatistikleri ve muhasebe yönetimi</p>
+                </div>
+
+                {/* Tarih Aralığı Seçici */}
+                <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                    <div className="flex items-center mb-4">
+                        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                            <span className="text-green-600 text-lg">📅</span>
+                        </div>
+                        <h2 className="text-xl font-semibold text-gray-900">Tarih Aralığı Seçin</h2>
                     </div>
-                    <div className="flex-1">
-                        <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
-                            Bitiş Tarihi
-                        </label>
-                        <input
-                            type="date"
-                            id="endDate"
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                        />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-2">
+                                📅 Başlangıç Tarihi
+                            </label>
+                            <input
+                                type="date"
+                                id="startDate"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                className="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm transition-all duration-200 hover:border-gray-400"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-2">
+                                📅 Bitiş Tarihi
+                            </label>
+                            <input
+                                type="date"
+                                id="endDate"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                className="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm transition-all duration-200 hover:border-gray-400"
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>
 
             {isLoading ? (
-                <div className="flex items-center justify-center h-64">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+                <div className="flex flex-col items-center justify-center h-64 bg-white rounded-xl shadow-lg">
+                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-green-500 mb-4"></div>
+                    <p className="text-gray-600 text-lg">Raporlar yükleniyor...</p>
                 </div>
             ) : error ? (
-                <div className="bg-white p-6 rounded-lg shadow text-center">
+                <div className="bg-white p-8 rounded-xl shadow-lg border border-red-200 text-center">
+                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span className="text-red-600 text-2xl">⚠️</span>
+                    </div>
+                    <h3 className="text-lg font-semibold text-red-800 mb-2">Hata Oluştu</h3>
                     <p className="text-red-600">{error}</p>
                 </div>
             ) : reportData ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {/* Finansal Özet */}
-                    <div className="bg-white p-6 rounded-lg shadow">
-                        <h3 className="text-lg font-medium text-gray-900 mb-4">Finansal Özet</h3>
-                        <dl className="space-y-4">
-                            <div>
-                                <dt className="text-sm text-gray-500">USD Satış Toplamı</dt>
-                                <dd className="text-2xl font-semibold text-green-600">{Number(reportData.totalRevenueUSD || 0).toFixed(2)} USD</dd>
-                                <dt className="text-sm text-gray-500 mt-1">USD/TL Kuru</dt>
-                                <dd className="text-lg font-medium text-gray-600">{Number(reportData.usdRate || 0).toFixed(2)} TL</dd>
-                                <dt className="text-sm text-gray-500 mt-2">TL Karşılığı</dt>
-                                <dd className="text-xl font-semibold text-green-600">{Number(reportData.totalRevenueTL || 0).toFixed(2)} TL</dd>
+                    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300">
+                        <div className="flex items-center mb-6">
+                            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mr-4">
+                                <span className="text-green-600 text-2xl">💰</span>
                             </div>
-                            <div>
-                                <dt className="text-sm text-gray-500">Şoför Hakediş (TL)</dt>
-                                <dd className="text-2xl font-semibold text-red-600">{Number(reportData.driverPayments || 0).toFixed(2)} TL</dd>
+                            <h3 className="text-xl font-semibold text-gray-900">Finansal Özet</h3>
+                        </div>
+                        <div className="space-y-6">
+                            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-green-700 font-medium">USD Satış Toplamı</p>
+                                        <p className="text-2xl font-bold text-green-800">{Number(reportData.totalRevenueUSD || 0).toFixed(2)} USD</p>
+                                    </div>
+                                    <span className="text-green-600 text-2xl">💵</span>
+                                </div>
                             </div>
-                            <div>
-                                <dt className="text-sm text-gray-500">Şirket Karı (TL)</dt>
-                                <dd className="text-2xl font-semibold text-blue-600">{Number(reportData.netIncome || 0).toFixed(2)} TL</dd>
+                            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-blue-700 font-medium">USD/TL Kuru</p>
+                                        <p className="text-lg font-semibold text-blue-800">{Number(reportData.usdRate || 0).toFixed(2)} TL</p>
+                                    </div>
+                                    <span className="text-blue-600 text-xl">📈</span>
+                                </div>
                             </div>
-                        </dl>
+                            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-green-700 font-medium">TL Karşılığı</p>
+                                        <p className="text-xl font-bold text-green-800">{Number(reportData.totalRevenueTL || 0).toFixed(2)} TL</p>
+                                    </div>
+                                    <span className="text-green-600 text-xl">🇹🇷</span>
+                                </div>
+                            </div>
+                            <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-red-700 font-medium">Şoför Hakediş</p>
+                                        <p className="text-xl font-bold text-red-800">{Number(reportData.driverPayments || 0).toFixed(2)} TL</p>
+                                    </div>
+                                    <span className="text-red-600 text-xl">👨‍✈️</span>
+                                </div>
+                            </div>
+                            <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-purple-700 font-medium">Şirket Karı</p>
+                                        <p className="text-xl font-bold text-purple-800">{Number(reportData.netIncome || 0).toFixed(2)} TL</p>
+                                    </div>
+                                    <span className="text-purple-600 text-xl">🏢</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Transfer İstatistikleri */}
-                    <div className="bg-white p-6 rounded-lg shadow">
-                        <h3 className="text-lg font-medium text-gray-900 mb-4">Transfer İstatistikleri</h3>
-                        <dl className="space-y-4">
-                            <div>
-                                <dt className="text-sm text-gray-500">Toplam Transfer</dt>
-                                <dd className="text-2xl font-semibold text-gray-900">{reportData.totalTransfers}</dd>
+                    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300">
+                        <div className="flex items-center mb-6">
+                            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mr-4">
+                                <span className="text-blue-600 text-2xl">🚗</span>
+                            </div>
+                            <h3 className="text-xl font-semibold text-gray-900">Transfer İstatistikleri</h3>
+                        </div>
+                        <div className="space-y-6">
+                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-gray-700 font-medium">Toplam Transfer</p>
+                                        <p className="text-3xl font-bold text-gray-900">{reportData.totalTransfers}</p>
+                                    </div>
+                                    <span className="text-gray-600 text-3xl">📊</span>
+                                </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <dt className="text-sm text-gray-500">Ödenen</dt>
-                                    <dd className="text-xl font-semibold text-green-600">{reportData.paidTransfers}</dd>
+                                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm text-green-700 font-medium">Ödenen</p>
+                                            <p className="text-2xl font-bold text-green-800">{reportData.paidTransfers}</p>
+                                        </div>
+                                        <span className="text-green-600 text-xl">✅</span>
+                                    </div>
                                 </div>
-                                <div>
-                                    <dt className="text-sm text-gray-500">Ödenmeyen</dt>
-                                    <dd className="text-xl font-semibold text-red-600">{reportData.unpaidTransfers}</dd>
+                                <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm text-red-700 font-medium">Ödenmeyen</p>
+                                            <p className="text-2xl font-bold text-red-800">{reportData.unpaidTransfers}</p>
+                                        </div>
+                                        <span className="text-red-600 text-xl">❌</span>
+                                    </div>
                                 </div>
                             </div>
-                        </dl>
+                        </div>
                     </div>
 
                     {/* Transfer Tipleri */}
-                    <div className="bg-white p-6 rounded-lg shadow">
-                        <h3 className="text-lg font-medium text-gray-900 mb-4">Transfer Tipleri</h3>
-                        <dl className="space-y-4">
-                            <div>
-                                <dt className="text-sm text-gray-500">Karşılama</dt>
-                                <dd className="text-xl font-semibold text-blue-600">{reportData.transfersByType.pickup}</dd>
+                    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300">
+                        <div className="flex items-center mb-6">
+                            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mr-4">
+                                <span className="text-purple-600 text-2xl">🎯</span>
                             </div>
-                            <div>
-                                <dt className="text-sm text-gray-500">Çıkış</dt>
-                                <dd className="text-xl font-semibold text-orange-600">{reportData.transfersByType.dropoff}</dd>
+                            <h3 className="text-xl font-semibold text-gray-900">Transfer Tipleri</h3>
+                        </div>
+                        <div className="space-y-4">
+                            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-blue-700 font-medium">Karşılama</p>
+                                        <p className="text-2xl font-bold text-blue-800">{reportData.transfersByType.pickup}</p>
+                                    </div>
+                                    <span className="text-blue-600 text-xl">✈️</span>
+                                </div>
                             </div>
-                            <div>
-                                <dt className="text-sm text-gray-500">Ara Transfer</dt>
-                                <dd className="text-xl font-semibold text-purple-600">{reportData.transfersByType.transfer}</dd>
+                            <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-orange-700 font-medium">Çıkış</p>
+                                        <p className="text-2xl font-bold text-orange-800">{reportData.transfersByType.dropoff}</p>
+                                    </div>
+                                    <span className="text-orange-600 text-xl">🚪</span>
+                                </div>
                             </div>
-                        </dl>
+                            <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-purple-700 font-medium">Ara Transfer</p>
+                                        <p className="text-2xl font-bold text-purple-800">{reportData.transfersByType.transfer}</p>
+                                    </div>
+                                    <span className="text-purple-600 text-xl">🔄</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Popüler Rotalar */}
-                    <div className="bg-white p-6 rounded-lg shadow col-span-full">
-                        <h3 className="text-lg font-medium text-gray-900 mb-4">Popüler Rotalar</h3>
+                    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 col-span-full">
+                        <div className="flex items-center mb-6">
+                            <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mr-4">
+                                <span className="text-indigo-600 text-2xl">🗺️</span>
+                            </div>
+                            <h3 className="text-xl font-semibold text-gray-900">Popüler Rotalar</h3>
+                        </div>
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200">
-                                <thead>
+                                <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rota</th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Transfer Sayısı</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                            <div className="flex items-center">
+                                                <span className="mr-2">📍</span>
+                                                Rota
+                                            </div>
+                                        </th>
+                                        <th className="px-6 py-4 text-right text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                            <div className="flex items-center justify-end">
+                                                <span className="mr-2">📊</span>
+                                                Transfer Sayısı
+                                            </div>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {(reportData.popularRoutes || []).map((route, index) => (
-                                        <tr key={index}>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{route.route}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{route.count}</td>
+                                        <tr key={index} className="hover:bg-gray-50 transition-colors duration-200">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                <div className="flex items-center">
+                                                    <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+                                                    {route.route}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                                                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                                    {route.count}
+                                                </span>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -257,10 +372,15 @@ export default function ReportsDashboard() {
                     </div>
                 </div>
             ) : (
-                <div className="bg-white p-6 rounded-lg shadow text-center">
+                <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 text-center">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span className="text-gray-600 text-2xl">📊</span>
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Rapor Hazır</h3>
                     <p className="text-gray-600">Rapor görüntülemek için tarih aralığı seçin</p>
                 </div>
             )}
+            </div>
         </div>
     );
 } 
