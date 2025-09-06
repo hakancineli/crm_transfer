@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { canViewReports, canViewAccounting, canManageUsers, canManageActivities, canCreateReservation } from '@/app/lib/permissions';
+// Permission functions are no longer needed as we use user-specific permissions
 import { useAuth } from '@/app/contexts/AuthContext';
 
 const AdminNavigation = () => {
@@ -27,8 +27,7 @@ const AdminNavigation = () => {
       name: 'Yeni Rezervasyon',
       href: '/new-reservation',
       icon: '➕',
-      description: 'Yeni rezervasyon oluştur',
-      show: canCreateReservation(userRole)
+      description: 'Yeni rezervasyon oluştur'
     },
     {
       name: 'Uçuş Durumu',
@@ -46,15 +45,13 @@ const AdminNavigation = () => {
       name: 'Raporlar',
       href: '/reports',
       icon: '📈',
-      description: 'Detaylı raporlar ve analizler',
-      show: canViewReports(userRole)
+      description: 'Detaylı raporlar ve analizler'
     },
     {
       name: 'Muhasebe',
       href: '/admin/accounting',
       icon: '💰',
-      description: 'Muhasebe ve ödeme yönetimi',
-      show: canViewAccounting(userRole)
+      description: 'Muhasebe ve ödeme yönetimi'
     },
     {
       name: 'Müşteriler',
@@ -66,8 +63,7 @@ const AdminNavigation = () => {
       name: 'Son Aktiviteler',
       href: '/admin/activities',
       icon: '📋',
-      description: 'Sistem logları ve aktiviteler',
-      show: canManageActivities(userRole)
+      description: 'Sistem logları ve aktiviteler'
     },
     {
       name: 'Ayarlar',
@@ -79,8 +75,7 @@ const AdminNavigation = () => {
       name: 'Kullanıcılar',
       href: '/admin/users',
       icon: '👤',
-      description: 'Kullanıcı yönetimi',
-      show: canManageUsers(userRole)
+      description: 'Kullanıcı yönetimi'
     }
   ];
 
@@ -102,8 +97,32 @@ const AdminNavigation = () => {
       {/* Navigation */}
       <nav className="p-4 space-y-2">
         {menuItems.map((item) => {
-          // Check if item should be shown based on permissions
-          if (item.show !== undefined && !item.show) {
+          // Check if item should be shown based on user permissions
+          let shouldShow = true;
+          
+          if (item.name === 'Yeni Rezervasyon') {
+            shouldShow = user?.permissions?.some(p => 
+              p.permission === 'VIEW_OWN_SALES' && p.isActive
+            ) || false;
+          } else if (item.name === 'Raporlar') {
+            shouldShow = user?.permissions?.some(p => 
+              p.permission === 'VIEW_REPORTS' && p.isActive
+            ) || false;
+          } else if (item.name === 'Muhasebe') {
+            shouldShow = user?.permissions?.some(p => 
+              p.permission === 'VIEW_ACCOUNTING' && p.isActive
+            ) || false;
+          } else if (item.name === 'Son Aktiviteler') {
+            shouldShow = user?.permissions?.some(p => 
+              p.permission === 'MANAGE_ACTIVITIES' && p.isActive
+            ) || false;
+          } else if (item.name === 'Kullanıcılar') {
+            shouldShow = user?.permissions?.some(p => 
+              p.permission === 'MANAGE_USERS' && p.isActive
+            ) || false;
+          }
+          
+          if (!shouldShow) {
             return null;
           }
           

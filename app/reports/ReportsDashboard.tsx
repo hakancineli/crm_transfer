@@ -37,7 +37,11 @@ export default function ReportsDashboard() {
 
     useEffect(() => {
         // Check if user has permission to view reports
-        if (user && !canViewReports(user.role)) {
+        const hasViewReportsPermission = user?.permissions?.some(p => 
+            p.permission === 'VIEW_REPORTS' && p.isActive
+        );
+        
+        if (user && !hasViewReportsPermission) {
             window.location.href = '/admin';
             return;
         }
@@ -95,7 +99,11 @@ export default function ReportsDashboard() {
     };
 
     // Check permissions before rendering
-    if (user && !canViewReports(user.role)) {
+    const hasViewReportsPermission = user?.permissions?.some(p => 
+        p.permission === 'VIEW_REPORTS' && p.isActive
+    );
+    
+    if (user && !hasViewReportsPermission) {
         return (
             <div className="p-6">
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">

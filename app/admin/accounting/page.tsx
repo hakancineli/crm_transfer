@@ -34,7 +34,11 @@ export default function AccountingPage() {
 
   useEffect(() => {
     // Check if user has permission to view accounting
-    if (user && !canViewAccounting(user.role)) {
+    const hasViewAccountingPermission = user?.permissions?.some(p => 
+      p.permission === 'VIEW_ACCOUNTING' && p.isActive
+    );
+    
+    if (user && !hasViewAccountingPermission) {
       window.location.href = '/admin';
       return;
     }
@@ -90,7 +94,11 @@ export default function AccountingPage() {
     .reduce((sum, r) => sum + r.price, 0);
 
   // Check permissions before rendering
-  if (user && !canViewAccounting(user.role)) {
+  const hasViewAccountingPermission = user?.permissions?.some(p => 
+    p.permission === 'VIEW_ACCOUNTING' && p.isActive
+  );
+  
+  if (user && !hasViewAccountingPermission) {
     return (
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">

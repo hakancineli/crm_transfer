@@ -33,7 +33,11 @@ export default function UsersPage() {
 
   useEffect(() => {
     // Check if user has permission to manage users
-    if (user && !canManageUsers(user.role)) {
+    const hasManageUsersPermission = user?.permissions?.some(p => 
+      p.permission === 'MANAGE_USERS' && p.isActive
+    );
+    
+    if (user && !hasManageUsersPermission) {
       window.location.href = '/admin';
       return;
     }
@@ -141,7 +145,11 @@ export default function UsersPage() {
   };
 
   // Check permissions before rendering
-  if (user && !canManageUsers(user.role)) {
+  const hasManageUsersPermission = user?.permissions?.some(p => 
+    p.permission === 'MANAGE_USERS' && p.isActive
+  );
+  
+  if (user && !hasManageUsersPermission) {
     return (
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">

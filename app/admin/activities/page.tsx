@@ -30,7 +30,11 @@ export default function ActivitiesPage() {
 
   useEffect(() => {
     // Check if user has permission to manage activities
-    if (user && !canManageActivities(user.role)) {
+    const hasManageActivitiesPermission = user?.permissions?.some(p => 
+      p.permission === 'MANAGE_ACTIVITIES' && p.isActive
+    );
+    
+    if (user && !hasManageActivitiesPermission) {
       window.location.href = '/admin';
       return;
     }
@@ -106,7 +110,11 @@ export default function ActivitiesPage() {
   });
 
   // Check permissions before rendering
-  if (user && !canManageActivities(user.role)) {
+  const hasManageActivitiesPermission = user?.permissions?.some(p => 
+    p.permission === 'MANAGE_ACTIVITIES' && p.isActive
+  );
+  
+  if (user && !hasManageActivitiesPermission) {
     return (
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
