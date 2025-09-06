@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import Link from 'next/link';
 import { EmailService } from '@/app/lib/emailService';
+import EditHotelBookingModal from '@/app/components/EditHotelBookingModal';
+import HotelBookingStats from '@/app/components/HotelBookingStats';
 
 interface HotelBooking {
   id: string;
@@ -37,6 +39,8 @@ export default function HotelReservationsPage() {
   const [filter, setFilter] = useState<'all' | 'pending' | 'confirmed' | 'cancelled' | 'completed'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [sendingEmail, setSendingEmail] = useState<string | null>(null);
+  const [editingBooking, setEditingBooking] = useState<HotelBooking | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
     fetchBookings();
@@ -163,6 +167,68 @@ export default function HotelReservationsPage() {
     }
   };
 
+  const handleEditBooking = (booking: HotelBooking) => {
+    setEditingBooking(booking);
+    setShowEditModal(true);
+  };
+
+  const handleSaveBooking = (updatedBooking: HotelBooking) => {
+    setBookings(prev => 
+      prev.map(booking => 
+        booking.id === updatedBooking.id ? updatedBooking : booking
+      )
+    );
+    setShowEditModal(false);
+    setEditingBooking(null);
+  };
+
+  const handleCancelBooking = async (booking: HotelBooking) => {
+    if (!confirm(`"${booking.voucherNumber}" numaralı rezervasyonu iptal etmek istediğinizden emin misiniz?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/accommodation/bookings/${booking.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...booking,
+          status: 'CANCELLED'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Rezervasyon iptal edilemedi');
+      }
+
+      // Rezervasyonu güncelle
+      const updatedBooking = { ...booking, status: 'CANCELLED' as const };
+      setBookings(prev => 
+        prev.map(b => b.id === booking.id ? updatedBooking : b)
+      );
+
+      // İptal e-postası gönder
+      try {
+        await EmailService.sendBookingCancellation({
+          voucherNumber: booking.voucherNumber,
+          hotelName: booking.hotelName,
+          customerInfo: booking.customerInfo,
+          cancellationReason: 'Müşteri talebi'
+        });
+        console.log('✅ İptal e-postası gönderildi');
+      } catch (emailError) {
+        console.warn('⚠️ İptal e-postası gönderilemedi:', emailError);
+      }
+
+      alert('✅ Rezervasyon başarıyla iptal edildi');
+    } catch (error) {
+      console.error('İptal hatası:', error);
+      alert('❌ Rezervasyon iptal edilemedi');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -251,32 +317,7 @@ export default function HotelReservationsPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="text-2xl font-bold text-blue-600">
-              {bookings.length}
-            </div>
-            <div className="text-sm text-gray-600">Toplam Rezervasyon</div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="text-2xl font-bold text-yellow-600">
-              {bookings.filter(b => b.status === 'PENDING').length}
-            </div>
-            <div className="text-sm text-gray-600">Beklemede</div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="text-2xl font-bold text-green-600">
-              {bookings.filter(b => b.status === 'CONFIRMED').length}
-            </div>
-            <div className="text-sm text-gray-600">Onaylandı</div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="text-2xl font-bold text-blue-600">
-              €{bookings.reduce((sum, b) => sum + b.totalPrice, 0).toFixed(2)}
-            </div>
-            <div className="text-sm text-gray-600">Toplam Tutar</div>
-          </div>
-        </div>
+        <HotelBookingStats bookings={bookings} />
 
         {/* Bookings List */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -398,14 +439,19 @@ export default function HotelReservationsPage() {
                             {sendingEmail === booking.id ? '⏳' : '❌'} İptal E-postası
                           </button>
                           <button
-                            onClick={() => {
-                              // TODO: Edit functionality
-                              alert('Düzenleme özelliği yakında eklenecek');
-                            }}
+                            onClick={() => handleEditBooking(booking)}
                             className="text-purple-600 hover:text-purple-900"
                           >
                             ✏️ Düzenle
                           </button>
+                          {booking.status !== 'CANCELLED' && (
+                            <button
+                              onClick={() => handleCancelBooking(booking)}
+                              className="text-red-600 hover:text-red-900"
+                            >
+                              ❌ İptal Et
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -415,6 +461,17 @@ export default function HotelReservationsPage() {
             </div>
           )}
         </div>
+
+        {/* Edit Modal */}
+        <EditHotelBookingModal
+          isOpen={showEditModal}
+          onClose={() => {
+            setShowEditModal(false);
+            setEditingBooking(null);
+          }}
+          booking={editingBooking}
+          onSave={handleSaveBooking}
+        />
       </div>
     </div>
   );
