@@ -48,7 +48,7 @@ export interface UserPermissions {
 export function hasPermission(userPermissions: UserPermissions, permission: string): boolean {
   // Check role-based permissions
   const rolePermissions = ROLE_PERMISSIONS[userPermissions.role as keyof typeof ROLE_PERMISSIONS] || [];
-  if (rolePermissions.includes(permission)) {
+  if ((rolePermissions as readonly string[]).includes(permission)) {
     return true;
   }
   

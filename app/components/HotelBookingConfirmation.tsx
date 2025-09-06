@@ -84,7 +84,7 @@ export default function HotelBookingConfirmation({
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Lokasyon:</span>
-                <span className="font-medium text-sm sm:text-base">{hotel.location}</span>
+                <span className="font-medium text-sm sm:text-base">{hotel.address}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Değerlendirme:</span>

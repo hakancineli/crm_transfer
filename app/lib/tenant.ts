@@ -66,7 +66,7 @@ export class TenantService {
       });
 
       console.log('Tenant loaded:', tenant?.companyName, 'Modules:', tenant?.modules?.length);
-      return tenant as Tenant;
+      return tenant as unknown as Tenant;
     } catch (error) {
       console.error('Error getting tenant by subdomain:', error);
       return null;
@@ -87,7 +87,7 @@ export class TenantService {
         }
       });
 
-      return tenant as Tenant;
+      return tenant as unknown as Tenant;
     } catch (error) {
       console.error('Error getting tenant by ID:', error);
       return null;
@@ -100,7 +100,7 @@ export class TenantService {
     );
   }
 
-  static async canAccessFeature(tenant: Tenant, feature: string): boolean {
+  static async canAccessFeature(tenant: Tenant, feature: string): Promise<boolean> {
     const module = tenant.modules.find(tm => 
       tm.module.features.includes(feature) && tm.isEnabled
     );
@@ -136,7 +136,7 @@ export class TenantService {
         }
       });
 
-      return tenant as Tenant;
+      return tenant as unknown as Tenant;
     } catch (error) {
       console.error('Error creating tenant:', error);
       return null;
@@ -203,7 +203,7 @@ export class TenantService {
         }
       });
 
-      return tenants as Tenant[];
+      return tenants as unknown as Tenant[];
     } catch (error) {
       console.error('Error getting all tenants:', error);
       return [];
@@ -217,7 +217,7 @@ export class TenantService {
         orderBy: { name: 'asc' }
       });
 
-      return modules as Module[];
+      return modules as unknown as Module[];
     } catch (error) {
       console.error('Error getting all modules:', error);
       return [];

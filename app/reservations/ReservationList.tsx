@@ -3,46 +3,36 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { SearchAndFilter } from '@/app/components/ui/SearchAndFilter';
-import { AIRPORTS, HOTELS, TRANSFER_TYPES } from '@/app/types';
+import { AIRPORTS } from '@/app/types';
+
+interface Reservation {
+    id: string;
+    date: string;
+    time: string;
+    from: string;
+    to: string;
+    flightCode: string;
+    passengerNames: string;
+    luggageCount: number;
+    price: number;
+    currency: string;
+    distanceKm?: number;
+    voucherNumber: string;
+    userId?: string;
+    createdAt: Date;
+    phoneNumber?: string;
+    paymentStatus: string;
+    driver?: {
+        id: string;
+        name: string;
+        phoneNumber?: string;
+    } | null;
+}
 import { formatLocation, formatPassengerName, formatHotelName } from '@/app/utils/textFormatters';
 import ReturnTransferModal from '@/app/components/ReturnTransferModal';
 import FlightStatus from '@/app/components/FlightStatus';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { canViewAllReservations, canViewOwnSales } from '@/app/lib/permissions';
-
-interface Reservation {
-    id: string;
-    voucherNumber: string;
-    date: string;
-    time: string;
-    from: string;
-    to: string;
-    flightCode?: string;
-    luggageCount?: number;
-    passengerNames: string[];
-    price: number;
-    currency: string;
-    distanceKm?: number;
-    driverFee?: number;
-    phoneNumber?: string;
-    isReturn: boolean;
-    returnTransfer?: {
-        voucherNumber: string;
-        date: string;
-        time: string;
-    } | null;
-    originalTransfer?: {
-        voucherNumber: string;
-        date: string;
-        time: string;
-    } | null;
-    driver?: {
-        id: string;
-        name: string;
-        phoneNumber: string;
-    } | null;
-    paymentStatus: string;
-}
 
 interface ReservationListProps {
     onFilterChange: (filter: string) => void;
@@ -181,7 +171,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                 filtered = [...reservations];
             } else if (hasViewOwnPermission) {
                 // User can only see their own reservations
-                filtered = reservations.filter(reservation => reservation.user?.id === user.id);
+                filtered = reservations.filter(reservation => reservation.userId === user.id);
             } else {
                 // User has no permission to view reservations
                 filtered = [];

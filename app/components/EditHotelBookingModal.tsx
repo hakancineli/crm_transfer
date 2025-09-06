@@ -9,14 +9,15 @@ interface HotelBooking {
   hotelName: string;
   hotelAddress: string;
   roomType: string;
-  checkin: Date | string;
-  checkout: Date | string;
+  checkin: Date;
+  checkout: Date;
   adults: number;
   children: number;
   rooms: number;
   totalPrice: number;
   currency: string;
   status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+  createdAt: Date;
   customerInfo: {
     name: string;
     email: string;
@@ -49,7 +50,7 @@ export default function EditHotelBookingModal({
     children: 0,
     rooms: 1,
     totalPrice: 0,
-    status: 'PENDING' as const,
+    status: 'PENDING' as 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED',
     customerName: '',
     customerEmail: '',
     customerPhone: '',

@@ -20,6 +20,7 @@ export interface Reservation {
     currency: Currency;
     distanceKm?: number;
     voucherNumber: string;
+    userId?: string;
     createdAt: Date;
 }
 
@@ -27,4 +28,4 @@ export const CURRENCIES: Record<Currency, string> = {
     USD: 'USD ($)',
     EUR: 'EUR (€)',
     TRY: 'TL (₺)'
-}; 
+};
