@@ -20,7 +20,9 @@ export interface Hotel {
   city: string;
   region: string;
   stars: number;
-  price: number;
+  price: number; // Müşteriye gösterilen fiyat (Booking.com fiyatı)
+  agentPrice: number; // Acente fiyatı (wholesale)
+  profitMargin: number; // Kar marjı
   currency: string;
   images: string[];
   amenities: string[];
@@ -67,6 +69,17 @@ export class BookingApiService {
   private static readonly API_BASE_URL = 'https://distribution-xml.booking.com/2.5/json';
   private static readonly API_KEY = process.env.BOOKING_API_KEY;
 
+  // Acente fiyatlandırma algoritması
+  private static calculateAgentPricing(bookingPrice: number): { agentPrice: number; profitMargin: number } {
+    // Acente fiyatı = Booking.com fiyatının %70-85'i (wholesale)
+    // Kar marjı = %15-30 arası
+    const discountRate = 0.25; // %25 indirim (wholesale)
+    const agentPrice = Math.round(bookingPrice * (1 - discountRate));
+    const profitMargin = bookingPrice - agentPrice;
+    
+    return { agentPrice, profitMargin };
+  }
+
   // Otel arama
   static async searchHotels(params: HotelSearchParams): Promise<Hotel[]> {
     try {
@@ -81,7 +94,9 @@ export class BookingApiService {
           city: 'Istanbul',
           region: 'Sultanahmet',
           stars: 5,
-          price: 150,
+          price: 150, // Müşteri fiyatı (Booking.com)
+          agentPrice: 113, // Acente fiyatı (%25 indirim)
+          profitMargin: 37, // Kar marjı
           currency: 'EUR',
           images: ['/hotels/grand-istanbul-1.jpg'],
           amenities: ['WiFi', 'Pool', 'Spa', 'Restaurant', 'Parking'],
@@ -96,7 +111,9 @@ export class BookingApiService {
           city: 'Cappadocia',
           region: 'Goreme',
           stars: 4,
-          price: 80,
+          price: 80, // Müşteri fiyatı (Booking.com)
+          agentPrice: 60, // Acente fiyatı (%25 indirim)
+          profitMargin: 20, // Kar marjı
           currency: 'EUR',
           images: ['/hotels/cappadocia-1.jpg'],
           amenities: ['WiFi', 'Breakfast', 'Cave Room', 'Terrace'],
@@ -111,7 +128,9 @@ export class BookingApiService {
           city: 'Antalya',
           region: 'Lara',
           stars: 5,
-          price: 120,
+          price: 120, // Müşteri fiyatı (Booking.com)
+          agentPrice: 90, // Acente fiyatı (%25 indirim)
+          profitMargin: 30, // Kar marjı
           currency: 'EUR',
           images: ['/hotels/antalya-1.jpg'],
           amenities: ['WiFi', 'Pool', 'Beach', 'Spa', 'Restaurant', 'Kids Club'],
@@ -126,7 +145,9 @@ export class BookingApiService {
           city: 'Istanbul',
           region: 'Taksim',
           stars: 4,
-          price: 180,
+          price: 180, // Müşteri fiyatı (Booking.com)
+          agentPrice: 135, // Acente fiyatı (%25 indirim)
+          profitMargin: 45, // Kar marjı
           currency: 'EUR',
           images: ['/hotels/marriott-istanbul-1.jpg'],
           amenities: ['WiFi', 'Pool', 'Spa', 'Restaurant', 'Parking', 'Gym'],
@@ -141,7 +162,9 @@ export class BookingApiService {
           city: 'Istanbul',
           region: 'Bomonti',
           stars: 5,
-          price: 200,
+          price: 200, // Müşteri fiyatı (Booking.com)
+          agentPrice: 150, // Acente fiyatı (%25 indirim)
+          profitMargin: 50, // Kar marjı
           currency: 'EUR',
           images: ['/hotels/hilton-bomonti-1.jpg'],
           amenities: ['WiFi', 'Pool', 'Spa', 'Restaurant', 'Parking', 'Gym', 'Business Center'],
@@ -156,7 +179,9 @@ export class BookingApiService {
           city: 'Istanbul',
           region: 'Sultanahmet',
           stars: 5,
-          price: 350,
+          price: 350, // Müşteri fiyatı (Booking.com)
+          agentPrice: 263, // Acente fiyatı (%25 indirim)
+          profitMargin: 87, // Kar marjı
           currency: 'EUR',
           images: ['/hotels/fourseasons-istanbul-1.jpg'],
           amenities: ['WiFi', 'Pool', 'Spa', 'Restaurant', 'Parking', 'Gym', 'Business Center', 'Concierge'],

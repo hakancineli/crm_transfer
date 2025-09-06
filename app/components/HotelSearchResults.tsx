@@ -204,6 +204,9 @@ export default function HotelSearchResults({
                       €{hotel.price}
                     </div>
                     <div className="text-sm text-gray-500">gece başına</div>
+                    <div className="text-xs text-green-600 font-medium">
+                      Acente: €{hotel.agentPrice} (€{hotel.profitMargin} kar)
+                    </div>
                   </div>
                 </div>
                 
