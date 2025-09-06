@@ -178,12 +178,10 @@ export class BookingApiService {
         console.log('After city filter:', filteredHotels.map(h => h.name));
       }
 
+      // Geçici olarak bölge filtresini devre dışı bırak
       if (params.region && filteredHotels.length > 0) {
-        filteredHotels = filteredHotels.filter(hotel => 
-          hotel.region.toLowerCase().includes(params.region!.toLowerCase()) ||
-          params.region!.toLowerCase().includes(hotel.region.toLowerCase())
-        );
-        console.log('After region filter:', filteredHotels.map(h => h.name));
+        console.log('Region filter skipped for testing:', params.region);
+        console.log('After region filter (skipped):', filteredHotels.map(h => h.name));
       }
 
       if (params.minPrice && filteredHotels.length > 0) {
