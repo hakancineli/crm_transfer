@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { TenantService } from '@/app/lib/tenant';
 import { BookingApiService, Hotel } from '@/app/lib/bookingApi';
+import { VoucherUtils } from '@/app/lib/voucherUtils';
 import HotelRequestForm from '@/app/components/HotelRequestForm';
 import HotelSearchResults from '@/app/components/HotelSearchResults';
 import HotelBookingConfirmation from '@/app/components/HotelBookingConfirmation';
@@ -85,6 +86,9 @@ export default function AccommodationPage() {
     setLoading(true);
     
     try {
+      // Voucher numarası oluştur
+      const voucherNumber = VoucherUtils.generateVoucherNumber('demo', 'HOTEL');
+      
       // Rezervasyon oluştur
       const bookingData = {
         hotelId: selectedHotel!.id,
@@ -102,14 +106,21 @@ export default function AccommodationPage() {
           email: requestData.customerEmail,
           phone: requestData.customerPhone
         },
-        specialRequests: requestData.specialRequests
+        specialRequests: requestData.specialRequests,
+        voucherNumber: voucherNumber
       };
 
       const booking = await BookingApiService.createBooking(bookingData);
       
       if (booking) {
-        // Başarı mesajı göster
-        alert('🎉 Rezervasyon başarıyla oluşturuldu!\n\nVoucher Numarası: ' + booking.voucherNumber);
+        // Başarı mesajı göster ve voucher sayfasına yönlendir
+        const confirmMessage = `🎉 Rezervasyon başarıyla oluşturuldu!\n\nVoucher Numarası: ${voucherNumber}\n\nVoucher'ı görüntülemek ister misiniz?`;
+        
+        if (confirm(confirmMessage)) {
+          // Voucher sayfasına yönlendir
+          window.open(`/accommodation/voucher/${voucherNumber}`, '_blank');
+        }
+        
         setCurrentStep('form');
         setRequestData(null);
         setHotels([]);
