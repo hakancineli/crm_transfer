@@ -19,9 +19,9 @@ VALUES
 -- Kullanıcılar oluştur
 INSERT INTO User (id, username, email, password, name, role, isActive, createdAt, updatedAt) 
 VALUES 
-('user-1', 'admin', 'admin@protransfer.com.tr', '$2a$10$example', 'Admin User', 'SUPERUSER', true, datetime('now'), datetime('now')),
-('user-2', 'seller1', 'seller1@protransfer.com.tr', '$2a$10$example', 'Satış Personeli 1', 'SELLER', true, datetime('now'), datetime('now')),
-('user-3', 'operation', 'operation@protransfer.com.tr', '$2a$10$example', 'Operasyon Personeli', 'OPERATION', true, datetime('now'), datetime('now'));
+('user-1', 'admin', 'admin@protransfer.com.tr', '$2b$10$ZvoVC5f/3rmoxaA9RPobrOuy2P782FT4h157jLAZ5P4vb0g4s4Mn2', 'Admin User', 'SUPERUSER', true, datetime('now'), datetime('now')),
+('user-2', 'seller1', 'seller1@protransfer.com.tr', '$2b$10$zgj8DLl6n/oHmx7bKhV33usjdi1Rlox2HbBD8PKE6WdWRA/zuxZDe', 'Satış Personeli 1', 'SELLER', true, datetime('now'), datetime('now')),
+('user-3', 'operation', 'operation@protransfer.com.tr', '$2b$10$bF07oxPoFLv7OiiZBwB8i.9Aifu.OYitK7apPFlfgXsRebEWj6Esi', 'Operasyon Personeli', 'OPERATION', true, datetime('now'), datetime('now'));
 
 -- Tenant kullanıcıları
 INSERT INTO tenant_users (id, tenantId, userId, role, permissions, isActive, createdAt, updatedAt) 

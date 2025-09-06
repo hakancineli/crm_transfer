@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
           id: 'user-1',
           username: 'admin',
           email: 'admin@protransfer.com.tr',
-          password: '$2a$10$example', // Gerçek production'da güvenli hash kullanın
+          password: '$2b$10$ZvoVC5f/3rmoxaA9RPobrOuy2P782FT4h157jLAZ5P4vb0g4s4Mn2',
           name: 'Admin User',
           role: 'SUPERUSER' as const,
           isActive: true
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
           id: 'user-2',
           username: 'seller1',
           email: 'seller1@protransfer.com.tr',
-          password: '$2a$10$example',
+          password: '$2b$10$zgj8DLl6n/oHmx7bKhV33usjdi1Rlox2HbBD8PKE6WdWRA/zuxZDe',
           name: 'Satış Personeli 1',
           role: 'SELLER' as const,
           isActive: true
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
           id: 'user-3',
           username: 'operation',
           email: 'operation@protransfer.com.tr',
-          password: '$2a$10$example',
+          password: '$2b$10$bF07oxPoFLv7OiiZBwB8i.9Aifu.OYitK7apPFlfgXsRebEWj6Esi',
           name: 'Operasyon Personeli',
           role: 'OPERATION' as const,
           isActive: true
