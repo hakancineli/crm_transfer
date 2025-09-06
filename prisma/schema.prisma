@@ -233,8 +233,16 @@ model HotelBooking {
   adults            Int
   children          Int
   rooms             Int
-  totalPrice        Float
+  
+  // Acente fiyatlandırma
+  customerPrice     Float    // Müşteriye satış fiyatı
+  agentPrice        Float    // Acente alış fiyatı
+  profitMargin      Float    // Kar marjı
+  totalPrice        Float    // Toplam fiyat (customerPrice * nights)
   currency          String   @default("EUR")
+  
+  // Voucher sistemi
+  voucherNumber     String   @unique // Transfer voucher numarasıyla entegre
   bookingReference  String   @unique
   status            String   @default("CONFIRMED") // PENDING, CONFIRMED, CANCELLED, COMPLETED
   customerInfo      Json     // Customer details as JSON

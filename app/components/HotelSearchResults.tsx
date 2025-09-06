@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Hotel, RoomType } from '@/app/lib/bookingApi';
+import AgentPricingForm from './AgentPricingForm';
 
 interface HotelSearchResultsProps {
   hotels: Hotel[];
@@ -19,6 +20,35 @@ export default function HotelSearchResults({
   const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
   const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showPricingForm, setShowPricingForm] = useState(false);
+  const [pricingHotel, setPricingHotel] = useState<Hotel | null>(null);
+
+  const handlePricingEdit = (hotel: Hotel) => {
+    setPricingHotel(hotel);
+    setShowPricingForm(true);
+  };
+
+  const handlePricingSave = (pricing: { customerPrice: number; agentPrice: number; profitMargin: number }) => {
+    if (pricingHotel) {
+      // Hotel fiyatlarını güncelle
+      const updatedHotel = {
+        ...pricingHotel,
+        price: pricing.customerPrice,
+        agentPrice: pricing.agentPrice,
+        profitMargin: pricing.profitMargin
+      };
+      
+      // Hotels listesini güncelle (burada state management gerekebilir)
+      console.log('Updated hotel pricing:', updatedHotel);
+    }
+    setShowPricingForm(false);
+    setPricingHotel(null);
+  };
+
+  const handlePricingCancel = () => {
+    setShowPricingForm(false);
+    setPricingHotel(null);
+  };
 
   const handleHotelSelect = async (hotel: Hotel) => {
     setSelectedHotel(hotel);
@@ -235,16 +265,33 @@ export default function HotelSearchResults({
                   )}
                 </div>
 
-                <button
-                  onClick={() => handleHotelSelect(hotel)}
-                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                >
-                  Oda Seçenekleri
-                </button>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => handlePricingEdit(hotel)}
+                    className="flex-1 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 text-sm"
+                  >
+                    Fiyat Düzenle
+                  </button>
+                  <button
+                    onClick={() => handleHotelSelect(hotel)}
+                    className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm"
+                  >
+                    Oda Seç
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
+      )}
+
+      {/* Acente Fiyatlandırma Formu */}
+      {showPricingForm && pricingHotel && (
+        <AgentPricingForm
+          hotel={pricingHotel}
+          onSave={handlePricingSave}
+          onCancel={handlePricingCancel}
+        />
       )}
     </div>
   );
