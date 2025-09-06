@@ -52,10 +52,11 @@ export async function PUT(
       });
     }
 
-    // Log activity
+    // Log activity - use the user being updated as the actor for now
+    // In a real app, you'd get the current user from the JWT token
     await prisma.activity.create({
       data: {
-        userId: 'system', // In real app, this should be the current user ID
+        userId: userId, // Use the user being updated as the actor
         action: 'UPDATE',
         entityType: 'USER_PERMISSIONS',
         entityId: userId,

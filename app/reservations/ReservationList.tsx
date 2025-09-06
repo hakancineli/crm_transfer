@@ -7,6 +7,8 @@ import { AIRPORTS, HOTELS, TRANSFER_TYPES } from '@/app/types';
 import { formatLocation, formatPassengerName, formatHotelName } from '@/app/utils/textFormatters';
 import ReturnTransferModal from '@/app/components/ReturnTransferModal';
 import FlightStatus from '@/app/components/FlightStatus';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { canViewAllReservations, canViewOwnSales } from '@/app/lib/permissions';
 
 interface Reservation {
     id: string;
@@ -47,6 +49,7 @@ interface ReservationListProps {
 }
 
 export default function ReservationList({ onFilterChange }: ReservationListProps) {
+    const { user } = useAuth();
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [filteredReservations, setFilteredReservations] = useState<Reservation[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -160,6 +163,21 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
 
     const handleFilter = (filter: string) => {
         let filtered = [...reservations];
+        
+        // Apply permission-based filtering first
+        if (user) {
+            if (canViewAllReservations(user.role)) {
+                // User can see all reservations
+                filtered = [...reservations];
+            } else if (canViewOwnSales(user.role)) {
+                // User can only see their own reservations
+                filtered = reservations.filter(reservation => reservation.user?.id === user.id);
+            } else {
+                // User has no permission to view reservations
+                filtered = [];
+            }
+        }
+        
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         

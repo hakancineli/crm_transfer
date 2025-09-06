@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { canViewReports, canViewAccounting, canManageUsers, canManageActivities } from '@/app/lib/permissions';
+import { canViewReports, canViewAccounting, canManageUsers, canManageActivities, canCreateReservation } from '@/app/lib/permissions';
 import { useAuth } from '@/app/contexts/AuthContext';
 
 const AdminNavigation = () => {
@@ -27,7 +27,8 @@ const AdminNavigation = () => {
       name: 'Yeni Rezervasyon',
       href: '/new-reservation',
       icon: '➕',
-      description: 'Yeni rezervasyon oluştur'
+      description: 'Yeni rezervasyon oluştur',
+      show: canCreateReservation(userRole)
     },
     {
       name: 'Uçuş Durumu',

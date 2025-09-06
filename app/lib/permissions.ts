@@ -78,3 +78,7 @@ export function canManageUsers(role: string): boolean {
 export function canManageActivities(role: string): boolean {
   return role === 'SUPERUSER';
 }
+
+export function canCreateReservation(role: string): boolean {
+  return ['SUPERUSER', 'OPERATION', 'SELLER'].includes(role);
+}

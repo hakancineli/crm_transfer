@@ -247,7 +247,7 @@ export default function AdminDashboard() {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Hızlı İşlemler</h3>
             <div className="grid grid-cols-2 gap-4">
               <Link
-                href="/admin/new-reservation"
+                href="/new-reservation"
                 className="flex items-center justify-center p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
               >
                 <div className="text-center">
