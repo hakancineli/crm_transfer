@@ -44,7 +44,7 @@ export default function AdminLayout({
       </div>
 
       {/* Main Content */}
-      <main className="lg:ml-64 min-h-screen overflow-x-hidden">
+      <main className="lg:ml-64 min-h-screen overflow-x-hidden pt-16 lg:pt-0">
         {children}
       </main>
     </div>

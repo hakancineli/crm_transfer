@@ -39,7 +39,7 @@ export default function ReservationsPage() {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="p-4 lg:p-6 space-y-6">
             <div>
                 <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
                 <p className="mt-2 text-sm text-gray-600">
