@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { startOfDay, endOfDay, format } from 'date-fns';
 import { tr } from 'date-fns/locale';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { canViewReports } from '@/app/lib/permissions';
 
 interface ReportData {
     totalRevenueUSD: number;
@@ -25,6 +27,7 @@ interface ReportData {
 }
 
 export default function ReportsDashboard() {
+    const { user } = useAuth();
     const today = new Date();
     const [startDate, setStartDate] = useState<string>(format(today, 'yyyy-MM-dd'));
     const [endDate, setEndDate] = useState<string>(format(today, 'yyyy-MM-dd'));
@@ -33,8 +36,13 @@ export default function ReportsDashboard() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        // Check if user has permission to view reports
+        if (user && !canViewReports(user.role)) {
+            window.location.href = '/admin';
+            return;
+        }
         fetchReportData();
-    }, [startDate, endDate]);
+    }, [startDate, endDate, user]);
 
     const fetchReportData = async () => {
         setIsLoading(true);
@@ -85,6 +93,31 @@ export default function ReportsDashboard() {
             setIsLoading(false);
         }
     };
+
+    // Check permissions before rendering
+    if (user && !canViewReports(user.role)) {
+        return (
+            <div className="p-6">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="flex">
+                        <div className="flex-shrink-0">
+                            <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                            </svg>
+                        </div>
+                        <div className="ml-3">
+                            <h3 className="text-sm font-medium text-red-800">
+                                Yetkisiz Erişim
+                            </h3>
+                            <div className="mt-2 text-sm text-red-700">
+                                <p>Bu sayfaya erişim yetkiniz bulunmamaktadır. Sadece yetkili kullanıcılar raporları görebilir.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">

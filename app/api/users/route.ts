@@ -99,9 +99,9 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // Activity log
+    // Activity log - use the created user's ID as the actor
     await ActivityLogger.logActivity({
-      userId: createdBy || 'system',
+      userId: user.id, // Use the created user's ID as the actor
       action: 'CREATE',
       entityType: 'USER',
       entityId: user.id,
