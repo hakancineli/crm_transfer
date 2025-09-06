@@ -52,22 +52,29 @@ export async function PUT(
       });
     }
 
-    // Log activity - use the user being updated as the actor for now
+    // Log activity - for now, use the first superuser as the actor
     // In a real app, you'd get the current user from the JWT token
-    await prisma.activity.create({
-      data: {
-        userId: userId, // Use the user being updated as the actor
-        action: 'UPDATE',
-        entityType: 'USER_PERMISSIONS',
-        entityId: userId,
-        description: `${user.name} kullanıcısının yetkileri güncellendi`,
-        details: {
-          permissions: Object.entries(permissions).filter(([_, isActive]) => isActive).map(([permission, _]) => permission)
-        },
-        ipAddress: request.headers.get('x-forwarded-for') || '127.0.0.1',
-        userAgent: request.headers.get('user-agent') || ''
-      }
+    const superuser = await prisma.user.findFirst({
+      where: { role: 'SUPERUSER' },
+      select: { id: true }
     });
+    
+    if (superuser) {
+      await prisma.activity.create({
+        data: {
+          userId: superuser.id, // Use superuser as the actor
+          action: 'UPDATE',
+          entityType: 'USER_PERMISSIONS',
+          entityId: userId,
+          description: `${user.name} kullanıcısının yetkileri güncellendi`,
+          details: {
+            permissions: Object.entries(permissions).filter(([_, isActive]) => isActive).map(([permission, _]) => permission)
+          },
+          ipAddress: request.headers.get('x-forwarded-for') || '127.0.0.1',
+          userAgent: request.headers.get('user-agent') || ''
+        }
+      });
+    }
 
     return NextResponse.json({
       message: 'Yetkiler başarıyla güncellendi',
