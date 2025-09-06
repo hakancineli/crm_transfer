@@ -1,0 +1,211 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { PERMISSIONS } from '@/app/lib/permissions';
+
+interface User {
+  id: string;
+  username: string;
+  name: string;
+  email: string;
+  role: string;
+  isActive: boolean;
+  permissions: UserPermission[];
+}
+
+interface UserPermission {
+  id: string;
+  permission: string;
+  isActive: boolean;
+  grantedAt: string;
+}
+
+export default function UserPermissionsPage() {
+  const params = useParams();
+  const router = useRouter();
+  const userId = params.id as string;
+  
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [permissions, setPermissions] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (userId) {
+      fetchUser();
+    }
+  }, [userId]);
+
+  const fetchUser = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/users/${userId}`);
+      const data = await response.json();
+      
+      if (response.ok) {
+        setUser(data);
+        // Initialize permissions state
+        const permState: Record<string, boolean> = {};
+        data.permissions.forEach((perm: UserPermission) => {
+          permState[perm.permission] = perm.isActive;
+        });
+        setPermissions(permState);
+      } else {
+        alert('Kullanıcı bulunamadı');
+        router.push('/admin/users');
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      alert('Kullanıcı bilgileri alınamadı');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePermissionChange = (permission: string, checked: boolean) => {
+    setPermissions(prev => ({
+      ...prev,
+      [permission]: checked
+    }));
+  };
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      const response = await fetch(`/api/users/${userId}/permissions`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ permissions }),
+      });
+
+      if (response.ok) {
+        alert('Yetkiler başarıyla güncellendi');
+        router.push('/admin/users');
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Yetkiler güncellenemedi');
+      }
+    } catch (error) {
+      console.error('Error updating permissions:', error);
+      alert('Yetkiler güncellenemedi');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const getPermissionDescription = (permission: string) => {
+    const descriptions: Record<string, string> = {
+      'VIEW_OWN_SALES': 'Sadece kendi satışlarını görme',
+      'VIEW_ALL_RESERVATIONS': 'Tüm rezervasyonları görme',
+      'VIEW_REPORTS': 'Raporları görme',
+      'VIEW_ACCOUNTING': 'Muhasebe bilgilerini görme',
+      'MANAGE_USERS': 'Kullanıcı yönetimi',
+      'MANAGE_ACTIVITIES': 'Aktivite loglarını görme'
+    };
+    return descriptions[permission] || permission;
+  };
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+          <div className="space-y-3">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-16 bg-gray-200 rounded"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="p-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Kullanıcı Bulunamadı</h2>
+          <button
+            onClick={() => router.push('/admin/users')}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          >
+            Kullanıcılar Listesine Dön
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Kullanıcı Yetkileri</h1>
+          <p className="text-gray-600 mt-1">
+            {user.name} ({user.username}) - {user.role}
+          </p>
+        </div>
+        <div className="flex space-x-3">
+          <button
+            onClick={() => router.push('/admin/users')}
+            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+          >
+            Geri Dön
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+          >
+            {saving ? 'Kaydediliyor...' : 'Kaydet'}
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Yetki Ayarları</h2>
+        
+        <div className="space-y-4">
+          {Object.values(PERMISSIONS).map((permission) => (
+            <div key={permission} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+              <div className="flex-1">
+                <h3 className="font-medium text-gray-900">{permission}</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  {getPermissionDescription(permission)}
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={permissions[permission] || false}
+                  onChange={(e) => handlePermissionChange(permission, e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="flex">
+          <div className="flex-shrink-0">
+            <span className="text-yellow-400">⚠️</span>
+          </div>
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-yellow-800">Dikkat</h3>
+            <div className="mt-2 text-sm text-yellow-700">
+              <p>
+                Yetki değişiklikleri anında etkili olur. Kullanıcı yetkilerini dikkatli bir şekilde yönetin.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

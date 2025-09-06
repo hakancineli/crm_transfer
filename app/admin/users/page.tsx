@@ -228,6 +228,13 @@ export default function UsersPage() {
                   >
                     Düzenle
                   </button>
+                  <button
+                    onClick={() => window.location.href = `/admin/users/${user.id}/permissions`}
+                    className="text-blue-600 hover:text-blue-900 mr-2"
+                    title="Yetkileri Yönet"
+                  >
+                    🔐 Yetkiler
+                  </button>
                   {user.role !== 'SUPERUSER' && (
                     <button
                       onClick={() => handleDeleteUser(user.id)}

@@ -194,19 +194,6 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Kullanıcı Yönetimi */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Kullanıcı Yönetimi</h3>
-              <Link 
-                href="/admin/users"
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                👤 Kullanıcıları Yönet
-              </Link>
-            </div>
-            <p className="text-gray-600">Sistem kullanıcılarını oluşturun, düzenleyin ve yönetin.</p>
-          </div>
 
           {/* Danger Zone */}
           <div className="bg-red-50 rounded-lg border border-red-200 p-6">

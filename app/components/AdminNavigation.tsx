@@ -73,6 +73,13 @@ const AdminNavigation = () => {
       href: '/admin/settings',
       icon: '⚙️',
       description: 'Sistem ayarları'
+    },
+    {
+      name: 'Kullanıcılar',
+      href: '/admin/users',
+      icon: '👤',
+      description: 'Kullanıcı yönetimi',
+      show: canManageUsers(userRole)
     }
   ];
 
