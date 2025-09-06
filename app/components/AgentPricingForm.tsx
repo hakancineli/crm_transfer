@@ -78,6 +78,12 @@ export default function AgentPricingForm({ hotel, onSave, onCancel }: AgentPrici
                 €{profitMargin.toFixed(2)}
               </span>
             </div>
+            <div className="flex justify-between items-center mt-2">
+              <span className="text-sm font-medium text-gray-700">Kar Oranı:</span>
+              <span className={`text-lg font-bold ${profitMargin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {customerPrice > 0 ? ((profitMargin / customerPrice) * 100).toFixed(1) : '0.0'}%
+              </span>
+            </div>
             <div className="text-xs text-gray-500 mt-1">
               {profitMargin >= 0 ? 'Kârlı' : 'Zararlı'} işlem
             </div>

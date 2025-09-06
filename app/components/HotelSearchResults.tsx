@@ -235,7 +235,7 @@ export default function HotelSearchResults({
                     </div>
                     <div className="text-sm text-gray-500">gece başına</div>
                     <div className="text-xs text-green-600 font-medium">
-                      Acente: €{hotel.agentPrice} (€{hotel.profitMargin} kar)
+                      Acente: €{hotel.agentPrice} (€{hotel.profitMargin} kar - {((hotel.profitMargin / hotel.price) * 100).toFixed(1)}%)
                     </div>
                   </div>
                 </div>
