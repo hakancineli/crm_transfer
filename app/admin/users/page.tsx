@@ -38,7 +38,8 @@ export default function UsersPage() {
       p.permission === 'MANAGE_USERS' && p.isActive
     );
     
-    if (user && !hasManageUsersPermission) {
+    // Allow SUPERUSER to access user management
+    if (user && user.role !== 'SUPERUSER' && !hasManageUsersPermission) {
       window.location.href = '/admin';
       return;
     }

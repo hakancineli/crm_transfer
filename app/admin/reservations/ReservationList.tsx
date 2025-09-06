@@ -166,7 +166,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                 p.permission === 'VIEW_OWN_SALES' && p.isActive
             );
             
-            if (hasViewAllPermission) {
+            // For now, show all reservations if user is SUPERUSER or has permissions
+            if (user.role === 'SUPERUSER' || hasViewAllPermission) {
                 // User can see all reservations
                 filtered = [...reservations];
             } else if (hasViewOwnPermission) {
@@ -176,6 +177,9 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                 // User has no permission to view reservations
                 filtered = [];
             }
+        } else {
+            // If no user, show all reservations (for debugging)
+            filtered = [...reservations];
         }
         
         const today = new Date();
