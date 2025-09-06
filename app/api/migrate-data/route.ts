@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
           email: 'admin@protransfer.com.tr',
           password: '$2a$10$example', // Gerçek production'da güvenli hash kullanın
           name: 'Admin User',
-          role: 'SUPERUSER',
+          role: 'SUPERUSER' as const,
           isActive: true
         },
         {
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
           email: 'seller1@protransfer.com.tr',
           password: '$2a$10$example',
           name: 'Satış Personeli 1',
-          role: 'SELLER',
+          role: 'SELLER' as const,
           isActive: true
         },
         {
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
           email: 'operation@protransfer.com.tr',
           password: '$2a$10$example',
           name: 'Operasyon Personeli',
-          role: 'OPERATION',
+          role: 'OPERATION' as const,
           isActive: true
         }
       ],
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
           id: 'tu-2',
           tenantId: 'tenant-1',
           userId: 'user-2',
-          role: 'SELLER',
+          role: 'SELLER' as const,
           permissions: '["VIEW_OWN_SALES", "CREATE_RESERVATIONS"]',
           isActive: true
         },
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
           id: 'tu-3',
           tenantId: 'tenant-1',
           userId: 'user-3',
-          role: 'OPERATION',
+          role: 'OPERATION' as const,
           permissions: '["VIEW_ALL_RESERVATIONS", "ASSIGN_DRIVERS"]',
           isActive: true
         }
