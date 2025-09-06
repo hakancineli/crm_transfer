@@ -6,6 +6,7 @@ import { TenantService } from '@/app/lib/tenant';
 import { BookingApiService, Hotel } from '@/app/lib/bookingApi';
 import HotelRequestForm from '@/app/components/HotelRequestForm';
 import HotelSearchResults from '@/app/components/HotelSearchResults';
+import HotelBookingConfirmation from '@/app/components/HotelBookingConfirmation';
 
 export default function AccommodationPage() {
   const { user } = useAuth();
@@ -108,7 +109,7 @@ export default function AccommodationPage() {
       
       if (booking) {
         // Başarı mesajı göster
-        alert('Rezervasyon başarıyla oluşturuldu!');
+        alert('🎉 Rezervasyon başarıyla oluşturuldu!\n\nVoucher Numarası: ' + booking.voucherNumber);
         setCurrentStep('form');
         setRequestData(null);
         setHotels([]);
@@ -226,103 +227,26 @@ export default function AccommodationPage() {
               />
             )}
 
-            {currentStep === 'search' && (
-              <HotelSearchResults
-                hotels={hotels}
-                requestData={requestData}
-                onSelectHotel={handleHotelSelect}
-                onBack={handleBack}
-              />
-            )}
+      {currentStep === 'search' && (
+        <HotelSearchResults
+          hotels={hotels}
+          requestData={requestData}
+          onSelectHotel={handleHotelSelect}
+          onBack={handleBack}
+        />
+      )}
 
-            {currentStep === 'booking' && selectedHotel && selectedRoomType && (
-              <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl mx-auto">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                  🎯 Rezervasyon Onayı
-                </h2>
+      {currentStep === 'booking' && selectedHotel && selectedRoomType && (
+        <HotelBookingConfirmation
+          hotel={selectedHotel}
+          roomType={selectedRoomType}
+          requestData={requestData}
+          onConfirm={handleBookingConfirm}
+          onBack={handleBack}
+          loading={loading}
+        />
+      )}
 
-                <div className="space-y-6">
-                  {/* Otel Bilgileri */}
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">Otel Bilgileri</h3>
-                    <p className="font-medium">{selectedHotel.name}</p>
-                    <p className="text-gray-600 text-sm">{selectedHotel.address}</p>
-                    <div className="flex items-center mt-2">
-                      <span className="text-yellow-500 mr-2">
-                        {'⭐'.repeat(selectedHotel.stars)}
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        {selectedHotel.rating}/5
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Oda Bilgileri */}
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">Oda Bilgileri</h3>
-                    <p className="font-medium">{selectedRoomType.name}</p>
-                    <p className="text-gray-600 text-sm">{selectedRoomType.description}</p>
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {selectedRoomType.amenities.map((amenity: string) => (
-                        <span
-                          key={amenity}
-                          className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"
-                        >
-                          {amenity}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Müşteri Bilgileri */}
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">Müşteri Bilgileri</h3>
-                    <p><strong>Ad:</strong> {requestData.customerName}</p>
-                    <p><strong>E-posta:</strong> {requestData.customerEmail}</p>
-                    <p><strong>Telefon:</strong> {requestData.customerPhone}</p>
-                  </div>
-
-                  {/* Tarih ve Fiyat */}
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">Rezervasyon Detayları</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p><strong>Giriş:</strong> {new Date(requestData.checkin).toLocaleDateString('tr-TR')}</p>
-                        <p><strong>Çıkış:</strong> {new Date(requestData.checkout).toLocaleDateString('tr-TR')}</p>
-                      </div>
-                      <div>
-                        <p><strong>Misafirler:</strong> {requestData.adults} yetişkin, {requestData.children} çocuk</p>
-                        <p><strong>Odalar:</strong> {requestData.rooms}</p>
-                      </div>
-                    </div>
-                    <div className="mt-4 pt-4 border-t border-gray-200">
-                      <div className="flex justify-between items-center">
-                        <span className="text-lg font-semibold">Toplam Tutar:</span>
-                        <span className="text-2xl font-bold text-blue-600">
-                          €{selectedRoomType.price * requestData.rooms}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Butonlar */}
-                  <div className="flex justify-end space-x-4">
-                    <button
-                      onClick={handleBack}
-                      className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                    >
-                      Geri Dön
-                    </button>
-                    <button
-                      onClick={handleBookingConfirm}
-                      className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                    >
-                      ✅ Rezervasyonu Onayla
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
           </>
         )}
       </div>
