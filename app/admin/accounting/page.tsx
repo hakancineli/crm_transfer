@@ -3,6 +3,20 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { canViewAccounting } from '@/app/lib/permissions';
+import { calculateCommissions, CommissionCalculation } from '@/app/lib/commissionCalculator';
+import { useLanguage } from '@/app/contexts/LanguageContext';
+
+// USD kuru alma fonksiyonu
+async function getUSDRate() {
+  try {
+    const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+    const data = await response.json();
+    return data.rates.TRY;
+  } catch (error) {
+    console.error('USD kuru alınamadı:', error);
+    return 31.50; // Fallback kur
+  }
+}
 
 interface Reservation {
   id: string;
@@ -15,15 +29,18 @@ interface Reservation {
   price: number;
   currency: string;
   paymentStatus: string;
+  driverFee?: number; // Şoför atama ekranından gelen hakediş tutarı
   user?: {
     name: string;
     username: string;
   };
   createdAt: string;
+  companyCommissionStatus?: 'PENDING' | 'APPROVED' | 'REJECTED';
 }
 
 export default function AccountingPage() {
   const { user } = useAuth();
+  const { t, dir } = useLanguage();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -31,6 +48,7 @@ export default function AccountingPage() {
     start: '',
     end: ''
   });
+  const [usdRate, setUsdRate] = useState<number>(31.50);
 
   useEffect(() => {
     // Check if user has permission to view accounting
@@ -42,6 +60,9 @@ export default function AccountingPage() {
       window.location.href = '/admin';
       return;
     }
+    
+    // USD kuru al
+    getUSDRate().then(rate => setUsdRate(rate));
     fetchReservations();
   }, [filter, dateRange, user]);
 
@@ -76,22 +97,157 @@ export default function AccountingPage() {
     }
   };
 
+  const getCompanyCommissionStatusColor = (status: string) => {
+    switch (status) {
+      case 'APPROVED': return 'bg-green-100 text-green-800';
+      case 'PENDING': return 'bg-yellow-100 text-yellow-800';
+      case 'REJECTED': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getCompanyCommissionStatusText = (status: string) => {
+    switch (status) {
+      case 'APPROVED': return 'Onaylandı';
+      case 'PENDING': return 'Bekliyor';
+      case 'REJECTED': return 'Reddedildi';
+      default: return 'Bekliyor';
+    }
+  };
+
+  const handleApproveCompanyCommission = async (voucherNumber: string) => {
+    try {
+      const response = await fetch(`/api/reservations/${voucherNumber}/commission`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: 'APPROVED' }),
+      });
+
+      if (response.ok) {
+        // State'i güncelle
+        setReservations(prev => prev.map(res => 
+          res.voucherNumber === voucherNumber 
+            ? { ...res, companyCommissionStatus: 'APPROVED' as const }
+            : res
+        ));
+        console.log('Şirket hakedişi onaylandı');
+      } else {
+        console.error('Şirket hakedişi onaylanamadı');
+      }
+    } catch (error) {
+      console.error('Error approving company commission:', error);
+    }
+  };
+
+  const handleRejectCompanyCommission = async (voucherNumber: string) => {
+    try {
+      const response = await fetch(`/api/reservations/${voucherNumber}/commission`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: 'REJECTED' }),
+      });
+
+      if (response.ok) {
+        // State'i güncelle
+        setReservations(prev => prev.map(res => 
+          res.voucherNumber === voucherNumber 
+            ? { ...res, companyCommissionStatus: 'REJECTED' as const }
+            : res
+        ));
+        console.log('Şirket hakedişi reddedildi');
+      } else {
+        console.error('Şirket hakedişi reddedilemedi');
+      }
+    } catch (error) {
+      console.error('Error rejecting company commission:', error);
+    }
+  };
+
   const filteredReservations = reservations.filter(reservation => {
     if (filter === 'all') return true;
     return reservation.paymentStatus === filter;
   });
 
-  const totalRevenue = filteredReservations
-    .filter(r => r.paymentStatus === 'PAID')
+  // Raporlar sayfasındaki mantığa göre hesaplamalar
+  const totalRevenueUSD = filteredReservations
+    .filter(r => r.paymentStatus === 'PAID' && r.currency === 'USD')
     .reduce((sum, r) => sum + r.price, 0);
+
+  const totalRevenueTL = filteredReservations
+    .filter(r => r.paymentStatus === 'PAID')
+    .reduce((sum, r) => {
+      if (r.currency === 'USD') {
+        return sum + (r.price * usdRate);
+      }
+      return sum + r.price;
+    }, 0);
 
   const pendingAmount = filteredReservations
     .filter(r => r.paymentStatus === 'PENDING')
-    .reduce((sum, r) => sum + r.price, 0);
+    .reduce((sum, r) => {
+      if (r.currency === 'USD') {
+        return sum + (r.price * usdRate);
+      }
+      return sum + r.price;
+    }, 0);
 
   const unpaidAmount = filteredReservations
     .filter(r => r.paymentStatus === 'UNPAID')
-    .reduce((sum, r) => sum + r.price, 0);
+    .reduce((sum, r) => {
+      if (r.currency === 'USD') {
+        return sum + (r.price * usdRate);
+      }
+      return sum + r.price;
+    }, 0);
+
+  // Şoför hakedişi hesaplamaları (TL cinsinden)
+  const totalDriverCommissionTL = filteredReservations
+    .filter(r => r.paymentStatus === 'PAID')
+    .reduce((sum, r) => {
+      if (r.driverFee !== undefined && r.driverFee !== null) {
+        // Şoför atama ekranından gelen hakediş tutarı (TL)
+        return sum + r.driverFee;
+      } else {
+        // Otomatik hesaplama - USD ise TL'ye çevir
+        const commission = calculateCommissions(r.price, r.currency);
+        if (r.currency === 'USD') {
+          return sum + (commission.driverCommission * usdRate);
+        }
+        return sum + commission.driverCommission;
+      }
+    }, 0);
+
+  // Şirket karı hesaplamaları (TL cinsinden)
+  const totalCompanyProfitTL = totalRevenueTL - totalDriverCommissionTL;
+
+  // Kar marjı hesaplama
+  const profitMargin = totalRevenueTL > 0 ? ((totalCompanyProfitTL / totalRevenueTL) * 100) : 0;
+
+  const pendingCompanyCommission = filteredReservations
+    .filter(r => r.paymentStatus === 'PAID' && (r.companyCommissionStatus === 'PENDING' || !r.companyCommissionStatus))
+    .reduce((sum, r) => {
+      const driverCommission = r.driverFee !== undefined && r.driverFee !== null 
+        ? r.driverFee 
+        : (r.currency === 'USD' ? calculateCommissions(r.price, r.currency).driverCommission * usdRate : calculateCommissions(r.price, r.currency).driverCommission);
+      
+      const revenue = r.currency === 'USD' ? r.price * usdRate : r.price;
+      return sum + (revenue - driverCommission);
+    }, 0);
+
+  const approvedCompanyCommission = filteredReservations
+    .filter(r => r.paymentStatus === 'PAID' && r.companyCommissionStatus === 'APPROVED')
+    .reduce((sum, r) => {
+      const driverCommission = r.driverFee !== undefined && r.driverFee !== null 
+        ? r.driverFee 
+        : (r.currency === 'USD' ? calculateCommissions(r.price, r.currency).driverCommission * usdRate : calculateCommissions(r.price, r.currency).driverCommission);
+      
+      const revenue = r.currency === 'USD' ? r.price * usdRate : r.price;
+      return sum + (revenue - driverCommission);
+    }, 0);
 
   // Check permissions before rendering
   const hasViewAccountingPermission = user?.permissions?.some(p => 
@@ -146,10 +302,10 @@ export default function AccountingPage() {
             onChange={(e) => setFilter(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="all">Tüm Ödemeler</option>
-            <option value="PAID">Ödenen</option>
-            <option value="PENDING">Bekleyen</option>
-            <option value="UNPAID">Ödenmeyen</option>
+            <option value="all">{t('admin.accounting.filters.all')}</option>
+            <option value="PAID">{t('admin.accounting.filters.paid')}</option>
+            <option value="PENDING">{t('admin.accounting.filters.pending')}</option>
+            <option value="UNPAID">{t('admin.accounting.filters.unpaid')}</option>
           </select>
           <button
             onClick={fetchReservations}
@@ -160,16 +316,64 @@ export default function AccountingPage() {
         </div>
       </div>
 
-      {/* Özet Kartları */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      {/* Özet Kartları - Raporlar sayfasındaki mantığa göre */}
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="p-2 bg-green-100 rounded-lg">
               <span className="text-green-600 text-2xl">💰</span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Toplam Gelir</p>
-              <p className="text-2xl font-bold text-gray-900">${totalRevenue.toFixed(2)}</p>
+              <p className="text-sm font-medium text-gray-600">{t('admin.accounting.stats.usdSalesTotal')}</p>
+              <p className="text-2xl font-bold text-gray-900">${totalRevenueUSD.toFixed(2)}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex items-center">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <span className="text-blue-600 text-2xl">💱</span>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">{t('admin.accounting.stats.usdTlRate')}</p>
+              <p className="text-2xl font-bold text-gray-900">{usdRate.toFixed(2)} TL</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex items-center">
+            <div className="p-2 bg-purple-100 rounded-lg">
+              <span className="text-purple-600 text-2xl">🏦</span>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">{t('admin.accounting.stats.tlEquivalent')}</p>
+              <p className="text-2xl font-bold text-gray-900">{totalRevenueTL.toFixed(2)} TL</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex items-center">
+            <div className="p-2 bg-orange-100 rounded-lg">
+              <span className="text-orange-600 text-2xl">🚗</span>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">{t('admin.accounting.stats.driverCommission')}</p>
+              <p className="text-2xl font-bold text-gray-900">{totalDriverCommissionTL.toFixed(2)} TL</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex items-center">
+            <div className="p-2 bg-green-100 rounded-lg">
+              <span className="text-green-600 text-2xl">🏢</span>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">{t('admin.accounting.stats.companyProfit')}</p>
+              <p className="text-2xl font-bold text-gray-900">{totalCompanyProfitTL.toFixed(2)} TL</p>
             </div>
           </div>
         </div>
@@ -177,11 +381,38 @@ export default function AccountingPage() {
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="p-2 bg-yellow-100 rounded-lg">
+              <span className="text-yellow-600 text-2xl">📊</span>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">{t('admin.accounting.stats.profitMargin')}</p>
+              <p className="text-2xl font-bold text-gray-900">{profitMargin.toFixed(1)}%</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Onay Durumu Kartları */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex items-center">
+            <div className="p-2 bg-yellow-100 rounded-lg">
               <span className="text-yellow-600 text-2xl">⏳</span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Bekleyen</p>
-              <p className="text-2xl font-bold text-gray-900">${pendingAmount.toFixed(2)}</p>
+              <p className="text-sm font-medium text-gray-600">{t('admin.accounting.stats.pendingCommission')}</p>
+              <p className="text-2xl font-bold text-gray-900">{pendingCompanyCommission.toFixed(2)} TL</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex items-center">
+            <div className="p-2 bg-green-100 rounded-lg">
+              <span className="text-green-600 text-2xl">✅</span>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">{t('admin.accounting.stats.approvedCommission')}</p>
+              <p className="text-2xl font-bold text-gray-900">{approvedCompanyCommission.toFixed(2)} TL</p>
             </div>
           </div>
         </div>
@@ -192,20 +423,8 @@ export default function AccountingPage() {
               <span className="text-red-600 text-2xl">❌</span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Ödenmeyen</p>
-              <p className="text-2xl font-bold text-gray-900">${unpaidAmount.toFixed(2)}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <span className="text-blue-600 text-2xl">📊</span>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Toplam Rezervasyon</p>
-              <p className="text-2xl font-bold text-gray-900">{filteredReservations.length}</p>
+              <p className="text-sm font-medium text-gray-600">{t('admin.accounting.stats.unpaid')}</p>
+              <p className="text-2xl font-bold text-gray-900">{unpaidAmount.toFixed(2)} TL</p>
             </div>
           </div>
         </div>
@@ -224,77 +443,147 @@ export default function AccountingPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Voucher
+                  {t('admin.accounting.table.voucher')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tarih
+                  {t('admin.accounting.table.date')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Güzergah
+                  {t('admin.accounting.table.route')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Yolcular
+                  {t('admin.accounting.table.passengers')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tutar
+                  {t('admin.accounting.table.salesAmount')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Ödeme Durumu
+                  {t('admin.accounting.table.driverCommission')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Satış Yapan
+                  {t('admin.accounting.table.companyProfit')}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {t('admin.accounting.table.paymentStatus')}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {t('admin.accounting.table.commissionApproval')}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {t('admin.accounting.table.salesPerson')}
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredReservations.map((reservation) => (
-                <tr key={reservation.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-purple-700">
-                      {reservation.voucherNumber}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {new Date(reservation.date).toLocaleDateString('tr-TR')}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {reservation.time}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900">
-                      {reservation.from} → {reservation.to}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900">
-                      {Array.isArray(reservation.passengerNames) 
-                        ? reservation.passengerNames.join(', ')
-                        : 'N/A'
-                      }
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      ${reservation.price.toFixed(2)} {reservation.currency}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusColor(reservation.paymentStatus)}`}>
-                      {getPaymentStatusText(reservation.paymentStatus)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {reservation.user?.name || 'N/A'}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {reservation.user?.username || ''}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {filteredReservations.map((reservation) => {
+                // Şoför hakedişi hesaplama (TL cinsinden)
+                const driverCommissionTL = reservation.driverFee !== undefined && reservation.driverFee !== null 
+                  ? reservation.driverFee 
+                  : (reservation.currency === 'USD' 
+                      ? calculateCommissions(reservation.price, reservation.currency).driverCommission * usdRate
+                      : calculateCommissions(reservation.price, reservation.currency).driverCommission);
+                
+                // Şirket karı hesaplama (TL cinsinden)
+                const revenueTL = reservation.currency === 'USD' ? reservation.price * usdRate : reservation.price;
+                const companyProfitTL = revenueTL - driverCommissionTL;
+                const companyCommissionStatus = reservation.companyCommissionStatus || 'PENDING';
+                
+                return (
+                  <tr key={reservation.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-purple-700">
+                        {reservation.voucherNumber}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {new Date(reservation.date).toLocaleDateString('tr-TR')}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {reservation.time}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-900">
+                        {reservation.from} → {reservation.to}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-900">
+                        {Array.isArray(reservation.passengerNames) 
+                          ? reservation.passengerNames.join(', ')
+                          : 'N/A'
+                        }
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">
+                        ${reservation.price.toFixed(2)} {reservation.currency}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        ({revenueTL.toFixed(2)} TL)
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-orange-600">
+                        {driverCommissionTL.toFixed(2)} TL
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        (%{((driverCommissionTL / revenueTL) * 100).toFixed(0)})
+                        {reservation.driverFee !== undefined && reservation.driverFee !== null && (
+                          <span className="text-blue-600 ml-1">(Atama)</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-green-600">
+                        {companyProfitTL.toFixed(2)} TL
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        (%{((companyProfitTL / revenueTL) * 100).toFixed(0)})
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusColor(reservation.paymentStatus)}`}>
+                        {getPaymentStatusText(reservation.paymentStatus)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center space-x-2">
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getCompanyCommissionStatusColor(companyCommissionStatus)}`}>
+                          {getCompanyCommissionStatusText(companyCommissionStatus)}
+                        </span>
+                        {companyCommissionStatus === 'PENDING' && (
+                          <div className="flex space-x-1">
+                            <button
+                              onClick={() => handleApproveCompanyCommission(reservation.voucherNumber)}
+                              className="text-green-600 hover:text-green-800 text-xs font-medium"
+                              title="Onayla"
+                            >
+                              ✓
+                            </button>
+                            <button
+                              onClick={() => handleRejectCompanyCommission(reservation.voucherNumber)}
+                              className="text-red-600 hover:text-red-800 text-xs font-medium"
+                              title="Reddet"
+                            >
+                              ✗
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {reservation.user?.name || 'N/A'}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {reservation.user?.username || ''}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

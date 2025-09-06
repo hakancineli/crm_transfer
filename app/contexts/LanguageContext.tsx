@@ -26,7 +26,7 @@ interface LanguageProviderProps {
 }
 
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>('en');
+  const [language, setLanguageState] = useState<Language>('tr');
   const [translations, setTranslations] = useState<any>({});
 
   useEffect(() => {
@@ -66,6 +66,11 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
   };
 
   const t = (key: string): string => {
+    // Eğer çeviriler henüz yüklenmemişse, anahtarı döndür
+    if (!translations || Object.keys(translations).length === 0) {
+      return key;
+    }
+    
     const keys = key.split('.');
     let value: any = translations;
     

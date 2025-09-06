@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 export default function AdminLoginPage() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const { adminLogin } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -15,17 +17,11 @@ export default function AdminLoginPage() {
         setError('');
 
         try {
-            const response = await fetch('/api/admin-login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ password }),
-            });
-
-            if (response.ok) {
+            const success = await adminLogin(password);
+            
+            if (success) {
                 // Başarılı giriş - admin paneline yönlendir
-                router.push('/reservations');
+                router.push('/admin');
             } else {
                 setError('Yanlış şifre');
             }

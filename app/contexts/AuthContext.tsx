@@ -19,9 +19,11 @@ interface User {
 interface AuthContextType {
   user: User | null;
   login: (username: string, password: string) => Promise<boolean>;
+  adminLogin: (password: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
   isAuthenticated: boolean;
+  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -68,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (response.ok) {
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('token', data.token);
+        localStorage.setItem('isAdmin', 'false');
         setUser(data.user);
 
         // Log activity
@@ -93,6 +96,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const adminLogin = async (password: string): Promise<boolean> => {
+    try {
+      const response = await fetch('/api/admin-login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Admin login için varsayılan admin kullanıcısı oluştur
+        const adminUser = {
+          id: 'admin',
+          username: 'admin',
+          email: 'admin@protransfer.com',
+          name: 'Admin User',
+          role: 'SUPERUSER',
+          isActive: true,
+          permissions: []
+        };
+
+        localStorage.setItem('user', JSON.stringify(adminUser));
+        localStorage.setItem('token', 'admin-token');
+        localStorage.setItem('isAdmin', 'true');
+        setUser(adminUser);
+
+        return true;
+      } else {
+        throw new Error(data.error || 'Admin girişi başarısız');
+      }
+    } catch (error) {
+      console.error('Admin login error:', error);
+      return false;
+    }
+  };
+
   const logout = () => {
     // Log activity before logout
     if (user) {
@@ -109,21 +151,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }).catch(console.error);
     }
 
-    localStorage.clear();
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('isAdmin');
     sessionStorage.clear();
     setUser(null);
     router.push('/login');
   };
 
   const isAuthenticated = !!user;
+  const isAdmin = typeof window !== 'undefined' ? localStorage.getItem('isAdmin') === 'true' : false;
 
   return (
     <AuthContext.Provider value={{
       user,
       login,
+      adminLogin,
       logout,
       loading,
-      isAuthenticated
+      isAuthenticated,
+      isAdmin
     }}>
       {children}
     </AuthContext.Provider>

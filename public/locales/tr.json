@@ -157,6 +157,171 @@
     "reports": "Raporlar",
     "drivers": "Şoförler"
   },
+  "admin": {
+    "dashboard": {
+      "title": "Admin Paneli",
+      "welcome": "Hoş Geldiniz",
+      "stats": {
+        "totalReservations": "Toplam Rezervasyonlar",
+        "todayReservations": "Bugünkü Rezervasyonlar",
+        "totalRevenue": "Toplam Gelir",
+        "todayRevenue": "Bugünkü Gelir",
+        "totalDrivers": "Toplam Şoförler",
+        "activeDrivers": "Aktif Şoförler",
+        "pendingPayments": "Bekleyen Ödemeler",
+        "completedTransfers": "Tamamlanan Transferler"
+      },
+      "quickActions": {
+        "transferOperations": "Transfer İşlemleri",
+        "accommodationOperations": "Konaklama İşlemleri",
+        "newReservation": "Yeni Rezervasyon",
+        "reservations": "Rezervasyonlar",
+        "reports": "Raporlar",
+        "flightStatus": "Uçuş Durumu",
+        "pricePool": "Fiyat Havuzu",
+        "hotelReservation": "Otel Rezervasyonu",
+        "accommodationReports": "Konaklama Raporları",
+        "hotelReservations": "Otel Rezervasyonları"
+      },
+      "recentActivities": "Son Aktiviteler",
+      "refresh": "Yenile"
+    },
+    "navigation": {
+      "dashboard": "Dashboard",
+      "reservations": "Rezervasyonlar",
+      "newReservation": "Yeni Rezervasyon",
+      "drivers": "Şoförler",
+      "reports": "Raporlar",
+      "accounting": "Muhasebe",
+      "customers": "Müşteriler",
+      "activities": "Son Aktiviteler",
+      "users": "Kullanıcılar",
+      "settings": "Ayarlar",
+      "logout": "Çıkış"
+    },
+    "accounting": {
+      "title": "Muhasebe ve Ödeme Yönetimi",
+      "description": "Rezervasyon ödemelerini ve komisyonları yönetin",
+      "filters": {
+        "all": "Tümü",
+        "paid": "Ödenen",
+        "pending": "Bekleyen",
+        "unpaid": "Ödenmeyen"
+      },
+      "dateRange": {
+        "startDate": "Başlangıç Tarihi",
+        "endDate": "Bitiş Tarihi",
+        "apply": "Uygula"
+      },
+      "stats": {
+        "usdSalesTotal": "USD Satış Toplamı",
+        "usdTlRate": "USD/TL Kuru",
+        "tlEquivalent": "TL Karşılığı",
+        "driverCommission": "Şoför Hakedişi",
+        "companyProfit": "Şirket Karı",
+        "profitMargin": "Kar Marjı",
+        "pendingCommission": "Bekleyen Hakediş",
+        "approvedCommission": "Onaylanan Hakediş",
+        "unpaid": "Ödenmeyen"
+      },
+      "table": {
+        "voucher": "Voucher",
+        "date": "Tarih",
+        "route": "Güzergah",
+        "passengers": "Yolcular",
+        "salesAmount": "Satış Tutarı",
+        "driverCommission": "Şoför Hakedişi (TL)",
+        "companyProfit": "Şirket Karı (TL)",
+        "paymentStatus": "Ödeme Durumu",
+        "commissionApproval": "Şirket Hakedişi Onayı",
+        "salesPerson": "Satış Yapan"
+      },
+      "actions": {
+        "approve": "Onayla",
+        "reject": "Reddet",
+        "refresh": "Yenile"
+      }
+    },
+    "settings": {
+      "title": "Sistem Ayarları",
+      "description": "Sistem genelinde ayarları yönetin",
+      "emojiSettings": "Emoji Ayarları",
+      "emojiToggle": "Emojileri Aç/Kapat",
+      "emojiDescription": "Arayüzde emoji kullanımını etkinleştirin veya devre dışı bırakın",
+      "moduleSettings": "Modül Ayarları",
+      "modules": {
+        "transfer": {
+          "name": "Transfer Modülü",
+          "description": "Temel transfer işlemleri (her zaman aktif)",
+          "status": "Aktif"
+        },
+        "accommodation": {
+          "name": "Konaklama Modülü",
+          "description": "Otel rezervasyon ve fiyat havuzu",
+          "status": "Devre Dışı"
+        },
+        "flight": {
+          "name": "Uçuş Modülü",
+          "description": "Uçuş rezervasyon ve takip",
+          "status": "Devre Dışı"
+        }
+      },
+      "toggleModule": "Modülü Aç/Kapat",
+      "saveSettings": "Ayarları Kaydet"
+    },
+    "users": {
+      "title": "Kullanıcı Yönetimi",
+      "description": "Sistem kullanıcılarını yönetin",
+      "addUser": "Yeni Kullanıcı",
+      "table": {
+        "name": "Ad Soyad",
+        "username": "Kullanıcı Adı",
+        "email": "E-posta",
+        "role": "Rol",
+        "permissions": "Yetkiler",
+        "reservations": "Rezervasyonlar",
+        "actions": "İşlemler"
+      },
+      "roles": {
+        "admin": "Admin",
+        "operasyon": "Operasyon",
+        "muhasebe": "Muhasebe",
+        "satisci": "Satışçı"
+      }
+    },
+    "activities": {
+      "title": "Sistem Aktiviteleri",
+      "description": "Sistem logları ve aktiviteleri görüntüleyin",
+      "table": {
+        "timestamp": "Zaman",
+        "user": "Kullanıcı",
+        "action": "Aksiyon",
+        "details": "Detaylar",
+        "ipAddress": "IP Adresi"
+      },
+      "actions": {
+        "login": "Giriş",
+        "logout": "Çıkış",
+        "create": "Oluştur",
+        "update": "Güncelle",
+        "delete": "Sil"
+      }
+    },
+    "reservations": {
+      "allReservations": "Tüm Rezervasyonlar",
+      "allReservationsDescription": "Sistemdeki tüm rezervasyonları görüntüleyin ve yönetin.",
+      "todayTransfers": "Bugünün Transferleri",
+      "todayTransfersDescription": "Bugün gerçekleşecek transferleri görüntüleyin.",
+      "tomorrowTransfers": "Yarının Transferleri",
+      "tomorrowTransfersDescription": "Yarın gerçekleşecek transferleri görüntüleyin.",
+      "thisWeekTransfers": "Bu Haftanın Transferleri",
+      "thisWeekTransfersDescription": "Bu hafta gerçekleşecek transferleri görüntüleyin.",
+      "assignedTransfers": "Şoför Atanmış Transferler",
+      "assignedTransfersDescription": "Şoför atanmış transferleri görüntüleyin.",
+      "unassignedTransfers": "Şoför Bekleyen Transferler",
+      "unassignedTransfersDescription": "Şoför atanmamış transferleri görüntüleyin."
+    }
+  },
   "landing": {
     "title": "İstanbul'da VIP Havalimanı Transferi",
     "description": "IST/SAW ↔ Otel/Adres arası konforlu, güvenli ve zamanında transfer. 7/24 hizmet, sabit fiyat, profesyonel şoförler.",

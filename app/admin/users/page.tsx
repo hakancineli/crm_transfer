@@ -17,7 +17,7 @@ interface User {
 }
 
 export default function UsersPage() {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -28,7 +28,8 @@ export default function UsersPage() {
     email: '',
     password: '',
     name: '',
-    role: 'SELLER' as 'SUPERUSER' | 'OPERATION' | 'SELLER' | 'ACCOUNTANT'
+    role: 'SELLER' as 'SUPERUSER' | 'OPERATION' | 'SELLER' | 'ACCOUNTANT',
+    isActive: true
   });
 
   useEffect(() => {
@@ -67,7 +68,7 @@ export default function UsersPage() {
 
       if (response.ok) {
         setShowCreateForm(false);
-        setFormData({ username: '', email: '', password: '', name: '', role: 'SELLER' });
+        setFormData({ username: '', email: '', password: '', name: '', role: 'SELLER', isActive: true });
         fetchUsers();
       } else {
         const error = await response.json();
@@ -84,15 +85,19 @@ export default function UsersPage() {
     if (!editingUser) return;
 
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`/api/users/${editingUser.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(formData)
       });
 
       if (response.ok) {
         setEditingUser(null);
-        setFormData({ username: '', email: '', password: '', name: '', role: 'SELLER' });
+        setFormData({ username: '', email: '', password: '', name: '', role: 'SELLER', isActive: true });
         fetchUsers();
       } else {
         const error = await response.json();
@@ -261,7 +266,8 @@ export default function UsersPage() {
                         email: user.email,
                         password: '',
                         name: user.name,
-                        role: user.role
+                        role: user.role,
+                        isActive: user.isActive
                       });
                     }}
                     className="text-blue-600 hover:text-blue-900"
@@ -427,6 +433,17 @@ export default function UsersPage() {
                     <option value="OPERATION">Operasyon</option>
                     <option value="ACCOUNTANT">Muhasebeci</option>
                   </select>
+                </div>
+                <div>
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formData.isActive}
+                      onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                      className="mr-2"
+                    />
+                    <span className="text-sm font-medium text-gray-700">Aktif Kullanıcı</span>
+                  </label>
                 </div>
               </div>
               <div className="flex justify-end space-x-2 mt-6">

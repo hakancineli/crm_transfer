@@ -136,6 +136,171 @@
     "confirmed": "مؤكد",
     "pending": "في الانتظار"
   },
+  "admin": {
+    "dashboard": {
+      "title": "لوحة الإدارة",
+      "welcome": "مرحباً",
+      "stats": {
+        "totalReservations": "إجمالي الحجوزات",
+        "todayReservations": "حجوزات اليوم",
+        "totalRevenue": "إجمالي الإيرادات",
+        "todayRevenue": "إيرادات اليوم",
+        "totalDrivers": "إجمالي السائقين",
+        "activeDrivers": "السائقون النشطون",
+        "pendingPayments": "المدفوعات المعلقة",
+        "completedTransfers": "التحويلات المكتملة"
+      },
+      "quickActions": {
+        "transferOperations": "عمليات النقل",
+        "accommodationOperations": "عمليات الإقامة",
+        "newReservation": "حجز جديد",
+        "reservations": "الحجوزات",
+        "reports": "التقارير",
+        "flightStatus": "حالة الرحلة",
+        "pricePool": "مجمع الأسعار",
+        "hotelReservation": "حجز الفندق",
+        "accommodationReports": "تقارير الإقامة",
+        "hotelReservations": "حجوزات الفنادق"
+      },
+      "recentActivities": "الأنشطة الأخيرة",
+      "refresh": "تحديث"
+    },
+    "navigation": {
+      "dashboard": "لوحة التحكم",
+      "reservations": "الحجوزات",
+      "newReservation": "حجز جديد",
+      "drivers": "السائقون",
+      "reports": "التقارير",
+      "accounting": "المحاسبة",
+      "customers": "العملاء",
+      "activities": "الأنشطة الأخيرة",
+      "users": "المستخدمون",
+      "settings": "الإعدادات",
+      "logout": "تسجيل الخروج"
+    },
+    "accounting": {
+      "title": "إدارة المحاسبة والمدفوعات",
+      "description": "إدارة مدفوعات الحجوزات والعمولات",
+      "filters": {
+        "all": "الكل",
+        "paid": "مدفوع",
+        "pending": "معلق",
+        "unpaid": "غير مدفوع"
+      },
+      "dateRange": {
+        "startDate": "تاريخ البداية",
+        "endDate": "تاريخ النهاية",
+        "apply": "تطبيق"
+      },
+      "stats": {
+        "usdSalesTotal": "إجمالي مبيعات الدولار",
+        "usdTlRate": "سعر الدولار/الليرة",
+        "tlEquivalent": "المعادل بالليرة",
+        "driverCommission": "عمولة السائق",
+        "companyProfit": "ربح الشركة",
+        "profitMargin": "هامش الربح",
+        "pendingCommission": "العمولة المعلقة",
+        "approvedCommission": "العمولة المعتمدة",
+        "unpaid": "غير مدفوع"
+      },
+      "table": {
+        "voucher": "القسيمة",
+        "date": "التاريخ",
+        "route": "المسار",
+        "passengers": "الركاب",
+        "salesAmount": "مبلغ البيع",
+        "driverCommission": "عمولة السائق (ليرة)",
+        "companyProfit": "ربح الشركة (ليرة)",
+        "paymentStatus": "حالة الدفع",
+        "commissionApproval": "موافقة العمولة",
+        "salesPerson": "مندوب المبيعات"
+      },
+      "actions": {
+        "approve": "موافقة",
+        "reject": "رفض",
+        "refresh": "تحديث"
+      }
+    },
+    "settings": {
+      "title": "إعدادات النظام",
+      "description": "إدارة الإعدادات العامة للنظام",
+      "emojiSettings": "إعدادات الرموز التعبيرية",
+      "emojiToggle": "تفعيل/إلغاء الرموز التعبيرية",
+      "emojiDescription": "تفعيل أو إلغاء استخدام الرموز التعبيرية في الواجهة",
+      "moduleSettings": "إعدادات الوحدات",
+      "modules": {
+        "transfer": {
+          "name": "وحدة النقل",
+          "description": "عمليات النقل الأساسية (نشطة دائماً)",
+          "status": "نشط"
+        },
+        "accommodation": {
+          "name": "وحدة الإقامة",
+          "description": "حجوزات الفنادق ومجمع الأسعار",
+          "status": "معطل"
+        },
+        "flight": {
+          "name": "وحدة الطيران",
+          "description": "حجوزات الطيران والمتابعة",
+          "status": "معطل"
+        }
+      },
+      "toggleModule": "تبديل الوحدة",
+      "saveSettings": "حفظ الإعدادات"
+    },
+    "users": {
+      "title": "إدارة المستخدمين",
+      "description": "إدارة مستخدمي النظام",
+      "addUser": "إضافة مستخدم",
+      "table": {
+        "name": "الاسم الكامل",
+        "username": "اسم المستخدم",
+        "email": "البريد الإلكتروني",
+        "role": "الدور",
+        "permissions": "الصلاحيات",
+        "reservations": "الحجوزات",
+        "actions": "الإجراءات"
+      },
+      "roles": {
+        "admin": "مدير",
+        "operasyon": "العمليات",
+        "muhasebe": "المحاسبة",
+        "satisci": "المبيعات"
+      }
+    },
+    "activities": {
+      "title": "أنشطة النظام",
+      "description": "عرض سجلات النظام والأنشطة",
+      "table": {
+        "timestamp": "الوقت",
+        "user": "المستخدم",
+        "action": "الإجراء",
+        "details": "التفاصيل",
+        "ipAddress": "عنوان IP"
+      },
+      "actions": {
+        "login": "تسجيل الدخول",
+        "logout": "تسجيل الخروج",
+        "create": "إنشاء",
+        "update": "تحديث",
+        "delete": "حذف"
+      }
+    },
+    "reservations": {
+      "allReservations": "جميع الحجوزات",
+      "allReservationsDescription": "عرض وإدارة جميع الحجوزات في النظام.",
+      "todayTransfers": "نقلات اليوم",
+      "todayTransfersDescription": "عرض النقلات المجدولة لليوم.",
+      "tomorrowTransfers": "نقلات الغد",
+      "tomorrowTransfersDescription": "عرض النقلات المجدولة لغد.",
+      "thisWeekTransfers": "نقلات هذا الأسبوع",
+      "thisWeekTransfersDescription": "عرض النقلات المجدولة لهذا الأسبوع.",
+      "assignedTransfers": "النقلات المعينة",
+      "assignedTransfersDescription": "عرض النقلات التي تم تعيين سائقين لها.",
+      "unassignedTransfers": "النقلات غير المعينة",
+      "unassignedTransfersDescription": "عرض النقلات التي تنتظر تعيين سائق."
+    }
+  },
   "landing": {
     "title": "نقل VIP من المطار في إسطنبول",
     "description": "نقل مريح وآمن وفي الوقت المحدد بين IST/SAW ↔ الفندق/العنوان. خدمة 24/7، سعر ثابت، سائقين محترفين.",

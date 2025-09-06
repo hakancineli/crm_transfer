@@ -5,34 +5,44 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useEmoji } from '@/app/contexts/EmojiContext';
 import { useModule } from '@/app/hooks/useModule';
+import { useLanguage } from '@/app/contexts/LanguageContext';
 
 const AdminNavigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const { user, logout } = useAuth();
   const { emojisEnabled } = useEmoji();
+  const { t, dir } = useLanguage();
   const accommodationEnabled = useModule('accommodation');
   const flightEnabled = useModule('flight');
 
+
+  // Client-side rendering kontrolü
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+
   const allMenuItems = [
     {
-      name: 'Dashboard',
+      name: t('admin.navigation.dashboard'),
       href: '/admin',
       icon: '🏠',
-      description: 'Ana sayfa',
+      description: t('admin.navigation.dashboard'),
       module: 'transfer'
     },
     {
-      name: 'Rezervasyonlar',
-      href: '/reservations',
+      name: t('admin.navigation.reservations'),
+      href: '/admin/reservations',
       icon: '📋',
-      description: 'Tüm rezervasyonları yönet',
+      description: t('admin.navigation.reservations'),
       module: 'transfer'
     },
     {
-      name: 'Yeni Rezervasyon',
+      name: t('admin.navigation.newReservation'),
       href: '/new-reservation',
       icon: '➕',
-      description: 'Yeni rezervasyon oluştur',
+      description: t('admin.navigation.newReservation'),
       module: 'transfer'
     },
     {
@@ -43,45 +53,45 @@ const AdminNavigation = () => {
       module: 'flight'
     },
     {
-      name: 'Şoförler',
+      name: t('admin.navigation.drivers'),
       href: '/admin/drivers',
       icon: '👨‍✈️',
-      description: 'Şoför yönetimi',
+      description: t('admin.navigation.drivers'),
       module: 'transfer'
     },
     {
-      name: 'Raporlar',
+      name: t('admin.navigation.reports'),
       href: '/reports',
       icon: '📈',
-      description: 'Detaylı raporlar ve analizler',
+      description: t('admin.navigation.reports'),
       module: 'transfer'
     },
     {
-      name: 'Muhasebe',
+      name: t('admin.navigation.accounting'),
       href: '/admin/accounting',
       icon: '💰',
-      description: 'Muhasebe ve ödeme yönetimi',
+      description: t('admin.navigation.accounting'),
       module: 'transfer'
     },
     {
-      name: 'Müşteriler',
+      name: t('admin.navigation.customers'),
       href: '/admin/customers',
       icon: '👥',
-      description: 'Müşteri yönetimi',
+      description: t('admin.navigation.customers'),
       module: 'transfer'
     },
     {
-      name: 'Son Aktiviteler',
+      name: t('admin.navigation.activities'),
       href: '/admin/activities',
       icon: '📋',
-      description: 'Sistem logları ve aktiviteler',
+      description: t('admin.navigation.activities'),
       module: 'transfer'
     },
     {
-      name: 'Kullanıcılar',
+      name: t('admin.navigation.users'),
       href: '/admin/users',
       icon: '👤',
-      description: 'Kullanıcı yönetimi',
+      description: t('admin.navigation.users'),
       module: 'transfer'
     },
     {
@@ -113,21 +123,22 @@ const AdminNavigation = () => {
       module: 'accommodation'
     },
     {
-      name: 'Ayarlar',
+      name: t('admin.navigation.settings'),
       href: '/admin/settings',
       icon: '⚙️',
-      description: 'Sistem ayarları',
+      description: t('admin.navigation.settings'),
       module: 'transfer'
     }
   ];
 
   // Modül durumuna göre menü öğelerini filtrele
-  const menuItems = allMenuItems.filter(item => {
-    if (item.module === 'transfer') return true; // Transfer her zaman aktif
-    if (item.module === 'accommodation') return accommodationEnabled;
-    if (item.module === 'flight') return flightEnabled;
-    return true;
-  });
+  // Sıralamayı sabit tutmak için filter yerine map kullan
+  const menuItems = allMenuItems.map(item => ({
+    ...item,
+    visible: item.module === 'transfer' || 
+             (item.module === 'accommodation' && accommodationEnabled) ||
+             (item.module === 'flight' && flightEnabled)
+  }));
 
   return (
     <div className="bg-white shadow-lg border-r border-gray-200 h-screen w-64 fixed left-0 top-16 z-40 flex flex-col">
@@ -159,7 +170,8 @@ const AdminNavigation = () => {
             ) || false;
           }
           
-          if (!shouldShow) {
+          // Hem modül durumu hem de izin kontrolü
+          if (!item.visible || !shouldShow) {
             return null;
           }
           
@@ -169,7 +181,7 @@ const AdminNavigation = () => {
               href={item.href}
               className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
             >
-              <span className="text-2xl">{emojisEnabled ? item.icon : ''}</span>
+              <span className="text-2xl">{isClient && emojisEnabled ? item.icon : ''}</span>
               <div className="flex-1">
                 <div className="text-sm font-medium text-gray-900 group-hover:text-gray-700">
                   {item.name}
@@ -185,32 +197,48 @@ const AdminNavigation = () => {
 
       {/* User Info & Logout */}
       <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-            <span className="text-gray-600 text-sm font-medium">
-              {user?.name?.charAt(0) || 'A'}
-            </span>
-          </div>
-          <div className="flex-1">
-            <div className="text-sm font-medium text-gray-900">
-              {user?.name || 'Admin User'}
+        {user ? (
+          <>
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                <span className="text-gray-600 text-sm font-medium">
+                  {user?.name?.charAt(0) || 'A'}
+                </span>
+              </div>
+              <div className="flex-1">
+                <div className="text-sm font-medium text-gray-900">
+                  {user?.name || 'Admin User'}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {user?.email || 'admin@protransfer.com'}
+                </div>
+              </div>
             </div>
-            <div className="text-xs text-gray-500">
-              {user?.email || 'admin@protransfer.com'}
+            <button
+              onClick={() => {
+                if (confirm(t('admin.navigation.logout'))) {
+                  logout();
+                }
+              }}
+              className="w-full mt-3 text-red-600 hover:text-red-800 text-sm font-medium px-3 py-2 rounded-lg hover:bg-red-50 border border-red-200 hover:border-red-300 transition-colors"
+              title={t('admin.navigation.logout')}
+            >
+              {isClient && emojisEnabled ? '🚪 ' : ''}{t('admin.navigation.logout')}
+            </button>
+          </>
+        ) : (
+          <div className="text-center">
+            <div className="text-sm text-gray-500 mb-3">
+              Giriş yapmamışsınız
             </div>
+            <a
+              href="/admin-login"
+              className="w-full inline-block bg-blue-600 text-white text-sm font-medium px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              {isClient && emojisEnabled ? '🔑 ' : ''}Giriş Yap
+            </a>
           </div>
-        </div>
-        <button
-          onClick={() => {
-            if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
-              logout();
-            }
-          }}
-          className="w-full mt-3 text-red-600 hover:text-red-800 text-sm font-medium px-3 py-2 rounded-lg hover:bg-red-50 border border-red-200 hover:border-red-300 transition-colors"
-          title="Çıkış Yap"
-        >
-          🚪 Çıkış Yap
-        </button>
+        )}
       </div>
     </div>
   );

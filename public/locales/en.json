@@ -136,6 +136,171 @@
     "confirmed": "Confirmed",
     "pending": "Pending"
   },
+  "admin": {
+    "dashboard": {
+      "title": "Admin Panel",
+      "welcome": "Welcome",
+      "stats": {
+        "totalReservations": "Total Reservations",
+        "todayReservations": "Today's Reservations",
+        "totalRevenue": "Total Revenue",
+        "todayRevenue": "Today's Revenue",
+        "totalDrivers": "Total Drivers",
+        "activeDrivers": "Active Drivers",
+        "pendingPayments": "Pending Payments",
+        "completedTransfers": "Completed Transfers"
+      },
+      "quickActions": {
+        "transferOperations": "Transfer Operations",
+        "accommodationOperations": "Accommodation Operations",
+        "newReservation": "New Reservation",
+        "reservations": "Reservations",
+        "reports": "Reports",
+        "flightStatus": "Flight Status",
+        "pricePool": "Price Pool",
+        "hotelReservation": "Hotel Reservation",
+        "accommodationReports": "Accommodation Reports",
+        "hotelReservations": "Hotel Reservations"
+      },
+      "recentActivities": "Recent Activities",
+      "refresh": "Refresh"
+    },
+    "navigation": {
+      "dashboard": "Dashboard",
+      "reservations": "Reservations",
+      "newReservation": "New Reservation",
+      "drivers": "Drivers",
+      "reports": "Reports",
+      "accounting": "Accounting",
+      "customers": "Customers",
+      "activities": "Recent Activities",
+      "users": "Users",
+      "settings": "Settings",
+      "logout": "Logout"
+    },
+    "accounting": {
+      "title": "Accounting and Payment Management",
+      "description": "Manage reservation payments and commissions",
+      "filters": {
+        "all": "All",
+        "paid": "Paid",
+        "pending": "Pending",
+        "unpaid": "Unpaid"
+      },
+      "dateRange": {
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "apply": "Apply"
+      },
+      "stats": {
+        "usdSalesTotal": "USD Sales Total",
+        "usdTlRate": "USD/TL Rate",
+        "tlEquivalent": "TL Equivalent",
+        "driverCommission": "Driver Commission",
+        "companyProfit": "Company Profit",
+        "profitMargin": "Profit Margin",
+        "pendingCommission": "Pending Commission",
+        "approvedCommission": "Approved Commission",
+        "unpaid": "Unpaid"
+      },
+      "table": {
+        "voucher": "Voucher",
+        "date": "Date",
+        "route": "Route",
+        "passengers": "Passengers",
+        "salesAmount": "Sales Amount",
+        "driverCommission": "Driver Commission (TL)",
+        "companyProfit": "Company Profit (TL)",
+        "paymentStatus": "Payment Status",
+        "commissionApproval": "Commission Approval",
+        "salesPerson": "Sales Person"
+      },
+      "actions": {
+        "approve": "Approve",
+        "reject": "Reject",
+        "refresh": "Refresh"
+      }
+    },
+    "settings": {
+      "title": "System Settings",
+      "description": "Manage system-wide settings",
+      "emojiSettings": "Emoji Settings",
+      "emojiToggle": "Enable/Disable Emojis",
+      "emojiDescription": "Enable or disable emoji usage in the interface",
+      "moduleSettings": "Module Settings",
+      "modules": {
+        "transfer": {
+          "name": "Transfer Module",
+          "description": "Basic transfer operations (always active)",
+          "status": "Active"
+        },
+        "accommodation": {
+          "name": "Accommodation Module",
+          "description": "Hotel reservations and price pool",
+          "status": "Disabled"
+        },
+        "flight": {
+          "name": "Flight Module",
+          "description": "Flight reservations and tracking",
+          "status": "Disabled"
+        }
+      },
+      "toggleModule": "Toggle Module",
+      "saveSettings": "Save Settings"
+    },
+    "users": {
+      "title": "User Management",
+      "description": "Manage system users",
+      "addUser": "Add User",
+      "table": {
+        "name": "Full Name",
+        "username": "Username",
+        "email": "Email",
+        "role": "Role",
+        "permissions": "Permissions",
+        "reservations": "Reservations",
+        "actions": "Actions"
+      },
+      "roles": {
+        "admin": "Admin",
+        "operasyon": "Operations",
+        "muhasebe": "Accounting",
+        "satisci": "Sales"
+      }
+    },
+    "activities": {
+      "title": "System Activities",
+      "description": "View system logs and activities",
+      "table": {
+        "timestamp": "Timestamp",
+        "user": "User",
+        "action": "Action",
+        "details": "Details",
+        "ipAddress": "IP Address"
+      },
+      "actions": {
+        "login": "Login",
+        "logout": "Logout",
+        "create": "Create",
+        "update": "Update",
+        "delete": "Delete"
+      }
+    },
+    "reservations": {
+      "allReservations": "All Reservations",
+      "allReservationsDescription": "View and manage all reservations in the system.",
+      "todayTransfers": "Today's Transfers",
+      "todayTransfersDescription": "View transfers scheduled for today.",
+      "tomorrowTransfers": "Tomorrow's Transfers",
+      "tomorrowTransfersDescription": "View transfers scheduled for tomorrow.",
+      "thisWeekTransfers": "This Week's Transfers",
+      "thisWeekTransfersDescription": "View transfers scheduled for this week.",
+      "assignedTransfers": "Assigned Transfers",
+      "assignedTransfersDescription": "View transfers with assigned drivers.",
+      "unassignedTransfers": "Unassigned Transfers",
+      "unassignedTransfersDescription": "View transfers waiting for driver assignment."
+    }
+  },
   "landing": {
     "title": "VIP Airport Transfer in Istanbul",
     "description": "Comfortable, safe and timely transfer between IST/SAW ↔ Hotel/Address. 24/7 service, fixed price, professional drivers.",

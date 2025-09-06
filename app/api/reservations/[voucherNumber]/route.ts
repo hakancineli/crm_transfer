@@ -155,6 +155,70 @@ export async function PUT(request: NextRequest, { params }: { params: { voucherN
   }
 }
 
+export async function PATCH(request: NextRequest, { params }: { params: { voucherNumber: string } }) {
+  try {
+    const voucherNumber = await Promise.resolve(params.voucherNumber);
+    if (!voucherNumber) {
+      return NextResponse.json(
+        { error: 'Voucher numarası gerekli' },
+        { status: 400 }
+      );
+    }
+
+    const data = await request.json();
+    
+    // Şoför atama için gerekli alanları kontrol et
+    if (!data.driverId || data.driverFee === undefined) {
+      return NextResponse.json(
+        { error: 'Şoför ID ve hakediş tutarı gerekli' },
+        { status: 400 }
+      );
+    }
+
+    // Şoför ID'sinin geçerli olduğunu kontrol et
+    const driver = await prisma.driver.findUnique({
+      where: { id: data.driverId }
+    });
+
+    if (!driver) {
+      return NextResponse.json(
+        { error: 'Geçersiz şoför ID' },
+        { status: 400 }
+      );
+    }
+
+    // Rezervasyonu güncelle
+    const updatedReservation = await prisma.reservation.update({
+      where: { voucherNumber },
+      data: {
+        driverId: data.driverId,
+        driverFee: parseFloat(data.driverFee)
+      },
+      include: { driver: true }
+    });
+
+    try {
+      const parsedNames = JSON.parse(updatedReservation.passengerNames || '[]');
+      return NextResponse.json({
+        ...updatedReservation,
+        passengerNames: parsedNames
+      });
+    } catch (e) {
+      console.error('Yolcu isimleri parse edilemedi:', e);
+      return NextResponse.json({
+        ...updatedReservation,
+        passengerNames: []
+      });
+    }
+  } catch (error) {
+    console.error('Şoför atama hatası:', error);
+    return NextResponse.json(
+      { error: 'Şoför atanırken bir hata oluştu' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function DELETE(request: NextRequest, { params }: { params: { voucherNumber: string } }) {
   try {
     const voucherNumber = params.voucherNumber;

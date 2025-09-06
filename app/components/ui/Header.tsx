@@ -23,7 +23,7 @@ export default function Header() {
 
     const adminNavigation = [
         { name: t('header.newReservation'), href: '/new-reservation' },
-        { name: t('header.allReservations'), href: '/reservations' },
+        { name: t('header.allReservations'), href: '/admin/reservations' },
         { name: 'Admin Panel', href: '/admin' },
     ];
 

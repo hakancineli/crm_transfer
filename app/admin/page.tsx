@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useEmoji } from '../contexts/EmojiContext';
+import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface DashboardStats {
   totalReservations: number;
@@ -17,8 +19,24 @@ interface DashboardStats {
 
 export default function AdminDashboard() {
   const { emojisEnabled } = useEmoji();
+  const { user, isAdmin } = useAuth();
+  const { t, dir } = useLanguage();
+  const [isClient, setIsClient] = useState(false);
   
   console.log('Admin Dashboard - Emojis enabled:', emojisEnabled);
+
+  // Client-side rendering kontrolü
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Kullanıcı kontrolü - sadece giriş yapmış kullanıcılar erişebilir
+  useEffect(() => {
+    if (isClient && !user) {
+      window.location.href = '/admin-login';
+      return;
+    }
+  }, [isClient, user]);
   
   const [stats, setStats] = useState<DashboardStats>({
     totalReservations: 0,
@@ -105,7 +123,7 @@ export default function AdminDashboard() {
                 onClick={fetchDashboardStats}
                 className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
               >
-                {emojisEnabled ? '🔄 ' : ''}Yenile
+{emojisEnabled ? '🔄 ' : ''}{t('admin.dashboard.refresh')}
               </button>
             </div>
           </div>
@@ -124,7 +142,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Toplam Rezervasyonlar</p>
+                <p className="text-sm font-medium text-gray-600">{t('admin.dashboard.stats.totalReservations')}</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalReservations}</p>
               </div>
             </div>
@@ -139,7 +157,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Bugünkü Rezervasyonlar</p>
+                <p className="text-sm font-medium text-gray-600">{t('admin.dashboard.stats.todayReservations')}</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.todayReservations}</p>
               </div>
             </div>
@@ -154,7 +172,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Toplam Gelir</p>
+                <p className="text-sm font-medium text-gray-600">{t('admin.dashboard.stats.totalRevenue')}</p>
                 <p className="text-2xl font-bold text-gray-900">${stats.totalRevenue.toFixed(2)}</p>
               </div>
             </div>
@@ -169,7 +187,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Bugünkü Gelir</p>
+                <p className="text-sm font-medium text-gray-600">{t('admin.dashboard.stats.todayRevenue')}</p>
                 <p className="text-2xl font-bold text-gray-900">${stats.todayRevenue.toFixed(2)}</p>
               </div>
             </div>
@@ -187,7 +205,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Toplam Şoförler</p>
+                <p className="text-sm font-medium text-gray-600">{t('admin.dashboard.stats.totalDrivers')}</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalDrivers}</p>
               </div>
             </div>
@@ -202,7 +220,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Aktif Şoförler</p>
+                <p className="text-sm font-medium text-gray-600">{t('admin.dashboard.stats.activeDrivers')}</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.activeDrivers}</p>
               </div>
             </div>
@@ -217,7 +235,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Bekleyen Ödemeler</p>
+                <p className="text-sm font-medium text-gray-600">{t('admin.dashboard.stats.pendingPayments')}</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.pendingPayments}</p>
               </div>
             </div>
@@ -232,7 +250,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Tamamlanan Transferler</p>
+                <p className="text-sm font-medium text-gray-600">{t('admin.dashboard.stats.completedTransfers')}</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.completedTransfers}</p>
               </div>
             </div>
@@ -243,7 +261,7 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Hızlı İşlemler - Transfer */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Transfer İşlemleri</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.dashboard.quickActions.transferOperations')}</h3>
             <div className="grid grid-cols-2 gap-4">
               <Link
                 href="/new-reservation"
@@ -251,17 +269,17 @@ export default function AdminDashboard() {
               >
                 <div className="text-center">
                   <div className="text-2xl mb-2">{emojisEnabled ? '➕' : '+'}</div>
-                  <div className="text-sm font-medium text-green-800">Yeni Rezervasyon</div>
+                  <div className="text-sm font-medium text-green-800">{t('admin.dashboard.quickActions.newReservation')}</div>
                 </div>
               </Link>
               
               <Link
-                href="/reservations"
+                href="/admin/reservations"
                 className="flex items-center justify-center p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
               >
                 <div className="text-center">
-                  <div className="text-2xl mb-2">{emojisEnabled ? '📋' : '📄'}</div>
-                  <div className="text-sm font-medium text-blue-800">Rezervasyonlar</div>
+                  <div className="text-2xl mb-2">{isClient && emojisEnabled ? '📋' : '📄'}</div>
+                  <div className="text-sm font-medium text-blue-800">{t('admin.dashboard.quickActions.reservations')}</div>
                 </div>
               </Link>
               
@@ -271,7 +289,7 @@ export default function AdminDashboard() {
               >
                 <div className="text-center">
                   <div className="text-2xl mb-2">{emojisEnabled ? '✈️' : '🛫'}</div>
-                  <div className="text-sm font-medium text-orange-800">Uçuş Durumu</div>
+                  <div className="text-sm font-medium text-orange-800">{t('admin.dashboard.quickActions.flightStatus')}</div>
                 </div>
               </Link>
               
@@ -280,8 +298,8 @@ export default function AdminDashboard() {
                 className="flex items-center justify-center p-4 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors"
               >
                 <div className="text-center">
-                  <div className="text-2xl mb-2">{emojisEnabled ? '📊' : '📈'}</div>
-                  <div className="text-sm font-medium text-purple-800">Raporlar</div>
+                  <div className="text-2xl mb-2">{isClient && emojisEnabled ? '📊' : '📈'}</div>
+                  <div className="text-sm font-medium text-purple-800">{t('admin.dashboard.quickActions.reports')}</div>
                 </div>
               </Link>
             </div>
@@ -289,7 +307,7 @@ export default function AdminDashboard() {
 
           {/* Hızlı İşlemler - Konaklama */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Konaklama İşlemleri</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.dashboard.quickActions.accommodationOperations')}</h3>
             <div className="grid grid-cols-2 gap-4">
               <Link
                 href="/accommodation"
@@ -297,7 +315,7 @@ export default function AdminDashboard() {
               >
                 <div className="text-center">
                   <div className="text-2xl mb-2">{emojisEnabled ? '🏨' : '🏢'}</div>
-                  <div className="text-sm font-medium text-blue-800">Otel Rezervasyonu</div>
+                  <div className="text-sm font-medium text-blue-800">{t('admin.dashboard.quickActions.hotelReservation')}</div>
                 </div>
               </Link>
               
@@ -307,7 +325,7 @@ export default function AdminDashboard() {
               >
                 <div className="text-center">
                   <div className="text-2xl mb-2">{emojisEnabled ? '💰' : '$'}</div>
-                  <div className="text-sm font-medium text-orange-800">Fiyat Havuzu</div>
+                  <div className="text-sm font-medium text-orange-800">{t('admin.dashboard.quickActions.pricePool')}</div>
                 </div>
               </Link>
               
@@ -316,8 +334,8 @@ export default function AdminDashboard() {
                 className="flex items-center justify-center p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
               >
                 <div className="text-center">
-                  <div className="text-2xl mb-2">{emojisEnabled ? '📋' : '📄'}</div>
-                  <div className="text-sm font-medium text-green-800">Otel Rezervasyonları</div>
+                  <div className="text-2xl mb-2">{isClient && emojisEnabled ? '📋' : '📄'}</div>
+                  <div className="text-sm font-medium text-green-800">{t('admin.dashboard.quickActions.hotelReservations')}</div>
                 </div>
               </Link>
               
@@ -326,8 +344,8 @@ export default function AdminDashboard() {
                 className="flex items-center justify-center p-4 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors"
               >
                 <div className="text-center">
-                  <div className="text-2xl mb-2">{emojisEnabled ? '📊' : '📈'}</div>
-                  <div className="text-sm font-medium text-purple-800">Konaklama Raporları</div>
+                  <div className="text-2xl mb-2">{isClient && emojisEnabled ? '📊' : '📈'}</div>
+                  <div className="text-sm font-medium text-purple-800">{t('admin.dashboard.quickActions.accommodationReports')}</div>
                 </div>
               </Link>
             </div>
@@ -335,7 +353,7 @@ export default function AdminDashboard() {
 
           {/* Son Aktiviteler */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Son Aktiviteler</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.dashboard.recentActivities')}</h3>
             <div className="space-y-3">
               <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
