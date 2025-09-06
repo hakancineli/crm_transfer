@@ -28,18 +28,47 @@ export default function HotelSearchResults({
     setShowPricingForm(true);
   };
 
-  const handlePricingSave = (pricing: { customerPrice: number; agentPrice: number; profitMargin: number }) => {
+  const handlePricingSave = async (pricing: { customerPrice: number; agentPrice: number; profitMargin: number }) => {
     if (pricingHotel) {
-      // Hotel fiyatlarını güncelle
-      const updatedHotel = {
-        ...pricingHotel,
-        price: pricing.customerPrice,
-        agentPrice: pricing.agentPrice,
-        profitMargin: pricing.profitMargin
-      };
-      
-      // Hotels listesini güncelle (burada state management gerekebilir)
-      console.log('Updated hotel pricing:', updatedHotel);
+      try {
+        // API'ye fiyatlandırma bilgilerini gönder
+        const response = await fetch('/api/accommodation/pricing', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            hotelId: pricingHotel.id,
+            customerPrice: pricing.customerPrice,
+            agentPrice: pricing.agentPrice,
+            profitMargin: pricing.profitMargin,
+            tenantId: 'demo' // Geçici olarak demo tenant
+          }),
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+          // Hotel fiyatlarını güncelle
+          const updatedHotel = {
+            ...pricingHotel,
+            price: pricing.customerPrice,
+            agentPrice: pricing.agentPrice,
+            profitMargin: pricing.profitMargin
+          };
+          
+          console.log('✅ Fiyatlandırma başarıyla kaydedildi:', updatedHotel);
+          
+          // Başarı mesajı göster
+          alert('✅ Fiyatlandırma başarıyla kaydedildi!');
+        } else {
+          console.error('❌ Fiyatlandırma kaydedilemedi:', result.message);
+          alert('❌ Fiyatlandırma kaydedilemedi: ' + result.message);
+        }
+      } catch (error) {
+        console.error('❌ API hatası:', error);
+        alert('❌ Fiyatlandırma kaydedilirken hata oluştu');
+      }
     }
     setShowPricingForm(false);
     setPricingHotel(null);
