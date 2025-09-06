@@ -3,7 +3,11 @@ import jwt from 'jsonwebtoken';
 
 export function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
-
+	const hostname = request.headers.get('host') || '';
+	
+	// Extract subdomain
+	const subdomain = hostname.split('.')[0];
+	
 	// Public routes that don't need authentication
 	const publicRoutes = ['/login', '/admin-login', '/', '/customer-reservation', '/customer-panel', '/reservation-lookup'];
 	
@@ -12,8 +16,12 @@ export function middleware(request: NextRequest) {
 		return NextResponse.next();
 	}
 
+	// Add tenant context to request headers
+	const response = NextResponse.next();
+	response.headers.set('x-subdomain', subdomain);
+	
 	// For now, allow all routes - authentication will be handled client-side
-	return NextResponse.next();
+	return response;
 }
 
 export const config = {

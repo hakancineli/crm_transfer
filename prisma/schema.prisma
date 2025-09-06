@@ -13,6 +13,80 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Multi-tenant yapısı
+model Tenant {
+  id              String        @id @default(uuid())
+  subdomain       String        @unique
+  companyName     String
+  domain          String?
+  isActive        Boolean       @default(true)
+  subscriptionPlan String       @default("basic")
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  // Relations
+  modules         TenantModule[]
+  users           TenantUser[]
+  reservations    Reservation[]
+  activities      Activity[]
+  
+  @@map("tenants")
+}
+
+model Module {
+  id            String        @id @default(uuid())
+  name          String        @unique
+  description   String?
+  isActive      Boolean       @default(true)
+  priceMonthly  Float         @default(0)
+  priceYearly   Float         @default(0)
+  features      String[]      @default([])
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  
+  // Relations
+  tenantModules TenantModule[]
+  
+  @@map("modules")
+}
+
+model TenantModule {
+  id          String   @id @default(uuid())
+  tenantId    String
+  moduleId    String
+  isEnabled   Boolean  @default(false)
+  activatedAt DateTime?
+  expiresAt   DateTime?
+  features    String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  tenant      Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  module      Module  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  
+  @@unique([tenantId, moduleId])
+  @@map("tenant_modules")
+}
+
+model TenantUser {
+  id          String   @id @default(uuid())
+  tenantId    String
+  userId      String
+  role        String   @default("USER")
+  permissions String[] @default([])
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  tenant      Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([tenantId, userId])
+  @@map("tenant_users")
+}
+
 model Driver {
   id            String        @id @default(uuid())
   name          String
@@ -35,6 +109,7 @@ model User {
   reservations  Reservation[]
   activities    Activity[]    @relation("UserActivities")
   permissions   UserPermission[]
+  tenantUsers   TenantUser[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
@@ -51,6 +126,8 @@ model UserPermission {
 
 model Activity {
   id            String   @id @default(uuid())
+  tenantId      String?
+  tenant        Tenant?  @relation(fields: [tenantId], references: [id])
   userId        String
   user          User     @relation("UserActivities", fields: [userId], references: [id])
   action        String   // CREATE, UPDATE, DELETE, LOGIN, LOGOUT
@@ -72,6 +149,8 @@ enum UserRole {
 
 model Reservation {
   id            String   @id @default(uuid())
+  tenantId      String?
+  tenant        Tenant?  @relation(fields: [tenantId], references: [id])
   date          String
   time          String
   from          String

@@ -74,6 +74,12 @@ const AdminNavigation = () => {
       href: '/admin/users',
       icon: '👤',
       description: 'Kullanıcı yönetimi'
+    },
+    {
+      name: 'Modül Yönetimi',
+      href: '/admin/modules',
+      icon: '🔧',
+      description: 'Modül ve firma yönetimi'
     }
   ];
 

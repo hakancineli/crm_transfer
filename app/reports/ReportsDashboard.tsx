@@ -248,11 +248,13 @@ export default function ReportsDashboard() {
                                     </div>
                                     <div className="bg-red-50 p-4 rounded-lg border border-red-200">
                                         <div className="flex items-center justify-between">
-                                            <div>
+                                            <div className="flex-1">
                                                 <p className="text-sm text-red-700 font-medium">Ödenmeyen</p>
                                                 <p className="text-2xl font-bold text-red-800">{reportData.unpaidTransfers}</p>
                                             </div>
-                                            <span className="text-red-600 text-xl">❌</span>
+                                            <div className="flex-shrink-0 ml-2">
+                                                <span className="text-red-600 text-xl">❌</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
