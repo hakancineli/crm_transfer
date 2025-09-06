@@ -35,7 +35,7 @@ export default function HotelVoucherPage() {
   useEffect(() => {
     const fetchBooking = async () => {
       try {
-        const response = await fetch(`/api/accommodation/bookings/${params.voucherNumber}`);
+        const response = await fetch(`/api/accommodation/bookings/by-voucher/${params.voucherNumber}`);
         
         if (!response.ok) {
           throw new Error('Rezervasyon bulunamadı');
