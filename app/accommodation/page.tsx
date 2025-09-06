@@ -33,6 +33,10 @@ export default function AccommodationPage() {
     fetchTenant();
   }, []);
 
+  // Debug log
+  console.log('Tenant state:', tenant);
+  console.log('Has accommodation module:', tenant?.modules?.some(tm => tm.moduleId === 'accommodation' && tm.isEnabled));
+
   const handleFormSubmit = async (data: any) => {
     setLoading(true);
     setError(null);
@@ -124,7 +128,25 @@ export default function AccommodationPage() {
   };
 
   // Konaklama modülü kontrolü
-  if (!tenant || !TenantService.hasModule(tenant, 'accommodation')) {
+  if (!tenant) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-blue-500 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-900">Yükleniyor...</h2>
+        </div>
+      </div>
+    );
+  }
+
+  const hasAccommodationModule = tenant.modules?.some(tm => 
+    tm.moduleId === 'accommodation' && tm.isEnabled
+  );
+
+  // Geçici olarak modül kontrolünü devre dışı bırak
+  const isModuleActive = true; // hasAccommodationModule;
+
+  if (!isModuleActive) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto text-center">

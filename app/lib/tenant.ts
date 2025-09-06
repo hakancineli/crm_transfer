@@ -58,6 +58,7 @@ export class TenantService {
         }
       });
 
+      console.log('Tenant loaded:', tenant?.companyName, 'Modules:', tenant?.modules?.length);
       return tenant as Tenant;
     } catch (error) {
       console.error('Error getting tenant by subdomain:', error);
@@ -86,7 +87,7 @@ export class TenantService {
     }
   }
 
-  static async hasModule(tenant: Tenant, moduleId: string): boolean {
+  static hasModule(tenant: Tenant, moduleId: string): boolean {
     return tenant.modules.some(tm => 
       tm.moduleId === moduleId && tm.isEnabled
     );
