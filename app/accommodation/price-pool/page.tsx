@@ -75,7 +75,7 @@ export default function HotelPricePoolPage() {
       const queryParams = new URLSearchParams();
       
       if (searchParams.city) queryParams.append('city', searchParams.city);
-      if (searchParams.checkin) queryParams.append('checkin', searchParams.searchParams.checkin);
+      if (searchParams.checkin) queryParams.append('checkin', searchParams.checkin);
       if (searchParams.checkout) queryParams.append('checkout', searchParams.checkout);
       if (searchParams.adults) queryParams.append('adults', searchParams.adults.toString());
       if (searchParams.children) queryParams.append('children', searchParams.children.toString());
