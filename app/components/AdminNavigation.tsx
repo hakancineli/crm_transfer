@@ -77,7 +77,7 @@ const AdminNavigation = () => {
   ];
 
   return (
-    <div className="bg-white shadow-lg border-r border-gray-200 min-h-screen w-64">
+    <div className="bg-white shadow-lg border-r border-gray-200 min-h-screen w-64 fixed left-0 top-0 z-40 overflow-y-auto">
       {/* Logo */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
