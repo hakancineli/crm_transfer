@@ -173,6 +173,7 @@ model Reservation {
   userId        String?  // Rezervasyonu oluşturan kullanıcı
   user          User?    @relation(fields: [userId], references: [id])
   paymentStatus String   @default("PENDING") // PENDING, RECEIVED, NOT_RECEIVED
+  companyCommissionStatus String @default("PENDING") // PENDING, APPROVED, REJECTED
   createdAt     DateTime @default(now())
   
   // Dönüş transferi ilişkisi
