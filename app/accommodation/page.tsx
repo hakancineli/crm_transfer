@@ -44,7 +44,7 @@ export default function AccommodationPage() {
 
   // Debug log
   console.log('Tenant state:', tenant);
-  console.log('Has accommodation module:', tenant?.modules?.some(tm => tm.moduleId === 'accommodation' && tm.isEnabled));
+  console.log('Has accommodation module:', tenant?.modules?.some((tm: any) => tm.moduleId === 'accommodation' && tm.isEnabled));
 
   const handleFormSubmit = async (data: any) => {
     setLoading(true);
