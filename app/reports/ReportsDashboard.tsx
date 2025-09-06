@@ -178,7 +178,7 @@ export default function ReportsDashboard() {
                         <p className="text-red-600">{error}</p>
                     </div>
                 ) : reportData ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {/* Finansal Özet */}
                         <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 h-96 flex flex-col">
                             <div className="flex items-center mb-6">

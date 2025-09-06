@@ -30,6 +30,28 @@ async function createSuperUser() {
       }
     });
 
+    // Süperkullanıcıya tüm izinleri ver
+    const permissions = [
+      'VIEW_OWN_SALES',
+      'VIEW_ALL_RESERVATIONS', 
+      'VIEW_REPORTS',
+      'VIEW_ACCOUNTING',
+      'MANAGE_USERS',
+      'MANAGE_ACTIVITIES'
+    ];
+
+    for (const permission of permissions) {
+      await prisma.userPermission.create({
+        data: {
+          userId: superUser.id,
+          permission: permission,
+          isActive: true
+        }
+      });
+    }
+
+    console.log('✅ Süperkullanıcıya tüm izinler verildi');
+
     console.log('✅ Süperkullanıcı oluşturuldu:');
     console.log('Kullanıcı adı: admin');
     console.log('Şifre: admin123');

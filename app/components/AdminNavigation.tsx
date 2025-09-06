@@ -78,7 +78,7 @@ const AdminNavigation = () => {
   ];
 
   return (
-    <div className="bg-white shadow-lg border-r border-gray-200 min-h-screen w-64 fixed left-0 top-16 z-40 overflow-y-auto">
+    <div className="bg-white shadow-lg border-r border-gray-200 h-screen w-64 fixed left-0 top-16 z-40 overflow-y-auto">
       {/* Navigation */}
       <nav className="p-4 space-y-2 pt-6">
         {menuItems.map((item) => {
