@@ -116,36 +116,92 @@ export class BookingApiService {
           rating: 4.7,
           distance: 0.1,
           availability: true
+        },
+        {
+          id: '4',
+          name: 'Istanbul Marriott Hotel',
+          address: 'Taksim, Istanbul',
+          city: 'Istanbul',
+          region: 'Taksim',
+          stars: 4,
+          price: 180,
+          currency: 'EUR',
+          images: ['/hotels/marriott-istanbul-1.jpg'],
+          amenities: ['WiFi', 'Pool', 'Spa', 'Restaurant', 'Parking', 'Gym'],
+          rating: 4.3,
+          distance: 0.8,
+          availability: true
+        },
+        {
+          id: '5',
+          name: 'Hilton Istanbul Bomonti',
+          address: 'Bomonti, Istanbul',
+          city: 'Istanbul',
+          region: 'Bomonti',
+          stars: 5,
+          price: 200,
+          currency: 'EUR',
+          images: ['/hotels/hilton-bomonti-1.jpg'],
+          amenities: ['WiFi', 'Pool', 'Spa', 'Restaurant', 'Parking', 'Gym', 'Business Center'],
+          rating: 4.6,
+          distance: 1.2,
+          availability: true
+        },
+        {
+          id: '6',
+          name: 'Four Seasons Hotel Istanbul',
+          address: 'Sultanahmet, Istanbul',
+          city: 'Istanbul',
+          region: 'Sultanahmet',
+          stars: 5,
+          price: 350,
+          currency: 'EUR',
+          images: ['/hotels/fourseasons-istanbul-1.jpg'],
+          amenities: ['WiFi', 'Pool', 'Spa', 'Restaurant', 'Parking', 'Gym', 'Business Center', 'Concierge'],
+          rating: 4.8,
+          distance: 0.3,
+          availability: true
         }
       ];
 
       // Filtreleme
       let filteredHotels = mockHotels;
 
+      console.log('Search params:', params);
+      console.log('All hotels:', mockHotels.map(h => h.city));
+
       if (params.city) {
         filteredHotels = filteredHotels.filter(hotel => 
-          hotel.city.toLowerCase().includes(params.city!.toLowerCase())
+          hotel.city.toLowerCase().includes(params.city!.toLowerCase()) ||
+          params.city!.toLowerCase().includes(hotel.city.toLowerCase())
         );
+        console.log('After city filter:', filteredHotels.map(h => h.name));
       }
 
-      if (params.region) {
+      if (params.region && filteredHotels.length > 0) {
         filteredHotels = filteredHotels.filter(hotel => 
-          hotel.region.toLowerCase().includes(params.region!.toLowerCase())
+          hotel.region.toLowerCase().includes(params.region!.toLowerCase()) ||
+          params.region!.toLowerCase().includes(hotel.region.toLowerCase())
         );
+        console.log('After region filter:', filteredHotels.map(h => h.name));
       }
 
-      if (params.minPrice) {
+      if (params.minPrice && filteredHotels.length > 0) {
         filteredHotels = filteredHotels.filter(hotel => hotel.price >= params.minPrice!);
+        console.log('After minPrice filter:', filteredHotels.map(h => h.name));
       }
 
-      if (params.maxPrice) {
+      if (params.maxPrice && filteredHotels.length > 0) {
         filteredHotels = filteredHotels.filter(hotel => hotel.price <= params.maxPrice!);
+        console.log('After maxPrice filter:', filteredHotels.map(h => h.name));
       }
 
-      if (params.stars) {
+      if (params.stars && filteredHotels.length > 0) {
         filteredHotels = filteredHotels.filter(hotel => hotel.stars >= params.stars!);
+        console.log('After stars filter:', filteredHotels.map(h => h.name));
       }
 
+      console.log('Final filtered hotels:', filteredHotels.length);
       return filteredHotels;
     } catch (error) {
       console.error('Error searching hotels:', error);

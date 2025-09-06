@@ -60,6 +60,9 @@ export default function AccommodationPage() {
 
       const searchResults = await BookingApiService.searchHotels(searchParams);
       
+      console.log('Search results:', searchResults);
+      console.log('Search params sent:', searchParams);
+      
       setRequestData(data);
       setHotels(searchResults);
       setCurrentStep('search');
