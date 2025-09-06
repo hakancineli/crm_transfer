@@ -7,6 +7,15 @@ export const PERMISSIONS = {
   MANAGE_ACTIVITIES: 'MANAGE_ACTIVITIES'
 } as const;
 
+export const PERMISSION_LABELS = {
+  VIEW_OWN_SALES: 'Kendi Satışlarını Görme',
+  VIEW_ALL_RESERVATIONS: 'Tüm Rezervasyonları Görme',
+  VIEW_REPORTS: 'Raporları Görme',
+  VIEW_ACCOUNTING: 'Muhasebe Bilgilerini Görme',
+  MANAGE_USERS: 'Kullanıcı Yönetimi',
+  MANAGE_ACTIVITIES: 'Aktivite Loglarını Görme'
+} as const;
+
 export const ROLE_PERMISSIONS = {
   SUPERUSER: [
     PERMISSIONS.VIEW_ALL_RESERVATIONS,
