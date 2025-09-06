@@ -48,22 +48,23 @@ export default function LoginPage() {
 
         // Redirect based on role
         if (data.user.role === 'SUPERUSER') {
-          router.push('/admin');
+          window.location.href = '/admin';
         } else if (data.user.role === 'ACCOUNTANT') {
-          router.push('/admin/accounting');
+          window.location.href = '/admin/accounting';
         } else if (data.user.role === 'OPERATION') {
-          router.push('/admin');
+          window.location.href = '/admin';
         } else if (data.user.role === 'SELLER') {
-          router.push('/reservations');
+          window.location.href = '/reservations';
         } else {
-          router.push('/');
+          window.location.href = '/';
         }
       } else {
+        console.error('Login failed:', data);
         setError(data.error || 'Giriş başarısız');
       }
     } catch (error) {
       console.error('Login error:', error);
-      setError('Bir hata oluştu. Lütfen tekrar deneyin.');
+      setError('Sunucu hatası. Lütfen tekrar deneyin.');
     } finally {
       setLoading(false);
     }
