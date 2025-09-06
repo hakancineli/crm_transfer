@@ -19,10 +19,6 @@ export default function HomePage() {
                 <Link href="/customer-reservation" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition">{t('landing.sendRequest')}</Link>
                 <a href={`https://wa.me/905545812034?text=${encodeURIComponent(t('landing.whatsappMessage'))}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white text-green-700 border border-green-200 hover:border-green-300 hover:bg-green-50 transition">{t('landing.whatsappWrite')}</a>
               </div>
-              <div className="mt-4 flex flex-col sm:flex-row gap-3">
-                <Link href="/staff-login" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">Personel Girişi</Link>
-                <Link href="/admin-login" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-gray-600 text-white font-semibold hover:bg-gray-700 transition">Admin Girişi</Link>
-              </div>
               <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm text-gray-700">
                 <div className="p-3 rounded-lg bg-white shadow border">{t('landing.service24h')}</div>
                 <div className="p-3 rounded-lg bg-white shadow border">{t('landing.fixedPrice')}</div>
