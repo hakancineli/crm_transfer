@@ -316,6 +316,50 @@ export default function ReportsDashboard() {
                             </div>
                         </div>
 
+                        {/* Şoför Hakediş */}
+                        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 h-96 flex flex-col">
+                            <div className="flex items-center mb-6">
+                                <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mr-4">
+                                    <span className="text-red-600 text-2xl">👨‍✈️</span>
+                                </div>
+                                <h3 className="text-xl font-semibold text-gray-900">Şoför Hakediş</h3>
+                            </div>
+                            <div className="space-y-4 flex-1">
+                                <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm text-red-700 font-medium">Toplam Hakediş</p>
+                                            <p className="text-3xl font-bold text-red-800">{Number(reportData.driverPayments || 0).toFixed(2)} TL</p>
+                                        </div>
+                                        <span className="text-red-600 text-3xl">💰</span>
+                                    </div>
+                                </div>
+                                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm text-gray-700 font-medium">Transfer Başına</p>
+                                            <p className="text-xl font-bold text-gray-900">
+                                                {reportData.totalTransfers > 0 
+                                                    ? (Number(reportData.driverPayments || 0) / reportData.totalTransfers).toFixed(2)
+                                                    : '0.00'
+                                                } TL
+                                            </p>
+                                        </div>
+                                        <span className="text-gray-600 text-xl">📊</span>
+                                    </div>
+                                </div>
+                                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm text-blue-700 font-medium">Aktif Şoförler</p>
+                                            <p className="text-2xl font-bold text-blue-800">1</p>
+                                        </div>
+                                        <span className="text-blue-600 text-xl">👥</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Popüler Rotalar */}
                         <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 col-span-full">
                             <div className="flex items-center mb-6">
