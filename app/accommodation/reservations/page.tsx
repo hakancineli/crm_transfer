@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import Link from 'next/link';
+import { EmailService } from '@/app/lib/emailService';
 
 interface HotelBooking {
   id: string;
@@ -35,6 +36,7 @@ export default function HotelReservationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'pending' | 'confirmed' | 'cancelled' | 'completed'>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [sendingEmail, setSendingEmail] = useState<string | null>(null);
 
   useEffect(() => {
     fetchBookings();
@@ -101,6 +103,64 @@ export default function HotelReservationsPage() {
     return Math.ceil(
       (new Date(checkout).getTime() - new Date(checkin).getTime()) / (1000 * 60 * 60 * 24)
     );
+  };
+
+  const handleSendEmail = async (booking: HotelBooking, type: 'confirmation' | 'cancellation' | 'modification') => {
+    setSendingEmail(booking.id);
+    
+    try {
+      let result;
+      
+      switch (type) {
+        case 'confirmation':
+          result = await EmailService.sendBookingConfirmation({
+            voucherNumber: booking.voucherNumber,
+            hotelName: booking.hotelName,
+            hotelAddress: booking.hotelAddress,
+            roomType: booking.roomType,
+            checkin: booking.checkin.toISOString(),
+            checkout: booking.checkout.toISOString(),
+            adults: booking.adults,
+            children: booking.children,
+            rooms: booking.rooms,
+            totalPrice: booking.totalPrice,
+            currency: booking.currency,
+            customerInfo: booking.customerInfo,
+            specialRequests: booking.specialRequests,
+            bookingReference: booking.bookingReference
+          });
+          break;
+        
+        case 'cancellation':
+          result = await EmailService.sendBookingCancellation({
+            voucherNumber: booking.voucherNumber,
+            hotelName: booking.hotelName,
+            customerInfo: booking.customerInfo,
+            cancellationReason: 'Müşteri talebi'
+          });
+          break;
+        
+        case 'modification':
+          result = await EmailService.sendBookingModification({
+            voucherNumber: booking.voucherNumber,
+            hotelName: booking.hotelName,
+            customerInfo: booking.customerInfo,
+            changes: 'Rezervasyon bilgilerinde değişiklik yapılmıştır.'
+          });
+          break;
+      }
+
+      if (result.success) {
+        alert(`✅ E-posta başarıyla gönderildi!\n\nMesaj ID: ${result.messageId}`);
+      } else {
+        alert(`❌ E-posta gönderilemedi: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('E-posta gönderme hatası:', error);
+      alert('❌ E-posta gönderilirken hata oluştu');
+    } finally {
+      setSendingEmail(null);
+    }
   };
 
   if (loading) {
@@ -316,7 +376,7 @@ export default function HotelReservationsPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-2">
+                        <div className="flex flex-wrap gap-2">
                           <Link
                             href={`/accommodation/voucher/${booking.voucherNumber}`}
                             className="text-blue-600 hover:text-blue-900"
@@ -324,11 +384,25 @@ export default function HotelReservationsPage() {
                             👁️ Görüntüle
                           </Link>
                           <button
+                            onClick={() => handleSendEmail(booking, 'confirmation')}
+                            disabled={sendingEmail === booking.id}
+                            className="text-green-600 hover:text-green-900 disabled:opacity-50"
+                          >
+                            {sendingEmail === booking.id ? '⏳' : '📧'} Onay E-postası
+                          </button>
+                          <button
+                            onClick={() => handleSendEmail(booking, 'cancellation')}
+                            disabled={sendingEmail === booking.id}
+                            className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                          >
+                            {sendingEmail === booking.id ? '⏳' : '❌'} İptal E-postası
+                          </button>
+                          <button
                             onClick={() => {
                               // TODO: Edit functionality
                               alert('Düzenleme özelliği yakında eklenecek');
                             }}
-                            className="text-green-600 hover:text-green-900"
+                            className="text-purple-600 hover:text-purple-900"
                           >
                             ✏️ Düzenle
                           </button>

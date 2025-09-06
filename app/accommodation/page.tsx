@@ -6,6 +6,7 @@ import { useAuth } from '@/app/contexts/AuthContext';
 import { TenantService } from '@/app/lib/tenant';
 import { BookingApiService, Hotel } from '@/app/lib/bookingApi';
 import { VoucherUtils } from '@/app/lib/voucherUtils';
+import { EmailService } from '@/app/lib/emailService';
 import HotelRequestForm from '@/app/components/HotelRequestForm';
 import HotelSearchResults from '@/app/components/HotelSearchResults';
 import HotelBookingConfirmation from '@/app/components/HotelBookingConfirmation';
@@ -114,8 +115,40 @@ export default function AccommodationPage() {
       const booking = await BookingApiService.createBooking(bookingData);
       
       if (booking) {
+        // E-posta gönder
+        try {
+          const emailResult = await EmailService.sendBookingConfirmation({
+            voucherNumber: voucherNumber,
+            hotelName: selectedHotel!.name,
+            hotelAddress: selectedHotel!.address || 'Adres bilgisi mevcut değil',
+            roomType: selectedRoomType.name,
+            checkin: requestData.checkin,
+            checkout: requestData.checkout,
+            adults: requestData.adults,
+            children: requestData.children,
+            rooms: requestData.rooms,
+            totalPrice: selectedRoomType.price,
+            currency: selectedRoomType.currency,
+            customerInfo: {
+              name: requestData.customerName,
+              email: requestData.customerEmail,
+              phone: requestData.customerPhone
+            },
+            specialRequests: requestData.specialRequests,
+            bookingReference: `REF-${Date.now()}`
+          });
+
+          if (emailResult.success) {
+            console.log('✅ E-posta başarıyla gönderildi:', emailResult.messageId);
+          } else {
+            console.warn('⚠️ E-posta gönderilemedi:', emailResult.error);
+          }
+        } catch (emailError) {
+          console.error('❌ E-posta hatası:', emailError);
+        }
+
         // Başarı mesajı göster ve voucher sayfasına yönlendir
-        const confirmMessage = `🎉 Rezervasyon başarıyla oluşturuldu!\n\nVoucher Numarası: ${voucherNumber}\n\nVoucher'ı görüntülemek ister misiniz?`;
+        const confirmMessage = `🎉 Rezervasyon başarıyla oluşturuldu!\n\nVoucher Numarası: ${voucherNumber}\n\nE-posta adresinize onay e-postası gönderildi.\n\nVoucher'ı görüntülemek ister misiniz?`;
         
         if (confirm(confirmMessage)) {
           // Voucher sayfasına yönlendir
