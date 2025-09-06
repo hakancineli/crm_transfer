@@ -2,20 +2,18 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-// Permission functions are no longer needed as we use user-specific permissions
 import { useAuth } from '@/app/contexts/AuthContext';
 
 const AdminNavigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
-  const userRole = user?.role || 'SUPERUSER';
 
   const menuItems = [
     {
       name: 'Dashboard',
       href: '/admin',
-      icon: '📊',
-      description: 'Genel durum ve istatistikler'
+      icon: '🏠',
+      description: 'Ana sayfa'
     },
     {
       name: 'Rezervasyonlar',
@@ -119,12 +117,12 @@ const AdminNavigation = () => {
               href={item.href}
               className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
             >
-              <div className="text-xl">{item.icon}</div>
+              <span className="text-2xl">{item.icon}</span>
               <div className="flex-1">
-                <div className="text-sm font-medium text-gray-900 group-hover:text-green-600">
+                <div className="text-sm font-medium text-gray-900 group-hover:text-gray-700">
                   {item.name}
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-gray-500 group-hover:text-gray-400">
                   {item.description}
                 </div>
               </div>
@@ -133,7 +131,7 @@ const AdminNavigation = () => {
         })}
       </nav>
 
-      {/* User Info */}
+      {/* User Info & Logout */}
       <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
