@@ -34,8 +34,19 @@ model User {
   createdUsers  User[]        @relation("UserCreator")
   reservations  Reservation[]
   activities    Activity[]    @relation("UserActivities")
+  permissions   UserPermission[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+}
+
+model UserPermission {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission    String   // VIEW_OWN_SALES, VIEW_ALL_RESERVATIONS, VIEW_REPORTS, VIEW_ACCOUNTING
+  grantedBy     String?  // Who granted this permission
+  grantedAt     DateTime @default(now())
+  isActive      Boolean  @default(true)
 }
 
 model Activity {
@@ -56,6 +67,7 @@ enum UserRole {
   SUPERUSER
   OPERATION
   SELLER
+  ACCOUNTANT
 }
 
 model Reservation {

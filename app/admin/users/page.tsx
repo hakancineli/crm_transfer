@@ -7,7 +7,7 @@ interface User {
   username: string;
   email: string;
   name: string;
-  role: 'SUPERUSER' | 'OPERATION' | 'SELLER';
+  role: 'SUPERUSER' | 'OPERATION' | 'SELLER' | 'ACCOUNTANT';
   isActive: boolean;
   createdAt: string;
   creator?: { name: string };
@@ -25,7 +25,7 @@ export default function UsersPage() {
     email: '',
     password: '',
     name: '',
-    role: 'SELLER' as 'SUPERUSER' | 'OPERATION' | 'SELLER'
+    role: 'SELLER' as 'SUPERUSER' | 'OPERATION' | 'SELLER' | 'ACCOUNTANT'
   });
 
   useEffect(() => {
@@ -117,6 +117,7 @@ export default function UsersPage() {
       case 'SUPERUSER': return 'Süperkullanıcı';
       case 'OPERATION': return 'Operasyon';
       case 'SELLER': return 'Satıcı';
+      case 'ACCOUNTANT': return 'Muhasebeci';
       default: return role;
     }
   };
@@ -126,6 +127,7 @@ export default function UsersPage() {
       case 'SUPERUSER': return 'bg-red-100 text-red-800';
       case 'OPERATION': return 'bg-blue-100 text-blue-800';
       case 'SELLER': return 'bg-green-100 text-green-800';
+      case 'ACCOUNTANT': return 'bg-purple-100 text-purple-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -297,6 +299,7 @@ export default function UsersPage() {
                   >
                     <option value="SELLER">Satıcı</option>
                     <option value="OPERATION">Operasyon</option>
+                    <option value="ACCOUNTANT">Muhasebeci</option>
                   </select>
                 </div>
               </div>
@@ -375,6 +378,7 @@ export default function UsersPage() {
                   >
                     <option value="SELLER">Satıcı</option>
                     <option value="OPERATION">Operasyon</option>
+                    <option value="ACCOUNTANT">Muhasebeci</option>
                   </select>
                 </div>
               </div>
