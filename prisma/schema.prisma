@@ -29,6 +29,8 @@ model Tenant {
   users           TenantUser[]
   reservations    Reservation[]
   activities      Activity[]
+  hotelRequests   HotelRequest[]
+  hotelBookings   HotelBooking[]
   
   @@map("tenants")
 }
@@ -110,6 +112,7 @@ model User {
   activities    Activity[]    @relation("UserActivities")
   permissions   UserPermission[]
   tenantUsers   TenantUser[]
+  hotelRequests HotelRequest[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
@@ -176,4 +179,69 @@ model Reservation {
   returnTransfer   Reservation? @relation("ReturnTransfer", fields: [returnTransferId], references: [id])
   originalTransfer Reservation? @relation("ReturnTransfer")
   isReturn        Boolean     @default(false) // Dönüş transferi olup olmadığını belirten alan
+  
+  // Konaklama ilişkisi
+  hotelBookings  HotelBooking[]
+}
+
+// Konaklama modülü modelleri
+model HotelRequest {
+  id              String   @id @default(uuid())
+  tenantId        String?
+  tenant          Tenant?  @relation(fields: [tenantId], references: [id])
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  checkin         DateTime
+  checkout        DateTime
+  adults          Int
+  children        Int      @default(0)
+  rooms           Int      @default(1)
+  city            String
+  region          String?
+  budget          Float?
+  roomType        String?  // Single, Double, Suite, etc.
+  breakfast       Boolean  @default(false)
+  amenities       String[] @default([])
+  specialRequests String?
+  status          String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, CANCELLED
+  assignedTo      String?  // User ID who is handling this request
+  user            User?    @relation(fields: [assignedTo], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  hotelBookings   HotelBooking[]
+  
+  @@map("hotel_requests")
+}
+
+model HotelBooking {
+  id                String   @id @default(uuid())
+  tenantId          String?
+  tenant            Tenant?  @relation(fields: [tenantId], references: [id])
+  requestId         String?
+  request           HotelRequest? @relation(fields: [requestId], references: [id])
+  reservationId     String?
+  reservation       Reservation? @relation(fields: [reservationId], references: [id])
+  hotelId           String
+  hotelName         String
+  hotelAddress      String
+  roomType          String
+  checkin           DateTime
+  checkout          DateTime
+  adults            Int
+  children          Int
+  rooms             Int
+  totalPrice        Float
+  currency          String   @default("EUR")
+  bookingReference  String   @unique
+  status            String   @default("CONFIRMED") // PENDING, CONFIRMED, CANCELLED, COMPLETED
+  customerInfo      Json     // Customer details as JSON
+  specialRequests   String?
+  cancellationPolicy String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("hotel_bookings")
 }

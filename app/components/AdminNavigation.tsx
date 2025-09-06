@@ -80,6 +80,12 @@ const AdminNavigation = () => {
       href: '/admin/modules',
       icon: '🔧',
       description: 'Modül ve firma yönetimi'
+    },
+    {
+      name: 'Konaklama',
+      href: '/accommodation',
+      icon: '🏨',
+      description: 'Otel rezervasyon yönetimi'
     }
   ];
 
