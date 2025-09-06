@@ -86,6 +86,12 @@ const AdminNavigation = () => {
       href: '/accommodation',
       icon: '🏨',
       description: 'Otel rezervasyon yönetimi'
+    },
+    {
+      name: 'Konaklama Rezervasyonları',
+      href: '/accommodation/reservations',
+      icon: '📋',
+      description: 'Tüm otel rezervasyonlarını görüntüle'
     }
   ];
 

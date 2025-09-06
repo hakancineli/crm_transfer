@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { TenantService } from '@/app/lib/tenant';
 import { BookingApiService, Hotel } from '@/app/lib/bookingApi';
@@ -156,9 +157,17 @@ export default function AccommodationPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             🏨 Konaklama Yönetimi
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 mb-6">
             Müşterileriniz için en uygun otelleri bulun ve rezervasyon yapın
           </p>
+          <div className="flex justify-center space-x-4">
+            <Link
+              href="/accommodation/reservations"
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              📋 Tüm Rezervasyonları Görüntüle
+            </Link>
+          </div>
         </div>
 
         {/* Progress Indicator */}
