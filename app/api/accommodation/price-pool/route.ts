@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/app/lib/prisma';
+import { PrismaClient } from '@prisma/client';
 import { BookingApiReal } from '@/app/lib/bookingApiReal';
+
+const prisma = new PrismaClient();
 
 // Fiyat havuzundaki otelleri getir
 export async function GET(request: NextRequest) {
@@ -51,6 +53,8 @@ export async function GET(request: NextRequest) {
       }
     });
 
+    await prisma.$disconnect();
+    
     return NextResponse.json({
       success: true,
       pricePool: pricePool.map(item => ({
@@ -89,6 +93,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error fetching price pool:', error);
+    await prisma.$disconnect();
     return NextResponse.json(
       { error: 'Sunucu hatası' },
       { status: 500 }
@@ -168,6 +173,8 @@ export async function POST(request: NextRequest) {
       }
     });
 
+    await prisma.$disconnect();
+    
     return NextResponse.json({
       success: true,
       message: 'Fiyat havuzuna başarıyla eklendi',
@@ -184,6 +191,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error adding to price pool:', error);
+    await prisma.$disconnect();
     return NextResponse.json(
       { error: 'Fiyat havuzuna eklenemedi' },
       { status: 500 }
