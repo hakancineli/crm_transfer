@@ -12,19 +12,7 @@ export function middleware(request: NextRequest) {
 		return NextResponse.next();
 	}
 
-	// Admin routes that need authentication
-	const isAdminRoute = pathname.startsWith('/admin') || 
-		pathname.startsWith('/reservations') || 
-		pathname.startsWith('/reports') || 
-		pathname.startsWith('/drivers') ||
-		pathname.startsWith('/new-reservation');
-
-	if (isAdminRoute) {
-		// Check for JWT token in localStorage (we'll handle this client-side)
-		// For now, redirect to login
-		return NextResponse.redirect(new URL('/login', request.url));
-	}
-
+	// For now, allow all routes - authentication will be handled client-side
 	return NextResponse.next();
 }
 

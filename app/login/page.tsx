@@ -17,6 +17,8 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
 
+    console.log('Giriş denemesi:', formData);
+
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
@@ -27,6 +29,7 @@ export default function LoginPage() {
       });
 
       const data = await response.json();
+      console.log('API Response:', { status: response.status, data });
 
       if (response.ok) {
         // Store user data in localStorage
@@ -47,15 +50,22 @@ export default function LoginPage() {
         }).catch(console.error);
 
         // Redirect based on role
+        console.log('Redirecting user with role:', data.user.role);
+        
         if (data.user.role === 'SUPERUSER') {
+          console.log('Redirecting to /admin');
           window.location.href = '/admin';
         } else if (data.user.role === 'ACCOUNTANT') {
+          console.log('Redirecting to /admin/accounting');
           window.location.href = '/admin/accounting';
         } else if (data.user.role === 'OPERATION') {
+          console.log('Redirecting to /admin');
           window.location.href = '/admin';
         } else if (data.user.role === 'SELLER') {
+          console.log('Redirecting to /reservations');
           window.location.href = '/reservations';
         } else {
+          console.log('Redirecting to /');
           window.location.href = '/';
         }
       } else {
