@@ -31,6 +31,7 @@ model Tenant {
   activities      Activity[]
   hotelRequests   HotelRequest[]
   hotelBookings   HotelBooking[]
+  hotelPricePool  HotelPricePool[]
   
   @@map("tenants")
 }
@@ -252,4 +253,63 @@ model HotelBooking {
   updatedAt         DateTime @updatedAt
   
   @@map("hotel_bookings")
+}
+
+// Otel Fiyat Havuzu - Tüm satış personelinin görebileceği fiyatlar
+model HotelPricePool {
+  id              String    @id @default(uuid())
+  tenantId        String
+  hotelId         String    // Booking.com hotel ID
+  hotelName       String
+  hotelAddress    String
+  hotelCity       String
+  hotelCountry    String
+  hotelRating     Float
+  hotelStars      Int
+  hotelImage      String?
+  hotelAmenities  String[]  @default([])
+  
+  // Oda bilgileri
+  roomType        String
+  roomName        String
+  roomDescription String?
+  roomAmenities   String[]  @default([])
+  maxOccupancy    Int
+  bedType         String
+  roomSize        String?
+  roomView        String?
+  
+  // Fiyat bilgileri
+  basePrice       Float     // Booking.com'dan alınan temel fiyat
+  agentPrice      Float     // Acente alış fiyatı
+  customerPrice   Float     // Müşteri satış fiyatı
+  profitMargin    Float     // Kar marjı
+  profitPercentage Float    // Kar yüzdesi
+  currency        String    @default("EUR")
+  
+  // Tarih aralığı
+  validFrom       DateTime  // Geçerlilik başlangıç tarihi
+  validTo         DateTime  // Geçerlilik bitiş tarihi
+  
+  // Rezervasyon koşulları
+  cancellationPolicy String?
+  breakfastIncluded  Boolean @default(false)
+  freeCancellation   Boolean @default(false)
+  
+  // Meta bilgiler
+  source          String    @default("booking.com") // Fiyat kaynağı
+  lastUpdated     DateTime  @default(now())
+  updatedBy       String    // Güncelleyen kullanıcı ID
+  isActive        Boolean   @default(true)
+  
+  // Relations
+  tenant          Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@map("hotel_price_pool")
+  @@index([tenantId, hotelId, validFrom, validTo])
+  @@index([hotelCity, validFrom, validTo])
+  @@index([isActive, validFrom, validTo])
 }

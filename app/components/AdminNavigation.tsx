@@ -98,6 +98,12 @@ const AdminNavigation = () => {
       href: '/accommodation/reports',
       icon: '📊',
       description: 'Detaylı analiz ve raporlar'
+    },
+    {
+      name: 'Otel Fiyat Havuzu',
+      href: '/accommodation/price-pool',
+      icon: '🏨',
+      description: 'Tüm satış personelinin görebileceği fiyatlar'
     }
   ];
 
