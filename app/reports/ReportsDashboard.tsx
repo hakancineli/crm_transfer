@@ -178,9 +178,9 @@ export default function ReportsDashboard() {
                         <p className="text-red-600">{error}</p>
                     </div>
                 ) : reportData ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Finansal Özet */}
-                        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 h-96 flex flex-col">
+                        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 h-96 flex flex-col relative z-10">
                             <div className="flex items-center mb-6">
                                 <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mr-4">
                                     <span className="text-green-600 text-2xl">💰</span>
@@ -237,7 +237,7 @@ export default function ReportsDashboard() {
                         </div>
 
                         {/* Transfer İstatistikleri */}
-                        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 h-96 flex flex-col">
+                        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 h-96 flex flex-col relative z-10">
                             <div className="flex items-center mb-6">
                                 <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mr-4">
                                     <span className="text-blue-600 text-2xl">🚗</span>
@@ -278,7 +278,7 @@ export default function ReportsDashboard() {
                         </div>
 
                         {/* Transfer Tipleri */}
-                        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 h-96 flex flex-col">
+                        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 h-96 flex flex-col relative z-10">
                             <div className="flex items-center mb-6">
                                 <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mr-4">
                                     <span className="text-purple-600 text-2xl">🎯</span>
@@ -317,7 +317,7 @@ export default function ReportsDashboard() {
                         </div>
 
                         {/* Şoför Hakediş */}
-                        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 h-96 flex flex-col">
+                        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 h-96 flex flex-col relative z-10">
                             <div className="flex items-center mb-6">
                                 <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mr-4">
                                     <span className="text-red-600 text-2xl">👨‍✈️</span>
@@ -361,7 +361,7 @@ export default function ReportsDashboard() {
                         </div>
 
                         {/* Popüler Rotalar */}
-                        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 col-span-full">
+                        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 col-span-full relative z-10">
                             <div className="flex items-center mb-6">
                                 <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mr-4">
                                     <span className="text-indigo-600 text-2xl">🗺️</span>
