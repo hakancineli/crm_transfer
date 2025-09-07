@@ -220,6 +220,14 @@ export default function UserPermissionsPage() {
       },
       'MANAGE_COMMISSIONS': {
         description: 'Komisyon hesaplamalarını yönetme yetkisi'
+      },
+      
+      // Performans İzinleri
+      'VIEW_PERFORMANCE': {
+        description: 'Kullanıcı performans verilerini görme yetkisi'
+      },
+      'MANAGE_PERFORMANCE': {
+        description: 'Kullanıcı performans yönetimi yapma yetkisi'
       }
     };
     return {

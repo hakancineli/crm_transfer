@@ -106,13 +106,6 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
       module: 'transfer'
     },
     {
-      name: 'İzin Yönetimi',
-      href: '/admin/permissions',
-      icon: '🔐',
-      description: 'Kullanıcı izinlerini yönet',
-      module: 'system'
-    },
-    {
       name: 'Denetim Logları',
       href: '/admin/audit-logs',
       icon: '📋',
@@ -223,8 +216,6 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
             } else if (item.name === 'Müşteri Kurulumu') {
               shouldShow = false; // Only SUPERUSER can see this
             } else if (item.name === 'Personel Performansı') {
-              shouldShow = false; // Only SUPERUSER can see this
-            } else if (item.name === 'İzin Yönetimi') {
               shouldShow = false; // Only SUPERUSER can see this
             }
           }
