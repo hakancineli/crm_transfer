@@ -17,7 +17,7 @@ interface User {
 }
 
 export default function UsersPage() {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, loading: authLoading } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -33,6 +33,11 @@ export default function UsersPage() {
   });
 
   useEffect(() => {
+    // Wait for auth to load
+    if (authLoading) {
+      return;
+    }
+    
     // Check if user has permission to manage users
     const hasManageUsersPermission = user?.permissions?.some(p => 
       p.permission === 'MANAGE_USERS' && p.isActive
@@ -48,7 +53,7 @@ export default function UsersPage() {
     if (user && (user.role === 'SUPERUSER' || hasManageUsersPermission)) {
       fetchUsers();
     }
-  }, [user]);
+  }, [user, authLoading]);
 
   const fetchUsers = async () => {
     try {
@@ -183,7 +188,7 @@ export default function UsersPage() {
     );
   }
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="p-6">
         <div className="animate-pulse">
