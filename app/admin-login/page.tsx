@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
 
 export default function AdminLoginPage() {
+    const [username, setUsername] = useState('admin');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const router = useRouter();
-    const { adminLogin } = useAuth();
+    const { login } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -17,13 +18,13 @@ export default function AdminLoginPage() {
         setError('');
 
         try {
-            const success = await adminLogin(password);
+            const success = await login(username, password);
             
             if (success) {
                 // Başarılı giriş - admin paneline yönlendir
                 router.push('/admin');
             } else {
-                setError('Yanlış şifre');
+                setError('Kullanıcı adı veya şifre hatalı');
             }
         } catch (err) {
             setError('Giriş hatası');
@@ -41,6 +42,21 @@ export default function AdminLoginPage() {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                            Kullanıcı Adı
+                        </label>
+                        <input
+                            type="text"
+                            id="username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Kullanıcı adınızı girin"
+                        />
+                    </div>
+                    
                     <div>
                         <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                             Şifre

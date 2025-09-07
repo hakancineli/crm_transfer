@@ -19,7 +19,6 @@ interface User {
 interface AuthContextType {
   user: User | null;
   login: (username: string, password: string) => Promise<boolean>;
-  adminLogin: (password: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
   isAuthenticated: boolean;
@@ -96,48 +95,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const adminLogin = async (password: string): Promise<boolean> => {
-    try {
-      // Admin kullanıcısı ile normal login yap
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: 'admin', password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log('Admin login - User data received:', data.user);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('isAdmin', 'true');
-        setUser(data.user);
-
-        // Log activity
-        await fetch('/api/activities', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId: data.user.id,
-            action: 'LOGIN',
-            entityType: 'SYSTEM',
-            description: `${data.user.name} admin girişi yaptı`,
-            ipAddress: '127.0.0.1'
-          })
-        }).catch(console.error);
-
-        return true;
-      } else {
-        throw new Error(data.error || 'Admin girişi başarısız');
-      }
-    } catch (error) {
-      console.error('Admin login error:', error);
-      return false;
-    }
-  };
 
   const logout = () => {
     // Log activity before logout
@@ -170,7 +127,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider value={{
       user,
       login,
-      adminLogin,
       logout,
       loading,
       isAuthenticated,
