@@ -43,10 +43,10 @@ export default function AdminLayout({
         />
       )}
 
-      {/* Sidebar - fixed for all viewports */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+      {/* Sidebar - positioned below header */}
+      <div className={`fixed left-0 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-40 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      }`} style={{ top: '64px', height: 'calc(100vh - 64px)' }}>
         <AdminNavigation onClose={() => setSidebarOpen(false)} />
       </div>
 
