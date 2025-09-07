@@ -66,7 +66,9 @@ export default function EditReservationForm({ voucherNumber, initialData }: Edit
             from: formatLocation(formData.from),
             to: formatLocation(formData.to),
             flightCode: formData.flightCode?.toUpperCase(),
-            passengerNames: formData.passengerNames.map((name: string) => formatPassengerName(name))
+            passengerNames: formData.passengerNames
+                .map((name: string) => formatPassengerName(name))
+                .filter((name: string) => name.trim() !== '') // Boş isimleri filtrele
         };
 
         try {

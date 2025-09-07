@@ -94,9 +94,9 @@ export async function PUT(request: NextRequest, { params }: { params: { voucherN
       }
     }
 
-    // Yolcu isimlerini JSON string'e çevir
+    // Yolcu isimlerini JSON string'e çevir ve boş isimleri filtrele
     const passengerNames = Array.isArray(data.passengerNames) 
-        ? JSON.stringify(data.passengerNames)
+        ? JSON.stringify(data.passengerNames.filter((name: string) => name && name.trim() !== ''))
         : JSON.stringify([]);
 
     // Şoför ID'sinin geçerli olduğunu kontrol et

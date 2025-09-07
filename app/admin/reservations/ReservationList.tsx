@@ -577,14 +577,14 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                                 🔄
                                                             </button>
                                                             <Link 
-                                                                href={`/reservations/${reservation.voucherNumber}?view=driver`}
+                                                                href={`/admin/reservations/${reservation.voucherNumber}/driver-voucher`}
                                                                 className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
                                                                 title="Şoför Voucherı"
                                                             >
                                                                 👨‍✈️
                                                             </Link>
                                                             <Link 
-                                                                href={`/reservations/${reservation.voucherNumber}?view=customer`}
+                                                                href={`/admin/reservations/${reservation.voucherNumber}/customer-voucher`}
                                                                 className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
                                                                 title="Müşteri Voucherı"
                                                             >
@@ -810,13 +810,13 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                 🔄 Dönüş
                                             </button>
                                             <Link 
-                                                href={`/reservations/${reservation.voucherNumber}?view=driver`}
+                                                href={`/admin/reservations/${reservation.voucherNumber}/driver-voucher`}
                                                 className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
                                             >
                                                 Şoför
                                             </Link>
                                             <Link 
-                                                href={`/reservations/${reservation.voucherNumber}?view=customer`}
+                                                href={`/admin/reservations/${reservation.voucherNumber}/customer-voucher`}
                                                 className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
                                             >
                                                 Müşteri
