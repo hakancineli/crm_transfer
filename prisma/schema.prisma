@@ -146,9 +146,12 @@ model Activity {
 
 enum UserRole {
   SUPERUSER
+  MANAGER
   OPERATION
   SELLER
   ACCOUNTANT
+  CUSTOMER_SERVICE
+  FINANCE
 }
 
 model Reservation {

@@ -106,6 +106,20 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
       module: 'transfer'
     },
     {
+      name: 'İzin Yönetimi',
+      href: '/admin/permissions',
+      icon: '🔐',
+      description: 'Kullanıcı izinlerini yönet',
+      module: 'system'
+    },
+    {
+      name: 'Denetim Logları',
+      href: '/admin/audit-logs',
+      icon: '📋',
+      description: 'Sistem aktivite logları',
+      module: 'system'
+    },
+    {
       name: 'Konaklama',
       href: '/admin/accommodation',
       icon: '🏨',
