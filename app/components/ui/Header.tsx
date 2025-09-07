@@ -9,7 +9,12 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useEmoji } from '../../contexts/EmojiContext';
 import LanguageSelector from '../LanguageSelector';
 
-export default function Header() {
+interface HeaderProps {
+    onSidebarToggle?: () => void;
+    showSidebarToggle?: boolean;
+}
+
+export default function Header({ onSidebarToggle, showSidebarToggle = false }: HeaderProps) {
     const pathname = usePathname();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { t } = useLanguage();
@@ -41,6 +46,17 @@ export default function Header() {
             <nav className="w-full px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     <div className="flex items-center">
+                        {/* Sidebar toggle button for admin pages */}
+                        {showSidebarToggle && onSidebarToggle && (
+                            <button
+                                onClick={onSidebarToggle}
+                                className="mr-3 p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                            >
+                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                            </button>
+                        )}
                         <div className="flex-shrink-0">
                             <Link href={logoHref} className="flex items-center space-x-2">
                                 <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
