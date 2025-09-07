@@ -60,12 +60,12 @@ export default function CustomerVoucherPage() {
 		);
 	}
 
-	const passengerNames = Array.isArray(reservation.passengerNames)
-		? reservation.passengerNames
-		: typeof reservation.passengerNames === 'string'
+	const passengerNames = Array.isArray((reservation as any).passengerNames)
+		? (reservation as any).passengerNames
+		: typeof (reservation as any).passengerNames === 'string'
 			? (() => {
 				try {
-					return JSON.parse(reservation.passengerNames);
+					return JSON.parse((reservation as any).passengerNames);
 				} catch {
 					return [];
 				}
