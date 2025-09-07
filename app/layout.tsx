@@ -69,7 +69,48 @@ export default function RootLayout({
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#16a34a" />
         <meta name="referrer" content="no-referrer-when-downgrade" />
-        <meta httpEquiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https:; frame-src 'none';" />
+        <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https:; frame-src 'none'; object-src 'none'; base-uri 'self';" />
+        <meta name="referrer" content="strict-origin-when-cross-origin" />
+        <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
+        <meta httpEquiv="X-Frame-Options" content="DENY" />
+        <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Prevent extension errors from appearing in console
+              window.addEventListener('error', function(e) {
+                if (e.message && e.message.includes('chrome-extension://')) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  return false;
+                }
+              });
+              
+              // Override console.error to filter extension errors
+              const originalError = console.error;
+              console.error = function(...args) {
+                const message = args.join(' ');
+                if (message.includes('chrome-extension://') || 
+                    message.includes('runtime.lastError') ||
+                    message.includes('querySelector') ||
+                    message.includes('microsofttranslator.com') ||
+                    message.includes('api-edge.cognitive')) {
+                  return;
+                }
+                originalError.apply(console, args);
+              };
+              
+              // Override fetch to prevent Microsoft Translator calls
+              const originalFetch = window.fetch;
+              window.fetch = function(url, options) {
+                if (typeof url === 'string' && url.includes('microsofttranslator.com')) {
+                  return Promise.reject(new Error('Translation service blocked'));
+                }
+                return originalFetch.call(this, url, options);
+              };
+            `,
+          }}
+        />
       </head>
       <body className={inter.className}>
         <AuthProvider>
