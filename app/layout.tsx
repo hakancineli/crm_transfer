@@ -72,41 +72,79 @@ export default function RootLayout({
         <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https:; frame-src 'none'; object-src 'none'; base-uri 'self';" />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
         <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
-        <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              // Prevent extension errors from appearing in console
-              window.addEventListener('error', function(e) {
-                if (e.message && e.message.includes('chrome-extension://')) {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  return false;
+              // Comprehensive error filtering system
+              (function() {
+                // Store original console methods
+                const originalError = console.error;
+                const originalWarn = console.warn;
+                const originalLog = console.log;
+                
+                // Filter function for extension errors
+                function shouldFilter(message) {
+                  const filterPatterns = [
+                    'chrome-extension://',
+                    'runtime.lastError',
+                    'querySelector',
+                    'microsofttranslator.com',
+                    'api-edge.cognitive',
+                    'message port closed',
+                    'listener indicated an asynchronous response',
+                    'X-Frame-Options may only be set via an HTTP header'
+                  ];
+                  
+                  return filterPatterns.some(pattern => 
+                    message.toLowerCase().includes(pattern.toLowerCase())
+                  );
                 }
-              });
-              
-              // Override console.error to filter extension errors
-              const originalError = console.error;
-              console.error = function(...args) {
-                const message = args.join(' ');
-                if (message.includes('chrome-extension://') || 
-                    message.includes('runtime.lastError') ||
-                    message.includes('querySelector') ||
-                    message.includes('microsofttranslator.com') ||
-                    message.includes('api-edge.cognitive')) {
-                  return;
-                }
-                originalError.apply(console, args);
-              };
-              
-              // Override fetch to prevent Microsoft Translator calls
-              const originalFetch = window.fetch;
-              window.fetch = function(url, options) {
-                if (typeof url === 'string' && url.includes('microsofttranslator.com')) {
-                  return Promise.reject(new Error('Translation service blocked'));
-                }
-                return originalFetch.call(this, url, options);
-              };
+                
+                // Override console methods
+                console.error = function(...args) {
+                  const message = args.join(' ');
+                  if (shouldFilter(message)) return;
+                  originalError.apply(console, args);
+                };
+                
+                console.warn = function(...args) {
+                  const message = args.join(' ');
+                  if (shouldFilter(message)) return;
+                  originalWarn.apply(console, args);
+                };
+                
+                console.log = function(...args) {
+                  const message = args.join(' ');
+                  if (shouldFilter(message)) return;
+                  originalLog.apply(console, args);
+                };
+                
+                // Prevent extension errors from appearing
+                window.addEventListener('error', function(e) {
+                  if (e.message && shouldFilter(e.message)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                  }
+                });
+                
+                // Prevent unhandled promise rejections from extensions
+                window.addEventListener('unhandledrejection', function(e) {
+                  if (e.reason && shouldFilter(e.reason.toString())) {
+                    e.preventDefault();
+                    return false;
+                  }
+                });
+                
+                // Override fetch to prevent unwanted API calls
+                const originalFetch = window.fetch;
+                window.fetch = function(url, options) {
+                  if (typeof url === 'string' && shouldFilter(url)) {
+                    return Promise.reject(new Error('Blocked by filter'));
+                  }
+                  return originalFetch.call(this, url, options);
+                };
+              })();
             `,
           }}
         />
