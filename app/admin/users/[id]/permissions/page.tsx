@@ -40,7 +40,8 @@ export default function UserPermissionsPage() {
       p.permission === 'MANAGE_USERS' && p.isActive
     );
     
-    if (currentUser && !hasManageUsersPermission) {
+    // Allow SUPERUSER to access user permissions
+    if (currentUser && currentUser.role !== 'SUPERUSER' && !hasManageUsersPermission) {
       window.location.href = '/admin';
       return;
     }
@@ -53,7 +54,13 @@ export default function UserPermissionsPage() {
   const fetchUser = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/users/${userId}`);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/users/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
       const data = await response.json();
       
       if (response.ok) {
@@ -141,7 +148,8 @@ export default function UserPermissionsPage() {
     p.permission === 'MANAGE_USERS' && p.isActive
   );
   
-  if (currentUser && !hasManageUsersPermission) {
+  // Check if user is SUPERUSER or has MANAGE_USERS permission
+  if (currentUser && currentUser.role !== 'SUPERUSER' && !hasManageUsersPermission) {
     return (
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
