@@ -26,10 +26,10 @@ export default function AdminLayout({
         onSidebarToggle={() => setSidebarOpen(!sidebarOpen)}
       />
 
-      {/* Overlay when sidebar is open */}
+      {/* Overlay when sidebar is open - only on mobile */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 z-40 bg-black bg-opacity-50"
+          className="fixed inset-0 z-20 bg-black bg-opacity-50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
