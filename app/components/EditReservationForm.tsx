@@ -68,12 +68,14 @@ export default function EditReservationForm({ voucherNumber, initialData }: Edit
             });
 
             if (!response.ok) {
-                throw new Error('Rezervasyon güncellenemedi');
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Rezervasyon güncellenemedi');
             }
 
-            router.push('/reservations');
+            router.push('/admin/reservations');
         } catch (error) {
             console.error('Rezervasyon güncelleme hatası:', error);
+            setError(error instanceof Error ? error.message : 'Rezervasyon güncellenirken bir hata oluştu');
         } finally {
             setLoading(false);
         }
