@@ -560,7 +560,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                                 🔄
                                                             </button>
                                                             <Link 
-                                                                href={`/reservations/${reservation.voucherNumber}/edit`}
+                                                                href={`/admin/reservations/${reservation.voucherNumber}/edit`}
                                                                 className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-lg font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                                                 title="Rezervasyonu Düzenle"
                                                             >

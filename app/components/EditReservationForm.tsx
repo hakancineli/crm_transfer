@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/contexts/AuthContext';
 import { Airport, AIRPORTS, Currency, CURRENCIES } from '../types';
 import { formatLocation, formatPassengerName, formatHotelName } from '@/app/utils/textFormatters';
 
@@ -12,6 +13,7 @@ interface EditReservationFormProps {
 
 export default function EditReservationForm({ voucherNumber, initialData }: EditReservationFormProps) {
     const router = useRouter();
+    const { user } = useAuth();
     const [formData, setFormData] = useState({
         date: initialData.date,
         time: initialData.time,
@@ -78,6 +80,16 @@ export default function EditReservationForm({ voucherNumber, initialData }: Edit
     };
 
     const handleDelete = async () => {
+        // Check if user has permission to delete reservations
+        const hasDeletePermission = user?.permissions?.some(p => 
+            p.permission === 'DELETE_RESERVATIONS' && p.isActive
+        );
+        
+        if (user?.role !== 'SUPERUSER' && !hasDeletePermission) {
+            setError('Bu rezervasyonu silme yetkiniz bulunmamaktadır.');
+            return;
+        }
+
         if (!window.confirm('Bu rezervasyonu silmek istediğinizden emin misiniz?')) {
             return;
         }
@@ -94,7 +106,7 @@ export default function EditReservationForm({ voucherNumber, initialData }: Edit
                 throw new Error('Rezervasyon silinemedi');
             }
 
-            router.push('/reservations');
+            router.push('/admin/reservations');
             router.refresh();
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Bir hata oluştu');
@@ -355,14 +367,19 @@ export default function EditReservationForm({ voucherNumber, initialData }: Edit
             </div>
 
             <div className="flex justify-between space-x-4">
-                <button
-                    type="button"
-                    onClick={handleDelete}
-                    className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:bg-red-400"
-                    disabled={loading}
-                >
-                    Rezervasyonu Sil
-                </button>
+                {/* Show delete button only if user has permission */}
+                {(user?.role === 'SUPERUSER' || user?.permissions?.some(p => 
+                    p.permission === 'DELETE_RESERVATIONS' && p.isActive
+                )) && (
+                    <button
+                        type="button"
+                        onClick={handleDelete}
+                        className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:bg-red-400"
+                        disabled={loading}
+                    >
+                        Rezervasyonu Sil
+                    </button>
+                )}
                 
                 <div className="flex space-x-4">
                     <button
