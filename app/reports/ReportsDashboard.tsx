@@ -103,7 +103,8 @@ export default function ReportsDashboard() {
         p.permission === 'VIEW_REPORTS' && p.isActive
     );
     
-    if (user && !hasViewReportsPermission) {
+    // Check if user is SUPERUSER or has VIEW_REPORTS permission
+    if (user && user.role !== 'SUPERUSER' && !hasViewReportsPermission) {
         return (
             <div className="p-6">
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -118,7 +119,7 @@ export default function ReportsDashboard() {
                                 Yetkisiz Erişim
                             </h3>
                             <div className="mt-2 text-sm text-red-700">
-                                <p>Bu sayfaya erişim yetkiniz bulunmamaktadır. Sadece yetkili kullanıcılar raporları görebilir.</p>
+                                <p>Bu sayfaya erişim yetkiniz bulunmamaktadır. Sadece süper kullanıcılar ve yetkili kullanıcılar raporları görebilir.</p>
                             </div>
                         </div>
                     </div>
