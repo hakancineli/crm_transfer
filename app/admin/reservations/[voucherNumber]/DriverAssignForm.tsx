@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 interface Driver {
     id: string;
@@ -24,6 +25,7 @@ interface DriverAssignFormProps {
 }
 
 export default function DriverAssignForm({ reservation, onAssign }: DriverAssignFormProps) {
+    const { user } = useAuth();
     const [newDriver, setNewDriver] = useState({ name: '', phoneNumber: '' });
     const [driverFee, setDriverFee] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -45,6 +47,17 @@ export default function DriverAssignForm({ reservation, onAssign }: DriverAssign
 
     const handleNewDriverSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        // Check if user has permission to assign drivers
+        const hasAssignDriverPermission = user?.permissions?.some(p => 
+            p.permission === 'ASSIGN_DRIVERS' && p.isActive
+        );
+        
+        if (user?.role !== 'SUPERUSER' && !hasAssignDriverPermission) {
+            setError('Şoför atama yetkiniz bulunmamaktadır.');
+            return;
+        }
+        
         if (!newDriver.name || !newDriver.phoneNumber || !driverFee) {
             setError('Lütfen tüm alanları doldurun');
             return;
@@ -86,7 +99,7 @@ export default function DriverAssignForm({ reservation, onAssign }: DriverAssign
                 await onAssign(createdDriver.id, parseFloat(driverFee));
             }
 
-            router.push(`/reservations/${reservation.voucherNumber}/driver-voucher`);
+            router.push(`/admin/reservations/${reservation.voucherNumber}/driver-voucher`);
             router.refresh();
         } catch (error) {
             console.error('Şoför atama hatası:', error);

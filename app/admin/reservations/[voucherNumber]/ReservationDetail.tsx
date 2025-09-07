@@ -83,7 +83,7 @@ export default function ReservationDetail({
 
             if (response.ok) {
                 router.refresh();
-                router.push(`/reservations/${reservation.voucherNumber}?view=driver`);
+                router.push(`/admin/reservations/${reservation.voucherNumber}?view=driver`);
             }
         } catch (error) {
             console.error('Şoför atama hatası:', error);

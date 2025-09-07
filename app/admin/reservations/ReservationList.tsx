@@ -547,7 +547,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     {!reservation.driver ? (
                                                         <div className="flex space-x-1">
                                                             <button
-                                                                onClick={() => window.location.href = `/reservations/${reservation.voucherNumber}?edit=driver`}
+                                                                onClick={() => window.location.href = `/admin/reservations/${reservation.voucherNumber}?edit=driver`}
                                                                 className="inline-flex items-center px-3 py-2 border border-transparent text-xs font-semibold rounded-lg text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 shadow-sm transition-colors"
                                                             >
                                                                 Şoför Ata
@@ -783,7 +783,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                     {!reservation.driver ? (
                                         <>
                                             <button
-                                                onClick={() => window.location.href = `/reservations/${reservation.voucherNumber}?edit=driver`}
+                                                onClick={() => window.location.href = `/admin/reservations/${reservation.voucherNumber}?edit=driver`}
                                                 className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded text-white bg-purple-600 hover:bg-purple-700"
                                             >
                                                 Şoför Ata
