@@ -98,32 +98,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const adminLogin = async (password: string): Promise<boolean> => {
     try {
-      const response = await fetch('/api/admin-login', {
+      // Admin kullanıcısı ile normal login yap
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ username: 'admin', password }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Admin login için varsayılan admin kullanıcısı oluştur
-        const adminUser = {
-          id: 'admin',
-          username: 'admin',
-          email: 'admin@protransfer.com',
-          name: 'Admin User',
-          role: 'SUPERUSER',
-          isActive: true,
-          permissions: []
-        };
-
-        localStorage.setItem('user', JSON.stringify(adminUser));
-        localStorage.setItem('token', 'admin-token');
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('token', data.token);
         localStorage.setItem('isAdmin', 'true');
-        setUser(adminUser);
+        setUser(data.user);
+
+        // Log activity
+        await fetch('/api/activities', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: data.user.id,
+            action: 'LOGIN',
+            entityType: 'SYSTEM',
+            description: `${data.user.name} admin girişi yaptı`,
+            ipAddress: '127.0.0.1'
+          })
+        }).catch(console.error);
 
         return true;
       } else {

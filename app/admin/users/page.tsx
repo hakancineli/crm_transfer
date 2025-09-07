@@ -43,7 +43,11 @@ export default function UsersPage() {
       window.location.href = '/admin';
       return;
     }
-    fetchUsers();
+    
+    // If user is SUPERUSER or has permission, fetch users
+    if (user && (user.role === 'SUPERUSER' || hasManageUsersPermission)) {
+      fetchUsers();
+    }
   }, [user]);
 
   const fetchUsers = async () => {
