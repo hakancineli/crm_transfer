@@ -20,7 +20,7 @@ export default function AdminLayout({
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Header (desktop + mobile) */}
-      <div className="bg-white shadow-sm border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
+      <div className="bg-white shadow-sm border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
@@ -51,7 +51,7 @@ export default function AdminLayout({
       </div>
 
       {/* Main Content */}
-      <main className={`${sidebarOpen ? 'lg:ml-64' : ''} min-h-screen overflow-x-hidden pt-4`}>
+      <main className={`${sidebarOpen ? 'lg:ml-64' : ''} min-h-screen overflow-x-hidden pt-16`}>
         {children}
       </main>
     </div>

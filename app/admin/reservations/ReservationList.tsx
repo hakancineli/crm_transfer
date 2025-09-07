@@ -293,8 +293,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
 
     return (<>
         <div className="w-full">
-            {/* Transfer Özeti */}
-            <div className="bg-white p-4 rounded-lg shadow mb-6">
+            {/* Transfer Özeti (sticky) */}
+            <div className="bg-white p-4 rounded-lg shadow mb-6 sticky top-16 z-40">
                 <div className="text-sm text-gray-600">
                     <span className="font-medium">Toplam {filteredReservations.length} Transfer</span>
                     {filteredReservations.length > 0 && (

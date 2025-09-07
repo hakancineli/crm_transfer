@@ -145,7 +145,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
   }));
 
   return (
-    <div className="bg-white shadow-lg border-r border-gray-200 h-screen w-64 flex flex-col overflow-hidden">
+    <div className="bg-white shadow-lg border-r border-gray-200 h-screen w-64 flex flex-col overflow-hidden sticky top-16 lg:top-0">
       {/* Mobile Close Button */}
       <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200">
         <span className="text-lg font-semibold text-gray-900">ProTransfer</span>
