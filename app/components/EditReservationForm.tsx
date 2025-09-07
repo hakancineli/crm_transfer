@@ -45,6 +45,17 @@ export default function EditReservationForm({ voucherNumber, initialData }: Edit
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        // Check if user has permission to edit reservations
+        const hasEditPermission = user?.permissions?.some(p => 
+            p.permission === 'EDIT_RESERVATIONS' && p.isActive
+        );
+        
+        if (user?.role !== 'SUPERUSER' && !hasEditPermission) {
+            setError('Bu rezervasyonu düzenleme yetkiniz bulunmamaktadır.');
+            return;
+        }
+        
         setLoading(true);
         setError('');
         setSuccess(false);

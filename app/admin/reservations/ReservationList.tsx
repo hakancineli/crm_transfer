@@ -591,7 +591,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                                 🎫
                                                             </Link>
                                                             <Link 
-                                                                href={`/reservations/${reservation.voucherNumber}/edit`}
+                                                                href={`/admin/reservations/${reservation.voucherNumber}/edit`}
                                                                 className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
                                                                 title="Rezervasyonu Düzenle"
                                                             >
@@ -795,7 +795,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                 🔄 Dönüş
                                             </button>
                                             <Link 
-                                                href={`/reservations/${reservation.voucherNumber}/edit`}
+                                                href={`/admin/reservations/${reservation.voucherNumber}/edit`}
                                                 className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
                                             >
                                                 Düzenle
@@ -822,7 +822,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                 Müşteri
                                             </Link>
                                             <Link 
-                                                href={`/reservations/${reservation.voucherNumber}/edit`}
+                                                href={`/admin/reservations/${reservation.voucherNumber}/edit`}
                                                 className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
                                             >
                                                 Düzenle

@@ -16,7 +16,7 @@ async function ReservationPage({
 
     // Eğer edit=true parametresi varsa, düzenleme sayfasına yönlendir
     if (editMode === 'true') {
-        redirect(`/reservations/${voucherNumber}/edit`);
+        redirect(`/admin/reservations/${voucherNumber}/edit`);
     }
 
     if (!reservation) {
