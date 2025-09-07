@@ -120,6 +120,13 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
       module: 'system'
     },
     {
+      name: 'Personel Performansı',
+      href: '/admin/performance',
+      icon: '📊',
+      description: 'Kullanıcı performans metrikleri',
+      module: 'system'
+    },
+    {
       name: 'Konaklama',
       href: '/admin/accommodation',
       icon: '🏨',

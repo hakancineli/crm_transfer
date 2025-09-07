@@ -33,7 +33,11 @@ export const PERMISSIONS = {
   // Finansal İzinler
   MANAGE_PAYMENTS: 'MANAGE_PAYMENTS',
   VIEW_FINANCIAL_DATA: 'VIEW_FINANCIAL_DATA',
-  MANAGE_COMMISSIONS: 'MANAGE_COMMISSIONS'
+  MANAGE_COMMISSIONS: 'MANAGE_COMMISSIONS',
+  
+  // Performans İzinleri
+  VIEW_PERFORMANCE: 'VIEW_PERFORMANCE',
+  MANAGE_PERFORMANCE: 'MANAGE_PERFORMANCE'
 } as const;
 
 export const PERMISSION_LABELS = {
@@ -71,7 +75,11 @@ export const PERMISSION_LABELS = {
   // Finansal İzinler
   MANAGE_PAYMENTS: 'Ödeme Yönetimi',
   VIEW_FINANCIAL_DATA: 'Finansal Verileri Görme',
-  MANAGE_COMMISSIONS: 'Komisyon Yönetimi'
+  MANAGE_COMMISSIONS: 'Komisyon Yönetimi',
+  
+  // Performans İzinleri
+  VIEW_PERFORMANCE: 'Performans Verilerini Görme',
+  MANAGE_PERFORMANCE: 'Performans Yönetimi'
 } as const;
 
 export const ROLE_PERMISSIONS = {
@@ -115,7 +123,8 @@ export const ROLE_PERMISSIONS = {
     PERMISSIONS.EXPORT_REPORTS,
     PERMISSIONS.MANAGE_CUSTOMERS,
     PERMISSIONS.VIEW_CUSTOMER_DATA,
-    PERMISSIONS.VIEW_ACTIVITIES
+    PERMISSIONS.VIEW_ACTIVITIES,
+    PERMISSIONS.VIEW_PERFORMANCE
   ]
 } as const;
 
