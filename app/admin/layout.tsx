@@ -19,8 +19,8 @@ export default function AdminLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hamburger button - always visible */}
-      <div className="fixed top-4 left-4 z-50">
+      {/* Hamburger button - positioned below global header */}
+      <div className="fixed top-20 left-4 z-50">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 bg-white shadow-md border border-gray-200"
@@ -42,7 +42,7 @@ export default function AdminLayout({
       {/* Sidebar */}
       <div className={`fixed left-0 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-30 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`} style={{ top: '0px', height: '100vh' }}>
+      }`} style={{ top: '64px', height: 'calc(100vh - 64px)' }}>
         <AdminNavigation onClose={() => setSidebarOpen(false)} />
       </div>
 
