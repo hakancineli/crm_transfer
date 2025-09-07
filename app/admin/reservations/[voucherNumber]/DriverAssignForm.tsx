@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
 
@@ -27,10 +27,20 @@ interface DriverAssignFormProps {
 export default function DriverAssignForm({ reservation, onAssign }: DriverAssignFormProps) {
     const { user } = useAuth();
     const [newDriver, setNewDriver] = useState({ name: '', phoneNumber: '' });
+    const [selectedDriverId, setSelectedDriverId] = useState('');
     const [driverFee, setDriverFee] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [drivers, setDrivers] = useState<Driver[]>([]);
     const router = useRouter();
+
+    // Mevcut şoförleri getir
+    useEffect(() => {
+        fetch('/api/drivers')
+            .then(response => response.json())
+            .then(data => setDrivers(data))
+            .catch(error => console.error('Şoför listesi getirme hatası:', error));
+    }, []);
 
     // Yolcu sayısını güvenli bir şekilde hesapla
     const getPassengerCount = () => {
@@ -81,7 +91,7 @@ export default function DriverAssignForm({ reservation, onAssign }: DriverAssign
             const createdDriver = await driverResponse.json();
 
             const updateResponse = await fetch(`/api/reservations/${reservation.voucherNumber}`, {
-                method: 'PUT',
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -109,36 +119,146 @@ export default function DriverAssignForm({ reservation, onAssign }: DriverAssign
         }
     };
 
+    const handleExistingDriverSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        // Check if user has permission to assign drivers
+        const hasAssignDriverPermission = user?.permissions?.some(p => 
+            p.permission === 'ASSIGN_DRIVERS' && p.isActive
+        );
+        
+        if (user?.role !== 'SUPERUSER' && !hasAssignDriverPermission) {
+            setError('Şoför atama yetkiniz bulunmamaktadır.');
+            return;
+        }
+        
+        if (!selectedDriverId || !driverFee) {
+            setError('Lütfen şoför seçin ve hakediş tutarını girin');
+            return;
+        }
+        
+        setIsLoading(true);
+        setError('');
+
+        try {
+            const updateResponse = await fetch(`/api/reservations/${reservation.voucherNumber}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    driverId: selectedDriverId,
+                    driverFee: parseFloat(driverFee)
+                }),
+            });
+
+            if (!updateResponse.ok) {
+                const errorData = await updateResponse.json();
+                throw new Error(errorData.error || 'Şoför ataması yapılırken bir hata oluştu');
+            }
+
+            if (onAssign) {
+                await onAssign(selectedDriverId, parseFloat(driverFee));
+            }
+
+            router.push(`/admin/reservations/${reservation.voucherNumber}/driver-voucher`);
+            router.refresh();
+        } catch (error) {
+            console.error('Şoför atama hatası:', error);
+            setError(error instanceof Error ? error.message : 'Bir hata oluştu');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className="max-w-2xl mx-auto py-6">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 {/* Başlık */}
                 <div className="px-6 py-4 bg-gradient-to-r from-green-50 to-blue-50 border-b border-gray-200">
-                    <h2 className="text-xl font-semibold text-gray-800">Yeni Şoför Ekle ve Ata</h2>
+                    <h2 className="text-xl font-semibold text-gray-800">Şoför Ata</h2>
                     <p className="mt-1 text-sm text-gray-600">
                         Rezervasyon No: {reservation.voucherNumber}
                     </p>
                 </div>
 
-                {/* Form */}
-                <form onSubmit={handleNewDriverSubmit} className="p-6">
-                    {/* Hata Mesajı */}
-                    {error && (
-                        <div className="mb-6 bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
-                            <div className="flex">
-                                <div className="flex-shrink-0">
-                                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div className="ml-3">
-                                    <p className="text-sm text-red-700">{error}</p>
-                                </div>
+                {/* Hata Mesajı */}
+                {error && (
+                    <div className="mx-6 mt-6 bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
+                        <div className="flex">
+                            <div className="flex-shrink-0">
+                                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                </svg>
+                            </div>
+                            <div className="ml-3">
+                                <p className="text-sm text-red-700">{error}</p>
                             </div>
                         </div>
-                    )}
+                    </div>
+                )}
 
-                    <div className="space-y-6">
+                <div className="p-6">
+                    {/* Mevcut Şoför Seçme */}
+                    <div className="mb-8">
+                        <h3 className="text-lg font-medium text-gray-900 mb-4">Mevcut Şoförden Seç</h3>
+                        <form onSubmit={handleExistingDriverSubmit} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Şoför Seçin
+                                </label>
+                                <select
+                                    value={selectedDriverId}
+                                    onChange={(e) => setSelectedDriverId(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                >
+                                    <option value="">Şoför seçin...</option>
+                                    {drivers.map((driver) => (
+                                        <option key={driver.id} value={driver.id}>
+                                            {driver.name} {driver.phoneNumber && `(${driver.phoneNumber})`}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Hakediş Tutarı (₺)
+                                </label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={driverFee}
+                                    onChange={(e) => setDriverFee(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Hakediş tutarını girin"
+                                />
+                            </div>
+                            
+                            <button
+                                type="submit"
+                                disabled={isLoading}
+                                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isLoading ? 'Atanıyor...' : 'Şoför Ata'}
+                            </button>
+                        </form>
+                    </div>
+
+                    {/* Ayırıcı */}
+                    <div className="relative mb-8">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-gray-300" />
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-2 bg-white text-gray-500">veya</span>
+                        </div>
+                    </div>
+
+                    {/* Yeni Şoför Ekleme */}
+                    <div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-4">Yeni Şoför Ekle ve Ata</h3>
+                        <form onSubmit={handleNewDriverSubmit} className="space-y-6">
                         {/* Şoför Bilgileri */}
                         <div className="bg-gray-50 p-6 rounded-lg space-y-4">
                             <h3 className="text-lg font-medium text-gray-900 mb-4">Şoför Bilgileri</h3>
@@ -262,8 +382,9 @@ export default function DriverAssignForm({ reservation, onAssign }: DriverAssign
                                 )}
                             </button>
                         </div>
+                        </form>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     );
