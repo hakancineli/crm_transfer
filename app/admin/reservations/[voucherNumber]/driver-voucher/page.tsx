@@ -1,30 +1,60 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import VoucherContent from '../VoucherContent';
 
-interface PageParams {
-	params: {
-		voucherNumber: string;
-	};
-}
+export default function DriverVoucherPage() {
+	const params = useParams();
+	const [reservation, setReservation] = useState(null);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState('');
 
-async function fetchReservation(voucherNumber: string): Promise<any | null> {
-	try {
-		const base = process.env.NEXT_PUBLIC_BASE_URL ?? '';
-		const res = await fetch(`${base}/api/reservations/${voucherNumber}`, { cache: 'no-store' });
-		if (!res.ok) return null;
-		return await res.json();
-	} catch {
-		return null;
+	const voucherNumber = params.voucherNumber as string;
+
+	useEffect(() => {
+		const fetchReservation = async () => {
+			try {
+				setLoading(true);
+				const response = await fetch(`/api/reservations/${voucherNumber}`);
+				
+				if (!response.ok) {
+					throw new Error('Rezervasyon bulunamadı');
+				}
+				
+				const data = await response.json();
+				setReservation(data);
+			} catch (err) {
+				console.error('Rezervasyon getirme hatası:', err);
+				setError(err instanceof Error ? err.message : 'Rezervasyon yüklenirken hata oluştu');
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		if (voucherNumber) {
+			fetchReservation();
+		}
+	}, [voucherNumber]);
+
+	if (loading) {
+		return (
+			<div className="min-h-screen bg-gray-50 py-8">
+				<div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
+					<div className="animate-pulse">
+						<div className="h-8 bg-gray-200 rounded mb-4"></div>
+						<div className="h-4 bg-gray-200 rounded"></div>
+					</div>
+				</div>
+			</div>
+		);
 	}
-}
 
-export default async function DriverVoucherPage({ params }: PageParams) {
-	const reservation = await fetchReservation(params.voucherNumber);
-
-	if (!reservation) {
+	if (error || !reservation) {
 		return (
 			<div className="p-6">
 				<div className="max-w-2xl mx-auto bg-white rounded-xl shadow p-6 text-center">
-					<p className="text-gray-700">Voucher bulunamadı veya yüklenemedi.</p>
+					<p className="text-gray-700">{error || 'Voucher bulunamadı veya yüklenemedi.'}</p>
 				</div>
 			</div>
 		);
