@@ -165,26 +165,32 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
           // Check if item should be shown based on user permissions
           let shouldShow = true;
           
-          if (item.name === 'Yeni Rezervasyon') {
-            shouldShow = user?.permissions?.some(p => 
-              p.permission === 'VIEW_OWN_SALES' && p.isActive
-            ) || false;
-          } else if (item.name === 'Raporlar') {
-            shouldShow = user?.permissions?.some(p => 
-              p.permission === 'VIEW_REPORTS' && p.isActive
-            ) || false;
-          } else if (item.name === 'Muhasebe') {
-            shouldShow = user?.permissions?.some(p => 
-              p.permission === 'VIEW_ACCOUNTING' && p.isActive
-            ) || false;
-          } else if (item.name === 'Son Aktiviteler') {
-            shouldShow = user?.permissions?.some(p => 
-              p.permission === 'MANAGE_ACTIVITIES' && p.isActive
-            ) || false;
-          } else if (item.name === 'Kullanıcılar') {
-            shouldShow = user?.permissions?.some(p => 
-              p.permission === 'MANAGE_USERS' && p.isActive
-            ) || false;
+          // SUPERUSER can see everything
+          if (user?.role === 'SUPERUSER') {
+            shouldShow = true;
+          } else {
+            // Check specific permissions for non-superusers
+            if (item.name === 'Yeni Rezervasyon') {
+              shouldShow = user?.permissions?.some(p => 
+                p.permission === 'VIEW_OWN_SALES' && p.isActive
+              ) || false;
+            } else if (item.name === 'Raporlar') {
+              shouldShow = user?.permissions?.some(p => 
+                p.permission === 'VIEW_REPORTS' && p.isActive
+              ) || false;
+            } else if (item.name === 'Muhasebe') {
+              shouldShow = user?.permissions?.some(p => 
+                p.permission === 'VIEW_ACCOUNTING' && p.isActive
+              ) || false;
+            } else if (item.name === 'Son Aktiviteler') {
+              shouldShow = user?.permissions?.some(p => 
+                p.permission === 'MANAGE_ACTIVITIES' && p.isActive
+              ) || false;
+            } else if (item.name === 'Kullanıcılar') {
+              shouldShow = user?.permissions?.some(p => 
+                p.permission === 'MANAGE_USERS' && p.isActive
+              ) || false;
+            }
           }
           
           // Hem modül durumu hem de izin kontrolü
