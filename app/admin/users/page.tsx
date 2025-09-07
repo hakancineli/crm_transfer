@@ -33,19 +33,28 @@ export default function UsersPage() {
   });
 
   useEffect(() => {
+    console.log('Users page - Current user:', user);
+    console.log('Users page - User role:', user?.role);
+    console.log('Users page - User permissions:', user?.permissions);
+    
     // Check if user has permission to manage users
     const hasManageUsersPermission = user?.permissions?.some(p => 
       p.permission === 'MANAGE_USERS' && p.isActive
     );
     
+    console.log('Users page - Has manage users permission:', hasManageUsersPermission);
+    console.log('Users page - Is SUPERUSER:', user?.role === 'SUPERUSER');
+    
     // Allow SUPERUSER to access user management
     if (user && user.role !== 'SUPERUSER' && !hasManageUsersPermission) {
+      console.log('Users page - Redirecting to admin - not authorized');
       window.location.href = '/admin';
       return;
     }
     
     // If user is SUPERUSER or has permission, fetch users
     if (user && (user.role === 'SUPERUSER' || hasManageUsersPermission)) {
+      console.log('Users page - Fetching users - authorized');
       fetchUsers();
     }
   }, [user]);
