@@ -43,19 +43,14 @@ export default function UsersPage() {
       return;
     }
     
-    // Check if user has permission to manage users
-    const hasManageUsersPermission = user?.permissions?.some(p => 
-      p.permission === 'MANAGE_USERS' && p.isActive
-    );
-    
-    // Allow SUPERUSER to access user management
-    if (user && user.role !== 'SUPERUSER' && !hasManageUsersPermission) {
+    // Only SUPERUSER can access user management
+    if (user && user.role !== 'SUPERUSER') {
       window.location.href = '/admin';
       return;
     }
     
-    // If user is SUPERUSER or has permission, fetch users
-    if (user && (user.role === 'SUPERUSER' || hasManageUsersPermission)) {
+    // If user is SUPERUSER, fetch users
+    if (user && user.role === 'SUPERUSER') {
       fetchUsers();
     }
   }, [user, authLoading]);

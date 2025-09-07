@@ -224,6 +224,8 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               shouldShow = false; // Only SUPERUSER can see this
             } else if (item.name === 'Personel Performansı') {
               shouldShow = false; // Only SUPERUSER can see this
+            } else if (item.name === 'İzin Yönetimi') {
+              shouldShow = false; // Only SUPERUSER can see this
             }
           }
           

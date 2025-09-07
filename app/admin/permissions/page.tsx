@@ -30,8 +30,14 @@ export default function PermissionsPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    // Only SUPERUSER can access permission management
+    if (user && user.role !== 'SUPERUSER') {
+      window.location.href = '/admin';
+      return;
+    }
+    
     fetchUsers();
-  }, []);
+  }, [user]);
 
   const fetchUsers = async () => {
     try {
@@ -64,7 +70,27 @@ export default function PermissionsPage() {
   };
 
   const handleSavePermissions = async () => {
-    if (!selectedUser) return;
+    if (!selectedUser || !user) return;
+
+    // Role hierarchy check
+    const roleHierarchy = {
+      'SUPERUSER': 4,
+      'MANAGER': 3,
+      'OPERATION': 2,
+      'SELLER': 1,
+      'ACCOUNTANT': 1,
+      'CUSTOMER_SERVICE': 1,
+      'FINANCE': 1
+    };
+
+    const currentUserLevel = roleHierarchy[user.role as keyof typeof roleHierarchy] || 0;
+    const targetUserLevel = roleHierarchy[selectedUser.role as keyof typeof roleHierarchy] || 0;
+
+    // Only allow editing users with lower or equal role level
+    if (currentUserLevel < targetUserLevel) {
+      alert('Bu kullanıcının izinlerini değiştirme yetkiniz yok. Sadece aynı seviye veya daha düşük seviye kullanıcıların izinlerini değiştirebilirsiniz.');
+      return;
+    }
 
     setSaving(true);
     try {

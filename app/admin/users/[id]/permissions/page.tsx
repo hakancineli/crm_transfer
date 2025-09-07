@@ -35,14 +35,16 @@ export default function UserPermissionsPage() {
   const [permissions, setPermissions] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    // Check if current user has permission to manage users
-    const hasManageUsersPermission = currentUser?.permissions?.some(p => 
-      p.permission === 'MANAGE_USERS' && p.isActive
-    );
-    
-    // Allow SUPERUSER to access user permissions
-    if (currentUser && currentUser.role !== 'SUPERUSER' && !hasManageUsersPermission) {
+    // Only SUPERUSER can access user permissions
+    if (currentUser && currentUser.role !== 'SUPERUSER') {
       window.location.href = '/admin';
+      return;
+    }
+    
+    // Prevent users from editing their own permissions
+    if (currentUser && currentUser.id === userId) {
+      alert('Kendi izinlerinizi değiştiremezsiniz. Bu işlem sadece süper kullanıcı tarafından yapılabilir.');
+      window.location.href = '/admin/users';
       return;
     }
     
@@ -91,6 +93,28 @@ export default function UserPermissionsPage() {
   };
 
   const handleSave = async () => {
+    if (!user || !currentUser) return;
+
+    // Role hierarchy check
+    const roleHierarchy = {
+      'SUPERUSER': 4,
+      'MANAGER': 3,
+      'OPERATION': 2,
+      'SELLER': 1,
+      'ACCOUNTANT': 1,
+      'CUSTOMER_SERVICE': 1,
+      'FINANCE': 1
+    };
+
+    const currentUserLevel = roleHierarchy[currentUser.role as keyof typeof roleHierarchy] || 0;
+    const targetUserLevel = roleHierarchy[user.role as keyof typeof roleHierarchy] || 0;
+
+    // Only allow editing users with lower or equal role level
+    if (currentUserLevel < targetUserLevel) {
+      alert('Bu kullanıcının izinlerini değiştirme yetkiniz yok. Sadece aynı seviye veya daha düşük seviye kullanıcıların izinlerini değiştirebilirsiniz.');
+      return;
+    }
+
     try {
       setSaving(true);
       const response = await fetch(`/api/users/${userId}/permissions`, {
