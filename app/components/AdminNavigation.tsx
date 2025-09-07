@@ -168,6 +168,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
   const menuItems = allMenuItems.map(item => ({
     ...item,
     visible: item.module === 'transfer' || 
+             item.module === 'system' ||
              (item.module === 'accommodation' && accommodationEnabled) ||
              (item.module === 'flight' && flightEnabled)
   }));
@@ -192,6 +193,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         {menuItems.map((item) => {
           // Check if item should be shown based on user permissions
           let shouldShow = true;
+          
           
           // SUPERUSER can see everything
           if (user?.role === 'SUPERUSER') {
