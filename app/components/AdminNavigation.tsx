@@ -238,17 +238,6 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
                 </div>
               </div>
             </div>
-            <button
-              onClick={() => {
-                if (confirm(t('admin.navigation.logout'))) {
-                  logout();
-                }
-              }}
-              className="w-full mt-3 text-red-600 hover:text-red-800 text-sm font-medium px-3 py-2 rounded-lg hover:bg-red-50 border border-red-200 hover:border-red-300 transition-colors"
-              title={t('admin.navigation.logout')}
-            >
-              {isClient && emojisEnabled ? '🚪 ' : ''}{t('admin.navigation.logout')}
-            </button>
           </>
         ) : (
           <div className="text-center">
