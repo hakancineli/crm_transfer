@@ -37,6 +37,8 @@ export async function POST(request: Request) {
             }
         });
 
+        console.log(`Rapor API: ${reservations.length} rezervasyon bulundu (${startDate} - ${endDate})`);
+
         // Toplam gelir (USD -> TL)
         const totalRevenueUSD = reservations.reduce((sum: number, res: any) => {
             if (res.currency === 'USD') {
@@ -77,7 +79,7 @@ export async function POST(request: Request) {
             .sort((a, b) => b.count - a.count)
             .slice(0, 10);
 
-        return NextResponse.json({
+        const result = {
             totalRevenueUSD,
             totalRevenueTL,
             usdRate,
@@ -88,7 +90,10 @@ export async function POST(request: Request) {
             netIncome: totalRevenueTL - driverPayments,
             transfersByType,
             popularRoutes
-        });
+        };
+
+        console.log('Rapor API sonucu:', result);
+        return NextResponse.json(result);
     } catch (error) {
         console.error('Rapor verisi getirme hatası:', error);
         return NextResponse.json(
