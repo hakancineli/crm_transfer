@@ -148,10 +148,10 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
       module: 'accommodation'
     },
     {
-      name: t('admin.navigation.settings'),
+      name: 'Ayarlar',
       href: '/admin/settings',
       icon: '⚙️',
-      description: t('admin.navigation.settings'),
+      description: 'Sistem ayarları',
       module: 'transfer'
     }
   ];
