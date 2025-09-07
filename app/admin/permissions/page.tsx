@@ -100,6 +100,48 @@ export default function PermissionsPage() {
     return getRolePermissions(role).includes(permission);
   };
 
+  const getPermissionDescription = (permission: string) => {
+    const descriptions: Record<string, string> = {
+      // Rezervasyon İzinleri
+      'VIEW_OWN_SALES': 'Sadece kendi oluşturduğu rezervasyonları görme yetkisi',
+      'VIEW_ALL_RESERVATIONS': 'Sistemdeki tüm rezervasyonları görme yetkisi',
+      'CREATE_RESERVATIONS': 'Yeni rezervasyon oluşturma yetkisi',
+      'EDIT_RESERVATIONS': 'Mevcut rezervasyonları düzenleme yetkisi',
+      'DELETE_RESERVATIONS': 'Rezervasyonları silme yetkisi',
+      
+      // Şoför İzinleri
+      'VIEW_DRIVERS': 'Şoför listesini görme yetkisi',
+      'MANAGE_DRIVERS': 'Şoför ekleme, düzenleme ve silme yetkisi',
+      'ASSIGN_DRIVERS': 'Rezervasyonlara şoför atama yetkisi',
+      
+      // Rapor İzinleri
+      'VIEW_REPORTS': 'Detaylı raporlar ve analizleri görme yetkisi',
+      'EXPORT_REPORTS': 'Raporları Excel/PDF formatında dışa aktarma yetkisi',
+      'VIEW_ACCOUNTING': 'Muhasebe ve ödeme bilgilerini görme yetkisi',
+      
+      // Kullanıcı İzinleri
+      'MANAGE_USERS': 'Kullanıcı oluşturma, düzenleme ve silme yetkisi',
+      'MANAGE_PERMISSIONS': 'Kullanıcı izinlerini yönetme yetkisi',
+      'MANAGE_ACTIVITIES': 'Sistem aktivitelerini ve logları görme yetkisi',
+      
+      // Sistem İzinleri
+      'SYSTEM_SETTINGS': 'Sistem ayarlarını değiştirme yetkisi',
+      'BACKUP_RESTORE': 'Veri yedekleme ve geri yükleme yetkisi',
+      'AUDIT_LOGS': 'Denetim loglarını görme yetkisi',
+      
+      // Müşteri İzinleri
+      'MANAGE_CUSTOMERS': 'Müşteri bilgilerini yönetme yetkisi',
+      'VIEW_CUSTOMER_DATA': 'Müşteri verilerini görme yetkisi',
+      
+      // Finansal İzinler
+      'MANAGE_PAYMENTS': 'Ödeme işlemlerini yönetme yetkisi',
+      'VIEW_FINANCIAL_DATA': 'Finansal verileri görme yetkisi',
+      'MANAGE_COMMISSIONS': 'Komisyon hesaplamalarını yönetme yetkisi'
+    };
+    
+    return descriptions[permission] || 'Bu izin için açıklama bulunmuyor';
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
@@ -184,7 +226,7 @@ export default function PermissionsPage() {
                               <p className="font-medium text-gray-900">
                                 {PERMISSION_LABELS[permission as keyof typeof PERMISSION_LABELS]}
                               </p>
-                              <p className="text-sm text-gray-500">{permission}</p>
+                              <p className="text-sm text-gray-500">{getPermissionDescription(permission)}</p>
                               {isInRole && (
                                 <span className="inline-block px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full mt-1">
                                   Rol İzni

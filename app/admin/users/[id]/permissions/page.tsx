@@ -118,28 +118,89 @@ export default function UserPermissionsPage() {
 
   const getPermissionInfo = (permission: string) => {
     const permissionInfo: Record<string, { description: string }> = {
+      // Rezervasyon İzinleri
       'VIEW_OWN_SALES': {
         description: 'Sadece kendi oluşturduğu rezervasyonları görme yetkisi'
       },
       'VIEW_ALL_RESERVATIONS': {
         description: 'Sistemdeki tüm rezervasyonları görme yetkisi'
       },
+      'CREATE_RESERVATIONS': {
+        description: 'Yeni rezervasyon oluşturma yetkisi'
+      },
+      'EDIT_RESERVATIONS': {
+        description: 'Mevcut rezervasyonları düzenleme yetkisi'
+      },
+      'DELETE_RESERVATIONS': {
+        description: 'Rezervasyonları silme yetkisi'
+      },
+      
+      // Şoför İzinleri
+      'VIEW_DRIVERS': {
+        description: 'Şoför listesini görme yetkisi'
+      },
+      'MANAGE_DRIVERS': {
+        description: 'Şoför ekleme, düzenleme ve silme yetkisi'
+      },
+      'ASSIGN_DRIVERS': {
+        description: 'Rezervasyonlara şoför atama yetkisi'
+      },
+      
+      // Rapor İzinleri
       'VIEW_REPORTS': {
         description: 'Detaylı raporlar ve analizleri görme yetkisi'
+      },
+      'EXPORT_REPORTS': {
+        description: 'Raporları Excel/PDF formatında dışa aktarma yetkisi'
       },
       'VIEW_ACCOUNTING': {
         description: 'Muhasebe ve ödeme bilgilerini görme yetkisi'
       },
+      
+      // Kullanıcı İzinleri
       'MANAGE_USERS': {
         description: 'Kullanıcı oluşturma, düzenleme ve silme yetkisi'
       },
+      'MANAGE_PERMISSIONS': {
+        description: 'Kullanıcı izinlerini yönetme yetkisi'
+      },
       'MANAGE_ACTIVITIES': {
         description: 'Sistem aktivitelerini ve logları görme yetkisi'
+      },
+      
+      // Sistem İzinleri
+      'SYSTEM_SETTINGS': {
+        description: 'Sistem ayarlarını değiştirme yetkisi'
+      },
+      'BACKUP_RESTORE': {
+        description: 'Veri yedekleme ve geri yükleme yetkisi'
+      },
+      'AUDIT_LOGS': {
+        description: 'Denetim loglarını görme yetkisi'
+      },
+      
+      // Müşteri İzinleri
+      'MANAGE_CUSTOMERS': {
+        description: 'Müşteri bilgilerini yönetme yetkisi'
+      },
+      'VIEW_CUSTOMER_DATA': {
+        description: 'Müşteri verilerini görme yetkisi'
+      },
+      
+      // Finansal İzinler
+      'MANAGE_PAYMENTS': {
+        description: 'Ödeme işlemlerini yönetme yetkisi'
+      },
+      'VIEW_FINANCIAL_DATA': {
+        description: 'Finansal verileri görme yetkisi'
+      },
+      'MANAGE_COMMISSIONS': {
+        description: 'Komisyon hesaplamalarını yönetme yetkisi'
       }
     };
     return {
       title: PERMISSION_LABELS[permission as keyof typeof PERMISSION_LABELS] || permission,
-      description: permissionInfo[permission]?.description || permission
+      description: permissionInfo[permission]?.description || 'Bu izin için açıklama bulunmuyor'
     };
   };
 
