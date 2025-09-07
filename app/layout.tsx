@@ -68,6 +68,8 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/logo.svg" />
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#16a34a" />
+        <meta name="referrer" content="no-referrer-when-downgrade" />
+        <meta httpEquiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https:; frame-src 'none';" />
       </head>
       <body className={inter.className}>
         <AuthProvider>
