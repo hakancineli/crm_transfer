@@ -36,13 +36,8 @@ export default function PerformancePage() {
   const [filterRole, setFilterRole] = useState<string>('all');
 
   useEffect(() => {
-    // Check if user has permission to view performance
-    const hasViewPerformancePermission = user?.permissions?.some(p => 
-      p.permission === 'VIEW_PERFORMANCE' && p.isActive
-    );
-    
-    // Allow SUPERUSER to access performance
-    if (user && user.role !== 'SUPERUSER' && !hasViewPerformancePermission) {
+    // Only SUPERUSER can access performance page
+    if (user && user.role !== 'SUPERUSER') {
       window.location.href = '/admin';
       return;
     }

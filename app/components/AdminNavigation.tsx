@@ -220,6 +220,8 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               ) || false;
             } else if (item.name === 'Müşteri Kurulumu') {
               shouldShow = false; // Only SUPERUSER can see this
+            } else if (item.name === 'Personel Performansı') {
+              shouldShow = false; // Only SUPERUSER can see this
             }
           }
           
