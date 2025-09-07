@@ -33,20 +33,12 @@ export default function UsersPage() {
   });
 
   useEffect(() => {
-    console.log('=== USERS PAGE DEBUG ===');
-    console.log('authLoading:', authLoading);
-    console.log('user:', user);
-    console.log('user?.role:', user?.role);
-    console.log('user?.permissions:', user?.permissions);
-    
     // Wait for auth to load
     if (authLoading) {
-      console.log('Auth still loading, waiting...');
       return;
     }
     
     if (!user) {
-      console.log('No user found, redirecting to admin');
       window.location.href = '/admin';
       return;
     }
@@ -56,16 +48,15 @@ export default function UsersPage() {
       p.permission === 'MANAGE_USERS' && p.isActive
     );
     
-    console.log('hasManageUsersPermission:', hasManageUsersPermission);
-    console.log('user.role === SUPERUSER:', user.role === 'SUPERUSER');
-    
-    // TEMPORARY: Allow all authenticated users to access for debugging
-    if (user) {
-      console.log('TEMP: Allowing access for debugging');
-      fetchUsers();
-    } else {
-      console.log('No user found, redirecting to admin');
+    // Allow SUPERUSER to access user management
+    if (user && user.role !== 'SUPERUSER' && !hasManageUsersPermission) {
       window.location.href = '/admin';
+      return;
+    }
+    
+    // If user is SUPERUSER or has permission, fetch users
+    if (user && (user.role === 'SUPERUSER' || hasManageUsersPermission)) {
+      fetchUsers();
     }
   }, [user, authLoading]);
 
@@ -178,30 +169,30 @@ export default function UsersPage() {
     p.permission === 'MANAGE_USERS' && p.isActive
   );
   
-  // TEMPORARY: Disable this permission check for debugging
-  // if (user && !hasManageUsersPermission) {
-  //   return (
-  //     <div className="p-6">
-  //       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-  //         <div className="flex">
-  //           <div className="flex-shrink-0">
-  //             <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-  //               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-  //             </svg>
-  //           </div>
-  //           <div className="ml-3">
-  //             <h3 className="text-sm font-medium text-red-800">
-  //               Yetkisiz Erişim
-  //             </h3>
-  //             <div className="mt-2 text-sm text-red-700">
-  //               <p>Bu sayfaya erişim yetkiniz bulunmamaktadır. Sadece süperkullanıcılar kullanıcı yönetimine erişebilir.</p>
-  //             </div>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+  // Check if user is SUPERUSER or has MANAGE_USERS permission
+  if (user && user.role !== 'SUPERUSER' && !hasManageUsersPermission) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">
+                Yetkisiz Erişim
+              </h3>
+              <div className="mt-2 text-sm text-red-700">
+                <p>Bu sayfaya erişim yetkiniz bulunmamaktadır. Sadece süperkullanıcılar kullanıcı yönetimine erişebilir.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (authLoading || loading) {
     return (
