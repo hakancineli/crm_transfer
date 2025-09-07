@@ -27,7 +27,7 @@ export default function Header({ onSidebarToggle, showSidebarToggle = false }: H
     const isCustomerContext = pathname === '/' || pathname.startsWith('/customer-reservation') || pathname.startsWith('/customer-panel');
 
     const adminNavigation = [
-        { name: t('header.newReservation'), href: '/new-reservation' },
+        { name: t('header.newReservation'), href: '/admin/new-reservation' },
         { name: t('header.allReservations'), href: '/admin/reservations' },
         { name: 'Admin Panel', href: '/admin' },
     ];

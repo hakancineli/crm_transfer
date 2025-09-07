@@ -264,7 +264,7 @@ export default function AdminDashboard() {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.dashboard.quickActions.transferOperations')}</h3>
             <div className="grid grid-cols-2 gap-4">
               <Link
-                href="/new-reservation"
+                href="/admin/new-reservation"
                 className="flex items-center justify-center p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
               >
                 <div className="text-center">
@@ -284,7 +284,7 @@ export default function AdminDashboard() {
               </Link>
               
               <Link
-                href="/flight-status"
+                href="/admin/flight-status"
                 className="flex items-center justify-center p-4 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
               >
                 <div className="text-center">
@@ -294,7 +294,7 @@ export default function AdminDashboard() {
               </Link>
               
               <Link
-                href="/reports"
+                href="/admin/reports"
                 className="flex items-center justify-center p-4 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors"
               >
                 <div className="text-center">
@@ -310,7 +310,7 @@ export default function AdminDashboard() {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.dashboard.quickActions.accommodationOperations')}</h3>
             <div className="grid grid-cols-2 gap-4">
               <Link
-                href="/accommodation"
+                href="/admin/accommodation"
                 className="flex items-center justify-center p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
               >
                 <div className="text-center">
@@ -320,7 +320,7 @@ export default function AdminDashboard() {
               </Link>
               
               <Link
-                href="/accommodation/price-pool"
+                href="/admin/accommodation/price-pool"
                 className="flex items-center justify-center p-4 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
               >
                 <div className="text-center">
@@ -330,7 +330,7 @@ export default function AdminDashboard() {
               </Link>
               
               <Link
-                href="/accommodation/reservations"
+                href="/admin/accommodation/reservations"
                 className="flex items-center justify-center p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
               >
                 <div className="text-center">
@@ -340,7 +340,7 @@ export default function AdminDashboard() {
               </Link>
               
               <Link
-                href="/accommodation/reports"
+                href="/admin/accommodation/reports"
                 className="flex items-center justify-center p-4 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors"
               >
                 <div className="text-center">

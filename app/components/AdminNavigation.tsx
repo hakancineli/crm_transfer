@@ -44,14 +44,14 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
     },
     {
       name: t('admin.navigation.newReservation'),
-      href: '/new-reservation',
+      href: '/admin/new-reservation',
       icon: '➕',
       description: t('admin.navigation.newReservation'),
       module: 'transfer'
     },
     {
       name: 'Uçuş Durumu',
-      href: '/flight-status',
+      href: '/admin/flight-status',
       icon: '✈️',
       description: 'Uçuş takibi ve durumu',
       module: 'flight'
@@ -65,7 +65,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
     },
     {
       name: t('admin.navigation.reports'),
-      href: '/reports',
+      href: '/admin/reports',
       icon: '📈',
       description: t('admin.navigation.reports'),
       module: 'transfer'
@@ -107,28 +107,28 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
     },
     {
       name: 'Konaklama',
-      href: '/accommodation',
+      href: '/admin/accommodation',
       icon: '🏨',
       description: 'Otel rezervasyon yönetimi',
       module: 'accommodation'
     },
     {
       name: 'Konaklama Rezervasyonları',
-      href: '/accommodation/reservations',
+      href: '/admin/accommodation/reservations',
       icon: '📋',
       description: 'Tüm otel rezervasyonlarını görüntüle',
       module: 'accommodation'
     },
     {
       name: 'Konaklama Raporları',
-      href: '/accommodation/reports',
+      href: '/admin/accommodation/reports',
       icon: '📊',
       description: 'Detaylı analiz ve raporlar',
       module: 'accommodation'
     },
     {
       name: 'Otel Fiyat Havuzu',
-      href: '/accommodation/price-pool',
+      href: '/admin/accommodation/price-pool',
       icon: '🏨',
       description: 'Tüm satış personelinin görebileceği fiyatlar',
       module: 'accommodation'
