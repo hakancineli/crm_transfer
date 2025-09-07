@@ -145,7 +145,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
   }));
 
   return (
-    <div className="bg-white shadow-lg border-r border-gray-200 h-screen w-64 flex flex-col">
+    <div className="bg-white shadow-lg border-r border-gray-200 h-screen w-64 flex flex-col overflow-hidden">
       {/* Mobile Close Button */}
       <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200">
         <span className="text-lg font-semibold text-gray-900">ProTransfer</span>
@@ -160,7 +160,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
       </div>
 
       {/* Navigation */}
-      <nav className="p-4 space-y-2 pt-6 flex-1 overflow-y-auto">
+      <nav className="p-4 space-y-2 pt-6 flex-1 overflow-y-auto pb-4">
         {menuItems.map((item) => {
           // Check if item should be shown based on user permissions
           let shouldShow = true;
@@ -214,7 +214,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
       </nav>
 
       {/* User Info & Logout */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">
         {user ? (
           <>
             <div className="flex items-center space-x-3">
