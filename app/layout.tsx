@@ -92,7 +92,10 @@ export default function RootLayout({
                     'api-edge.cognitive',
                     'message port closed',
                     'listener indicated an asynchronous response',
-                    'X-Frame-Options may only be set via an HTTP header'
+                    'X-Frame-Options may only be set via an HTTP header',
+                    'Extra attributes from the server: rp-extension',
+                    'Error handling response: TypeError: Cannot read properties of undefined',
+                    'Unchecked runtime.lastError: The message port closed before a response was received'
                   ];
                   
                   return filterPatterns.some(pattern => 
@@ -121,7 +124,8 @@ export default function RootLayout({
                 
                 // Prevent extension errors from appearing
                 window.addEventListener('error', function(e) {
-                  if (e.message && shouldFilter(e.message)) {
+                  const errorMessage = e.message || e.error?.message || '';
+                  if (shouldFilter(errorMessage)) {
                     e.preventDefault();
                     e.stopPropagation();
                     return false;
