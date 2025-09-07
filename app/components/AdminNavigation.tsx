@@ -99,6 +99,13 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
       module: 'transfer'
     },
     {
+      name: 'Müşteri Kurulumu',
+      href: '/admin/customer-setup',
+      icon: '🏢',
+      description: 'Yeni müşteri şirketi kurulumu',
+      module: 'transfer'
+    },
+    {
       name: 'Konaklama',
       href: '/accommodation',
       icon: '🏨',
@@ -190,6 +197,8 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               shouldShow = user?.permissions?.some(p => 
                 p.permission === 'MANAGE_USERS' && p.isActive
               ) || false;
+            } else if (item.name === 'Müşteri Kurulumu') {
+              shouldShow = false; // Only SUPERUSER can see this
             }
           }
           
