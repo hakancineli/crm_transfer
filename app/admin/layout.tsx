@@ -1,19 +1,26 @@
 'use client';
 
 import AdminNavigation from '@/app/components/AdminNavigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+      setSidebarOpen(isDesktop);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Mobile Header */}
-      <div className="lg:hidden bg-white shadow-sm border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+      {/* Top Header (desktop + mobile) */}
+      <div className="bg-white shadow-sm border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
@@ -25,26 +32,26 @@ export default function AdminLayout({
         <div className="flex items-center">
           <span className="text-lg font-semibold text-gray-900">ProTransfer</span>
         </div>
-        <div className="w-10"></div> {/* Spacer for centering */}
+        <div className="w-10"></div>
       </div>
 
-      {/* Mobile Overlay */}
+      {/* Overlay for mobile when sidebar is open */}
       {sidebarOpen && (
         <div 
-          className="lg:hidden fixed inset-0 z-40 bg-black bg-opacity-50"
+          className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+      {/* Sidebar - fixed for all viewports */}
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <AdminNavigation onClose={() => setSidebarOpen(false)} />
       </div>
 
       {/* Main Content */}
-      <main className="lg:ml-64 min-h-screen overflow-x-hidden pt-16 lg:pt-0">
+      <main className={`${sidebarOpen ? 'lg:ml-64' : ''} min-h-screen overflow-x-hidden pt-4`}>
         {children}
       </main>
     </div>
