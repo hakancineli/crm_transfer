@@ -19,11 +19,11 @@ export default function AdminLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hamburger button for mobile sidebar */}
-      <div className="fixed top-4 left-4 z-50 lg:hidden">
+      {/* Hamburger button - always visible */}
+      <div className="fixed top-4 left-4 z-50">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 bg-white shadow-md"
+          className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 bg-white shadow-md border border-gray-200"
         >
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -31,10 +31,10 @@ export default function AdminLayout({
         </button>
       </div>
 
-      {/* Overlay for mobile when sidebar is open */}
+      {/* Overlay when sidebar is open */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
+          className="fixed inset-0 z-40 bg-black bg-opacity-50"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -47,7 +47,7 @@ export default function AdminLayout({
       </div>
 
       {/* Main Content */}
-      <main className={`${sidebarOpen ? 'lg:ml-64' : ''} min-h-screen overflow-x-hidden pt-16`}>
+      <main className={`${sidebarOpen ? 'ml-64' : ''} min-h-screen overflow-x-hidden pt-16`}>
         {children}
       </main>
     </div>
