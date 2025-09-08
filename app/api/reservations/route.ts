@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
     const authHeader = request.headers.get('authorization');
     let currentUserId: string | null = null;
     let currentUserRole: string | null = null;
+    let currentTenantIds: string[] = [];
 
     if (authHeader && authHeader.startsWith('Bearer ')) {
       try {
@@ -17,6 +18,14 @@ export async function GET(request: NextRequest) {
         const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
         currentUserId = decoded.userId || null;
         currentUserRole = decoded.role || null;
+        // Fetch tenant links for scoping
+        if (decoded?.userId) {
+          const links = await prisma.tenantUser.findMany({
+            where: { userId: decoded.userId, isActive: true },
+            select: { tenantId: true }
+          });
+          currentTenantIds = links.map(l => l.tenantId);
+        }
       } catch (e) {
         // token invalid → treat as public
       }
@@ -80,10 +89,13 @@ export async function GET(request: NextRequest) {
     // If no phone parameter, return reservations (scoped)
     console.log('API: Tüm rezervasyonlar getiriliyor...');
     const whereClause: any = {};
-    // AGENCY rollerini kendi oluşturduklarıyla sınırlıyoruz (tenant bağlama gelene kadar)
+    // AGENCY rollerini tenant bazında sınırla
     if (currentUserRole === 'AGENCY_ADMIN' || currentUserRole === 'AGENCY_USER') {
-      if (currentUserId) {
-        whereClause.userId = currentUserId;
+      if (currentTenantIds.length > 0) {
+        whereClause.tenantId = { in: currentTenantIds };
+      } else {
+        // Tenant bağlantısı yoksa sonuç göstermeyelim
+        whereClause.tenantId = '__no_such_tenant__';
       }
     }
 
@@ -132,11 +144,19 @@ export async function POST(request: NextRequest) {
         const data = await request.json();
         const authHeader = request.headers.get('authorization');
         let currentUserId: string | null = null;
+        let currentTenantId: string | null = null;
         if (authHeader && authHeader.startsWith('Bearer ')) {
           try {
             const token = authHeader.substring(7);
             const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
             currentUserId = decoded.userId || null;
+            if (decoded?.userId) {
+              const link = await prisma.tenantUser.findFirst({
+                where: { userId: decoded.userId, isActive: true },
+                select: { tenantId: true }
+              });
+              currentTenantId = link?.tenantId || null;
+            }
           } catch (e) {
             // ignore token errors
           }
@@ -191,7 +211,8 @@ export async function POST(request: NextRequest) {
                 voucherNumber,
                 driverId: null,
                 driverFee: null,
-                userId: currentUserId || null
+                userId: currentUserId || null,
+                tenantId: currentTenantId || null
             }
         });
 
