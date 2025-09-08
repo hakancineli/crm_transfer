@@ -319,9 +319,9 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             </div>
 
             {/* Desktop Tablo */}
-            <div className="hidden lg:block bg-white shadow-lg rounded-xl border border-gray-200 overflow-x-auto">
+            <div className="hidden lg:block bg-white shadow-lg rounded-xl border border-gray-200 overflow-hidden">
                 <div>
-                    <table className="w-full min-w-[1200px] xl:min-w-[1400px] 2xl:min-w-[1600px] table-fixed">
+                    <table className="w-full table-auto">
                         <thead>
                             <tr className="bg-gradient-to-r from-gray-50 to-gray-100">
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-28">
@@ -333,10 +333,10 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-36">
                                     Tarih
                                 </th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-[26rem] xl:w-[32rem] 2xl:w-[36rem]">
+                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Güzergah
                                 </th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-56 xl:w-64 2xl:w-72">
+                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Müşteri
                                 </th>
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-24">
@@ -421,16 +421,16 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                 <div className="flex flex-col space-y-2">
                                                     {/* Güzergah Bilgisi - Temiz ve Düzenli */}
                                                     <div className="flex items-start">
-                                                        <div className="flex flex-col flex-1 max-w-[24rem] xl:max-w-[30rem] 2xl:max-w-[34rem]">
-                                                            <div className="text-sm font-medium text-gray-900 truncate" title={formattedFrom}>
+                                                        <div className="flex flex-col flex-1">
+                                                            <div className="text-sm font-medium text-gray-900 whitespace-normal break-words leading-tight" title={formattedFrom}>
                                                                 {formattedFrom}
                                                             </div>
                                                         </div>
                                                         <div className="flex items-center justify-center w-8 px-1">
                                                             <span className="text-gray-400 text-lg">→</span>
                                                         </div>
-                                                        <div className="flex flex-col flex-1 max-w-[24rem] xl:max-w-[30rem] 2xl:max-w-[34rem]">
-                                                            <div className="text-sm font-medium text-gray-900 truncate" title={formattedTo}>
+                                                        <div className="flex flex-col flex-1">
+                                                            <div className="text-sm font-medium text-gray-900 whitespace-normal break-words leading-tight" title={formattedTo}>
                                                                 {formattedTo}
                                                             </div>
                                                         </div>
@@ -450,12 +450,12 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-900 align-top">
-                                                <div className="flex flex-col max-w-[14rem] xl:max-w-[18rem] 2xl:max-w-[22rem]">
-                                                    <div className="font-medium truncate whitespace-nowrap" title={formattedPassengerNames.join(', ')}>
+                                                <div className="flex flex-col">
+                                                    <div className="font-medium whitespace-normal break-words leading-tight" title={formattedPassengerNames.join(', ')}>
                                                         {formattedPassengerNames.join(', ')}
                                                     </div>
                                                     {reservation.phoneNumber && (
-                                                        <div className="text-xs text-gray-500 mt-1 truncate" title={formatPhoneNumber(reservation.phoneNumber)}>
+                                                        <div className="text-xs text-gray-500 mt-1 whitespace-normal break-words" title={formatPhoneNumber(reservation.phoneNumber)}>
                                                             {formatPhoneNumber(reservation.phoneNumber)}
                                                         </div>
                                                     )}
