@@ -48,7 +48,10 @@ export default function PerformancePage() {
   const fetchPerformanceData = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/performance');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const response = await fetch('/api/performance', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
+      });
       if (response.ok) {
         const data = await response.json();
         setPerformance(data.performance);

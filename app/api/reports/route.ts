@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Reservation } from '@prisma/client';
+import jwt from 'jsonwebtoken';
 
 async function getUSDRate() {
     try {
@@ -13,7 +14,7 @@ async function getUSDRate() {
     }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     try {
         const { startDate, endDate } = await request.json();
 
@@ -23,15 +24,43 @@ export async function POST(request: Request) {
         }
         const usdRate = await getUSDRate();
 
+        // Tenant scoping for non-SUPERUSER
+        const authHeader = request.headers.get('authorization');
+        let currentUserRole: string | null = null;
+        let currentTenantIds: string[] = [];
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            try {
+                const token = authHeader.substring(7);
+                const decoded: any = jwt.decode(token);
+                currentUserRole = decoded?.role || null;
+                if (decoded?.userId) {
+                    const links = await prisma.tenantUser.findMany({
+                        where: { userId: decoded.userId, isActive: true },
+                        select: { tenantId: true }
+                    });
+                    currentTenantIds = links.map(l => l.tenantId);
+                }
+            } catch (_) {}
+        }
+
+        const whereClause: any = {
+            // date alanı string (YYYY-MM-DD). Postgres için doğrudan karşılaştırma yapılabilir.
+            date: {
+                gte: String(startDate),
+                lte: String(endDate)
+            }
+        };
+        if (currentUserRole && currentUserRole !== 'SUPERUSER') {
+            if (currentTenantIds.length > 0) {
+                whereClause.tenantId = { in: currentTenantIds };
+            } else {
+                whereClause.tenantId = '__none__';
+            }
+        }
+
         // Tarih aralığındaki tüm rezervasyonları getir
         const reservations = await prisma.reservation.findMany({
-            where: {
-                // date alanı string (YYYY-MM-DD). Postgres için doğrudan karşılaştırma yapılabilir.
-                date: {
-                    gte: String(startDate),
-                    lte: String(endDate)
-                }
-            },
+            where: whereClause,
             include: {
                 driver: true
             }

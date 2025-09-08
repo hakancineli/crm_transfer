@@ -1,12 +1,41 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import jwt from 'jsonwebtoken';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // Get all users with their reservations
+    // Scope by tenant for non-SUPERUSER
+    const authHeader = request.headers.get('authorization');
+    let currentUserRole: string | null = null;
+    let currentTenantIds: string[] = [];
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.substring(7);
+        const decoded: any = jwt.decode(token);
+        currentUserRole = decoded?.role || null;
+        if (decoded?.userId) {
+          const links = await prisma.tenantUser.findMany({
+            where: { userId: decoded.userId, isActive: true },
+            select: { tenantId: true }
+          });
+          currentTenantIds = links.map(l => l.tenantId);
+        }
+      } catch (_) {}
+    }
+
+    const reservationWhere: any = {};
+    if (currentUserRole && currentUserRole !== 'SUPERUSER') {
+      if (currentTenantIds.length > 0) {
+        reservationWhere.tenantId = { in: currentTenantIds };
+      } else {
+        reservationWhere.tenantId = '__none__';
+      }
+    }
+
+    // Get all users with their reservations (scoped)
     const users = await prisma.user.findMany({
       include: {
-        reservations: true,
+        reservations: { where: reservationWhere },
         _count: {
           select: {
             reservations: true
