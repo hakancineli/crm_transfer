@@ -9,7 +9,7 @@ interface User {
   username: string;
   email: string;
   name: string;
-  role: 'SUPERUSER' | 'OPERATION' | 'SELLER' | 'ACCOUNTANT';
+  role: 'SUPERUSER' | 'AGENCY_ADMIN' | 'AGENCY_USER' | 'OPERATION' | 'SELLER' | 'ACCOUNTANT';
   isActive: boolean;
   createdAt: string;
   creator?: { name: string };
@@ -28,7 +28,7 @@ export default function UsersPage() {
     email: '',
     password: '',
     name: '',
-    role: 'SELLER' as 'SUPERUSER' | 'OPERATION' | 'SELLER' | 'ACCOUNTANT',
+    role: 'SELLER' as 'SUPERUSER' | 'AGENCY_ADMIN' | 'AGENCY_USER' | 'OPERATION' | 'SELLER' | 'ACCOUNTANT',
     isActive: true
   });
 
@@ -142,6 +142,8 @@ export default function UsersPage() {
   const getRoleText = (role: string) => {
     switch (role) {
       case 'SUPERUSER': return 'Süperkullanıcı';
+      case 'AGENCY_ADMIN': return 'Acenta Yöneticisi';
+      case 'AGENCY_USER': return 'Acenta Personeli';
       case 'OPERATION': return 'Operasyon';
       case 'SELLER': return 'Satıcı';
       case 'ACCOUNTANT': return 'Muhasebeci';
@@ -152,6 +154,8 @@ export default function UsersPage() {
   const getRoleColor = (role: string) => {
     switch (role) {
       case 'SUPERUSER': return 'bg-red-100 text-red-800';
+      case 'AGENCY_ADMIN': return 'bg-indigo-100 text-indigo-800';
+      case 'AGENCY_USER': return 'bg-teal-100 text-teal-800';
       case 'OPERATION': return 'bg-blue-100 text-blue-800';
       case 'SELLER': return 'bg-green-100 text-green-800';
       case 'ACCOUNTANT': return 'bg-purple-100 text-purple-800';
@@ -425,6 +429,8 @@ export default function UsersPage() {
                     onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
                     className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                   >
+                    <option value="AGENCY_ADMIN">Acenta Yöneticisi</option>
+                    <option value="AGENCY_USER">Acenta Personeli</option>
                     <option value="SELLER">Satıcı</option>
                     <option value="OPERATION">Operasyon</option>
                     <option value="ACCOUNTANT">Muhasebeci</option>
@@ -504,6 +510,8 @@ export default function UsersPage() {
                     onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
                     className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                   >
+                    <option value="AGENCY_ADMIN">Acenta Yöneticisi</option>
+                    <option value="AGENCY_USER">Acenta Personeli</option>
                     <option value="SELLER">Satıcı</option>
                     <option value="OPERATION">Operasyon</option>
                     <option value="ACCOUNTANT">Muhasebeci</option>
