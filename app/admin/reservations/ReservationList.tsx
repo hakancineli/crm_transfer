@@ -319,9 +319,9 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             </div>
 
             {/* Desktop Tablo */}
-            <div className="hidden lg:block bg-white shadow-lg rounded-xl border border-gray-200 overflow-hidden">
+            <div className="hidden lg:block bg-white shadow-lg rounded-xl border border-gray-200 overflow-x-auto">
                 <div>
-                    <table className="w-full table-fixed">
+                    <table className="w-full min-w-[1200px] xl:min-w-[1400px] 2xl:min-w-[1600px] table-fixed">
                         <thead>
                             <tr className="bg-gradient-to-r from-gray-50 to-gray-100">
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-28">
