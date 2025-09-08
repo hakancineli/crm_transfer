@@ -62,7 +62,10 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
 
     const fetchReservations = async () => {
         try {
-            const response = await fetch('/api/reservations');
+            const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+            const response = await fetch('/api/reservations', {
+                headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
+            });
             const data = await response.json();
             
             // Eğer hata objesi dönerse veya veri dizi değilse, boş dizi kullan

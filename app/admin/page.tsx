@@ -58,12 +58,17 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       
-      // Rezervasyon istatistikleri
-      const reservationsResponse = await fetch('/api/reservations');
+      // Rezervasyon istatistikleri (token ile)
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const reservationsResponse = await fetch('/api/reservations', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
+      });
       const reservations = await reservationsResponse.json();
       
-      // Sürücü istatistikleri
-      const driversResponse = await fetch('/api/drivers');
+      // Sürücü istatistikleri (token ile)
+      const driversResponse = await fetch('/api/drivers', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
+      });
       const drivers = await driversResponse.json();
       
       // Bugünkü tarih
