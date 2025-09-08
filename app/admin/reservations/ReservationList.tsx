@@ -333,7 +333,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-36">
                                     Tarih
                                 </th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-[26rem] xl:w-[32rem] 2xl:w-[36rem]">
                                     Güzergah
                                 </th>
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
@@ -420,17 +420,17 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             <td className="px-6 py-4 text-sm text-gray-900 whitespace-normal break-words align-top">
                                                 <div className="flex flex-col space-y-2">
                                                     {/* Güzergah Bilgisi - Temiz ve Düzenli */}
-                                                    <div className="flex items-center">
-                                                        <div className="flex flex-col flex-1">
-                                                            <div className="whitespace-normal break-words text-sm font-medium text-gray-900">
+                                                    <div className="flex items-start">
+                                                        <div className="flex flex-col flex-1 max-w-[24rem] xl:max-w-[30rem] 2xl:max-w-[34rem]">
+                                                            <div className="text-sm font-medium text-gray-900 truncate" title={formattedFrom}>
                                                                 {formattedFrom}
                                                             </div>
                                                         </div>
-                                                        <div className="flex items-center justify-center w-8">
+                                                        <div className="flex items-center justify-center w-8 px-1">
                                                             <span className="text-gray-400 text-lg">→</span>
                                                         </div>
-                                                        <div className="flex flex-col flex-1">
-                                                            <div className="whitespace-normal break-words text-sm font-medium text-gray-900">
+                                                        <div className="flex flex-col flex-1 max-w-[24rem] xl:max-w-[30rem] 2xl:max-w-[34rem]">
+                                                            <div className="text-sm font-medium text-gray-900 truncate" title={formattedTo}>
                                                                 {formattedTo}
                                                             </div>
                                                         </div>
