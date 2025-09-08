@@ -319,24 +319,24 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             </div>
 
             {/* Desktop Tablo */}
-            <div className="hidden lg:block bg-white shadow-lg rounded-xl border border-gray-200 overflow-hidden">
+            <div className="hidden lg:block bg-white shadow-lg rounded-xl border border-gray-200 overflow-x-auto">
                 <div>
-                    <table className="w-full table-auto">
+                    <table className="w-full min-w-[1200px] xl:min-w-[1360px] table-auto">
                         <thead>
                             <tr className="bg-gradient-to-r from-gray-50 to-gray-100">
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-28">
+                                <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-28">
                                     Voucher
                                 </th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-32">
+                                <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-28">
                                     Tip
                                 </th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-36">
+                                <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-32">
                                     Tarih
                                 </th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Güzergah
                                 </th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Müşteri
                                 </th>
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-24">
