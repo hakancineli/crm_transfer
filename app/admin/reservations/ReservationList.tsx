@@ -28,7 +28,7 @@ interface Reservation {
         phoneNumber?: string;
     } | null;
 }
-import { formatLocation, formatPassengerName, formatHotelName } from '@/app/utils/textFormatters';
+import { formatLocation, formatPassengerName, formatHotelName, toTitleCase } from '@/app/utils/textFormatters';
 import ReturnTransferModal from '@/app/components/ReturnTransferModal';
 import FlightStatus from '@/app/components/FlightStatus';
 import { useAuth } from '@/app/contexts/AuthContext';
@@ -369,8 +369,28 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                             ) : (
                                 filteredReservations.map((reservation) => {
                                     const isUrgent = isWithinTwoHours(reservation.date, reservation.time);
-                                    const formattedFrom = formatLocation(reservation.from);
-                                    const formattedTo = formatLocation(reservation.to);
+                                    // Kısa güzergah gösterimi: Havalimanı adı + ilçe
+                                    const isFromAirport = reservation.from.includes('IST') || reservation.from.includes('SAW');
+                                    const isToAirport = reservation.to.includes('IST') || reservation.to.includes('SAW');
+
+                                    const extractDistrict = (text: string) => {
+                                        // virgül veya '/' ile ayrılmış son parça ilçe/semte işaret eder
+                                        const parts = text.split(/[,/]/).map(p => p.trim()).filter(Boolean);
+                                        return toTitleCase(parts[0] || text);
+                                    };
+
+                                    const airportLabel = (text: string) => {
+                                        if (text.includes('IST')) return 'IST';
+                                        if (text.includes('SAW')) return 'SAW';
+                                        return formatLocation(text);
+                                    };
+
+                                    const formattedFrom = isFromAirport
+                                        ? airportLabel(reservation.from)
+                                        : extractDistrict(reservation.from);
+                                    const formattedTo = isToAirport
+                                        ? airportLabel(reservation.to)
+                                        : extractDistrict(reservation.to);
                                     const formattedPassengerNames = Array.isArray(reservation.passengerNames)
                                         ? reservation.passengerNames.map(name => formatPassengerName(name))
                                         : typeof reservation.passengerNames === 'string'
@@ -619,8 +639,19 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                 ) : (
                     filteredReservations.map((reservation) => {
                         const isUrgent = isWithinTwoHours(reservation.date, reservation.time);
-                        const formattedFrom = formatLocation(reservation.from);
-                        const formattedTo = formatLocation(reservation.to);
+                        const isFromAirport = reservation.from.includes('IST') || reservation.from.includes('SAW');
+                        const isToAirport = reservation.to.includes('IST') || reservation.to.includes('SAW');
+                        const extractDistrict = (text: string) => {
+                            const parts = text.split(/[,/]/).map(p => p.trim()).filter(Boolean);
+                            return toTitleCase(parts[0] || text);
+                        };
+                        const airportLabel = (text: string) => {
+                            if (text.includes('IST')) return 'IST';
+                            if (text.includes('SAW')) return 'SAW';
+                            return formatLocation(text);
+                        };
+                        const formattedFrom = isFromAirport ? airportLabel(reservation.from) : extractDistrict(reservation.from);
+                        const formattedTo = isToAirport ? airportLabel(reservation.to) : extractDistrict(reservation.to);
                         const formattedPassengerNames = Array.isArray(reservation.passengerNames)
                             ? reservation.passengerNames.map(name => formatPassengerName(name))
                             : typeof reservation.passengerNames === 'string'
