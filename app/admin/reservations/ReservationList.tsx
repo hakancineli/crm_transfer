@@ -336,7 +336,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-[26rem] xl:w-[32rem] 2xl:w-[36rem]">
                                     Güzergah
                                 </th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-56 xl:w-64 2xl:w-72">
                                     Müşteri
                                 </th>
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-24">
@@ -449,13 +449,13 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 whitespace-normal break-words align-top">
-                                                <div className="flex flex-col">
-                                                    <div className="font-medium whitespace-normal break-words">
+                                            <td className="px-6 py-4 text-sm text-gray-900 align-top">
+                                                <div className="flex flex-col max-w-[14rem] xl:max-w-[18rem] 2xl:max-w-[22rem]">
+                                                    <div className="font-medium truncate whitespace-nowrap" title={formattedPassengerNames.join(', ')}>
                                                         {formattedPassengerNames.join(', ')}
                                                     </div>
                                                     {reservation.phoneNumber && (
-                                                        <div className="text-xs text-gray-500">
+                                                        <div className="text-xs text-gray-500 mt-1 truncate" title={formatPhoneNumber(reservation.phoneNumber)}>
                                                             {formatPhoneNumber(reservation.phoneNumber)}
                                                         </div>
                                                     )}
