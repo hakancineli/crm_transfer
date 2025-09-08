@@ -67,7 +67,7 @@ export default function ReservationForm() {
             const result = await response.json();
             setSuccess(true);
 
-            router.push(`/reservations/${result.voucherNumber}`);
+            router.push(`/admin/reservations/${result.voucherNumber}`);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Bir hata oluştu');
             console.error('Form gönderme hatası:', err);
