@@ -70,7 +70,12 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             
             // Eğer hata objesi dönerse veya veri dizi değilse, boş dizi kullan
             const sortedData = Array.isArray(data)
-                ? data.sort((a: Reservation, b: Reservation) => {
+                ? data.map((reservation: any) => ({
+                    ...reservation,
+                    passengerNames: typeof reservation.passengerNames === 'string' 
+                        ? JSON.parse(reservation.passengerNames || '[]')
+                        : reservation.passengerNames || []
+                })).sort((a: Reservation, b: Reservation) => {
                     const timeA = new Date(`${a.date} ${a.time}`).getTime();
                     const timeB = new Date(`${b.date} ${b.time}`).getTime();
                     // Yeni → Eski

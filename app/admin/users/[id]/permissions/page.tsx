@@ -35,15 +35,15 @@ export default function UserPermissionsPage() {
   const [permissions, setPermissions] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    // Only SUPERUSER can access user permissions
-    if (currentUser && currentUser.role !== 'SUPERUSER') {
+    // SUPERUSER or AGENCY_ADMIN can access user permissions
+    if (currentUser && !['SUPERUSER', 'AGENCY_ADMIN'].includes(currentUser.role)) {
       window.location.href = '/admin';
       return;
     }
     
     // Prevent users from editing their own permissions
     if (currentUser && currentUser.id === userId) {
-      alert('Kendi izinlerinizi değiştiremezsiniz. Bu işlem sadece süper kullanıcı tarafından yapılabilir.');
+      alert('Kendi izinlerinizi değiştiremezsiniz. Bu işlem sadece süper kullanıcı veya acenta yöneticisi tarafından yapılabilir.');
       window.location.href = '/admin/users';
       return;
     }

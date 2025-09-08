@@ -308,7 +308,7 @@ export default function UsersPage() {
                   >
                     🔐 Yetkiler
                   </button>
-                  {user.role !== 'SUPERUSER' && (
+                  {user.role !== 'SUPERUSER' && user.id !== currentUser?.id && (
                     <button
                       onClick={() => handleDeleteUser(user.id)}
                       className="text-red-600 hover:text-red-900"
@@ -373,7 +373,7 @@ export default function UsersPage() {
               >
                 🔐 Yetkiler
               </button>
-              {user.role !== 'SUPERUSER' && (
+              {user.role !== 'SUPERUSER' && user.id !== currentUser?.id && (
                 <button
                   onClick={() => handleDeleteUser(user.id)}
                   className="text-red-600 hover:text-red-900 text-sm px-3 py-1 border border-red-200 rounded"
