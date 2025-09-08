@@ -29,12 +29,29 @@ interface TenantUser {
   };
 }
 
+interface Reservation {
+  id: string;
+  voucherNumber: string;
+  date: string;
+  time: string;
+  from: string;
+  to: string;
+  passengerNames: string[];
+  price: number;
+  currency: string;
+  phoneNumber: string;
+  paymentStatus: string;
+  createdAt: string;
+}
+
 export default function CompaniesPage() {
   const { user } = useAuth();
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
   const [tenantUsers, setTenantUsers] = useState<TenantUser[]>([]);
+  const [tenantReservations, setTenantReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'users' | 'reservations'>('users');
 
   useEffect(() => {
     if (user?.role !== 'SUPERUSER') {
@@ -81,9 +98,28 @@ export default function CompaniesPage() {
     }
   };
 
+  const fetchTenantReservations = async (tenantId: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/reservations?tenantId=${tenantId}`, {
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setTenantReservations(data);
+      }
+    } catch (error) {
+      console.error('Şirket rezervasyonları getirilemedi:', error);
+    }
+  };
+
   const handleTenantSelect = (tenant: Tenant) => {
     setSelectedTenant(tenant);
+    setActiveTab('users');
     fetchTenantUsers(tenant.id);
+    fetchTenantReservations(tenant.id);
   };
 
   const getRoleText = (role: string) => {
@@ -191,45 +227,109 @@ export default function CompaniesPage() {
           </div>
         </div>
 
-        {/* Seçili Şirketin Kullanıcıları */}
+        {/* Seçili Şirketin Detayları */}
         <div className="bg-white shadow rounded-lg">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">
-              {selectedTenant ? `${selectedTenant.companyName} - Kullanıcılar` : 'Kullanıcılar'}
-            </h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-medium text-gray-900">
+                {selectedTenant ? selectedTenant.companyName : 'Detaylar'}
+              </h2>
+              {selectedTenant && (
+                <div className="flex space-x-1">
+                  <button
+                    onClick={() => setActiveTab('users')}
+                    className={`px-3 py-1 text-sm font-medium rounded-md ${
+                      activeTab === 'users'
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    Kullanıcılar
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('reservations')}
+                    className={`px-3 py-1 text-sm font-medium rounded-md ${
+                      activeTab === 'reservations'
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    Rezervasyonlar
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
           <div className="divide-y divide-gray-200">
             {selectedTenant ? (
-              tenantUsers.length > 0 ? (
-                tenantUsers.map((tenantUser) => (
-                  <div key={tenantUser.id} className="p-4">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h3 className="text-sm font-medium text-gray-900">{tenantUser.user.name}</h3>
-                        <p className="text-sm text-gray-500">{tenantUser.user.username}</p>
-                        <p className="text-sm text-gray-500">{tenantUser.user.email}</p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(tenantUser.role)}`}>
-                          {getRoleText(tenantUser.role)}
-                        </span>
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          tenantUser.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}>
-                          {tenantUser.isActive ? 'Aktif' : 'Pasif'}
-                        </span>
+              activeTab === 'users' ? (
+                tenantUsers.length > 0 ? (
+                  tenantUsers.map((tenantUser) => (
+                    <div key={tenantUser.id} className="p-4">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900">{tenantUser.user.name}</h3>
+                          <p className="text-sm text-gray-500">{tenantUser.user.username}</p>
+                          <p className="text-sm text-gray-500">{tenantUser.user.email}</p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(tenantUser.role)}`}>
+                            {getRoleText(tenantUser.role)}
+                          </span>
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            tenantUser.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>
+                            {tenantUser.isActive ? 'Aktif' : 'Pasif'}
+                          </span>
+                        </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="p-4 text-center text-gray-500">
+                    Bu şirkette kullanıcı bulunmuyor
                   </div>
-                ))
+                )
               ) : (
-                <div className="p-4 text-center text-gray-500">
-                  Bu şirkette kullanıcı bulunmuyor
-                </div>
+                tenantReservations.length > 0 ? (
+                  <div className="max-h-96 overflow-y-auto">
+                    {tenantReservations.map((reservation) => (
+                      <div key={reservation.id} className="p-4">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2">
+                              <h3 className="text-sm font-medium text-gray-900">{reservation.voucherNumber}</h3>
+                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                reservation.paymentStatus === 'PAID' 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : 'bg-yellow-100 text-yellow-800'
+                              }`}>
+                                {reservation.paymentStatus === 'PAID' ? 'Ödendi' : 'Beklemede'}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-500 mt-1">
+                              {reservation.date} {reservation.time} - {reservation.from} → {reservation.to}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {reservation.passengerNames.join(', ')} • {reservation.price} {reservation.currency}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              {reservation.phoneNumber} • {new Date(reservation.createdAt).toLocaleDateString('tr-TR')}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-4 text-center text-gray-500">
+                    Bu şirkette rezervasyon bulunmuyor
+                  </div>
+                )
               )
             ) : (
               <div className="p-4 text-center text-gray-500">
-                Kullanıcıları görüntülemek için bir şirket seçin
+                Detayları görüntülemek için bir şirket seçin
               </div>
             )}
           </div>

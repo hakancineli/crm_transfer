@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
     console.log('API: Rezervasyonlar getiriliyor...');
     const { searchParams } = new URL(request.url);
     const phone = searchParams.get('phone');
+    const tenantId = searchParams.get('tenantId');
     const authHeader = request.headers.get('authorization');
     let currentUserId: string | null = null;
     let currentUserRole: string | null = null;
@@ -89,13 +90,19 @@ export async function GET(request: NextRequest) {
     // If no phone parameter, return reservations (scoped)
     console.log('API: Tüm rezervasyonlar getiriliyor...');
     const whereClause: any = {};
-    // AGENCY rollerini tenant bazında sınırla
-    if (currentUserRole === 'AGENCY_ADMIN' || currentUserRole === 'AGENCY_USER') {
-      if (currentTenantIds.length > 0) {
-        whereClause.tenantId = { in: currentTenantIds };
-      } else {
-        // Tenant bağlantısı yoksa sonuç göstermeyelim
-        whereClause.tenantId = '__no_such_tenant__';
+    
+    // If tenantId is specified, filter by that tenant (SUPERUSER only)
+    if (tenantId && currentUserRole === 'SUPERUSER') {
+      whereClause.tenantId = tenantId;
+    } else {
+      // AGENCY rollerini tenant bazında sınırla
+      if (currentUserRole === 'AGENCY_ADMIN' || currentUserRole === 'AGENCY_USER') {
+        if (currentTenantIds.length > 0) {
+          whereClause.tenantId = { in: currentTenantIds };
+        } else {
+          // Tenant bağlantısı yoksa sonuç göstermeyelim
+          whereClause.tenantId = '__no_such_tenant__';
+        }
       }
     }
 
