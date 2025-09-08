@@ -43,21 +43,24 @@ export default function UsersPage() {
       return;
     }
     
-    // Only SUPERUSER can access user management
-    if (user && user.role !== 'SUPERUSER') {
+    // Allow SUPERUSER or AGENCY_ADMIN (or roles with MANAGE_USERS permission)
+    const allowed = canManageUsers(user.role) || user.permissions?.some(p => p.permission === 'MANAGE_USERS' && p.isActive);
+    if (!allowed) {
       window.location.href = '/admin';
       return;
     }
     
-    // If user is SUPERUSER, fetch users
-    if (user && user.role === 'SUPERUSER') {
-      fetchUsers();
-    }
+    fetchUsers();
   }, [user, authLoading]);
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('/api/users');
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/users', {
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
+      });
       const data = await response.json();
       setUsers(data);
     } catch (error) {
@@ -70,9 +73,10 @@ export default function UsersPage() {
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch('/api/users', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': token ? `Bearer ${token}` : '' },
         body: JSON.stringify(formData)
       });
 
@@ -123,8 +127,10 @@ export default function UsersPage() {
     if (!confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')) return;
 
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`/api/users/${id}`, {
         method: 'DELETE'
+        , headers: { 'Authorization': token ? `Bearer ${token}` : '' }
       });
 
       if (response.ok) {
@@ -168,8 +174,8 @@ export default function UsersPage() {
     p.permission === 'MANAGE_USERS' && p.isActive
   );
   
-  // Check if user is SUPERUSER or has MANAGE_USERS permission
-  if (user && user.role !== 'SUPERUSER' && !hasManageUsersPermission) {
+  // Check if user can manage users (SUPERUSER or AGENCY_ADMIN or has MANAGE_USERS)
+  if (user && !canManageUsers(user.role) && !hasManageUsersPermission) {
     return (
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -184,7 +190,7 @@ export default function UsersPage() {
                 Yetkisiz Erişim
               </h3>
               <div className="mt-2 text-sm text-red-700">
-                <p>Bu sayfaya erişim yetkiniz bulunmamaktadır. Sadece süperkullanıcılar kullanıcı yönetimine erişebilir.</p>
+                <p>Bu sayfaya erişim yetkiniz bulunmamaktadır. Sadece Süperkullanıcılar veya Acenta Yöneticileri erişebilir.</p>
               </div>
             </div>
           </div>

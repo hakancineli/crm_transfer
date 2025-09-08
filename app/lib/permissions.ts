@@ -20,6 +20,7 @@ export const PERMISSIONS = {
   MANAGE_USERS: 'MANAGE_USERS',
   MANAGE_PERMISSIONS: 'MANAGE_PERMISSIONS',
   MANAGE_ACTIVITIES: 'MANAGE_ACTIVITIES',
+  VIEW_ACTIVITIES: 'VIEW_ACTIVITIES',
   
   // Sistem İzinleri
   SYSTEM_SETTINGS: 'SYSTEM_SETTINGS',
@@ -62,6 +63,7 @@ export const PERMISSION_LABELS = {
   MANAGE_USERS: 'Kullanıcı Yönetimi',
   MANAGE_PERMISSIONS: 'İzin Yönetimi',
   MANAGE_ACTIVITIES: 'Aktivite Loglarını Görme',
+  VIEW_ACTIVITIES: 'Aktivite Loglarını Görüntüleme',
   
   // Sistem İzinleri
   SYSTEM_SETTINGS: 'Sistem Ayarları',
@@ -101,7 +103,9 @@ export const ROLE_PERMISSIONS = {
     PERMISSIONS.MANAGE_PAYMENTS,
     PERMISSIONS.MANAGE_COMMISSIONS,
     PERMISSIONS.MANAGE_CUSTOMERS,
-    PERMISSIONS.VIEW_CUSTOMER_DATA
+    PERMISSIONS.VIEW_CUSTOMER_DATA,
+    PERMISSIONS.MANAGE_USERS,
+    PERMISSIONS.MANAGE_PERMISSIONS
   ],
   AGENCY_USER: [
     PERMISSIONS.VIEW_OWN_SALES,
@@ -184,7 +188,7 @@ export function canViewOwnSales(role: string): boolean {
 }
 
 export function canManageUsers(role: string): boolean {
-  return role === 'SUPERUSER';
+  return role === 'SUPERUSER' || role === 'AGENCY_ADMIN';
 }
 
 export function canManageActivities(role: string): boolean {
