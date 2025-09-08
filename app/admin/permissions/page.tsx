@@ -118,8 +118,9 @@ export default function PermissionsPage() {
     }
   };
 
-  const getRolePermissions = (role: string) => {
-    return ROLE_PERMISSIONS[role as keyof typeof ROLE_PERMISSIONS] || [];
+  const getRolePermissions = (role: string): string[] => {
+    const perms = ROLE_PERMISSIONS[role as keyof typeof ROLE_PERMISSIONS] || [];
+    return [...(perms as readonly string[])];
   };
 
   const isPermissionInRole = (permission: string, role: string) => {
