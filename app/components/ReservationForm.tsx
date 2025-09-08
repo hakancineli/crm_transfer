@@ -66,15 +66,6 @@ export default function ReservationForm() {
 
             const result = await response.json();
             setSuccess(true);
-            
-            // Sunucuyu yeniden başlat
-            try {
-                await fetch('/api/restart', {
-                    method: 'POST',
-                });
-            } catch (error) {
-                console.error('Sunucu yeniden başlatılamadı:', error);
-            }
 
             router.push(`/reservations/${result.voucherNumber}`);
         } catch (err) {
