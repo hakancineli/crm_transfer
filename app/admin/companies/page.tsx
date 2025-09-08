@@ -73,6 +73,10 @@ export default function CompaniesPage() {
       if (response.ok) {
         const data = await response.json();
         setTenants(data);
+      } else if (response.status === 401 || response.status === 403) {
+        // Token geçersiz, login sayfasına yönlendir
+        localStorage.removeItem('token');
+        window.location.href = '/admin-login';
       }
     } catch (error) {
       console.error('Şirketler getirilemedi:', error);
@@ -92,6 +96,9 @@ export default function CompaniesPage() {
       if (response.ok) {
         const data = await response.json();
         setTenantUsers(data);
+      } else if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem('token');
+        window.location.href = '/admin-login';
       }
     } catch (error) {
       console.error('Şirket kullanıcıları getirilemedi:', error);
@@ -109,6 +116,9 @@ export default function CompaniesPage() {
       if (response.ok) {
         const data = await response.json();
         setTenantReservations(data);
+      } else if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem('token');
+        window.location.href = '/admin-login';
       }
     } catch (error) {
       console.error('Şirket rezervasyonları getirilemedi:', error);
