@@ -146,6 +146,8 @@ model Activity {
 
 enum UserRole {
   SUPERUSER
+  AGENCY_ADMIN
+  AGENCY_USER
   MANAGER
   OPERATION
   SELLER

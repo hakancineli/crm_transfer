@@ -87,6 +87,29 @@ export const ROLE_PERMISSIONS = {
     // Tüm izinler
     ...Object.values(PERMISSIONS)
   ],
+  AGENCY_ADMIN: [
+    PERMISSIONS.VIEW_ALL_RESERVATIONS,
+    PERMISSIONS.CREATE_RESERVATIONS,
+    PERMISSIONS.EDIT_RESERVATIONS,
+    PERMISSIONS.DELETE_RESERVATIONS,
+    PERMISSIONS.VIEW_DRIVERS,
+    PERMISSIONS.MANAGE_DRIVERS,
+    PERMISSIONS.ASSIGN_DRIVERS,
+    PERMISSIONS.VIEW_REPORTS,
+    PERMISSIONS.EXPORT_REPORTS,
+    PERMISSIONS.VIEW_ACCOUNTING,
+    PERMISSIONS.MANAGE_PAYMENTS,
+    PERMISSIONS.MANAGE_COMMISSIONS,
+    PERMISSIONS.MANAGE_CUSTOMERS,
+    PERMISSIONS.VIEW_CUSTOMER_DATA
+  ],
+  AGENCY_USER: [
+    PERMISSIONS.VIEW_OWN_SALES,
+    PERMISSIONS.CREATE_RESERVATIONS,
+    PERMISSIONS.EDIT_RESERVATIONS,
+    PERMISSIONS.VIEW_DRIVERS,
+    PERMISSIONS.VIEW_CUSTOMER_DATA
+  ],
   OPERATION: [
     PERMISSIONS.VIEW_ALL_RESERVATIONS,
     PERMISSIONS.CREATE_RESERVATIONS,
@@ -145,19 +168,19 @@ export function hasPermission(userPermissions: UserPermissions, permission: stri
 }
 
 export function canViewReports(role: string): boolean {
-  return ['SUPERUSER', 'OPERATION', 'ACCOUNTANT'].includes(role);
+  return ['SUPERUSER', 'AGENCY_ADMIN', 'OPERATION', 'ACCOUNTANT'].includes(role);
 }
 
 export function canViewAccounting(role: string): boolean {
-  return ['SUPERUSER', 'ACCOUNTANT'].includes(role);
+  return ['SUPERUSER', 'AGENCY_ADMIN', 'ACCOUNTANT'].includes(role);
 }
 
 export function canViewAllReservations(role: string): boolean {
-  return ['SUPERUSER', 'OPERATION', 'ACCOUNTANT'].includes(role);
+  return ['SUPERUSER', 'AGENCY_ADMIN', 'OPERATION', 'ACCOUNTANT'].includes(role);
 }
 
 export function canViewOwnSales(role: string): boolean {
-  return ['SUPERUSER', 'SELLER'].includes(role);
+  return ['SUPERUSER', 'AGENCY_USER', 'SELLER'].includes(role);
 }
 
 export function canManageUsers(role: string): boolean {
@@ -169,5 +192,5 @@ export function canManageActivities(role: string): boolean {
 }
 
 export function canCreateReservation(role: string): boolean {
-  return ['SUPERUSER', 'OPERATION', 'SELLER'].includes(role);
+  return ['SUPERUSER', 'AGENCY_ADMIN', 'AGENCY_USER', 'OPERATION', 'SELLER'].includes(role);
 }
