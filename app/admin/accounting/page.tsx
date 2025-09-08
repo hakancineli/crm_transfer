@@ -204,7 +204,7 @@ export default function AccountingPage() {
       return sum + r.price;
     }, 0);
 
-  // Şoför hakedişi hesaplamaları (TL cinsinden)
+  // Şoför hakedişi hesaplamaları (TL cinsinden) - sadece şoför atanmışsa hesapla
   const totalDriverCommissionTL = filteredReservations
     .filter(r => r.paymentStatus === 'PAID')
     .reduce((sum, r) => {
@@ -212,12 +212,8 @@ export default function AccountingPage() {
         // Şoför atama ekranından gelen hakediş tutarı (TL)
         return sum + r.driverFee;
       } else {
-        // Otomatik hesaplama - USD ise TL'ye çevir
-        const commission = calculateCommissions(r.price, r.currency);
-        if (r.currency === 'USD') {
-          return sum + (commission.driverCommission * usdRate);
-        }
-        return sum + commission.driverCommission;
+        // Şoför atanmamışsa 0
+        return sum + 0;
       }
     }, 0);
 
@@ -232,7 +228,7 @@ export default function AccountingPage() {
     .reduce((sum, r) => {
       const driverCommission = r.driverFee !== undefined && r.driverFee !== null 
         ? r.driverFee 
-        : (r.currency === 'USD' ? calculateCommissions(r.price, r.currency).driverCommission * usdRate : calculateCommissions(r.price, r.currency).driverCommission);
+        : 0; // Şoför atanmamışsa 0
       
       const revenue = r.currency === 'USD' ? r.price * usdRate : r.price;
       return sum + (revenue - driverCommission);
@@ -243,7 +239,7 @@ export default function AccountingPage() {
     .reduce((sum, r) => {
       const driverCommission = r.driverFee !== undefined && r.driverFee !== null 
         ? r.driverFee 
-        : (r.currency === 'USD' ? calculateCommissions(r.price, r.currency).driverCommission * usdRate : calculateCommissions(r.price, r.currency).driverCommission);
+        : 0; // Şoför atanmamışsa 0
       
       const revenue = r.currency === 'USD' ? r.price * usdRate : r.price;
       return sum + (revenue - driverCommission);
@@ -477,12 +473,10 @@ export default function AccountingPage() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredReservations.map((reservation) => {
-                // Şoför hakedişi hesaplama (TL cinsinden)
+                // Şoför hakedişi hesaplama (TL cinsinden) - sadece şoför atanmışsa hesapla
                 const driverCommissionTL = reservation.driverFee !== undefined && reservation.driverFee !== null 
                   ? reservation.driverFee 
-                  : (reservation.currency === 'USD' 
-                      ? calculateCommissions(reservation.price, reservation.currency).driverCommission * usdRate
-                      : calculateCommissions(reservation.price, reservation.currency).driverCommission);
+                  : 0; // Şoför atanmamışsa 0
                 
                 // Şirket karı hesaplama (TL cinsinden)
                 const revenueTL = reservation.currency === 'USD' ? reservation.price * usdRate : reservation.price;
