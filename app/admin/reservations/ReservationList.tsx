@@ -381,7 +381,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                         <tr key={reservation.id} 
                                             onClick={(e) => {
                                                 if (!(e.target as HTMLElement).closest('button, a, select')) {
-                                                    window.location.href = `/reservations/${reservation.voucherNumber}`;
+                                                    window.location.href = `/admin/reservations/${reservation.voucherNumber}`;
                                                 }
                                             }}
                                             className={`transition-all duration-200 cursor-pointer ${
@@ -632,7 +632,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 key={reservation.id}
                                 onClick={(e) => {
                                     if (!(e.target as HTMLElement).closest('button, a')) {
-                                        window.location.href = `/reservations/${reservation.voucherNumber}`;
+                                        window.location.href = `/admin/reservations/${reservation.voucherNumber}`;
                                     }
                                 }}
                                 className={`bg-white rounded-lg shadow-sm border p-4 cursor-pointer transition-colors duration-150 ${

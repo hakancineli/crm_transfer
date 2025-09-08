@@ -404,7 +404,7 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                                             <span className="font-medium">{reservation.originalTransfer.flightCode}</span>
                                         </div>
                                         <Link 
-                                            href={`/reservations/${reservation.originalTransfer.voucherNumber}${isDriverVoucher ? '?view=driver' : ''}`}
+                                            href={`/admin/reservations/${reservation.originalTransfer.voucherNumber}${isDriverVoucher ? '?view=driver' : ''}`}
                                             className="text-blue-600 hover:text-blue-800 font-medium text-sm mt-2 inline-block"
                                         >
                                             Voucher: {reservation.originalTransfer.voucherNumber}
@@ -428,7 +428,7 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                                             <span className="font-medium">{reservation.returnTransfer.flightCode}</span>
                                         </div>
                                         <Link 
-                                            href={`/reservations/${reservation.returnTransfer.voucherNumber}${isDriverVoucher ? '?view=driver' : ''}`}
+                                            href={`/admin/reservations/${reservation.returnTransfer.voucherNumber}${isDriverVoucher ? '?view=driver' : ''}`}
                                             className="text-blue-600 hover:text-blue-800 font-medium text-sm mt-2 inline-block"
                                         >
                                             Voucher: {reservation.returnTransfer.voucherNumber}
