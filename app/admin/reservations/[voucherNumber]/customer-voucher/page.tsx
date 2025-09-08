@@ -6,7 +6,7 @@ import VoucherContent from '../VoucherContent';
 
 export default function CustomerVoucherPage() {
 	const params = useParams();
-	const [reservation, setReservation] = useState(null);
+	const [reservation, setReservation] = useState<any>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState('');
 
@@ -73,10 +73,10 @@ export default function CustomerVoucherPage() {
 			: [];
 
 	const normalized = {
-		...reservation,
+		...(reservation as any),
 		passengerNames: passengerNames as string[],
-		driverFee: reservation.driverFee ?? undefined,
-		isReturn: !!reservation.isReturn,
+		driverFee: (reservation as any).driverFee ?? undefined,
+		isReturn: !!(reservation as any).isReturn,
 	};
 
 	return <VoucherContent reservation={normalized} isDriverVoucher={false} />;
