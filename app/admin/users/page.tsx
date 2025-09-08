@@ -56,7 +56,7 @@ export default function UsersPage() {
     }
     
     fetchUsers();
-  }, [user, authLoading]);
+  }, [currentUser, authLoading]);
 
   const fetchUsers = async () => {
     try {
