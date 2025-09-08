@@ -47,7 +47,12 @@ export default function CompaniesPage() {
 
   const fetchTenants = async () => {
     try {
-      const response = await fetch('/api/tenants');
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/tenants', {
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setTenants(data);
@@ -61,7 +66,12 @@ export default function CompaniesPage() {
 
   const fetchTenantUsers = async (tenantId: string) => {
     try {
-      const response = await fetch(`/api/tenants/${tenantId}/users`);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/tenants/${tenantId}/users`, {
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setTenantUsers(data);
