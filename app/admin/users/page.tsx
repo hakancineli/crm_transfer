@@ -50,6 +50,11 @@ export default function UsersPage() {
       return;
     }
     
+    // For non-SUPERUSER roles, only show users from their own tenant
+    if (user.role !== 'SUPERUSER') {
+      // This will be handled by the API with tenant filtering
+    }
+    
     fetchUsers();
   }, [user, authLoading]);
 

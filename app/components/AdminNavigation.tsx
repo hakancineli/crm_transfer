@@ -99,6 +99,13 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
       module: 'transfer'
     },
     {
+      name: 'Şirketler',
+      href: '/admin/companies',
+      icon: '🏢',
+      description: 'Tüm şirketleri ve kullanıcılarını yönet',
+      module: 'system'
+    },
+    {
       name: 'Müşteri Kurulumu',
       href: '/admin/customer-setup',
       icon: '🏢',
@@ -213,6 +220,8 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               shouldShow = user?.permissions?.some(p => 
                 p.permission === 'MANAGE_USERS' && p.isActive
               ) || false;
+            } else if (item.name === 'Şirketler') {
+              shouldShow = user?.role === 'SUPERUSER';
             } else if (item.name === 'Müşteri Kurulumu') {
               shouldShow = false; // Only SUPERUSER can see this
             } else if (item.name === 'Personel Performansı') {
