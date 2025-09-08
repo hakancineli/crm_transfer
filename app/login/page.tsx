@@ -55,6 +55,9 @@ export default function LoginPage() {
         if (data.user.role === 'SUPERUSER') {
           console.log('Redirecting to /admin');
           window.location.href = '/admin';
+        } else if (data.user.role === 'AGENCY_ADMIN' || data.user.role === 'AGENCY_USER') {
+          console.log('Redirecting AGENCY role to /admin');
+          window.location.href = '/admin';
         } else if (data.user.role === 'ACCOUNTANT') {
           console.log('Redirecting to /admin/accounting');
           window.location.href = '/admin/accounting';
