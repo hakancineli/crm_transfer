@@ -580,6 +580,13 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                                 🔄
                                                             </button>
                                                             <Link 
+                                                                href={`/admin/reservations/${reservation.voucherNumber}/customer-voucher`}
+                                                                className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-lg font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                                                title="Müşteri Voucherı"
+                                                            >
+                                                                🎫
+                                                            </Link>
+                                                            <Link 
                                                                 href={`/admin/reservations/${reservation.voucherNumber}/edit`}
                                                                 className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-lg font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                                                 title="Rezervasyonu Düzenle"
@@ -825,6 +832,12 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             >
                                                 🔄 Dönüş
                                             </button>
+                                            <Link 
+                                                href={`/admin/reservations/${reservation.voucherNumber}/customer-voucher`}
+                                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
+                                            >
+                                                Müşteri
+                                            </Link>
                                             <Link 
                                                 href={`/admin/reservations/${reservation.voucherNumber}/edit`}
                                                 className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
