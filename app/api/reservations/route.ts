@@ -1,11 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import jwt from 'jsonwebtoken';
 
 export async function GET(request: NextRequest) {
   try {
     console.log('API: Rezervasyonlar getiriliyor...');
     const { searchParams } = new URL(request.url);
     const phone = searchParams.get('phone');
+    const authHeader = request.headers.get('authorization');
+    let currentUserId: string | null = null;
+    let currentUserRole: string | null = null;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.substring(7);
+        const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+        currentUserId = decoded.userId || null;
+        currentUserRole = decoded.role || null;
+      } catch (e) {
+        // token invalid → treat as public
+      }
+    }
 
     // If phone parameter is provided, search by phone number
     if (phone) {
@@ -62,9 +77,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(parsedReservations);
     }
 
-    // If no phone parameter, return all reservations (admin panel)
+    // If no phone parameter, return reservations (scoped)
     console.log('API: Tüm rezervasyonlar getiriliyor...');
+    const whereClause: any = {};
+    // AGENCY rollerini kendi oluşturduklarıyla sınırlıyoruz (tenant bağlama gelene kadar)
+    if (currentUserRole === 'AGENCY_ADMIN' || currentUserRole === 'AGENCY_USER') {
+      if (currentUserId) {
+        whereClause.userId = currentUserId;
+      }
+    }
+
     const reservations = await prisma.reservation.findMany({
+      where: whereClause,
       orderBy: [
         { date: 'desc' },
         { time: 'desc' }
@@ -106,6 +130,17 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const data = await request.json();
+        const authHeader = request.headers.get('authorization');
+        let currentUserId: string | null = null;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+          try {
+            const token = authHeader.substring(7);
+            const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+            currentUserId = decoded.userId || null;
+          } catch (e) {
+            // ignore token errors
+          }
+        }
         
         // Yolcu isimlerini JSON string'e çevir
         const passengerNames = Array.isArray(data.passengerNames) 
@@ -155,7 +190,8 @@ export async function POST(request: NextRequest) {
                 distanceKm: data.distanceKm,
                 voucherNumber,
                 driverId: null,
-                driverFee: null
+                driverFee: null,
+                userId: currentUserId || null
             }
         });
 
