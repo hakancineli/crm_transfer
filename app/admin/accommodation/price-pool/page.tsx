@@ -86,7 +86,10 @@ export default function HotelPricePoolPage() {
       if (searchParams.maxPrice) queryParams.append('maxPrice', searchParams.maxPrice);
       if (searchParams.stars) queryParams.append('stars', searchParams.stars);
 
-      const response = await fetch(`/api/accommodation/price-pool?${queryParams}`);
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const response = await fetch(`/api/accommodation/price-pool?${queryParams}`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
+      });
       
       if (!response.ok) {
         throw new Error('Fiyat havuzu yüklenemedi');
@@ -109,10 +112,12 @@ export default function HotelPricePoolPage() {
     if (!selectedHotel || !selectedRoom) return;
 
     try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const response = await fetch('/api/accommodation/price-pool', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           hotelId: selectedHotel.id,

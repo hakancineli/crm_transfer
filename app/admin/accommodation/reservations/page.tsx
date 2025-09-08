@@ -49,7 +49,10 @@ export default function HotelReservationsPage() {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/accommodation/bookings');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const response = await fetch('/api/accommodation/bookings', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
+      });
       
       if (!response.ok) {
         throw new Error('Rezervasyonlar yüklenemedi');
@@ -188,10 +191,12 @@ export default function HotelReservationsPage() {
     }
 
     try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const response = await fetch(`/api/accommodation/bookings/${booking.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           ...booking,

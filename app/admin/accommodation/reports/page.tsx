@@ -54,7 +54,10 @@ export default function HotelReportsPage() {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/accommodation/bookings');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const response = await fetch('/api/accommodation/bookings', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
+      });
       
       if (!response.ok) {
         throw new Error('Rezervasyonlar yüklenemedi');

@@ -32,10 +32,12 @@ export default function HotelSearchResults({
     if (pricingHotel) {
       try {
         // API'ye fiyatlandırma bilgilerini gönder
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
         const response = await fetch('/api/accommodation/pricing', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
           },
           body: JSON.stringify({
             hotelId: pricingHotel.id,

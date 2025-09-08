@@ -2,13 +2,43 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { ActivityLogger } from '@/app/lib/activityLogger';
+import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
 
 // Kullanıcıları listele
 export async function GET(request: NextRequest) {
   try {
+    // Scope by tenant for AGENCY roles
+    const authHeader = request.headers.get('authorization');
+    let currentUserRole: string | null = null;
+    let currentTenantIds: string[] = [];
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.substring(7);
+        const decoded: any = jwt.decode(token);
+        currentUserRole = decoded?.role || null;
+        if (decoded?.userId) {
+          const links = await prisma.tenantUser.findMany({
+            where: { userId: decoded.userId, isActive: true },
+            select: { tenantId: true }
+          });
+          currentTenantIds = links.map(l => l.tenantId);
+        }
+      } catch (_) {}
+    }
+
+    const whereClause: any = {};
+    if (currentUserRole && currentUserRole !== 'SUPERUSER') {
+      if (currentTenantIds.length > 0) {
+        whereClause.tenantUsers = { some: { tenantId: { in: currentTenantIds } } };
+      } else {
+        whereClause.id = '__none__';
+      }
+    }
+
     const users = await prisma.user.findMany({
+      where: whereClause,
       select: {
         id: true,
         username: true,
@@ -48,6 +78,31 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { username, email, password, name, role, createdBy } = body;
+
+    // Only SUPERUSER or AGENCY_ADMIN (within tenant) can create users
+    const authHeader = request.headers.get('authorization');
+    let currentUserRole: string | null = null;
+    let currentUserId: string | null = null;
+    let currentTenantIds: string[] = [];
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.substring(7);
+        const decoded: any = jwt.decode(token);
+        currentUserRole = decoded?.role || null;
+        currentUserId = decoded?.userId || null;
+        if (decoded?.userId) {
+          const links = await prisma.tenantUser.findMany({
+            where: { userId: decoded.userId, isActive: true },
+            select: { tenantId: true }
+          });
+          currentTenantIds = links.map(l => l.tenantId);
+        }
+      } catch (_) {}
+    }
+
+    if (!currentUserRole || (currentUserRole !== 'SUPERUSER' && currentUserRole !== 'AGENCY_ADMIN')) {
+      return NextResponse.json({ error: 'Yetkisiz işlem' }, { status: 403 });
+    }
 
     // Kullanıcı sayısını kontrol et
     const userCount = await prisma.user.count();
@@ -98,6 +153,21 @@ export async function POST(request: NextRequest) {
         createdAt: true
       }
     });
+
+    // If creator is AGENCY_ADMIN, ensure the new user is linked to same tenant(s)
+    if (currentUserRole === 'AGENCY_ADMIN' && currentUserId) {
+      const adminLinks = await prisma.tenantUser.findMany({
+        where: { userId: currentUserId, isActive: true },
+        select: { tenantId: true }
+      });
+      await Promise.all(adminLinks.map(l =>
+        prisma.tenantUser.upsert({
+          where: { tenantId_userId: { tenantId: l.tenantId, userId: user.id } },
+          update: { isActive: true },
+          create: { tenantId: l.tenantId, userId: user.id, role: 'AGENCY_USER', permissions: '[]' }
+        })
+      ));
+    }
 
     // Activity log - use the created user's ID as the actor
     await ActivityLogger.logActivity({
