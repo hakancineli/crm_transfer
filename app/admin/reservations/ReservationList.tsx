@@ -174,9 +174,12 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                 p.permission === 'VIEW_OWN_SALES' && p.isActive
             );
             
-            // For now, show all reservations if user is SUPERUSER or has permissions
+            // Show all reservations if user is SUPERUSER or has permissions
             if (user.role === 'SUPERUSER' || hasViewAllPermission) {
                 // User can see all reservations
+                filtered = [...reservations];
+            } else if (user.role === 'AGENCY_ADMIN' || user.role === 'AGENCY_USER') {
+                // AGENCY users can see all reservations (tenant filtering is handled by API)
                 filtered = [...reservations];
             } else if (hasViewOwnPermission) {
                 // User can only see their own reservations
