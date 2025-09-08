@@ -69,7 +69,10 @@ export default function AccountingPage() {
   const fetchReservations = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/reservations');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const response = await fetch('/api/reservations', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
+      });
       const data = await response.json();
       setReservations(data);
     } catch (error) {

@@ -23,7 +23,10 @@ export default function CustomersPage() {
   const fetchCustomers = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/reservations');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const response = await fetch('/api/reservations', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
+      });
       const reservations = await response.json();
       
       // Müşterileri telefon numarasına göre grupla

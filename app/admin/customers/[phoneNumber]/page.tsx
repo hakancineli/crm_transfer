@@ -50,7 +50,10 @@ export default function CustomerDetailPage() {
   const fetchCustomerDetails = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/reservations');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const response = await fetch('/api/reservations', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
+      });
       const reservations = await response.json();
       
       // Bu telefon numarasına sahip rezervasyonları filtrele

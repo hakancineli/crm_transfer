@@ -24,7 +24,10 @@ export default function DriversPage() {
   const fetchDrivers = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/drivers');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const response = await fetch('/api/drivers', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
+      });
       const data = await response.json();
       setDrivers(data);
     } catch (error) {
@@ -37,10 +40,12 @@ export default function DriversPage() {
   const handleAddDriver = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const response = await fetch('/api/drivers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
         body: JSON.stringify(newDriver),
       });
