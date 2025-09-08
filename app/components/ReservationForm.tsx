@@ -41,10 +41,12 @@ export default function ReservationForm() {
         setSuccess(false);
 
         try {
+            const token = localStorage.getItem('token');
             const response = await fetch('/api/reservations', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : ''
                 },
                 body: JSON.stringify({
                     date: formData.date,
