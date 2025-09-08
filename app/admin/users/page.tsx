@@ -38,7 +38,7 @@ export default function UsersPage() {
       return;
     }
     
-    if (!user) {
+    if (!currentUser) {
       window.location.href = '/admin';
       return;
     }
