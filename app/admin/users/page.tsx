@@ -17,7 +17,7 @@ interface User {
 }
 
 export default function UsersPage() {
-  const { user, isAdmin, loading: authLoading } = useAuth();
+  const { user: currentUser, isAdmin, loading: authLoading } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -44,14 +44,14 @@ export default function UsersPage() {
     }
     
     // Allow SUPERUSER or AGENCY_ADMIN (or roles with MANAGE_USERS permission)
-    const allowed = canManageUsers(user.role) || user.permissions?.some(p => p.permission === 'MANAGE_USERS' && p.isActive);
+    const allowed = canManageUsers(currentUser.role) || currentUser.permissions?.some(p => p.permission === 'MANAGE_USERS' && p.isActive);
     if (!allowed) {
       window.location.href = '/admin';
       return;
     }
     
     // For non-SUPERUSER roles, only show users from their own tenant
-    if (user.role !== 'SUPERUSER') {
+    if (currentUser.role !== 'SUPERUSER') {
       // This will be handled by the API with tenant filtering
     }
     
@@ -175,12 +175,12 @@ export default function UsersPage() {
   };
 
   // Check permissions before rendering
-  const hasManageUsersPermission = user?.permissions?.some(p => 
+  const hasManageUsersPermission = currentUser?.permissions?.some(p => 
     p.permission === 'MANAGE_USERS' && p.isActive
   );
   
   // Check if user can manage users (SUPERUSER or AGENCY_ADMIN or has MANAGE_USERS)
-  if (user && !canManageUsers(user.role) && !hasManageUsersPermission) {
+  if (currentUser && !canManageUsers(currentUser.role) && !hasManageUsersPermission) {
     return (
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
