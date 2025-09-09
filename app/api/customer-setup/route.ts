@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { ActivityLogger } from '@/app/lib/activityLogger';
-
-const prisma = new PrismaClient();
 
 // Authentication helper
 async function authenticateUser(request: NextRequest) {

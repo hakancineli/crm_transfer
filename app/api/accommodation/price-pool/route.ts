@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { BookingApiReal } from '@/app/lib/bookingApiReal';
 
-const prisma = new PrismaClient();
 
 // Fiyat havuzundaki otelleri getir
 export async function GET(request: NextRequest) {

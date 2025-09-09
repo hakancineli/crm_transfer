@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { ActivityLogger } from '@/app/lib/activityLogger';
 import jwt from 'jsonwebtoken';
-
-const prisma = new PrismaClient();
 
 // Kullanıcıları listele
 export async function GET(request: NextRequest) {

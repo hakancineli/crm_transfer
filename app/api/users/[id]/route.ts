@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { getRequestUserContext } from '@/app/lib/requestContext';
 
-const prisma = new PrismaClient();
 
 // Authentication helper (JWT-based)
 async function authenticateUser(request: NextRequest) {
