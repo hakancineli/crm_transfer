@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
 import { getRequestUserContext, buildTenantWhere } from '@/app/lib/requestContext';
+import { PERMISSIONS, ROLE_PERMISSIONS } from '@/app/lib/permissions';
 
 export async function GET(request: NextRequest) {
   try {
@@ -113,25 +114,28 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const data = await request.json();
-        const authHeader = request.headers.get('authorization');
-        let currentUserId: string | null = null;
-        let currentTenantId: string | null = null;
-        if (authHeader && authHeader.startsWith('Bearer ')) {
-          try {
-            const token = authHeader.substring(7);
-            const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-            currentUserId = decoded.userId || null;
-            if (decoded?.userId) {
-              const link = await prisma.tenantUser.findFirst({
-                where: { userId: decoded.userId, isActive: true },
-                select: { tenantId: true }
-              });
-              currentTenantId = link?.tenantId || null;
-            }
-          } catch (e) {
-            // ignore token errors
+        const { userId: currentUserId, role, tenantIds } = await getRequestUserContext(request);
+
+        // Check if this is a customer reservation (no auth token)
+        const isCustomerReservation = !currentUserId;
+        
+        // Permission: require CREATE_RESERVATIONS unless SUPERUSER or customer reservation
+        if (role !== 'SUPERUSER' && !isCustomerReservation) {
+          let allowed = role && (ROLE_PERMISSIONS as any)[role]?.includes(PERMISSIONS.CREATE_RESERVATIONS) ? true : false;
+          if (currentUserId) {
+            const perms = await prisma.userPermission.findMany({
+              where: { userId: currentUserId, isActive: true },
+              select: { permission: true }
+            });
+            allowed = perms.some(p => p.permission === PERMISSIONS.CREATE_RESERVATIONS);
+          }
+          if (!allowed) {
+            return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 403 });
           }
         }
+
+        // Determine tenant
+        const currentTenantId: string | null = role === 'SUPERUSER' ? null : (tenantIds && tenantIds.length > 0 ? tenantIds[0] : null);
         
         // Yolcu isimlerini JSON string'e çevir
         const passengerNames = Array.isArray(data.passengerNames) 

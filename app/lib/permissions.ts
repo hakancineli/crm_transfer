@@ -1,4 +1,6 @@
 export const PERMISSIONS = {
+  // Genel
+  VIEW_DASHBOARD: 'VIEW_DASHBOARD',
   // Rezervasyon İzinleri
   VIEW_OWN_SALES: 'VIEW_OWN_SALES',
   VIEW_ALL_RESERVATIONS: 'VIEW_ALL_RESERVATIONS',
@@ -42,6 +44,8 @@ export const PERMISSIONS = {
 } as const;
 
 export const PERMISSION_LABELS = {
+  // Genel
+  VIEW_DASHBOARD: 'Dashboard Görüntüleme',
   // Rezervasyon İzinleri
   VIEW_OWN_SALES: 'Kendi Satışlarını Görme',
   VIEW_ALL_RESERVATIONS: 'Tüm Rezervasyonları Görme',
@@ -90,6 +94,7 @@ export const ROLE_PERMISSIONS = {
     ...Object.values(PERMISSIONS)
   ],
   AGENCY_ADMIN: [
+    PERMISSIONS.VIEW_DASHBOARD,
     PERMISSIONS.VIEW_ALL_RESERVATIONS,
     PERMISSIONS.CREATE_RESERVATIONS,
     PERMISSIONS.EDIT_RESERVATIONS,

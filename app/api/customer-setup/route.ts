@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { ActivityLogger } from '@/app/lib/activityLogger';
 
 const prisma = new PrismaClient();
 
@@ -13,17 +15,13 @@ async function authenticateUser(request: NextRequest) {
     }
 
     const token = authHeader.substring(7);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
     
-    // Basit token kontrolü (gerçek uygulamada JWT kullanılmalı)
-    if (token === 'admin-token') {
-      return {
-        id: 'admin',
-        username: 'admin',
-        role: 'SUPERUSER'
-      };
-    }
-
-    return null;
+    return {
+      id: decoded.userId,
+      username: decoded.username,
+      role: decoded.role
+    };
   } catch (error) {
     return null;
   }
@@ -51,10 +49,123 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create tenant/company (if tenant system exists)
-    // For now, we'll just create users with a company identifier
+    // Create tenant/company first
+    const slugify = (v: string) => v
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9-]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .replace(/--+/g, '-');
     
-    const createdUsers = [];
+    const subdomain = slugify(companyName);
+    
+    // Check if subdomain already exists
+    const existingTenant = await prisma.tenant.findUnique({
+      where: { subdomain }
+    });
+
+    if (existingTenant) {
+      return NextResponse.json(
+        { error: `'${companyName}' şirketi zaten mevcut` },
+        { status: 400 }
+      );
+    }
+
+    // Create tenant
+    const tenant = await prisma.tenant.create({
+      data: {
+        companyName,
+        subdomain,
+        subscriptionPlan: 'basic',
+        isActive: true
+      }
+    });
+
+    // First create an Agency Admin user automatically
+    const adminUsername = `${subdomain}-admin`;
+    const adminEmail = `admin@${subdomain}.com`;
+    const adminPassword = 'admin123';
+    
+    // Check if admin username already exists
+    const existingAdmin = await prisma.user.findUnique({
+      where: { username: adminUsername }
+    });
+
+    if (existingAdmin) {
+      return NextResponse.json(
+        { error: `Admin kullanıcı adı '${adminUsername}' zaten kullanılıyor` },
+        { status: 400 }
+      );
+    }
+
+    // Hash admin password
+    const hashedAdminPassword = await bcrypt.hash(adminPassword, 12);
+
+    // Create admin user
+    const adminUser = await prisma.user.create({
+      data: {
+        username: adminUsername,
+        email: adminEmail,
+        name: `${companyName} Admin`,
+        password: hashedAdminPassword,
+        role: 'AGENCY_ADMIN',
+        isActive: true,
+        createdBy: null
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        name: true,
+        role: true,
+        isActive: true,
+        createdAt: true
+      }
+    });
+
+    // Link admin to tenant with default permissions
+    await prisma.tenantUser.create({
+      data: {
+        tenantId: tenant.id,
+        userId: adminUser.id,
+        role: 'AGENCY_ADMIN',
+        isActive: true,
+        permissions: JSON.stringify([
+          'MANAGE_USERS',
+          'MANAGE_PERMISSIONS',
+          'VIEW_REPORTS',
+          'MANAGE_ACTIVITIES',
+          'VIEW_ACCOUNTING'
+        ])
+      }
+    });
+
+    // Add permissions to User Permissions table
+    const userPermissions = [
+      'VIEW_DASHBOARD',
+      'VIEW_OWN_SALES',
+      'VIEW_ALL_RESERVATIONS',
+      'CREATE_RESERVATION',
+      'EDIT_RESERVATION',
+      'DELETE_RESERVATION',
+      'MANAGE_USERS',
+      'MANAGE_PERMISSIONS',
+      'VIEW_REPORTS',
+      'MANAGE_ACTIVITIES',
+      'VIEW_ACCOUNTING'
+    ];
+
+    for (const permission of userPermissions) {
+      await prisma.userPermission.create({
+        data: {
+          userId: adminUser.id,
+          permission: permission,
+          isActive: true
+        }
+      });
+    }
+
+    const createdUsers = [adminUser];
     
     for (const userData of initialUsers) {
       // Check if username already exists
@@ -82,7 +193,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Hash password
-      const saltRounds = 10;
+      const saltRounds = 12;
       const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
 
       // Create user
@@ -94,8 +205,7 @@ export async function POST(request: NextRequest) {
           password: hashedPassword,
           role: userData.role,
           isActive: true,
-          // Add company identifier (you can extend this based on your tenant system)
-          // companyId: companyId,
+          createdBy: null // Set to null to avoid foreign key constraint
         },
         select: {
           id: true,
@@ -108,29 +218,68 @@ export async function POST(request: NextRequest) {
         }
       });
 
+      // Link user to tenant (normal users get no permissions by default)
+      await prisma.tenantUser.create({
+        data: {
+          tenantId: tenant.id,
+          userId: user.id,
+          role: userData.role,
+          isActive: true,
+          permissions: JSON.stringify([]) // Normal users get no permissions by default
+        }
+      });
+
+      // Normal users get no User Permissions by default
+      // Only Agency Admins get permissions
+
       createdUsers.push(user);
     }
 
-    // Create activity log
-    await prisma.activity.create({
-      data: {
+    // Activity log - only if we have a valid userId
+    try {
+      await ActivityLogger.logActivity({
         userId: authUser.id,
-        action: 'CUSTOMER_SETUP',
+        action: 'CREATE',
         entityType: 'SYSTEM',
-        description: `${companyName} şirketi için ${createdUsers.length} kullanıcı oluşturuldu`,
-        ipAddress: '127.0.0.1'
-      }
-    });
+        entityId: tenant.id,
+        description: `Müşteri kurulumu: ${companyName} şirketi ve ${createdUsers.length} kullanıcı oluşturuldu`,
+        details: { 
+          companyName, 
+          contactPerson, 
+          email, 
+          phone, 
+          address,
+          userCount: createdUsers.length 
+        },
+        ipAddress: request.headers.get('x-forwarded-for') || undefined,
+        userAgent: request.headers.get('user-agent') || undefined
+      });
+    } catch (activityError) {
+      console.warn('Activity logging failed:', activityError);
+      // Continue without failing the main operation
+    }
 
     return NextResponse.json({
       success: true,
       message: 'Müşteri kurulumu başarıyla tamamlandı',
+      tenant: {
+        id: tenant.id,
+        companyName: tenant.companyName,
+        subdomain: tenant.subdomain,
+        subscriptionPlan: tenant.subscriptionPlan
+      },
       company: {
         name: companyName,
         contactPerson,
         email,
         phone,
         address
+      },
+      adminUser: {
+        username: adminUser.username,
+        email: adminUser.email,
+        name: adminUser.name,
+        password: adminPassword
       },
       users: createdUsers
     });

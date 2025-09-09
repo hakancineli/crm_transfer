@@ -217,14 +217,23 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
                 p.permission === 'MANAGE_ACTIVITIES' && p.isActive
               ) || false;
             } else if (item.name === 'Kullanıcılar') {
-              shouldShow = user?.permissions?.some(p => 
-                p.permission === 'MANAGE_USERS' && p.isActive
-              ) || false;
+              // AGENCY_ADMIN her zaman görsün; diğer roller izinle görsün
+              if (user?.role === 'AGENCY_ADMIN') {
+                shouldShow = true;
+              } else {
+                shouldShow = user?.permissions?.some(p => 
+                  p.permission === 'MANAGE_USERS' && p.isActive
+                ) || false;
+              }
             } else if (item.name === 'Şirketler') {
               shouldShow = user?.role === 'SUPERUSER';
             } else if (item.name === 'Müşteri Kurulumu') {
-              shouldShow = false; // Only SUPERUSER can see this
+              shouldShow = user?.role === 'SUPERUSER';
             } else if (item.name === 'Personel Performansı') {
+              shouldShow = false; // Only SUPERUSER can see this
+            } else if (item.name === 'Denetim Logları') {
+              shouldShow = false; // Only SUPERUSER can see this
+            } else if (item.name === 'Ayarlar') {
               shouldShow = false; // Only SUPERUSER can see this
             }
           }
