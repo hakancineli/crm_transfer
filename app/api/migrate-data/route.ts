@@ -9,7 +9,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const prisma = new PrismaClient();
 
     // Mevcut rezervasyonları production'a aktar
     const testData = {
