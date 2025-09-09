@@ -82,7 +82,12 @@ export async function POST(request: NextRequest) {
       );
     } else if (typeof user.password === 'string' && user.password.startsWith('$2')) {
       // Bcrypt hash
-      isPasswordValid = await bcrypt.compare(password, user.password);
+      try {
+        isPasswordValid = await bcrypt.compare(password, user.password);
+      } catch (cmpErr) {
+        console.error('bcrypt compare error:', cmpErr);
+        isPasswordValid = false;
+      }
     } else {
       // Legacy/plaintext fallback
       isPasswordValid = user.password === password;
