@@ -7,7 +7,8 @@
     "build": "prisma generate && prisma migrate deploy && next build",
     "start": "next start",
     "lint": "next lint",
-    "tenant:create": "ts-node scripts/tenant_create.ts"
+    "tenant:create": "ts-node scripts/tenant_create.ts",
+    "test:tenant-scope": "node scripts/test_tenant_scope.js"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.10",
@@ -41,6 +42,7 @@
     "postcss": "^8.5.3",
     "prisma": "6.13.0",
     "tailwindcss": "^3.4.17",
+    "ts-node": "^10.9.2",
     "typescript": "5.3.3"
   }
 }

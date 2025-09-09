@@ -1,6 +1,8 @@
 #!/usr/bin/env ts-node
-import { prisma } from '@/lib/prisma';
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+
+const prisma = new PrismaClient();
 
 async function main() {
   const args = process.argv.slice(2);
