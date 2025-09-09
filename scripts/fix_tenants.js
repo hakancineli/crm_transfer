@@ -4,41 +4,74 @@ const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
-async function upsertFarahTourism() {
-  const tenant = await prisma.tenant.upsert({
-    where: { subdomain: 'farahtourism' },
-    update: { companyName: 'Farah Tourism', isActive: true },
-    create: { companyName: 'Farah Tourism', subdomain: 'farahtourism', isActive: true }
-  });
-  return tenant;
+async function upsertTenants() {
+  const tenants = [
+    { subdomain: 'farahtourism', companyName: 'Farah Tourism' },
+    { subdomain: 'alya-karde-ler', companyName: 'Alya Kardeşler' },
+    { subdomain: 'protransfer', companyName: 'ProTransfer' },
+    { subdomain: 'ahjaaz', companyName: 'Ahjaaz Tourism' }
+  ];
+
+  const results = [];
+  for (const tenantData of tenants) {
+    const tenant = await prisma.tenant.upsert({
+      where: { subdomain: tenantData.subdomain },
+      update: { companyName: tenantData.companyName, isActive: true },
+      create: { companyName: tenantData.companyName, subdomain: tenantData.subdomain, isActive: true }
+    });
+    results.push(tenant);
+  }
+  return results;
 }
 
-async function ensureFarahAdminUser() {
-  const existing = await prisma.user.findUnique({ where: { username: 'farahtourism' } });
-  if (existing) return existing;
+async function ensureAdminUsers() {
+  const users = [
+    { username: 'farahtourism', email: 'fatah@toursim.com', name: 'Şekip Ahmet Kırk', password: 'farahtourism34' },
+    { username: 'alya-karde-ler-admin', email: 'admin@alya-karde-ler.com', name: 'Alya kardeşler Admin', password: 'alya123' },
+    { username: 'protransfer-admin', email: 'admin@protransfer.com', name: 'ProTransfer Admin', password: 'protransfer123' },
+    { username: 'ahjaaz-admin', email: 'admin@ahjaaz.com', name: 'Ahjaaz Admin', password: 'ahjaaz123' }
+  ];
 
-  const hashed = await bcrypt.hash('farahtourism34', 12);
-  // Try to create with AGENCY_ADMIN, fallback to SUPERUSER if enum missing
-  const tryRoles = ['AGENCY_ADMIN', 'SUPERUSER'];
-  let lastError;
-  for (const role of tryRoles) {
-    try {
-      const user = await prisma.user.create({
-        data: {
-          username: 'farahtourism',
-          email: 'fatah@toursim.com',
-          name: 'Şekip Ahmet Kırk',
-          password: hashed,
-          role
-        }
-      });
-      return user;
-    } catch (e) {
-      lastError = e;
-      // continue
+  const results = [];
+  for (const userData of users) {
+    const existing = await prisma.user.findFirst({ 
+      where: { 
+        OR: [
+          { username: userData.username },
+          { email: userData.email }
+        ]
+      } 
+    });
+    if (existing) {
+      results.push(existing);
+      continue;
+    }
+
+    const hashed = await bcrypt.hash(userData.password, 12);
+    const tryRoles = ['AGENCY_ADMIN', 'SUPERUSER'];
+    let lastError;
+    for (const role of tryRoles) {
+      try {
+        const user = await prisma.user.create({
+          data: {
+            username: userData.username,
+            email: userData.email,
+            name: userData.name,
+            password: hashed,
+            role
+          }
+        });
+        results.push(user);
+        break;
+      } catch (e) {
+        lastError = e;
+      }
+    }
+    if (!results.find(r => r.username === userData.username)) {
+      throw lastError;
     }
   }
-  throw lastError;
+  return results;
 }
 
 async function linkUserToTenant(tenantId, userId) {
@@ -59,14 +92,17 @@ async function main() {
   const deactivated = await deactivateDemoTenant();
   console.log('Deactivated demo tenants:', deactivated);
 
-  const tenant = await upsertFarahTourism();
-  console.log('Upserted tenant:', tenant.subdomain, tenant.id);
+  const tenants = await upsertTenants();
+  console.log('Upserted tenants:', tenants.length);
 
-  const user = await ensureFarahAdminUser();
-  console.log('Ensured user:', user.username, user.role);
+  const users = await ensureAdminUsers();
+  console.log('Ensured users:', users.length);
 
-  const link = await linkUserToTenant(tenant.id, user.id);
-  console.log('Linked:', link.role, '->', tenant.subdomain);
+  // Link each user to their corresponding tenant
+  for (let i = 0; i < tenants.length && i < users.length; i++) {
+    const link = await linkUserToTenant(tenants[i].id, users[i].id);
+    console.log('Linked:', link.role, '->', tenants[i].subdomain);
+  }
 }
 
 main()
