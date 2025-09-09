@@ -16,13 +16,47 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find user by username
-    const user = await prisma.user.findUnique({
-      where: { username },
-      include: {
-        permissions: true
+    // Find user by username (avoid fragile includes in prod)
+    let user: any = null;
+    try {
+      user = await prisma.user.findUnique({
+        where: { username }
+      });
+    } catch (dbErr) {
+      console.error('Login DB error:', dbErr);
+      // Fallback to env-based emergency login to avoid total outage
+      const fallbackUsers = [
+        {
+          username: process.env.FALLBACK_USER_1,
+          password: process.env.FALLBACK_PASS_1,
+          role: process.env.FALLBACK_ROLE_1 || 'SUPERUSER'
+        },
+        {
+          username: process.env.FALLBACK_USER_2,
+          password: process.env.FALLBACK_PASS_2,
+          role: process.env.FALLBACK_ROLE_2 || 'AGENCY_ADMIN'
+        }
+      ].filter(u => u.username && u.password);
+
+      const matched = fallbackUsers.find(u => u.username === username && u.password === password);
+      if (matched) {
+        const token = jwt.sign(
+          { userId: 'fallback', username: matched.username, role: matched.role },
+          process.env.JWT_SECRET || 'your-secret-key',
+          { expiresIn: '24h' }
+        );
+        return NextResponse.json({
+          message: 'Giriş başarılı (fallback)',
+          user: { id: 'fallback', username: matched.username, role: matched.role, isActive: true },
+          token
+        });
       }
-    });
+
+      return NextResponse.json(
+        { error: 'Sunucu hatası' },
+        { status: 500 }
+      );
+    }
 
     if (!user) {
       return NextResponse.json(
