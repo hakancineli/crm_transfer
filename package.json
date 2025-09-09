@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "prisma generate && prisma migrate deploy && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "tenant:create": "ts-node scripts/tenant_create.ts"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.10",
