@@ -38,8 +38,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // Check password with graceful fallbacks
+    let isPasswordValid = false;
+    if (!user.password) {
+      // No password set for this user
+      return NextResponse.json(
+        { error: 'Şifre tanımlı değil. Lütfen yöneticiye başvurun.' },
+        { status: 401 }
+      );
+    } else if (typeof user.password === 'string' && user.password.startsWith('$2')) {
+      // Bcrypt hash
+      isPasswordValid = await bcrypt.compare(password, user.password);
+    } else {
+      // Legacy/plaintext fallback
+      isPasswordValid = user.password === password;
+    }
+
     if (!isPasswordValid) {
       return NextResponse.json(
         { error: 'Geçersiz şifre' },
