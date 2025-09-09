@@ -45,10 +45,12 @@ export default function ReturnTransferModal({
         setError('');
 
         try {
+            const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
             const response = await fetch('/api/reservations/return-transfer', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 },
                 body: JSON.stringify({
                     originalVoucherNumber: originalReservation.voucherNumber,
@@ -64,11 +66,12 @@ export default function ReturnTransferModal({
 
             const result = await response.json();
             
-            // Show success message
-            alert(`Dönüş transferi başarıyla oluşturuldu!\nVoucher: ${result.returnTransfer.voucherNumber}`);
-            
             onSuccess();
             onClose();
+            // Rezervasyon listesine dön
+            if (typeof window !== 'undefined') {
+                window.location.href = '/admin/reservations';
+            }
         } catch (err: any) {
             setError(err.message || 'Bir hata oluştu');
         } finally {

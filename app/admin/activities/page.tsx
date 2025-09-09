@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
-import { canManageActivities } from '@/app/lib/permissions';
+import { ROLE_PERMISSIONS, PERMISSIONS } from '@/app/lib/permissions';
 
 interface Activity {
   id: string;
@@ -29,12 +29,9 @@ export default function ActivitiesPage() {
   const [filter, setFilter] = useState('all');
 
   useEffect(() => {
-    // Check if user has permission to manage activities
-    const hasManageActivitiesPermission = user?.permissions?.some(p => 
-      p.permission === 'MANAGE_ACTIVITIES' && p.isActive
-    );
-    
-    if (user && !hasManageActivitiesPermission) {
+    const roleAllows = user?.role === 'SUPERUSER' || (user?.role && (ROLE_PERMISSIONS as any)[user.role]?.includes(PERMISSIONS.MANAGE_ACTIVITIES));
+    const hasManageActivitiesPermission = user?.permissions?.some(p => p.permission === PERMISSIONS.MANAGE_ACTIVITIES && p.isActive);
+    if (user && !(roleAllows || hasManageActivitiesPermission)) {
       window.location.href = '/admin';
       return;
     }
@@ -110,9 +107,9 @@ export default function ActivitiesPage() {
   });
 
   // Check permissions before rendering
-  const hasManageActivitiesPermission = user?.permissions?.some(p => 
-    p.permission === 'MANAGE_ACTIVITIES' && p.isActive
-  );
+  const hasManageActivitiesPermission = user?.role === 'SUPERUSER' ||
+    (user?.role && (ROLE_PERMISSIONS as any)[user.role]?.includes(PERMISSIONS.MANAGE_ACTIVITIES)) ||
+    user?.permissions?.some(p => p.permission === PERMISSIONS.MANAGE_ACTIVITIES && p.isActive);
   
   if (user && !hasManageActivitiesPermission) {
     return (

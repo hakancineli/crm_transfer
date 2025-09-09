@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { PERMISSIONS, ROLE_PERMISSIONS } from '@/app/lib/permissions';
 
 interface Driver {
   id: string;
@@ -12,14 +14,25 @@ interface Driver {
 }
 
 export default function DriversPage() {
+  const { user } = useAuth();
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newDriver, setNewDriver] = useState({ name: '', phoneNumber: '' });
 
+  const canViewDrivers =
+    user?.role === 'SUPERUSER' ||
+    (user?.role && (ROLE_PERMISSIONS as any)[user.role]?.includes(PERMISSIONS.VIEW_DRIVERS)) ||
+    user?.permissions?.some(p => p.permission === PERMISSIONS.VIEW_DRIVERS && p.isActive);
+  const canManageDrivers =
+    user?.role === 'SUPERUSER' ||
+    (user?.role && (ROLE_PERMISSIONS as any)[user.role]?.includes(PERMISSIONS.MANAGE_DRIVERS)) ||
+    user?.permissions?.some(p => p.permission === PERMISSIONS.MANAGE_DRIVERS && p.isActive);
+
   useEffect(() => {
+    if (!canViewDrivers) return;
     fetchDrivers();
-  }, []);
+  }, [canViewDrivers]);
 
   const fetchDrivers = async () => {
     try {
@@ -60,6 +73,17 @@ export default function DriversPage() {
     }
   };
 
+  if (!canViewDrivers) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Yetkisiz Erişim</h1>
+          <p className="text-gray-600">Bu sayfaya erişim yetkiniz bulunmamaktadır.</p>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -80,19 +104,21 @@ export default function DriversPage() {
                 Şoförleri yönetin ve performanslarını takip edin
               </p>
             </div>
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-            >
-              ➕ Yeni Şoför Ekle
-            </button>
+            {canManageDrivers && (
+              <button
+                onClick={() => setShowAddForm(true)}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+              >
+                ➕ Yeni Şoför Ekle
+              </button>
+            )}
           </div>
         </div>
       </div>
 
       <div className="p-6">
         {/* Add Driver Modal */}
-        {showAddForm && (
+        {showAddForm && canManageDrivers && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Yeni Şoför Ekle</h3>

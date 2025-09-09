@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { FlightInfo, FlightTracker } from '@/app/lib/flightTracker';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 interface FlightStatusData {
   flightCode: string;
@@ -14,6 +15,7 @@ interface FlightStatusData {
 }
 
 export default function FlightStatusPage() {
+  const { user } = useAuth();
   const [flights, setFlights] = useState<FlightStatusData[]>([]);
   const [filteredFlights, setFilteredFlights] = useState<FlightStatusData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,8 +29,15 @@ export default function FlightStatusPage() {
   const [lookupError, setLookupError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Guard: SUPERUSER veya izinli kullanıcılar
+    const hasViewFlights = user?.role === 'SUPERUSER' || user?.permissions?.some(p => p.permission === 'VIEW_ALL_RESERVATIONS' && p.isActive);
+    if (!hasViewFlights) {
+      setLoading(false);
+      setError('UNAUTHORIZED');
+      return;
+    }
     fetchFlightStatus();
-  }, []);
+  }, [user]);
 
   const fetchFlightStatus = async () => {
     try {
@@ -36,7 +45,10 @@ export default function FlightStatusPage() {
       setError(null);
 
       // Bugünkü rezervasyonları al
-      const response = await fetch('/api/reservations');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const response = await fetch('/api/reservations', {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      });
       const reservations = await response.json();
 
       // Uçuş kodu olan rezervasyonları filtrele
@@ -70,6 +82,7 @@ export default function FlightStatusPage() {
   };
 
   const refreshStatus = async () => {
+    if (error === 'UNAUTHORIZED') return;
     await fetchFlightStatus();
   };
 
@@ -117,6 +130,17 @@ export default function FlightStatusPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div>
+      </div>
+    );
+  }
+
+  if (error === 'UNAUTHORIZED') {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Yetkisiz Erişim</h1>
+          <p className="text-gray-600">Bu sayfaya erişim yetkiniz bulunmamaktadır.</p>
+        </div>
       </div>
     );
   }

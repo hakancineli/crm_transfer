@@ -36,7 +36,10 @@ export default function DriverAssignForm({ reservation, onAssign }: DriverAssign
 
     // Mevcut şoförleri getir
     useEffect(() => {
-        fetch('/api/drivers')
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        fetch('/api/drivers', {
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        })
             .then(response => response.json())
             .then(data => setDrivers(data))
             .catch(error => console.error('Şoför listesi getirme hatası:', error));
@@ -62,8 +65,9 @@ export default function DriverAssignForm({ reservation, onAssign }: DriverAssign
         const hasAssignDriverPermission = user?.permissions?.some(p => 
             p.permission === 'ASSIGN_DRIVERS' && p.isActive
         );
+        const isAgencyAdmin = user?.role === 'AGENCY_ADMIN';
         
-        if (user?.role !== 'SUPERUSER' && !hasAssignDriverPermission) {
+        if (user?.role !== 'SUPERUSER' && !isAgencyAdmin && !hasAssignDriverPermission) {
             setError('Şoför atama yetkiniz bulunmamaktadır.');
             return;
         }
@@ -76,10 +80,12 @@ export default function DriverAssignForm({ reservation, onAssign }: DriverAssign
         setError('');
 
         try {
+            const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
             const driverResponse = await fetch('/api/drivers', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 },
                 body: JSON.stringify(newDriver),
             });
@@ -94,6 +100,7 @@ export default function DriverAssignForm({ reservation, onAssign }: DriverAssign
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 },
                 body: JSON.stringify({
                     driverId: createdDriver.id,
@@ -126,8 +133,9 @@ export default function DriverAssignForm({ reservation, onAssign }: DriverAssign
         const hasAssignDriverPermission = user?.permissions?.some(p => 
             p.permission === 'ASSIGN_DRIVERS' && p.isActive
         );
+        const isAgencyAdmin = user?.role === 'AGENCY_ADMIN';
         
-        if (user?.role !== 'SUPERUSER' && !hasAssignDriverPermission) {
+        if (user?.role !== 'SUPERUSER' && !isAgencyAdmin && !hasAssignDriverPermission) {
             setError('Şoför atama yetkiniz bulunmamaktadır.');
             return;
         }
@@ -141,10 +149,12 @@ export default function DriverAssignForm({ reservation, onAssign }: DriverAssign
         setError('');
 
         try {
+            const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
             const updateResponse = await fetch(`/api/reservations/${reservation.voucherNumber}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 },
                 body: JSON.stringify({
                     driverId: selectedDriverId,

@@ -1,30 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { getRequestUserContext } from '@/app/lib/requestContext';
 
 const prisma = new PrismaClient();
 
-// Authentication helper
+// Authentication helper (JWT-based)
 async function authenticateUser(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return null;
-    }
-
-    const token = authHeader.substring(7);
-    
-    // Basit token kontrolü (gerçek uygulamada JWT kullanılmalı)
-    if (token === 'admin-token') {
-      return {
-        id: 'admin',
-        username: 'admin',
-        role: 'SUPERUSER'
-      };
-    }
-
-    return null;
-  } catch (error) {
+    const ctx = await getRequestUserContext(request);
+    if (!ctx || !ctx.userId) return null;
+    return ctx; // { userId, role, tenantIds }
+  } catch {
     return null;
   }
 }
@@ -38,30 +25,7 @@ export async function GET(
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        name: true,
-        role: true,
-        isActive: true,
-        createdAt: true,
-        updatedAt: true,
-        permissions: {
-          select: {
-            id: true,
-            permission: true,
-            isActive: true,
-            grantedAt: true
-          }
-        },
-        _count: {
-          select: {
-            reservations: true,
-            activities: true
-          }
-        }
-      }
+      select: { id: true, username: true, email: true, name: true, role: true, isActive: true, createdAt: true, updatedAt: true, permissions: true }
     });
 
     if (!user) {
@@ -72,11 +36,10 @@ export async function GET(
     }
 
     return NextResponse.json(user);
-
   } catch (error) {
     console.error('Error fetching user:', error);
     return NextResponse.json(
-      { error: 'Sunucu hatası' },
+      { error: 'Kullanıcı getirilemedi' },
       { status: 500 }
     );
   }
@@ -96,13 +59,14 @@ export async function PUT(
       );
     }
 
-    const userId = params.id;
+    const targetUserId = params.id;
     const body = await request.json();
     const { username, email, name, password, role, isActive } = body;
 
     // Kullanıcının var olup olmadığını kontrol et
     const existingUser = await prisma.user.findUnique({
-      where: { id: userId }
+      where: { id: targetUserId },
+      select: { id: true, role: true }
     });
 
     if (!existingUser) {
@@ -110,6 +74,26 @@ export async function PUT(
         { error: 'Kullanıcı bulunamadı' },
         { status: 404 }
       );
+    }
+
+    // Authorization: SUPERUSER her şeyi yapabilir; AGENCY_ADMIN sadece kendi tenantındaki kullanıcıları güncelleyebilir
+    if (authUser.role !== 'SUPERUSER') {
+      // Hedef kullanıcı, auth kullanıcının tenantlarından birinde mi?
+      const link = await prisma.tenantUser.findFirst({
+        where: {
+          userId: targetUserId,
+          tenantId: { in: authUser.tenantIds || [] },
+          isActive: true
+        },
+        select: { id: true }
+      });
+      if (!link) {
+        return NextResponse.json({ error: 'Bu kullanıcıyı güncelleme yetkiniz yok' }, { status: 403 });
+      }
+      // AGENCY_ADMIN, SUPERUSER rolüne terfi veremez
+      if (role === 'SUPERUSER') {
+        return NextResponse.json({ error: 'SUPERUSER rolü atanamaz' }, { status: 403 });
+      }
     }
 
     // Güncelleme verilerini hazırla
@@ -131,7 +115,7 @@ export async function PUT(
 
     // Kullanıcıyı güncelle
     const updatedUser = await prisma.user.update({
-      where: { id: userId },
+      where: { id: targetUserId },
       data: updateData,
       select: {
         id: true,
@@ -144,9 +128,6 @@ export async function PUT(
         updatedAt: true
       }
     });
-
-    // Activity log geçici olarak devre dışı
-    // TODO: Activity log'u düzelt
 
     return NextResponse.json({
       success: true,

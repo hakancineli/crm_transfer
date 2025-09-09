@@ -92,7 +92,12 @@ export default function CustomerSetupPage() {
       });
 
       if (response.ok) {
-        alert('Müşteri kurulumu başarıyla tamamlandı!');
+        const result = await response.json();
+        if (result.adminUser) {
+          alert(`Müşteri kurulumu başarıyla tamamlandı!\n\nAdmin Kullanıcı:\nKullanıcı Adı: ${result.adminUser.username}\nE-posta: ${result.adminUser.email}\nŞifre: ${result.adminUser.password}`);
+        } else {
+          alert('Müşteri kurulumu başarıyla tamamlandı!');
+        }
         setFormData({
           companyName: '',
           contactPerson: '',

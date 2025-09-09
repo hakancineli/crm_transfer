@@ -7,11 +7,12 @@ interface Tenant {
   id: string;
   subdomain: string;
   companyName: string;
+  logoUrl?: string;
   isActive: boolean;
   subscriptionPlan: string;
   createdAt: string;
   _count: {
-    tenantUsers: number;
+    users: number;
   };
 }
 
@@ -52,6 +53,8 @@ export default function CompaniesPage() {
   const [tenantReservations, setTenantReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'users' | 'reservations'>('users');
+  const [creating, setCreating] = useState(false);
+  const [newCompany, setNewCompany] = useState({ companyName: '' });
 
   useEffect(() => {
     if (user?.role !== 'SUPERUSER') {
@@ -82,6 +85,54 @@ export default function CompaniesPage() {
       console.error('Şirketler getirilemedi:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreateTenant = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setCreating(true);
+      const token = localStorage.getItem('token');
+      const slugify = (v: string) => v
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9-]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .replace(/--+/g, '-');
+      const payload = {
+        companyName: newCompany.companyName,
+        subdomain: slugify(newCompany.companyName || 'company'),
+        isActive: true,
+        subscriptionPlan: 'STANDARD'
+      };
+
+      const res = await fetch('/api/tenants', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Şirket oluşturulamadı');
+      }
+      
+      const result = await res.json();
+      if (result.adminUser) {
+        alert(`Şirket oluşturuldu!\n\nAdmin Kullanıcı:\nKullanıcı Adı: ${result.adminUser.username}\nE-posta: ${result.adminUser.email}\nŞifre: admin123`);
+      } else {
+        alert('Şirket oluşturuldu!');
+      }
+      
+      setNewCompany({ companyName: '' });
+      await fetchTenants();
+    } catch (err) {
+      console.error(err);
+      alert((err as Error).message);
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -201,6 +252,25 @@ export default function CompaniesPage() {
         <h1 className="text-2xl font-bold text-gray-900">Şirket Yönetimi</h1>
       </div>
 
+      {user?.role === 'SUPERUSER' && (
+        <div className="bg-white shadow rounded-lg border border-gray-200 mb-6">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-900">Yeni Şirket Oluştur</h2>
+          </div>
+          <form onSubmit={handleCreateTenant} className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Şirket Adı</label>
+              <input value={newCompany.companyName} onChange={(e) => setNewCompany({ ...newCompany, companyName: e.target.value })} required className="w-full px-3 py-2 border rounded-md" />
+            </div>
+            <div className="md:col-span-2 flex justify-end">
+              <button disabled={creating} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-60">
+                {creating ? 'Oluşturuluyor...' : 'Oluştur'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Şirket Listesi */}
         <div className="bg-white shadow rounded-lg">
@@ -218,10 +288,16 @@ export default function CompaniesPage() {
               >
                 <div className="flex justify-between items-center">
                   <div>
-                    <h3 className="text-sm font-medium text-gray-900">{tenant.companyName}</h3>
+                    <div className="flex items-center gap-2">
+                      {tenant.logoUrl && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={tenant.logoUrl} alt={`${tenant.companyName} logo`} className="w-6 h-6 rounded object-cover border" />
+                      )}
+                      <h3 className="text-sm font-medium text-gray-900">{tenant.companyName}</h3>
+                    </div>
                     <p className="text-sm text-gray-500">{tenant.subdomain}</p>
                     <p className="text-xs text-gray-400">
-                      {tenant._count.tenantUsers} kullanıcı • {tenant.subscriptionPlan}
+                      {tenant._count.users} kullanıcı • {tenant.subscriptionPlan}
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -241,7 +317,11 @@ export default function CompaniesPage() {
         <div className="bg-white shadow rounded-lg">
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex justify-between items-center">
-              <h2 className="text-lg font-medium text-gray-900">
+              <h2 className="text-lg font-medium text-gray-900 flex items-center gap-2">
+                {selectedTenant?.logoUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={selectedTenant.logoUrl} alt={`${selectedTenant.companyName} logo`} className="w-8 h-8 rounded object-cover border" />
+                )}
                 {selectedTenant ? selectedTenant.companyName : 'Detaylar'}
               </h2>
               {selectedTenant && (

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useEmoji } from '../contexts/EmojiContext';
 import { useAuth } from '../contexts/AuthContext';
+import { PERMISSIONS, ROLE_PERMISSIONS } from '../lib/permissions';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface DashboardStats {
@@ -20,6 +21,21 @@ interface DashboardStats {
 export default function AdminDashboard() {
   const { emojisEnabled } = useEmoji();
   const { user, isAdmin } = useAuth();
+  
+  const canViewDashboard =
+    user?.role === 'SUPERUSER' ||
+    (user?.role && (ROLE_PERMISSIONS as any)[user.role]?.includes(PERMISSIONS.VIEW_DASHBOARD)) ||
+    user?.permissions?.some(p => p.permission === PERMISSIONS.VIEW_DASHBOARD && p.isActive);
+  if (!canViewDashboard) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Yetkisiz Erişim</h1>
+          <p className="text-gray-600">Bu sayfaya erişim yetkiniz bulunmamaktadır.</p>
+        </div>
+      </div>
+    );
+  }
   const { t, dir } = useLanguage();
   const [isClient, setIsClient] = useState(false);
   

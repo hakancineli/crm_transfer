@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { getRequestUserContext } from '@/app/lib/requestContext';
 
 const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
         const { originalVoucherNumber, returnDate, returnTime } = await request.json();
+        const ctx = await getRequestUserContext(request);
 
         // Get the original reservation
         const originalReservation = await prisma.reservation.findUnique({
@@ -50,6 +52,7 @@ export async function POST(request: NextRequest) {
         // Create return transfer with reversed locations
         const returnTransfer = await prisma.reservation.create({
             data: {
+                tenantId: originalReservation.tenantId ?? (ctx.tenantIds?.[0] || null),
                 date: returnDate,
                 time: returnTime,
                 from: originalReservation.to, // Reversed
@@ -64,6 +67,7 @@ export async function POST(request: NextRequest) {
                 voucherNumber: returnVoucherNumber,
                 driverId: null,
                 driverFee: null,
+                userId: ctx.userId ?? originalReservation.userId,
                 isReturn: true,
                 // Prisma nested relation alanı olduğundan null gönderme
                 // yerine hiç göndermiyoruz

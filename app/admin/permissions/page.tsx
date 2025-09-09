@@ -30,18 +30,27 @@ export default function PermissionsPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    // Only SUPERUSER can access permission management
-    if (user && user.role !== 'SUPERUSER') {
+    // SUPERUSER veya MANAGE_PERMISSIONS izni olan kullanıcı erişebilir
+    if (!user) return;
+
+    const canAccess =
+      user.role === 'SUPERUSER' ||
+      user.permissions?.some((p) => p.permission === 'MANAGE_PERMISSIONS' && p.isActive);
+
+    if (!canAccess) {
       window.location.href = '/admin';
       return;
     }
-    
+
     fetchUsers();
   }, [user]);
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('/api/users');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const response = await fetch('/api/users', {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      });
       if (response.ok) {
         const data = await response.json();
         setUsers(data);
