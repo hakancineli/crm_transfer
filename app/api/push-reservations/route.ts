@@ -9,7 +9,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const prisma = new PrismaClient();
 
     console.log('🚀 Rezervasyonlar production\'a aktarılıyor...');
 
@@ -92,7 +91,6 @@ export async function POST(request: NextRequest) {
       console.log(`✅ ${reservation.voucherNumber} rezervasyonu eklendi`);
     }
 
-    await prisma.$disconnect();
 
     return NextResponse.json({ 
       success: true, 
