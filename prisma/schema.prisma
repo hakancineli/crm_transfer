@@ -23,6 +23,7 @@ model Tenant {
   hotelRequests    HotelRequest[]
   modules          TenantModule[]
   users            TenantUser[]
+  drivers          Driver[]
 
   @@map("tenants")
 }
@@ -79,8 +80,12 @@ model Driver {
   id           String        @id @default(uuid())
   name         String
   phoneNumber  String?
+  tenantId     String?
   createdAt    DateTime      @default(now())
   reservations Reservation[]
+  tenant       Tenant?       @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  @@map("drivers")
 }
 
 model User {

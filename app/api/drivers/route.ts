@@ -32,9 +32,9 @@ export async function GET(request: NextRequest) {
     const whereClause: any = {};
     if (role && role !== 'SUPERUSER') {
       if (tenantIds.length > 0) {
-        whereClause.reservations = { some: { tenantId: { in: tenantIds } } };
+        whereClause.tenantId = { in: tenantIds };
       } else {
-        whereClause.reservations = { none: {} }; // no tenant → no drivers
+        whereClause.tenantId = null; // no tenant → no drivers
       }
     }
 
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       );
     }
     // Permission: require MANAGE_DRIVERS (or SUPERUSER)
-    const { role, userId } = await getRequestUserContext(request);
+    const { role, userId, tenantIds } = await getRequestUserContext(request);
     let allowed = role === 'SUPERUSER' || (role && (ROLE_PERMISSIONS as any)[role]?.includes(PERMISSIONS.MANAGE_DRIVERS));
     if (!allowed && userId) {
       const perms = await prisma.userPermission.findMany({
@@ -78,10 +78,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 403 });
     }
 
+    // SUPERUSER için tenantId opsiyonel, diğerleri için ilk tenantId'yi kullan
+    const tenantId = role === 'SUPERUSER' ? body.tenantId : (tenantIds.length > 0 ? tenantIds[0] : null);
+
     const driver = await prisma.driver.create({
       data: {
         name,
         phoneNumber,
+        tenantId,
       },
     });
 
