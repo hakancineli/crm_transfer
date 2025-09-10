@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     const filename = `${safeBase}-${Date.now()}${ext}`;
     const fullPath = path.join(uploadsDir, filename);
 
-    await fs.writeFile(fullPath, buffer);
+    await fs.writeFile(fullPath, new Uint8Array(buffer));
 
     const urlPath = `/uploads/tenants/${filename}`;
     return NextResponse.json({ url: urlPath });

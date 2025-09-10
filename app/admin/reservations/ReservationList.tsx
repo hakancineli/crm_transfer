@@ -19,6 +19,7 @@ interface Reservation {
     distanceKm?: number;
     voucherNumber: string;
     userId?: string;
+    tenantId?: string;
     createdAt: Date;
     phoneNumber?: string;
     paymentStatus: string;
@@ -27,6 +28,16 @@ interface Reservation {
         name: string;
         phoneNumber?: string;
     } | null;
+    user?: {
+        id: string;
+        username: string;
+        name?: string;
+    };
+    tenant?: {
+        id: string;
+        companyName: string;
+        subdomain: string;
+    };
 }
 import { formatLocation, formatPassengerName, formatHotelName, toTitleCase } from '@/app/utils/textFormatters';
 import ReturnTransferModal from '@/app/components/ReturnTransferModal';
@@ -44,6 +55,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
     const [filteredReservations, setFilteredReservations] = useState<Reservation[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [updateLoading, setUpdateLoading] = useState<string | null>(null);
+    const [selectedTenant, setSelectedTenant] = useState<string>('all');
+    const [tenants, setTenants] = useState<Array<{id: string, companyName: string, subdomain: string}>>([]);
     const [returnTransferModal, setReturnTransferModal] = useState<{
         isOpen: boolean;
         reservation: any;
@@ -51,7 +64,10 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
 
     useEffect(() => {
         fetchReservations();
-    }, []);
+        if (user?.role === 'SUPERUSER') {
+            fetchTenants();
+        }
+    }, [user]);
 
     // Default filter to all reservations
     useEffect(() => {
@@ -59,6 +75,13 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             handleFilter('all');
         }
     }, [reservations]);
+
+    // Re-filter when tenant selection changes
+    useEffect(() => {
+        if (reservations.length > 0) {
+            handleFilter('all');
+        }
+    }, [selectedTenant]);
 
     const fetchReservations = async () => {
         try {
@@ -91,6 +114,22 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             setFilteredReservations([]);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const fetchTenants = async () => {
+        try {
+            const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+            const response = await fetch('/api/tenants', {
+                headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
+            });
+            const data = await response.json();
+            
+            if (Array.isArray(data)) {
+                setTenants(data);
+            }
+        } catch (error) {
+            console.error('Tenant\'ları getirme hatası:', error);
         }
     };
 
@@ -191,6 +230,11 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
         } else {
             // If no user, show all reservations (for debugging)
             filtered = [...reservations];
+        }
+
+        // Apply tenant filtering for SUPERUSER
+        if (user?.role === 'SUPERUSER' && selectedTenant !== 'all') {
+            filtered = filtered.filter(reservation => reservation.tenantId === selectedTenant);
         }
         
         const today = new Date();
@@ -324,6 +368,39 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                 </div>
             </div>
 
+            {/* Acente Filtreleme - Sadece Superuser için */}
+            {user?.role === 'SUPERUSER' && tenants.length > 0 && (
+                <div className="mb-4">
+                    <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+                        <div className="flex items-center gap-4">
+                            <label className="text-sm font-medium text-gray-700">
+                                Acente Filtresi:
+                            </label>
+                            <select
+                                value={selectedTenant}
+                                onChange={(e) => setSelectedTenant(e.target.value)}
+                                className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            >
+                                <option value="all">Tüm Acenteler</option>
+                                {tenants.map((tenant) => (
+                                    <option key={tenant.id} value={tenant.id}>
+                                        {tenant.companyName}
+                                    </option>
+                                ))}
+                            </select>
+                            {selectedTenant !== 'all' && (
+                                <button
+                                    onClick={() => setSelectedTenant('all')}
+                                    className="text-sm text-blue-600 hover:text-blue-800 underline"
+                                >
+                                    Filtreyi Temizle
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Arama ve Filtreleme */}
             <div className="mb-6">
                 <SearchAndFilter onSearch={handleSearch} onFilter={handleFilter} />
@@ -350,6 +427,11 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Müşteri
                                 </th>
+                                {user?.role === 'SUPERUSER' && (
+                                    <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-32">
+                                        Acente
+                                    </th>
+                                )}
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-24">
                                     Fiyat
                                 </th>
@@ -373,7 +455,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                         <tbody className="bg-white divide-y divide-gray-100">
                             {filteredReservations.length === 0 ? (
                                 <tr>
-                                    <td colSpan={11} className="px-3 py-4 text-center text-gray-500">
+                                    <td colSpan={user?.role === 'SUPERUSER' ? 12 : 11} className="px-3 py-4 text-center text-gray-500">
                                         Rezervasyon bulunamadı
                                     </td>
                                 </tr>
@@ -492,6 +574,18 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     )}
                                                 </div>
                                             </td>
+                                            {user?.role === 'SUPERUSER' && (
+                                                <td className="px-6 py-4 text-sm text-gray-900 align-middle">
+                                                    <div className="flex flex-col">
+                                                        <div className="font-medium text-blue-600">
+                                                            {reservation.tenant?.companyName || 'Bilinmiyor'}
+                                                        </div>
+                                                        <div className="text-xs text-gray-500">
+                                                            {reservation.user?.username || 'Bilinmiyor'}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            )}
                                             <td className="px-6 py-4 text-sm text-gray-900 align-middle">
                                                 <div className="font-semibold text-green-600">{reservation.price} {reservation.currency}</div>
                                                 {reservation.distanceKm && (

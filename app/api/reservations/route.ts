@@ -42,6 +42,13 @@ export async function GET(request: NextRequest) {
               name: true,
               username: true
             }
+          },
+          tenant: {
+            select: {
+              id: true,
+              companyName: true,
+              subdomain: true
+            }
           }
         }
       });
@@ -78,7 +85,21 @@ export async function GET(request: NextRequest) {
         { time: 'desc' }
       ],
       include: {
-        driver: true
+        driver: true,
+        user: {
+          select: {
+            id: true,
+            username: true,
+            name: true
+          }
+        },
+        tenant: {
+          select: {
+            id: true,
+            companyName: true,
+            subdomain: true
+          }
+        }
       }
     });
     console.log('API: Bulunan rezervasyon sayısı:', reservations.length);

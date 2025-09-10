@@ -155,6 +155,13 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
       module: 'accommodation'
     },
     {
+      name: 'Modül Yönetimi',
+      href: '/admin/modules',
+      icon: '🔧',
+      description: 'Modülleri açma/kapatma',
+      module: 'system'
+    },
+    {
       name: 'Ayarlar',
       href: '/admin/settings',
       icon: '⚙️',

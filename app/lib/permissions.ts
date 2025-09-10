@@ -90,34 +90,32 @@ export const PERMISSION_LABELS = {
 
 export const ROLE_PERMISSIONS = {
   SUPERUSER: [
-    // Tüm izinler
+    // Tüm izinler - tüm şirketlere erişim
     ...Object.values(PERMISSIONS)
   ],
   AGENCY_ADMIN: [
+    // Sadece kendi şirketinin bilgilerine erişim
     PERMISSIONS.VIEW_DASHBOARD,
-    PERMISSIONS.VIEW_ALL_RESERVATIONS,
+    PERMISSIONS.VIEW_ALL_RESERVATIONS, // Kendi şirketinin rezervasyonları
     PERMISSIONS.CREATE_RESERVATIONS,
     PERMISSIONS.EDIT_RESERVATIONS,
     PERMISSIONS.DELETE_RESERVATIONS,
-    PERMISSIONS.VIEW_DRIVERS,
+    PERMISSIONS.VIEW_DRIVERS, // Kendi şirketinin şoförleri
     PERMISSIONS.MANAGE_DRIVERS,
     PERMISSIONS.ASSIGN_DRIVERS,
-    PERMISSIONS.VIEW_REPORTS,
+    PERMISSIONS.VIEW_REPORTS, // Kendi şirketinin raporları
     PERMISSIONS.EXPORT_REPORTS,
-    PERMISSIONS.VIEW_ACCOUNTING,
+    PERMISSIONS.VIEW_ACCOUNTING, // Kendi şirketinin muhasebesi
     PERMISSIONS.MANAGE_PAYMENTS,
     PERMISSIONS.MANAGE_COMMISSIONS,
-    PERMISSIONS.MANAGE_CUSTOMERS,
+    PERMISSIONS.MANAGE_CUSTOMERS, // Kendi şirketinin müşterileri
     PERMISSIONS.VIEW_CUSTOMER_DATA,
-    PERMISSIONS.MANAGE_USERS,
-    PERMISSIONS.MANAGE_PERMISSIONS
+    PERMISSIONS.MANAGE_USERS, // Kendi şirketinin kullanıcıları
+    PERMISSIONS.MANAGE_PERMISSIONS // Kendi şirketinin kullanıcılarına yetki verme
   ],
   AGENCY_USER: [
-    PERMISSIONS.VIEW_OWN_SALES,
-    PERMISSIONS.CREATE_RESERVATIONS,
-    PERMISSIONS.EDIT_RESERVATIONS,
-    PERMISSIONS.VIEW_DRIVERS,
-    PERMISSIONS.VIEW_CUSTOMER_DATA
+    // Varsayılan olarak hiçbir şeye erişim yok
+    // Agency Admin tarafından yetki verilmesi gerekir
   ],
   OPERATION: [
     PERMISSIONS.VIEW_ALL_RESERVATIONS,
@@ -202,4 +200,37 @@ export function canManageActivities(role: string): boolean {
 
 export function canCreateReservation(role: string): boolean {
   return ['SUPERUSER', 'AGENCY_ADMIN', 'AGENCY_USER', 'OPERATION', 'SELLER'].includes(role);
+}
+
+// Tenant scoping fonksiyonları
+export function canAccessTenantData(userRole: string, userTenantId: string, targetTenantId: string): boolean {
+  // SUPERUSER tüm tenant'lara erişebilir
+  if (userRole === 'SUPERUSER') {
+    return true;
+  }
+  
+  // Diğer roller sadece kendi tenant'larına erişebilir
+  return userTenantId === targetTenantId;
+}
+
+export function canViewAllTenants(role: string): boolean {
+  return role === 'SUPERUSER';
+}
+
+export function canManageTenantModules(role: string): boolean {
+  return role === 'SUPERUSER';
+}
+
+export function canViewTenantUsers(role: string, userTenantId: string, targetTenantId: string): boolean {
+  // SUPERUSER tüm tenant'ların kullanıcılarını görebilir
+  if (role === 'SUPERUSER') {
+    return true;
+  }
+  
+  // AGENCY_ADMIN sadece kendi tenant'ının kullanıcılarını görebilir
+  if (role === 'AGENCY_ADMIN') {
+    return userTenantId === targetTenantId;
+  }
+  
+  return false;
 }

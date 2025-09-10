@@ -21,25 +21,24 @@ interface DashboardStats {
 export default function AdminDashboard() {
   const { emojisEnabled } = useEmoji();
   const { user, isAdmin } = useAuth();
-  
+  const { t, dir } = useLanguage();
+  const [isClient, setIsClient] = useState(false);
+  const [stats, setStats] = useState<DashboardStats>({
+    totalReservations: 0,
+    todayReservations: 0,
+    totalRevenue: 0,
+    todayRevenue: 0,
+    totalDrivers: 0,
+    activeDrivers: 0,
+    pendingPayments: 0,
+    completedTransfers: 0
+  });
+  const [loading, setLoading] = useState(true);
+
   const canViewDashboard =
     user?.role === 'SUPERUSER' ||
     (user?.role && (ROLE_PERMISSIONS as any)[user.role]?.includes(PERMISSIONS.VIEW_DASHBOARD)) ||
     user?.permissions?.some(p => p.permission === PERMISSIONS.VIEW_DASHBOARD && p.isActive);
-  if (!canViewDashboard) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Yetkisiz Erişim</h1>
-          <p className="text-gray-600">Bu sayfaya erişim yetkiniz bulunmamaktadır.</p>
-        </div>
-      </div>
-    );
-  }
-  const { t, dir } = useLanguage();
-  const [isClient, setIsClient] = useState(false);
-  
-  console.log('Admin Dashboard - Emojis enabled:', emojisEnabled);
 
   // Client-side rendering kontrolü
   useEffect(() => {
@@ -53,22 +52,23 @@ export default function AdminDashboard() {
       return;
     }
   }, [isClient, user]);
-  
-  const [stats, setStats] = useState<DashboardStats>({
-    totalReservations: 0,
-    todayReservations: 0,
-    totalRevenue: 0,
-    todayRevenue: 0,
-    totalDrivers: 0,
-    activeDrivers: 0,
-    pendingPayments: 0,
-    completedTransfers: 0
-  });
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchDashboardStats();
-  }, []);
+    if (canViewDashboard) {
+      fetchDashboardStats();
+    }
+  }, [canViewDashboard]);
+
+  if (!canViewDashboard) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Yetkisiz Erişim</h1>
+          <p className="text-gray-600">Bu sayfaya erişim yetkiniz bulunmamaktadır.</p>
+        </div>
+      </div>
+    );
+  }
 
   const fetchDashboardStats = async () => {
     try {

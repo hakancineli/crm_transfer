@@ -1,29 +1,88 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { TenantService, Tenant, Module } from '@/app/lib/tenant';
+import { useAuth } from '@/app/contexts/AuthContext';
 import { MODULES, MODULE_FEATURES } from '@/app/lib/modules';
+import { useRouter } from 'next/navigation';
+
+interface Tenant {
+  id: string;
+  subdomain: string;
+  companyName: string;
+  domain?: string;
+  isActive: boolean;
+  subscriptionPlan: string;
+  modules: TenantModule[];
+  users: TenantUser[];
+}
+
+interface TenantModule {
+  id: string;
+  tenantId: string;
+  moduleId: string;
+  isEnabled: boolean;
+  activatedAt?: Date;
+  expiresAt?: Date;
+  features: string[];
+  module: Module;
+}
+
+interface Module {
+  id: string;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  priceMonthly: number;
+  priceYearly: number;
+  features: string[];
+}
+
+interface TenantUser {
+  id: string;
+  tenantId: string;
+  userId: string;
+  role: string;
+  permissions: string[];
+  isActive: boolean;
+}
 
 export default function ModuleManagement() {
+  const { user } = useAuth();
+  const router = useRouter();
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Superuser kontrolü
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (user && user.role !== 'SUPERUSER') {
+      router.push('/admin');
+      return;
+    }
+  }, [user, router]);
+
+  // Superuser değilse veri çekme
+  useEffect(() => {
+    if (user?.role === 'SUPERUSER') {
+      fetchData();
+    }
+  }, [user]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [tenantsData, modulesData] = await Promise.all([
-        TenantService.getAllTenants(),
-        TenantService.getAllModules()
-      ]);
-      
-      setTenants(tenantsData);
-      setModules(modulesData);
+      console.log('Fetching module data...');
+      const response = await fetch('/api/admin/modules');
+      console.log('Response status:', response.status);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Module data received:', data);
+        setTenants(data.data.tenants);
+        setModules(data.data.modules);
+      } else {
+        setError('Veriler yüklenirken hata oluştu');
+      }
     } catch (err) {
       setError('Veriler yüklenirken hata oluştu');
       console.error('Error fetching data:', err);
@@ -34,8 +93,15 @@ export default function ModuleManagement() {
 
   const toggleModule = async (tenantId: string, moduleId: string) => {
     try {
-      const success = await TenantService.toggleModule(tenantId, moduleId);
-      if (success) {
+      const response = await fetch('/api/admin/modules', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tenantId, moduleId }),
+      });
+      
+      if (response.ok) {
         await fetchData(); // Refresh data
       } else {
         setError('Modül durumu güncellenirken hata oluştu');
@@ -53,6 +119,18 @@ export default function ModuleManagement() {
   const getFeatureLabel = (featureId: string) => {
     return MODULE_FEATURES[featureId as keyof typeof MODULE_FEATURES] || featureId;
   };
+
+  // Superuser kontrolü
+  if (user && user.role !== 'SUPERUSER') {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Erişim Reddedildi</h2>
+          <p className="text-gray-600">Bu sayfaya erişim için SUPERUSER yetkisi gereklidir.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
