@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -18,12 +18,12 @@ model Tenant {
   updatedAt        DateTime         @updatedAt
   activities       Activity[]
   reservations     Reservation[]
+  drivers          Driver[]
   hotelBookings    HotelBooking[]
   hotelPricePool   HotelPricePool[]
   hotelRequests    HotelRequest[]
   modules          TenantModule[]
   users            TenantUser[]
-  drivers          Driver[]
 
   @@map("tenants")
 }
@@ -53,8 +53,8 @@ model TenantModule {
   features    String    @default("[]")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  module      Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  module      Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
 
   @@unique([tenantId, moduleId])
   @@map("tenant_modules")
@@ -69,8 +69,8 @@ model TenantUser {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@unique([tenantId, userId])
   @@map("tenant_users")
@@ -83,7 +83,7 @@ model Driver {
   tenantId     String?
   createdAt    DateTime      @default(now())
   reservations Reservation[]
-  tenant       Tenant?       @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  tenant       Tenant?       @relation(fields: [tenantId], references: [id])
 
   @@map("drivers")
 }
@@ -94,7 +94,7 @@ model User {
   email         String           @unique
   password      String
   name          String
-  role          UserRole         @default(SELLER)
+  role          UserRole         @default("SELLER")
   isActive      Boolean          @default(true)
   createdBy     String?
   createdAt     DateTime         @default(now())
@@ -130,8 +130,8 @@ model Activity {
   userAgent   String?
   createdAt   DateTime @default(now())
   tenantId    String?
-  tenant      Tenant?  @relation(fields: [tenantId], references: [id])
   user        User     @relation("UserActivities", fields: [userId], references: [id])
+  tenant      Tenant?  @relation(fields: [tenantId], references: [id])
 }
 
 model Reservation {
@@ -157,11 +157,11 @@ model Reservation {
   userId                  String?
   tenantId                String?
   companyCommissionStatus String         @default("PENDING")
-  driver                  Driver?        @relation(fields: [driverId], references: [id])
+  user                    User?          @relation(fields: [userId], references: [id])
+  tenant                  Tenant?        @relation(fields: [tenantId], references: [id])
   returnTransfer          Reservation?   @relation("ReturnTransfer", fields: [returnTransferId], references: [id])
   originalTransfer        Reservation?   @relation("ReturnTransfer")
-  tenant                  Tenant?        @relation(fields: [tenantId], references: [id])
-  user                    User?          @relation(fields: [userId], references: [id])
+  driver                  Driver?        @relation(fields: [driverId], references: [id])
   hotelBookings           HotelBooking[]
 }
 
@@ -188,8 +188,8 @@ model HotelRequest {
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
   hotelBookings   HotelBooking[]
-  user            User?          @relation(fields: [assignedTo], references: [id])
   tenant          Tenant?        @relation(fields: [tenantId], references: [id])
+  user            User?          @relation(fields: [assignedTo], references: [id])
 
   @@map("hotel_requests")
 }
@@ -221,9 +221,9 @@ model HotelBooking {
   customerPrice      Float
   profitMargin       Float
   voucherNumber      String        @unique
-  request            HotelRequest? @relation(fields: [requestId], references: [id])
-  reservation        Reservation?  @relation(fields: [reservationId], references: [id])
   tenant             Tenant?       @relation(fields: [tenantId], references: [id])
+  reservation        Reservation?  @relation(fields: [reservationId], references: [id])
+  request            HotelRequest? @relation(fields: [requestId], references: [id])
 
   @@map("hotel_bookings")
 }
