@@ -443,9 +443,14 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Müşteri
                                 </th>
-                                {user?.role === 'SUPERUSER' && (
+                                {(user?.role === 'SUPERUSER' || user?.role === 'AGENCY_ADMIN') && (
                                     <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-32">
                                         Acente
+                                    </th>
+                                )}
+                                {(user?.role === 'SUPERUSER' || user?.role === 'AGENCY_ADMIN') && (
+                                    <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-32">
+                                        Kullanıcı
                                     </th>
                                 )}
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-24">
@@ -590,15 +595,23 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     )}
                                                 </div>
                                             </td>
-                                            {user?.role === 'SUPERUSER' && (
+                                            {(user?.role === 'SUPERUSER' || user?.role === 'AGENCY_ADMIN') && (
                                                 <td className="px-6 py-4 text-sm text-gray-900 align-middle">
-                                                    <div className="flex flex-col">
-                                                        <div className="font-medium text-blue-600">
-                                                            {reservation.tenant?.companyName || 'Bilinmiyor'}
-                                                        </div>
-                                                        <div className="text-xs text-gray-500">
-                                                            {reservation.user?.username || 'Bilinmiyor'}
-                                                        </div>
+                                                    <div className="font-medium text-blue-600">
+                                                        {reservation.tenant?.companyName || 'Bilinmiyor'}
+                                                    </div>
+                                                    <div className="text-xs text-gray-500">
+                                                        {reservation.tenant?.subdomain || 'N/A'}
+                                                    </div>
+                                                </td>
+                                            )}
+                                            {(user?.role === 'SUPERUSER' || user?.role === 'AGENCY_ADMIN') && (
+                                                <td className="px-6 py-4 text-sm text-gray-900 align-middle">
+                                                    <div className="font-medium text-green-600">
+                                                        {reservation.user?.name || reservation.user?.username || 'Bilinmiyor'}
+                                                    </div>
+                                                    <div className="text-xs text-gray-500">
+                                                        {reservation.user?.username || 'N/A'}
                                                     </div>
                                                 </td>
                                             )}
