@@ -130,9 +130,11 @@ export async function GET(request: NextRequest) {
     console.log('API: Rezervasyonlardaki tenant ID\'leri:', tenantIds);
     
     // Debug: Her tenant için rezervasyon sayısı
-    const tenantCounts = {};
+    const tenantCounts: Record<string, number> = {};
     reservations.forEach(r => {
-      tenantCounts[r.tenantId] = (tenantCounts[r.tenantId] || 0) + 1;
+      if (r.tenantId) {
+        tenantCounts[r.tenantId] = (tenantCounts[r.tenantId] || 0) + 1;
+      }
     });
     console.log('API: Tenant başına rezervasyon sayıları:', tenantCounts);
 
