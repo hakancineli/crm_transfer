@@ -83,7 +83,9 @@ export async function GET(request: NextRequest) {
 
     // If no phone parameter, return reservations (scoped)
     console.log('API: Tüm rezervasyonlar getiriliyor...');
+    console.log('API: Kullanıcı bilgileri:', { currentUserId, currentUserRole, currentTenantIds });
     const whereClause: any = buildTenantWhere(currentUserRole, currentTenantIds, tenantId || undefined);
+    console.log('API: Where clause:', whereClause);
     // Optional date range on string field `date` (YYYY-MM-DD)
     if (fromDate || toDate) {
       whereClause.date = {} as any;

@@ -42,7 +42,12 @@ export function buildTenantWhere(role: string | null, tenantIds: string[], expli
     return where;
   }
   if (role === 'AGENCY_ADMIN' || role === 'AGENCY_USER') {
-    where.tenantId = tenantIds.length > 0 ? { in: tenantIds } : '__no_such_tenant__';
+    if (tenantIds.length > 0) {
+      where.tenantId = { in: tenantIds };
+    } else {
+      // Eğer kullanıcının hiç tenant'ı yoksa, hiçbir rezervasyon görmesin
+      where.tenantId = '__no_such_tenant__';
+    }
   }
   return where;
 }
