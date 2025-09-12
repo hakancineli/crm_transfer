@@ -27,148 +27,178 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
   }, []);
 
 
-  const allMenuItems = [
-    {
-      name: t('admin.navigation.dashboard'),
-      href: '/admin',
-      icon: '🏠',
-      description: t('admin.navigation.dashboard'),
-      module: 'transfer'
-    },
-    {
-      name: user?.role === 'SUPERUSER' ? t('admin.navigation.allReservations') : 'Rezervasyonlar',
-      href: '/admin/reservations',
-      icon: '📋',
-      description: t('admin.navigation.reservations'),
-      module: 'transfer'
-    },
-    {
-      name: t('admin.navigation.newReservation'),
-      href: '/admin/new-reservation',
-      icon: '➕',
-      description: t('admin.navigation.newReservation'),
-      module: 'transfer'
-    },
-    {
-      name: 'Uçuş Durumu',
-      href: '/admin/flight-status',
-      icon: '✈️',
-      description: 'Uçuş takibi ve durumu',
-      module: 'flight'
-    },
-    {
-      name: t('admin.navigation.drivers'),
-      href: '/admin/drivers',
-      icon: '👨‍✈️',
-      description: t('admin.navigation.drivers'),
-      module: 'transfer'
-    },
-    {
-      name: t('admin.navigation.reports'),
-      href: '/admin/reports',
-      icon: '📈',
-      description: t('admin.navigation.reports'),
-      module: 'transfer'
-    },
-    {
-      name: t('admin.navigation.accounting'),
-      href: '/admin/accounting',
-      icon: '💰',
-      description: t('admin.navigation.accounting'),
-      module: 'transfer'
-    },
-    {
-      name: t('admin.navigation.customers'),
-      href: '/admin/customers',
-      icon: '👥',
-      description: t('admin.navigation.customers'),
-      module: 'transfer'
-    },
-    {
-      name: t('admin.navigation.activities'),
-      href: '/admin/activities',
-      icon: '📋',
-      description: t('admin.navigation.activities'),
-      module: 'transfer'
-    },
-    {
-      name: t('admin.navigation.users'),
-      href: '/admin/users',
-      icon: '👤',
-      description: t('admin.navigation.users'),
-      module: 'transfer'
-    },
-    {
-      name: 'Şirketler',
-      href: '/admin/companies',
-      icon: '🏢',
-      description: 'Tüm şirketleri ve kullanıcılarını yönet',
-      module: 'system'
-    },
-    {
-      name: 'Müşteri Kurulumu',
-      href: '/admin/customer-setup',
-      icon: '🏢',
-      description: 'Yeni müşteri şirketi kurulumu',
-      module: 'transfer'
-    },
-    {
-      name: 'Denetim Logları',
-      href: '/admin/audit-logs',
-      icon: '📋',
-      description: 'Sistem aktivite logları',
-      module: 'system'
-    },
-    {
-      name: 'Personel Performansı',
-      href: '/admin/performance',
-      icon: '📊',
-      description: 'Kullanıcı performans metrikleri',
-      module: 'system'
-    },
-    {
-      name: 'Konaklama',
-      href: '/admin/accommodation',
-      icon: '🏨',
-      description: 'Otel rezervasyon yönetimi',
-      module: 'accommodation'
-    },
-    {
-      name: 'Konaklama Rezervasyonları',
-      href: '/admin/accommodation/reservations',
-      icon: '📋',
-      description: 'Tüm otel rezervasyonlarını görüntüle',
-      module: 'accommodation'
-    },
-    {
-      name: 'Konaklama Raporları',
-      href: '/admin/accommodation/reports',
-      icon: '📊',
-      description: 'Detaylı analiz ve raporlar',
-      module: 'accommodation'
-    },
-    {
-      name: 'Otel Fiyat Havuzu',
-      href: '/admin/accommodation/price-pool',
-      icon: '🏨',
-      description: 'Tüm satış personelinin görebileceği fiyatlar',
-      module: 'accommodation'
-    },
-    {
-      name: 'Modül Yönetimi',
-      href: '/admin/modules',
-      icon: '🔧',
-      description: 'Modülleri açma/kapatma',
-      module: 'system'
-    },
-    {
-      name: 'Ayarlar',
-      href: '/admin/settings',
-      icon: '⚙️',
-      description: 'Sistem ayarları',
-      module: 'transfer'
-    }
-  ];
+  // Rol bazlı menü sıralaması
+  const getMenuItemsByRole = (role: string) => {
+    const baseMenuItems = [
+      {
+        name: t('admin.navigation.dashboard'),
+        href: '/admin',
+        icon: '🏠',
+        description: t('admin.navigation.dashboard'),
+        module: 'transfer',
+        order: 1
+      },
+      {
+        name: role === 'SUPERUSER' ? t('admin.navigation.allReservations') : 'Rezervasyonlar',
+        href: '/admin/reservations',
+        icon: '📋',
+        description: t('admin.navigation.reservations'),
+        module: 'transfer',
+        order: role === 'SUPERUSER' ? 5 : 2
+      },
+      {
+        name: t('admin.navigation.newReservation'),
+        href: '/admin/new-reservation',
+        icon: '➕',
+        description: t('admin.navigation.newReservation'),
+        module: 'transfer',
+        order: role === 'SUPERUSER' ? 6 : 3
+      },
+      {
+        name: 'Uçuş Durumu',
+        href: '/admin/flight-status',
+        icon: '✈️',
+        description: 'Uçuş takibi ve durumu',
+        module: 'flight',
+        order: role === 'SUPERUSER' ? 12 : (role === 'ACCOUNTANT' ? 999 : 6)
+      },
+      {
+        name: t('admin.navigation.drivers'),
+        href: '/admin/drivers',
+        icon: '👨‍✈️',
+        description: t('admin.navigation.drivers'),
+        module: 'transfer',
+        order: role === 'SUPERUSER' ? 7 : (role === 'ACCOUNTANT' ? 999 : 4)
+      },
+      {
+        name: t('admin.navigation.reports'),
+        href: '/admin/reports',
+        icon: '📈',
+        description: t('admin.navigation.reports'),
+        module: 'transfer',
+        order: role === 'SUPERUSER' ? 9 : (role === 'ACCOUNTANT' ? 4 : 8)
+      },
+      {
+        name: t('admin.navigation.accounting'),
+        href: '/admin/accounting',
+        icon: '💰',
+        description: t('admin.navigation.accounting'),
+        module: 'transfer',
+        order: role === 'SUPERUSER' ? 10 : (role === 'ACCOUNTANT' ? 3 : 9)
+      },
+      {
+        name: t('admin.navigation.customers'),
+        href: '/admin/customers',
+        icon: '👥',
+        description: t('admin.navigation.customers'),
+        module: 'transfer',
+        order: role === 'SUPERUSER' ? 8 : (role === 'ACCOUNTANT' ? 999 : 5)
+      },
+      {
+        name: t('admin.navigation.activities'),
+        href: '/admin/activities',
+        icon: '📋',
+        description: t('admin.navigation.activities'),
+        module: 'transfer',
+        order: role === 'SUPERUSER' ? 4 : 999
+      },
+      {
+        name: t('admin.navigation.users'),
+        href: '/admin/users',
+        icon: '👤',
+        description: t('admin.navigation.users'),
+        module: 'transfer',
+        order: role === 'SUPERUSER' ? 3 : (role === 'AGENCY_ADMIN' ? 10 : 999)
+      },
+      {
+        name: 'Şirketler',
+        href: '/admin/companies',
+        icon: '🏢',
+        description: 'Tüm şirketleri ve kullanıcılarını yönet',
+        module: 'system',
+        order: role === 'SUPERUSER' ? 2 : 999
+      },
+      {
+        name: 'Müşteri Kurulumu',
+        href: '/admin/customer-setup',
+        icon: '🏢',
+        description: 'Yeni müşteri şirketi kurulumu',
+        module: 'transfer',
+        order: role === 'SUPERUSER' ? 999 : 999
+      },
+      {
+        name: 'Denetim Logları',
+        href: '/admin/audit-logs',
+        icon: '📋',
+        description: 'Sistem aktivite logları',
+        module: 'system',
+        order: role === 'SUPERUSER' ? 4 : 999
+      },
+      {
+        name: 'Personel Performansı',
+        href: '/admin/performance',
+        icon: '📊',
+        description: 'Kullanıcı performans metrikleri',
+        module: 'system',
+        order: role === 'SUPERUSER' ? 11 : (role === 'AGENCY_ADMIN' ? 7 : (role === 'ACCOUNTANT' ? 5 : 999))
+      },
+      {
+        name: 'Konaklama',
+        href: '/admin/accommodation',
+        icon: '🏨',
+        description: 'Otel rezervasyon yönetimi',
+        module: 'accommodation',
+        order: 999
+      },
+      {
+        name: 'Konaklama Rezervasyonları',
+        href: '/admin/accommodation/reservations',
+        icon: '📋',
+        description: 'Tüm otel rezervasyonlarını görüntüle',
+        module: 'accommodation',
+        order: 999
+      },
+      {
+        name: 'Konaklama Raporları',
+        href: '/admin/accommodation/reports',
+        icon: '📊',
+        description: 'Detaylı analiz ve raporlar',
+        module: 'accommodation',
+        order: 999
+      },
+      {
+        name: 'Otel Fiyat Havuzu',
+        href: '/admin/accommodation/price-pool',
+        icon: '🏨',
+        description: 'Tüm satış personelinin görebileceği fiyatlar',
+        module: 'accommodation',
+        order: 999
+      },
+      {
+        name: 'Modül Yönetimi',
+        href: '/admin/modules',
+        icon: '🔧',
+        description: 'Modülleri açma/kapatma',
+        module: 'system',
+        order: role === 'SUPERUSER' ? 13 : 999
+      },
+      {
+        name: 'Ayarlar',
+        href: '/admin/settings',
+        icon: '⚙️',
+        description: 'Sistem ayarları',
+        module: 'transfer',
+        order: role === 'SUPERUSER' ? 14 : 999
+      }
+    ];
+
+    // Order'a göre sırala ve 999 olanları filtrele
+    return baseMenuItems
+      .filter(item => item.order < 999)
+      .sort((a, b) => a.order - b.order);
+  };
+
+  const allMenuItems = getMenuItemsByRole(user?.role || '');
 
   // Modül durumuna göre menü öğelerini filtrele
   // Sıralamayı sabit tutmak için filter yerine map kullan
