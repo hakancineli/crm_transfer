@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { FlightInfo, FlightTracker } from '@/app/lib/flightTracker';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useModule } from '@/app/hooks/useModule';
 
 interface FlightStatusData {
   flightCode: string;
@@ -16,6 +17,7 @@ interface FlightStatusData {
 
 export default function FlightStatusPage() {
   const { user, loading: authLoading } = useAuth();
+  const flightEnabled = useModule('flight');
   const [flights, setFlights] = useState<FlightStatusData[]>([]);
   const [filteredFlights, setFilteredFlights] = useState<FlightStatusData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,6 +36,13 @@ export default function FlightStatusPage() {
       return;
     }
     
+    // Modül kontrolü: SUPERUSER veya modül açık olmalı
+    if (user?.role !== 'SUPERUSER' && !flightEnabled) {
+      setLoading(false);
+      setError('MODULE_DISABLED');
+      return;
+    }
+    
     // Guard: SUPERUSER veya izinli kullanıcılar
     const hasViewFlights = user?.role === 'SUPERUSER' || user?.permissions?.some(p => p.permission === 'VIEW_ALL_RESERVATIONS' && p.isActive);
     if (!hasViewFlights) {
@@ -42,7 +51,7 @@ export default function FlightStatusPage() {
       return;
     }
     fetchFlightStatus();
-  }, [user, authLoading]);
+  }, [user, authLoading, flightEnabled]);
 
   const fetchFlightStatus = async () => {
     try {
@@ -145,6 +154,25 @@ export default function FlightStatusPage() {
         <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">Yetkisiz Erişim</h1>
           <p className="text-gray-600">Bu sayfaya erişim yetkiniz bulunmamaktadır.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error === 'MODULE_DISABLED') {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
+          <div className="text-center">
+            <div className="text-6xl mb-4">✈️</div>
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">Uçuş Modülü Kapalı</h1>
+            <p className="text-gray-600 mb-6">
+              Uçuş Durumu takibi özelliği şu anda devre dışı bırakılmıştır.
+            </p>
+            <p className="text-sm text-gray-500">
+              Bu özelliği kullanmak için Modül Yönetimi'nden Uçuş Yönetimi modülünü aktifleştirin.
+            </p>
+          </div>
         </div>
       </div>
     );
