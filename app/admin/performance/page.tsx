@@ -36,8 +36,8 @@ export default function PerformancePage() {
   const [filterRole, setFilterRole] = useState<string>('all');
 
   useEffect(() => {
-    // Only SUPERUSER can access performance page
-    if (user && user.role !== 'SUPERUSER') {
+    // SUPERUSER and AGENCY_ADMIN can access performance page
+    if (user && user.role !== 'SUPERUSER' && user.role !== 'AGENCY_ADMIN') {
       window.location.href = '/admin';
       return;
     }

@@ -243,7 +243,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
             } else if (item.name === 'Müşteri Kurulumu') {
               shouldShow = user?.role === 'SUPERUSER';
             } else if (item.name === 'Personel Performansı') {
-              shouldShow = false; // Only SUPERUSER can see this
+              shouldShow = user?.role === 'AGENCY_ADMIN' || user?.role === 'SUPERUSER';
             } else if (item.name === 'Denetim Logları') {
               shouldShow = false; // Only SUPERUSER can see this
             } else if (item.name === 'Ayarlar') {
