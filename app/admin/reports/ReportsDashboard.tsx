@@ -5,6 +5,7 @@ import { startOfDay, endOfDay, format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useEmoji } from '@/app/contexts/EmojiContext';
+import { useDebounce } from '@/app/hooks/useDebounce';
 
 interface ReportData {
     totalRevenueUSD: number;
@@ -36,6 +37,10 @@ export default function ReportsDashboard() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    // Debounced tarihler - 500ms gecikme ile
+    const debouncedStartDate = useDebounce(startDate, 500);
+    const debouncedEndDate = useDebounce(endDate, 500);
+
     useEffect(() => {
         // Check if user has permission to view reports
         const hasViewReportsPermission = user?.permissions?.some(p => 
@@ -51,6 +56,13 @@ export default function ReportsDashboard() {
         fetchReportData();
     }, [user]); // Sadece user değiştiğinde çalışsın
 
+    // Debounced tarihler değiştiğinde otomatik güncelle
+    useEffect(() => {
+        if (user) {
+            fetchReportData();
+        }
+    }, [debouncedStartDate, debouncedEndDate]);
+
     const fetchReportData = async () => {
         setIsLoading(true);
         setError(null);
@@ -63,8 +75,8 @@ export default function ReportsDashboard() {
                     ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
                 },
                 body: JSON.stringify({
-                    startDate,
-                    endDate,
+                    startDate: debouncedStartDate,
+                    endDate: debouncedEndDate,
                 }),
             });
             
@@ -189,7 +201,7 @@ export default function ReportsDashboard() {
                             disabled={isLoading}
                             className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {isLoading ? 'Yükleniyor...' : 'Raporu Güncelle'}
+                            {isLoading ? 'Yükleniyor...' : 'Hemen Güncelle'}
                         </button>
                     </div>
                 </div>
