@@ -62,6 +62,11 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
         reservation: any;
     }>({ isOpen: false, reservation: null });
 
+    // Sayfalama ve tarih filtreleri
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(50);
+    // Tarih aralığı kaldırıldı (yalnızca sayfa boyutu kaldı)
+
     useEffect(() => {
         fetchReservations();
         if (user?.role === 'SUPERUSER') {
@@ -86,7 +91,11 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
     const fetchReservations = async () => {
         try {
             const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-            const response = await fetch('/api/reservations', {
+            const params = new URLSearchParams();
+            params.set('page', String(page));
+            params.set('pageSize', String(pageSize));
+            const url = `/api/reservations?${params.toString()}`;
+            const response = await fetch(url, {
                 headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
             });
             const data = await response.json();
@@ -116,6 +125,13 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             setIsLoading(false);
         }
     };
+
+    // Sayfa boyutu değiştiğinde 1. sayfadan çek
+    useEffect(() => {
+        setPage(1);
+        fetchReservations();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pageSize]);
 
     const fetchTenants = async () => {
         try {
@@ -387,7 +403,23 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
 
             {/* Arama ve Filtreleme */}
             <div className="mb-6">
-                <SearchAndFilter onSearch={handleSearch} onFilter={handleFilter} />
+                <SearchAndFilter 
+                    onSearch={handleSearch} 
+                    onFilter={handleFilter}
+                    pageSizeControl={
+                        <div className="flex items-end gap-2">
+                            <div>
+                                <label className="block text-xs text-gray-500 mb-1">Sayfa Boyutu</label>
+                                <select value={pageSize} onChange={(e)=>setPageSize(parseInt(e.target.value))} className="px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                    <option value={10}>10</option>
+                                    <option value={20}>20</option>
+                                    <option value={50}>50</option>
+                                </select>
+                            </div>
+                            <button onClick={()=>fetchReservations()} className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">Uygula</button>
+                        </div>
+                    }
+                />
             </div>
 
             {/* Desktop Tablo */}
@@ -967,6 +999,19 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                         );
                     })
                 )}
+            </div>
+            {/* Sayfalama Kontrolleri */}
+            <div className="mt-6 flex items-center justify-between">
+                <button
+                    onClick={() => { if (page > 1) { setPage(page-1); fetchReservations(); } }}
+                    className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50 disabled:opacity-50"
+                    disabled={page === 1}
+                >Önceki</button>
+                <div className="text-sm text-gray-600">Sayfa {page}</div>
+                <button
+                    onClick={() => { setPage(page+1); fetchReservations(); }}
+                    className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50"
+                >Sonraki</button>
             </div>
         </div>
         {returnTransferModal.isOpen && returnTransferModal.reservation ? (

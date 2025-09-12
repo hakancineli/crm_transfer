@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
 import { getRequestUserContext, buildTenantWhere } from '@/app/lib/requestContext';
 import { PERMISSIONS, ROLE_PERMISSIONS } from '@/app/lib/permissions';
+import { evaluatePermissions, shouldRestrictToOwnReservations } from '@/app/lib/authorization';
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,6 +11,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const phone = searchParams.get('phone');
     const tenantId = searchParams.get('tenantId');
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+    const pageSize = Math.min(200, Math.max(1, parseInt(searchParams.get('pageSize') || '50', 10))); // default 50
+    const fromDate = searchParams.get('from'); // YYYY-MM-DD
+    const toDate = searchParams.get('to');     // YYYY-MM-DD
     const { userId: currentUserId, role: currentUserRole, tenantIds: currentTenantIds } = await getRequestUserContext(request);
 
     // If phone parameter is provided, search by phone number
@@ -34,6 +39,8 @@ export async function GET(request: NextRequest) {
           { date: 'desc' },
           { time: 'desc' }
         ],
+        skip: (page - 1) * pageSize,
+        take: pageSize,
         include: {
           driver: true,
           user: {
@@ -77,20 +84,14 @@ export async function GET(request: NextRequest) {
     // If no phone parameter, return reservations (scoped)
     console.log('API: Tüm rezervasyonlar getiriliyor...');
     const whereClause: any = buildTenantWhere(currentUserRole, currentTenantIds, tenantId || undefined);
-
-    // Determine visibility scope: if user cannot view all, restrict to own reservations
-    let canViewAll = currentUserRole === 'SUPERUSER';
-    if (!canViewAll && currentUserRole) {
-      canViewAll = (ROLE_PERMISSIONS as any)[currentUserRole]?.includes(PERMISSIONS.VIEW_ALL_RESERVATIONS) || false;
+    // Optional date range on string field `date` (YYYY-MM-DD)
+    if (fromDate || toDate) {
+      whereClause.date = {} as any;
+      if (fromDate) (whereClause.date as any).gte = fromDate;
+      if (toDate) (whereClause.date as any).lte = toDate;
     }
-    if (!canViewAll && currentUserId) {
-      const explicit = await prisma.userPermission.findMany({
-        where: { userId: currentUserId, isActive: true },
-        select: { permission: true }
-      });
-      canViewAll = explicit.some(p => p.permission === PERMISSIONS.VIEW_ALL_RESERVATIONS);
-    }
-    if (!canViewAll && currentUserId) {
+    const evald = await evaluatePermissions(currentUserId, currentUserRole);
+    if (shouldRestrictToOwnReservations(evald) && currentUserId) {
       whereClause.userId = currentUserId;
     }
 
@@ -100,6 +101,8 @@ export async function GET(request: NextRequest) {
         { date: 'desc' },
         { time: 'desc' }
       ],
+      skip: (page - 1) * pageSize,
+      take: pageSize,
       include: {
         driver: true,
         user: {
