@@ -1,76 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { originalVoucherNumber, returnDate, returnTime } = body || {};
-    if (!originalVoucherNumber || !returnDate || !returnTime) {
-      return NextResponse.json({ error: 'Gerekli alanlar eksik' }, { status: 400 });
-    }
-
-    const original = await prisma.reservation.findUnique({ where: { voucherNumber: originalVoucherNumber } });
-    if (!original) {
-      return NextResponse.json({ error: 'Orijinal rezervasyon bulunamadı' }, { status: 404 });
-    }
-
-    const returnVoucherNumber = `${originalVoucherNumber}-R`;
-    const created = await prisma.reservation.create({
-      data: {
-        date: returnDate,
-        time: returnTime,
-        from: original.to,
-        to: original.from,
-        flightCode: original.flightCode,
-        passengerNames: original.passengerNames,
-        luggageCount: original.luggageCount,
-        price: original.price,
-        currency: original.currency,
-        phoneNumber: original.phoneNumber,
-        voucherNumber: returnVoucherNumber,
-        driverFee: original.driverFee,
-        paymentStatus: 'PENDING',
-        isReturn: true,
-        userId: original.userId || null,
-        tenantId: original.tenantId || null,
-        originalTransfer: { connect: { id: original.id } }
-      }
-    });
-
-    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-    const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
-    if (BOT_TOKEN && CHAT_ID) {
-      try {
-        const names = (() => { try { return JSON.parse(original.passengerNames || '[]'); } catch { return []; } })();
-        const text = [
-          'Dönüş Transferi Oluşturuldu 🔄',
-          `Voucher: ${returnVoucherNumber}`,
-          `Orijinal: ${originalVoucherNumber}`,
-          `Tarih: ${returnDate} ${returnTime}`,
-          `Güzergah: ${original.to} → ${original.from}`,
-          names.length ? `Yolcular: ${names.join(', ')}` : undefined,
-          original.phoneNumber ? `Telefon: ${original.phoneNumber}` : undefined,
-          original.flightCode ? `Uçuş: ${original.flightCode}` : undefined,
-        ].filter(Boolean).join('\n');
-        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: CHAT_ID, text })
-        });
-      } catch (e) {
-        console.error('Telegram gönderim hatası:', e);
-      }
-    }
-
-    return NextResponse.json(created, { status: 201 });
-  } catch (error) {
-    console.error('Return transfer hatası:', error);
-    return NextResponse.json({ error: 'Dönüş transferi sırasında hata' }, { status: 500 });
-  }
-}
-
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { getRequestUserContext } from '@/app/lib/requestContext';
 
 
@@ -139,8 +68,6 @@ export async function POST(request: NextRequest) {
                 driverFee: null,
                 userId: ctx.userId ?? originalReservation.userId,
                 isReturn: true,
-                // Prisma nested relation alanı olduğundan null gönderme
-                // yerine hiç göndermiyoruz
                 originalTransfer: {
                     connect: { voucherNumber: originalReservation.voucherNumber }
                 }
