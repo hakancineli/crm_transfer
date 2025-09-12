@@ -71,9 +71,22 @@ export function useModule(moduleName: keyof ModuleSettings) {
             const data = await response.json();
             const tenantModules = data.tenantModules || [];
             
+            // Modül adından ID'ye mapping
+            const moduleIdMap: Record<string, string> = {
+              'transfer': '7151a226-3a15-493d-b663-4b05bf5ca37d', // Transfer Yönetimi
+              'accommodation': 'd7ed6d22-e836-47f2-93fe-f2b6d5cefe55', // Konaklama Yönetimi
+              'flight': '4555dbae-4051-4d0e-a10d-b8c728fc2402' // Uçuş Yönetimi
+            };
+            
+            const moduleId = moduleIdMap[moduleName];
+            if (!moduleId) {
+              setIsEnabled(defaultModules[moduleName]);
+              return;
+            }
+            
             // Kullanıcının tenant'larındaki modül durumunu kontrol et
             const hasModuleAccess = tenantModules.some((tm: any) => 
-              tm.moduleId === moduleName && tm.isEnabled
+              tm.moduleId === moduleId && tm.isEnabled
             );
             
             setIsEnabled(hasModuleAccess);
