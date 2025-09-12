@@ -36,7 +36,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
       module: 'transfer'
     },
     {
-      name: t('admin.navigation.reservations'),
+      name: user?.role === 'SUPERUSER' ? t('admin.navigation.allReservations') : 'Rezervasyonlar',
       href: '/admin/reservations',
       icon: '📋',
       description: t('admin.navigation.reservations'),
@@ -219,6 +219,12 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               shouldShow = user?.permissions?.some(p => 
                 p.permission === 'VIEW_ACCOUNTING' && p.isActive
               ) || false;
+            } else if (item.href === '/admin/customers' || item.name === 'Müşteriler') {
+              // Customers menu: require explicit view/manage customer permission
+              const hasExplicit = user?.permissions?.some(p => 
+                (p.permission === 'VIEW_CUSTOMER_DATA' || p.permission === 'MANAGE_CUSTOMERS') && p.isActive
+              ) || false;
+              shouldShow = hasExplicit;
             } else if (item.name === 'Son Aktiviteler') {
               shouldShow = user?.permissions?.some(p => 
                 p.permission === 'MANAGE_ACTIVITIES' && p.isActive
@@ -242,6 +248,8 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               shouldShow = false; // Only SUPERUSER can see this
             } else if (item.name === 'Ayarlar') {
               shouldShow = false; // Only SUPERUSER can see this
+            } else if (item.name === 'Modül Yönetimi') {
+              shouldShow = user?.role === 'SUPERUSER';
             }
           }
           

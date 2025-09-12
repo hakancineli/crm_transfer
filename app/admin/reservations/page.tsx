@@ -12,11 +12,11 @@ export default function ReservationsPage() {
     const [title, setTitle] = useState(t('admin.reservations.allReservations'));
     const [description, setDescription] = useState(t('admin.reservations.allReservationsDescription'));
 
-    const canViewAll =
-        user?.role === 'SUPERUSER' ||
-        (user?.role && (ROLE_PERMISSIONS as any)[user.role]?.includes(PERMISSIONS.VIEW_ALL_RESERVATIONS)) ||
-        user?.permissions?.some(p => p.permission === PERMISSIONS.VIEW_ALL_RESERVATIONS && p.isActive);
-    if (!canViewAll) {
+    const rolePerms = user?.role ? (ROLE_PERMISSIONS as any)[user.role] || [] : [];
+    const has = (perm: string) => rolePerms.includes(perm) || user?.permissions?.some(p => p.permission === perm && p.isActive);
+    const canViewAll = user?.role === 'SUPERUSER' || has(PERMISSIONS.VIEW_ALL_RESERVATIONS);
+    const canViewOwn = has(PERMISSIONS.VIEW_OWN_SALES) || has(PERMISSIONS.CREATE_RESERVATIONS);
+    if (!canViewAll && !canViewOwn) {
         return (
             <div className="min-h-screen bg-gray-50 py-8">
                 <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">

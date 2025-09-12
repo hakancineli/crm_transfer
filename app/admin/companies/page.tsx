@@ -68,7 +68,8 @@ export default function CompaniesPage() {
   const fetchTenants = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/tenants', {
+      const url = new URL('/api/tenants', window.location.origin).toString();
+      const response = await fetch(url, {
         headers: {
           'Authorization': token ? `Bearer ${token}` : ''
         }
@@ -80,6 +81,8 @@ export default function CompaniesPage() {
         // Token geçersiz, login sayfasına yönlendir
         localStorage.removeItem('token');
         window.location.href = '/admin-login';
+      } else {
+        console.error('Şirketler API hata', response.status);
       }
     } catch (error) {
       console.error('Şirketler getirilemedi:', error);
@@ -139,7 +142,8 @@ export default function CompaniesPage() {
   const fetchTenantUsers = async (tenantId: string) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/tenants/${tenantId}/users`, {
+      const url = new URL(`/api/tenants/${tenantId}/users`, window.location.origin).toString();
+      const response = await fetch(url, {
         headers: {
           'Authorization': token ? `Bearer ${token}` : ''
         }
@@ -159,7 +163,8 @@ export default function CompaniesPage() {
   const fetchTenantReservations = async (tenantId: string) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/reservations?tenantId=${tenantId}`, {
+      const url = new URL(`/api/reservations?tenantId=${tenantId}`, window.location.origin).toString();
+      const response = await fetch(url, {
         headers: {
           'Authorization': token ? `Bearer ${token}` : ''
         }

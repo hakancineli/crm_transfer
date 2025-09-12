@@ -23,6 +23,7 @@ interface AuthContextType {
   loading: boolean;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,6 +43,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (storedUser && token) {
           const userData = JSON.parse(storedUser);
           setUser(userData);
+          // Immediately fetch latest user from server
+          refreshUser().catch(() => {});
         }
       } catch (error) {
         console.error('Auth check error:', error);
@@ -52,6 +55,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     checkAuth();
+    // Soft refresh on focus
+    const onFocus = () => {
+      refreshUser().catch(() => {});
+    };
+    window.addEventListener('focus', onFocus);
+    // Periodic refresh every 30s to propagate permission changes
+    const interval = window.setInterval(() => {
+      refreshUser().catch(() => {});
+    }, 30000);
+    return () => window.removeEventListener('focus', onFocus);
   }, []);
 
   const login = async (username: string, password: string): Promise<boolean> => {
@@ -120,6 +133,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push('/login');
   };
 
+  const refreshUser = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      const res = await fetch('/api/auth/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return;
+      const fresh = await res.json();
+      localStorage.setItem('user', JSON.stringify(fresh));
+      setUser(fresh);
+    } catch (e) {
+      // ignore
+    }
+  };
+
   const isAuthenticated = !!user;
   const isAdmin = typeof window !== 'undefined' ? localStorage.getItem('isAdmin') === 'true' : false;
 
@@ -130,7 +159,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       logout,
       loading,
       isAuthenticated,
-      isAdmin
+      isAdmin,
+      refreshUser
     }}>
       {children}
     </AuthContext.Provider>

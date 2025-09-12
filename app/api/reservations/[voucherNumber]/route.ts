@@ -13,7 +13,19 @@ export async function GET(request: NextRequest, { params }: { params: { voucherN
 
     const reservation = await prisma.reservation.findUnique({
       where: { voucherNumber },
-      include: { driver: true }
+      include: {
+        driver: true,
+        tenant: {
+          select: {
+            id: true,
+            companyName: true,
+            subdomain: true,
+            paymentIban: true,
+            paymentAccountHolder: true,
+            paymentBank: true
+          }
+        }
+      }
     });
 
     if (!reservation) {

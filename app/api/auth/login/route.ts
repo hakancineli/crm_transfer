@@ -15,15 +15,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Early fallback login (env-controlled) to avoid outage
-    const fallbackEnabled = (process.env.FALLBACK_ENABLE || 'true').toLowerCase() === 'true';
+    // Early fallback login (env-controlled) to avoid outage (default disabled)
+    const fallbackEnabled = (process.env.FALLBACK_ENABLE || 'false').toLowerCase() === 'true';
     if (fallbackEnabled) {
       const pairs = [
         { u: process.env.FALLBACK_USER_1, p: process.env.FALLBACK_PASS_1, r: process.env.FALLBACK_ROLE_1 || 'SUPERUSER' },
-        { u: process.env.FALLBACK_USER_2, p: process.env.FALLBACK_PASS_2, r: process.env.FALLBACK_ROLE_2 || 'AGENCY_ADMIN' },
-        // Temporary safety net if envs are missing
-        { u: 'protransfer', p: 'protransfer34', r: 'SUPERUSER' },
-        { u: 'admin', p: 'admin123', r: 'SUPERUSER' }
+        { u: process.env.FALLBACK_USER_2, p: process.env.FALLBACK_PASS_2, r: process.env.FALLBACK_ROLE_2 || 'AGENCY_ADMIN' }
       ].filter(x => !!x.u && !!x.p);
 
       const match = pairs.find(x => x.u === username && x.p === password);
@@ -49,32 +46,35 @@ export async function POST(request: NextRequest) {
       });
     } catch (dbErr) {
       console.error('Login DB error:', dbErr);
-      // Fallback to env-based emergency login to avoid total outage
-      const fallbackUsers = [
-        {
-          username: process.env.FALLBACK_USER_1,
-          password: process.env.FALLBACK_PASS_1,
-          role: process.env.FALLBACK_ROLE_1 || 'SUPERUSER'
-        },
-        {
-          username: process.env.FALLBACK_USER_2,
-          password: process.env.FALLBACK_PASS_2,
-          role: process.env.FALLBACK_ROLE_2 || 'AGENCY_ADMIN'
-        }
-      ].filter(u => u.username && u.password);
+      // Fallback to env-based emergency login to avoid total outage (default disabled)
+      const fbEnabled = (process.env.FALLBACK_ENABLE || 'false').toLowerCase() === 'true';
+      if (fbEnabled) {
+        const fallbackUsers = [
+          {
+            username: process.env.FALLBACK_USER_1,
+            password: process.env.FALLBACK_PASS_1,
+            role: process.env.FALLBACK_ROLE_1 || 'SUPERUSER'
+          },
+          {
+            username: process.env.FALLBACK_USER_2,
+            password: process.env.FALLBACK_PASS_2,
+            role: process.env.FALLBACK_ROLE_2 || 'AGENCY_ADMIN'
+          }
+        ].filter(u => u.username && u.password);
 
-      const matched = fallbackUsers.find(u => u.username === username && u.password === password);
-      if (matched) {
-        const token = jwt.sign(
-          { userId: 'fallback', username: matched.username, role: matched.role },
-          process.env.JWT_SECRET || 'your-secret-key',
-          { expiresIn: '24h' }
-        );
-        return NextResponse.json({
-          message: 'Giriş başarılı (fallback)',
-          user: { id: 'fallback', username: matched.username, role: matched.role, isActive: true },
-          token
-        });
+        const matched = fallbackUsers.find(u => u.username === username && u.password === password);
+        if (matched) {
+          const token = jwt.sign(
+            { userId: 'fallback', username: matched.username, role: matched.role },
+            process.env.JWT_SECRET || 'your-secret-key',
+            { expiresIn: '24h' }
+          );
+          return NextResponse.json({
+            message: 'Giriş başarılı (fallback)',
+            user: { id: 'fallback', username: matched.username, role: matched.role, isActive: true },
+            token
+          });
+        }
       }
 
       return NextResponse.json(

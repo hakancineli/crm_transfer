@@ -78,6 +78,22 @@ export async function GET(request: NextRequest) {
     console.log('API: Tüm rezervasyonlar getiriliyor...');
     const whereClause: any = buildTenantWhere(currentUserRole, currentTenantIds, tenantId || undefined);
 
+    // Determine visibility scope: if user cannot view all, restrict to own reservations
+    let canViewAll = currentUserRole === 'SUPERUSER';
+    if (!canViewAll && currentUserRole) {
+      canViewAll = (ROLE_PERMISSIONS as any)[currentUserRole]?.includes(PERMISSIONS.VIEW_ALL_RESERVATIONS) || false;
+    }
+    if (!canViewAll && currentUserId) {
+      const explicit = await prisma.userPermission.findMany({
+        where: { userId: currentUserId, isActive: true },
+        select: { permission: true }
+      });
+      canViewAll = explicit.some(p => p.permission === PERMISSIONS.VIEW_ALL_RESERVATIONS);
+    }
+    if (!canViewAll && currentUserId) {
+      whereClause.userId = currentUserId;
+    }
+
     const reservations = await prisma.reservation.findMany({
       where: whereClause,
       orderBy: [

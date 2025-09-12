@@ -65,8 +65,8 @@ export default function LoginPage() {
           console.log('Redirecting to /admin');
           window.location.href = '/admin';
         } else if (data.user.role === 'SELLER') {
-          console.log('Redirecting to /reservations');
-          window.location.href = '/reservations';
+          console.log('Redirecting to /admin/reservations');
+          window.location.href = '/admin/reservations';
         } else {
           console.log('Redirecting to /');
           window.location.href = '/';

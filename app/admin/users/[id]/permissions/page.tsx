@@ -26,7 +26,7 @@ interface UserPermission {
 export default function UserPermissionsPage() {
   const params = useParams();
   const router = useRouter();
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, refreshUser } = useAuth();
   const userId = params.id as string;
   
   const [user, setUser] = useState<User | null>(null);
@@ -95,16 +95,18 @@ export default function UserPermissionsPage() {
   const handleSave = async () => {
     if (!user || !currentUser) return;
 
-    // Role hierarchy check
+    // Role hierarchy check (AGENCY_ADMIN tenant içinde tüm rolleri yönetebilir)
     const roleHierarchy = {
-      'SUPERUSER': 4,
+      'SUPERUSER': 5,
+      'AGENCY_ADMIN': 4,
       'MANAGER': 3,
       'OPERATION': 2,
+      'ACCOUNTANT': 2,
       'SELLER': 1,
-      'ACCOUNTANT': 1,
+      'AGENCY_USER': 1,
       'CUSTOMER_SERVICE': 1,
       'FINANCE': 1
-    };
+    } as const;
 
     const currentUserLevel = roleHierarchy[currentUser.role as keyof typeof roleHierarchy] || 0;
     const targetUserLevel = roleHierarchy[user.role as keyof typeof roleHierarchy] || 0;
@@ -127,6 +129,10 @@ export default function UserPermissionsPage() {
 
       if (response.ok) {
         alert('Yetkiler başarıyla güncellendi');
+        // If admin edited their own permissions, refresh session
+        if (currentUser && currentUser.id === userId) {
+          await refreshUser();
+        }
         router.push('/admin/users');
       } else {
         const error = await response.json();

@@ -21,8 +21,9 @@ export default function CustomersPage() {
   
   const canViewCustomers =
     user?.role === 'SUPERUSER' ||
-    (user?.role && (ROLE_PERMISSIONS as any)[user.role]?.includes(PERMISSIONS.VIEW_CUSTOMER_DATA)) ||
-    user?.permissions?.some(p => p.permission === PERMISSIONS.VIEW_CUSTOMER_DATA && p.isActive);
+    (user?.role && ((ROLE_PERMISSIONS as any)[user.role]?.includes(PERMISSIONS.VIEW_CUSTOMER_DATA) ||
+                    (ROLE_PERMISSIONS as any)[user.role]?.includes(PERMISSIONS.MANAGE_CUSTOMERS))) ||
+    user?.permissions?.some(p => (p.permission === PERMISSIONS.VIEW_CUSTOMER_DATA || p.permission === PERMISSIONS.MANAGE_CUSTOMERS) && p.isActive);
 
   useEffect(() => {
     if (!canViewCustomers) return;

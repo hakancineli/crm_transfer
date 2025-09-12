@@ -201,30 +201,14 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
     const handleFilter = (filter: string) => {
         let filtered = [...reservations];
         
-        // Apply permission-based filtering first
+        // Apply permission-based filtering first (role-aware)
         if (user) {
-            // Check if user has VIEW_ALL_RESERVATIONS permission
-            const hasViewAllPermission = user.permissions?.some(p => 
-                p.permission === 'VIEW_ALL_RESERVATIONS' && p.isActive
-            );
-            
-            // Check if user has VIEW_OWN_SALES permission
-            const hasViewOwnPermission = user.permissions?.some(p => 
-                p.permission === 'VIEW_OWN_SALES' && p.isActive
-            );
-            
-            // Show all reservations if user is SUPERUSER or has permissions
-            if (user.role === 'SUPERUSER' || hasViewAllPermission) {
-                // User can see all reservations
+            const canViewAll = (user.role === 'SUPERUSER') || ['SUPERUSER','AGENCY_ADMIN','AGENCY_USER','OPERATION','ACCOUNTANT','MANAGER'].includes(user.role);
+            if (canViewAll) {
                 filtered = [...reservations];
-            } else if (user.role === 'AGENCY_ADMIN' || user.role === 'AGENCY_USER') {
-                // AGENCY users can see all reservations (tenant filtering is handled by API)
-                filtered = [...reservations];
-            } else if (hasViewOwnPermission) {
-                // User can only see their own reservations
+            } else if (['SELLER'].includes(user.role)) {
                 filtered = reservations.filter(reservation => reservation.userId === user.id);
             } else {
-                // User has no permission to view reservations
                 filtered = [];
             }
         } else {

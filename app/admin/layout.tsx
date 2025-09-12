@@ -28,21 +28,21 @@ export default function AdminLayout({
 
       {/* Overlay when sidebar is open - only on mobile */}
       {sidebarOpen && (
-        <div 
-          className="fixed inset-0 z-20 bg-black bg-opacity-50 lg:hidden"
+        <div
+          className="fixed inset-0 z-20 bg-black bg-opacity-40 lg:hidden transition-opacity duration-500 ease-out"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <div className={`fixed left-0 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-30 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      <div className={`fixed left-0 w-64 bg-white shadow-2xl transform transition-all duration-700 ease-out will-change-transform z-30 print:hidden ${
+        sidebarOpen ? 'translate-x-0 shadow-xl' : '-translate-x-full shadow-none'
       }`} style={{ top: '64px', height: 'calc(100vh - 64px)' }}>
         <AdminNavigation onClose={() => setSidebarOpen(false)} />
       </div>
 
       {/* Main Content */}
-      <main className={`${sidebarOpen ? 'ml-64' : ''} min-h-screen overflow-x-hidden pt-16`}>
+      <main className={`${sidebarOpen ? 'ml-64' : 'ml-0'} min-h-screen overflow-x-hidden pt-16 transition-all duration-700 ease-out`}>
         {children}
       </main>
     </div>
