@@ -250,18 +250,28 @@ export async function POST(request: NextRequest) {
                     data.specialRequests ? `Not: ${data.specialRequests}` : undefined
                 ].filter(Boolean).join('\n');
 
-                const tgRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                // Fire-and-forget with timeout (prevents slow create)
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 1500);
+                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: String(CHAT_ID), text: textLines })
+                    body: JSON.stringify({ chat_id: String(CHAT_ID), text: textLines }),
+                    signal: controller.signal
+                })
+                .then(async (tgRes) => {
+                    clearTimeout(timeout);
+                    if (!tgRes.ok) {
+                        const errText = await tgRes.text();
+                        console.error('Telegram bildirim hatası (response):', tgRes.status, errText);
+                    } else {
+                        telegramOk = true;
+                    }
+                })
+                .catch((e) => {
+                    clearTimeout(timeout);
+                    console.error('Telegram fetch error:', e?.name || e);
                 });
-
-                if (!tgRes.ok) {
-                    const errText = await tgRes.text();
-                    console.error('Telegram bildirim hatası (response):', tgRes.status, errText);
-                } else {
-                    telegramOk = true;
-                }
             } else {
                 console.warn('Telegram env eksik: BOT_TOKEN veya CHAT_ID yok');
             }

@@ -79,6 +79,7 @@ export async function POST(request: NextRequest) {
             const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
             const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
             if (BOT_TOKEN && CHAT_ID) {
+                console.log('ReturnTransfer: Telegram sending...');
                 const names = (() => { try { return JSON.parse(originalReservation.passengerNames || '[]'); } catch { return []; } })();
                 const textLines = [
                     'Dönüş Transferi Oluşturuldu 🔄',
@@ -90,14 +91,31 @@ export async function POST(request: NextRequest) {
                     originalReservation.phoneNumber ? `Telefon: ${originalReservation.phoneNumber}` : undefined,
                     originalReservation.flightCode ? `Uçuş: ${originalReservation.flightCode}` : undefined
                 ].filter(Boolean).join('\n');
-                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 1500);
+                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: String(CHAT_ID), text: textLines })
+                    body: JSON.stringify({ chat_id: String(CHAT_ID), text: textLines }),
+                    signal: controller.signal
+                }).then(async (tgRes) => {
+                    clearTimeout(timeout);
+                    if (!tgRes.ok) {
+                        const errText = await tgRes.text();
+                        console.error('Telegram response not ok:', tgRes.status, errText);
+                    } else {
+                        console.log('ReturnTransfer: Telegram sent successfully');
+                    }
+                }).catch((e) => {
+                    clearTimeout(timeout);
+                    console.error('ReturnTransfer: Telegram fetch error:', e?.name || e);
                 });
             }
+            else {
+                console.warn('ReturnTransfer: BOT_TOKEN or CHAT_ID missing');
+            }
         } catch (notifyErr) {
-            console.error('Telegram bildirim hatası:', notifyErr);
+            console.error('ReturnTransfer: Telegram send error:', notifyErr);
         }
 
         // Update original reservation to mark it as having a return transfer
