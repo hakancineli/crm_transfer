@@ -15,13 +15,19 @@ interface UserPerformance {
   averageReservationsPerDay: number;
   lastActivity: string;
   isActive: boolean;
-  // New sales and profitability metrics
+  // Sales and profitability metrics
   salesRevenue: number;
   pendingRevenue: number;
   unpaidRevenue: number;
   totalCommission: number;
   netProfit: number;
   profitMargin: number;
+  // Detailed sales counts
+  totalSalesCount: number;
+  pendingSalesCount: number;
+  unpaidSalesCount: number;
+  paidSalesCount: number;
+  approvedSalesCount: number;
 }
 
 interface PerformanceStats {
@@ -41,6 +47,9 @@ export default function PerformancePage() {
   const [error, setError] = useState('');
   const [sortBy, setSortBy] = useState<'revenue' | 'salesRevenue' | 'netProfit' | 'profitMargin' | 'reservations' | 'name'>('revenue');
   const [filterRole, setFilterRole] = useState<string>('all');
+  const [selectedUser, setSelectedUser] = useState<string>('all');
+  const [fromDate, setFromDate] = useState<string>('');
+  const [toDate, setToDate] = useState<string>('');
 
   useEffect(() => {
     // SUPERUSER and AGENCY_ADMIN can access performance page
@@ -50,15 +59,30 @@ export default function PerformancePage() {
     }
     
     fetchPerformanceData();
-  }, [user]);
+  }, [user, selectedUser, fromDate, toDate]);
 
   const fetchPerformanceData = async () => {
     try {
       setLoading(true);
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const response = await fetch('/api/performance', {
+      
+      // Build query parameters
+      const params = new URLSearchParams();
+      if (selectedUser !== 'all') {
+        params.append('userId', selectedUser);
+      }
+      if (fromDate) {
+        params.append('fromDate', fromDate);
+      }
+      if (toDate) {
+        params.append('toDate', toDate);
+      }
+      
+      const url = `/api/performance${params.toString() ? `?${params.toString()}` : ''}`;
+      const response = await fetch(url, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
       });
+      
       if (response.ok) {
         const data = await response.json();
         setPerformance(data.performance);
@@ -238,44 +262,95 @@ export default function PerformancePage() {
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-            <div className="flex space-x-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Sıralama</label>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="revenue">Toplam Gelire Göre</option>
-                  <option value="salesRevenue">Satış Gelirine Göre</option>
-                  <option value="netProfit">Net Kâra Göre</option>
-                  <option value="profitMargin">Kâr Marjına Göre</option>
-                  <option value="reservations">Rezervasyon Sayısına Göre</option>
-                  <option value="name">İsme Göre</option>
-                </select>
+          <div className="space-y-4">
+            {/* First row - Sorting and Role filters */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+              <div className="flex flex-wrap gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Sıralama</label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as any)}
+                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="revenue">Toplam Gelire Göre</option>
+                    <option value="salesRevenue">Satış Gelirine Göre</option>
+                    <option value="netProfit">Net Kâra Göre</option>
+                    <option value="profitMargin">Kâr Marjına Göre</option>
+                    <option value="reservations">Rezervasyon Sayısına Göre</option>
+                    <option value="name">İsme Göre</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Rol Filtresi</label>
+                  <select
+                    value={filterRole}
+                    onChange={(e) => setFilterRole(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="all">Tüm Roller</option>
+                    <option value="SELLER">Satış</option>
+                    <option value="OPERATION">Operasyon</option>
+                    <option value="ACCOUNTANT">Muhasebe</option>
+                    <option value="MANAGER">Yönetici</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Kullanıcı Seçimi</label>
+                  <select
+                    value={selectedUser}
+                    onChange={(e) => setSelectedUser(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="all">Tüm Kullanıcılar</option>
+                    {performance.map((user) => (
+                      <option key={user.id} value={user.id}>
+                        {user.name} ({user.role})
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Rol Filtresi</label>
-                <select
-                  value={filterRole}
-                  onChange={(e) => setFilterRole(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="all">Tüm Roller</option>
-                  <option value="SELLER">Satış</option>
-                  <option value="OPERATION">Operasyon</option>
-                  <option value="ACCOUNTANT">Muhasebe</option>
-                  <option value="MANAGER">Yönetici</option>
-                </select>
-              </div>
+              <button
+                onClick={fetchPerformanceData}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Yenile
+              </button>
             </div>
-            <button
-              onClick={fetchPerformanceData}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              Yenile
-            </button>
+            
+            {/* Second row - Date filters */}
+            <div className="flex flex-wrap gap-4 items-end">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Başlangıç Tarihi</label>
+                <input
+                  type="date"
+                  value={fromDate}
+                  onChange={(e) => setFromDate(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Bitiş Tarihi</label>
+                <input
+                  type="date"
+                  value={toDate}
+                  onChange={(e) => setToDate(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <button
+                onClick={() => {
+                  setFromDate('');
+                  setToDate('');
+                  setSelectedUser('all');
+                  setFilterRole('all');
+                }}
+                className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+              >
+                Filtreleri Temizle
+              </button>
+            </div>
           </div>
         </div>
 
@@ -305,13 +380,10 @@ export default function PerformancePage() {
                     Toplam Gelir
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Satış Geliri
+                    Satış Detayları
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Net Kar
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Kar Marjı
+                    Kar Analizi
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Bu Ay
@@ -355,20 +427,32 @@ export default function PerformancePage() {
                       {formatCurrency(user.totalRevenue)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <div className="font-medium">{formatCurrency(user.salesRevenue)}</div>
-                      <div className="text-xs text-gray-500">
-                        Bekleyen: {formatCurrency(user.pendingRevenue)}
+                      <div className="space-y-1">
+                        <div className="font-medium text-green-600">
+                          Satış: {user.totalSalesCount} adet - {formatCurrency(user.salesRevenue)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Ödenen: {user.paidSalesCount} | Onaylanan: {user.approvedSalesCount}
+                        </div>
+                        <div className="text-xs text-yellow-600">
+                          Bekleyen: {user.pendingSalesCount} adet - {formatCurrency(user.pendingRevenue)}
+                        </div>
+                        <div className="text-xs text-red-600">
+                          Ödenmemiş: {user.unpaidSalesCount} adet - {formatCurrency(user.unpaidRevenue)}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <div className="font-medium text-green-600">{formatCurrency(user.netProfit)}</div>
-                      <div className="text-xs text-gray-500">
-                        Komisyon: {formatCurrency(user.totalCommission)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <div className={`font-medium ${user.profitMargin >= 15 ? 'text-green-600' : user.profitMargin >= 10 ? 'text-yellow-600' : 'text-red-600'}`}>
-                        %{user.profitMargin.toFixed(1)}
+                      <div className="space-y-1">
+                        <div className="font-medium text-green-600">
+                          Net Kar: {formatCurrency(user.netProfit)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Komisyon: {formatCurrency(user.totalCommission)}
+                        </div>
+                        <div className={`font-medium ${user.profitMargin >= 15 ? 'text-green-600' : user.profitMargin >= 10 ? 'text-yellow-600' : 'text-red-600'}`}>
+                          Kar Marjı: %{user.profitMargin.toFixed(1)}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

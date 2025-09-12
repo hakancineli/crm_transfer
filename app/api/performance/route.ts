@@ -4,6 +4,12 @@ import jwt from 'jsonwebtoken';
 
 export async function GET(request: NextRequest) {
   try {
+    // Get query parameters
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+    const fromDate = searchParams.get('fromDate');
+    const toDate = searchParams.get('toDate');
+
     // Scope by tenant for non-SUPERUSER
     const authHeader = request.headers.get('authorization');
     let currentUserRole: string | null = null;
@@ -32,8 +38,37 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Add date filtering
+    if (fromDate && toDate) {
+      reservationWhere.date = {
+        gte: fromDate,
+        lte: toDate
+      };
+    }
+
+    // Build user filter
+    const userWhere: any = {
+      isActive: true
+    };
+
+    // Add specific user filter if provided
+    if (userId) {
+      userWhere.id = userId;
+    } else {
+      // Only apply tenant filtering if no specific user is requested
+      userWhere.tenantUsers = {
+        some: {
+          isActive: true,
+          ...(currentUserRole !== 'SUPERUSER' && currentTenantIds.length > 0 ? {
+            tenantId: { in: currentTenantIds }
+          } : {})
+        }
+      };
+    }
+
     // Get all users with their reservations (scoped)
     const users = await prisma.user.findMany({
+      where: userWhere,
       include: {
         reservations: { where: reservationWhere },
         _count: {
@@ -73,18 +108,25 @@ export async function GET(request: NextRequest) {
       });
       const averageReservationsPerDay = recentReservations.length / 30;
 
-      // Calculate sales metrics
-      const salesRevenue = user.reservations
-        .filter(res => res.status === 'PAID' || res.status === 'APPROVED')
+      // Calculate detailed sales metrics
+      const paidReservations = user.reservations.filter(res => res.status === 'PAID');
+      const approvedReservations = user.reservations.filter(res => res.status === 'APPROVED');
+      const pendingReservations = user.reservations.filter(res => res.status === 'PENDING');
+      const unpaidReservations = user.reservations.filter(res => res.status === 'UNPAID');
+      
+      const salesRevenue = [...paidReservations, ...approvedReservations]
         .reduce((sum, res) => sum + res.price, 0);
       
-      const pendingRevenue = user.reservations
-        .filter(res => res.status === 'PENDING')
+      const pendingRevenue = pendingReservations
         .reduce((sum, res) => sum + res.price, 0);
       
-      const unpaidRevenue = user.reservations
-        .filter(res => res.status === 'UNPAID')
+      const unpaidRevenue = unpaidReservations
         .reduce((sum, res) => sum + res.price, 0);
+
+      // Count different types of sales
+      const totalSalesCount = paidReservations.length + approvedReservations.length;
+      const pendingSalesCount = pendingReservations.length;
+      const unpaidSalesCount = unpaidReservations.length;
 
       // Calculate profitability (assuming 20% commission rate for now)
       const commissionRate = 0.20; // 20% commission
@@ -109,13 +151,19 @@ export async function GET(request: NextRequest) {
         averageReservationsPerDay,
         lastActivity,
         isActive: user.isActive,
-        // New sales and profitability metrics
+        // Sales and profitability metrics
         salesRevenue,
         pendingRevenue,
         unpaidRevenue,
         totalCommission,
         netProfit,
-        profitMargin
+        profitMargin,
+        // Detailed sales counts
+        totalSalesCount,
+        pendingSalesCount,
+        unpaidSalesCount,
+        paidSalesCount: paidReservations.length,
+        approvedSalesCount: approvedReservations.length
       };
     });
 
