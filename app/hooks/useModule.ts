@@ -66,7 +66,20 @@ export function useModule(moduleName: keyof ModuleSettings) {
       // AGENCY_ADMIN ve diğer roller için tenant modül kontrolü
       if (user && (user.role === 'AGENCY_ADMIN' || user.role === 'AGENCY_USER')) {
         try {
-          const response = await fetch('/api/tenant-modules');
+          // JWT token'ı localStorage'dan al
+          const token = localStorage.getItem('token');
+          if (!token) {
+            console.error('Token bulunamadı');
+            setIsEnabled(defaultModules[moduleName]);
+            return;
+          }
+
+          const response = await fetch('/api/tenant-modules', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
           if (response.ok) {
             const data = await response.json();
             const tenantModules = data.tenantModules || [];
