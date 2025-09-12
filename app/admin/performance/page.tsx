@@ -429,16 +429,16 @@ export default function PerformancePage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div className="space-y-1">
                         <div className="font-medium text-green-600">
-                          Satış: {user.totalSalesCount} adet - {formatCurrency(user.salesRevenue)}
+                          ✅ Tamamlanan: {user.totalSalesCount} adet
                         </div>
-                        <div className="text-xs text-gray-500">
-                          Ödenen: {user.paidSalesCount} | Onaylanan: {user.approvedSalesCount}
+                        <div className="text-sm text-gray-700">
+                          {formatCurrency(user.salesRevenue)}
                         </div>
                         <div className="text-xs text-yellow-600">
-                          Bekleyen: {user.pendingSalesCount} adet - {formatCurrency(user.pendingRevenue)}
+                          ⏳ Bekleyen: {user.pendingSalesCount} adet
                         </div>
                         <div className="text-xs text-red-600">
-                          Ödenmemiş: {user.unpaidSalesCount} adet - {formatCurrency(user.unpaidRevenue)}
+                          ❌ Ödenmemiş: {user.unpaidSalesCount} adet
                         </div>
                       </div>
                     </td>
