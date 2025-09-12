@@ -39,7 +39,7 @@ interface Reservation {
 }
 
 export default function AccountingPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { t, dir } = useLanguage();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,6 +51,11 @@ export default function AccountingPage() {
   const [usdRate, setUsdRate] = useState<number>(31.50);
 
   useEffect(() => {
+    // Wait for auth to load
+    if (authLoading) {
+      return;
+    }
+    
     // Check if user has permission to view accounting
     const hasViewAccountingPermission = user?.role === 'SUPERUSER' || 
       user?.permissions?.some(p => p.permission === 'VIEW_ACCOUNTING' && p.isActive);
@@ -63,7 +68,7 @@ export default function AccountingPage() {
     // USD kuru al
     getUSDRate().then(rate => setUsdRate(rate));
     fetchReservations();
-  }, [filter, dateRange, user]);
+  }, [filter, dateRange, user, authLoading]);
 
   const fetchReservations = async () => {
     try {
@@ -246,6 +251,18 @@ export default function AccountingPage() {
       const revenue = r.currency === 'USD' ? r.price * usdRate : r.price;
       return sum + (revenue - driverCommission);
     }, 0);
+
+  // Loading state - authentication henüz tamamlanmadıysa loading göster
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Check permissions before rendering
   const hasViewAccountingPermission = user?.role === 'SUPERUSER' || 
