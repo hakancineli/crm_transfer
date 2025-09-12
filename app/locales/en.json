@@ -22,6 +22,16 @@
     "allReservations": "All Reservations",
     "reports": "Reports"
   },
+  "admin": {
+    "navigation": {
+      "allReservations": "All Reservations",
+      "reservations": "Reservations"
+    },
+    "reservations": {
+      "allReservations": "All Reservations",
+      "allReservationsDescription": "View all reservations in the system"
+    }
+  },
   "customerForm": {
     "title": "ProTransfer",
     "subtitle": "Reservation Request",

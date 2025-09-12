@@ -22,6 +22,16 @@
     "allReservations": "Tüm Rezervasyonlar",
     "reports": "Raporlar"
   },
+  "admin": {
+    "navigation": {
+      "allReservations": "Tüm Rezervasyonlar",
+      "reservations": "Rezervasyonlar"
+    },
+    "reservations": {
+      "allReservations": "Tüm Rezervasyonlar",
+      "allReservationsDescription": "Sistemdeki tüm rezervasyonları görüntüleyin"
+    }
+  },
   "customerForm": {
     "title": "ProTransfer",
     "subtitle": "Rezervasyon Talebi",

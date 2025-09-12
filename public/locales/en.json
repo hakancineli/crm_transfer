@@ -167,6 +167,7 @@
     },
     "navigation": {
       "dashboard": "Dashboard",
+      "allReservations": "All Reservations",
       "reservations": "Reservations",
       "newReservation": "New Reservation",
       "drivers": "Drivers",

@@ -188,6 +188,7 @@
     },
     "navigation": {
       "dashboard": "Dashboard",
+      "allReservations": "Tüm Rezervasyonlar",
       "reservations": "Rezervasyonlar",
       "newReservation": "Yeni Rezervasyon",
       "drivers": "Şoförler",
