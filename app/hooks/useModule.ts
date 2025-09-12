@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 interface ModuleSettings {
   transfer: boolean;
@@ -15,6 +16,7 @@ const defaultModules: ModuleSettings = {
 };
 
 export function useModule(moduleName: keyof ModuleSettings) {
+  const { user } = useAuth();
   const [isEnabled, setIsEnabled] = useState<boolean>(() => {
     if (moduleName === 'transfer') return true; // Transfer her zaman aktif
     
@@ -52,6 +54,40 @@ export function useModule(moduleName: keyof ModuleSettings) {
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, [moduleName]);
+
+  // Tenant bazlı modül kontrolü için API çağrısı
+  useEffect(() => {
+    const checkTenantModule = async () => {
+      // SUPERUSER için localStorage kontrolü yeterli
+      if (user?.role === 'SUPERUSER') {
+        return;
+      }
+
+      // AGENCY_ADMIN ve diğer roller için tenant modül kontrolü
+      if (user && (user.role === 'AGENCY_ADMIN' || user.role === 'AGENCY_USER')) {
+        try {
+          const response = await fetch('/api/tenant-modules');
+          if (response.ok) {
+            const data = await response.json();
+            const tenantModules = data.tenantModules || [];
+            
+            // Kullanıcının tenant'larındaki modül durumunu kontrol et
+            const hasModuleAccess = tenantModules.some((tm: any) => 
+              tm.moduleId === moduleName && tm.isEnabled
+            );
+            
+            setIsEnabled(hasModuleAccess);
+          }
+        } catch (error) {
+          console.error('Tenant modül kontrolü hatası:', error);
+          // Hata durumunda default değeri kullan
+          setIsEnabled(defaultModules[moduleName]);
+        }
+      }
+    };
+
+    checkTenantModule();
+  }, [user, moduleName]);
 
   return isEnabled;
 }
