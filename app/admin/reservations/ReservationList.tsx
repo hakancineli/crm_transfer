@@ -44,6 +44,7 @@ import ReturnTransferModal from '@/app/components/ReturnTransferModal';
 import FlightStatus from '@/app/components/FlightStatus';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { canViewAllReservations, canViewOwnSales } from '@/app/lib/permissions';
+import { useModule } from '@/app/hooks/useModule';
 
 interface ReservationListProps {
     onFilterChange: (filter: string) => void;
@@ -51,6 +52,7 @@ interface ReservationListProps {
 
 export default function ReservationList({ onFilterChange }: ReservationListProps) {
     const { user } = useAuth();
+    const flightEnabled = useModule('flight');
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [filteredReservations, setFilteredReservations] = useState<Reservation[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -459,9 +461,11 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-36">
                                     Şoför
                                 </th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-32">
-                                    Uçuş Durumu
-                                </th>
+                                {(user?.role === 'SUPERUSER' || flightEnabled) && (
+                                    <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-32">
+                                        Uçuş Durumu
+                                    </th>
+                                )}
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-28">
                                     Durum
                                 </th>
@@ -476,7 +480,15 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                         <tbody className="bg-white divide-y divide-gray-100">
                             {filteredReservations.length === 0 ? (
                                 <tr>
-                                    <td colSpan={user?.role === 'SUPERUSER' ? 12 : 11} className="px-3 py-4 text-center text-gray-500">
+                                    <td colSpan={
+                                        (user?.role === 'SUPERUSER' ? 1 : 0) + // Acente sütunu
+                                        (user?.role === 'SUPERUSER' || user?.role === 'AGENCY_ADMIN' ? 1 : 0) + // Kullanıcı sütunu
+                                        6 + // VOUCHER, TİP, TARİH, GÜZERGAH, MÜŞTERİ, FİYAT
+                                        1 + // Şoför
+                                        ((user?.role === 'SUPERUSER' || flightEnabled) ? 1 : 0) + // Uçuş Durumu
+                                        3 + // Durum, Ödeme, İşlem
+                                        0
+                                    } className="px-3 py-4 text-center text-gray-500">
                                         Rezervasyon bulunamadı
                                     </td>
                                 </tr>
@@ -633,18 +645,20 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     <span className="text-gray-400">-</span>
                                                 )}
                                             </td>
-                                            <td className="px-6 py-4 text-sm align-middle">
-                                                {reservation.flightCode ? (
-                                                    <FlightStatus 
-                                                        flightCode={reservation.flightCode}
-                                                        reservationDate={reservation.date}
-                                                        reservationTime={reservation.time}
-                                                        isArrival={reservation.from.includes('IST') || reservation.from.includes('SAW')}
-                                                    />
-                                                ) : (
-                                                    <span className="text-gray-400 text-xs">-</span>
-                                                )}
-                                            </td>
+                                            {(user?.role === 'SUPERUSER' || flightEnabled) && (
+                                                <td className="px-6 py-4 text-sm align-middle">
+                                                    {reservation.flightCode ? (
+                                                        <FlightStatus 
+                                                            flightCode={reservation.flightCode}
+                                                            reservationDate={reservation.date}
+                                                            reservationTime={reservation.time}
+                                                            isArrival={reservation.from.includes('IST') || reservation.from.includes('SAW')}
+                                                        />
+                                                    ) : (
+                                                        <span className="text-gray-400 text-xs">-</span>
+                                                    )}
+                                                </td>
+                                            )}
                                             <td className="px-6 py-4 text-sm align-middle">
                                                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
                                                     reservation.driver ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-yellow-100 text-yellow-800 border border-yellow-200'
