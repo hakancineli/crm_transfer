@@ -60,11 +60,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshUser().catch(() => {});
     };
     window.addEventListener('focus', onFocus);
-    // Periodic refresh every 30s to propagate permission changes
+    // Periodic refresh every 5 minutes to propagate permission changes (reduced frequency)
     const interval = window.setInterval(() => {
       refreshUser().catch(() => {});
-    }, 30000);
-    return () => window.removeEventListener('focus', onFocus);
+    }, 300000); // 5 dakika = 300000ms
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      clearInterval(interval);
+    };
   }, []);
 
   const login = async (username: string, password: string): Promise<boolean> => {
@@ -142,8 +145,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       if (!res.ok) return;
       const fresh = await res.json();
-      localStorage.setItem('user', JSON.stringify(fresh));
-      setUser(fresh);
+      
+      // Sadece gerçekten değişiklik varsa state'i güncelle
+      const currentUser = localStorage.getItem('user');
+      if (currentUser) {
+        const currentUserData = JSON.parse(currentUser);
+        const hasChanges = JSON.stringify(currentUserData) !== JSON.stringify(fresh);
+        if (hasChanges) {
+          localStorage.setItem('user', JSON.stringify(fresh));
+          setUser(fresh);
+        }
+      } else {
+        localStorage.setItem('user', JSON.stringify(fresh));
+        setUser(fresh);
+      }
     } catch (e) {
       // ignore
     }
