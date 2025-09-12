@@ -6,6 +6,7 @@ import { useEmoji } from '../contexts/EmojiContext';
 import { useAuth } from '../contexts/AuthContext';
 import { PERMISSIONS, ROLE_PERMISSIONS } from '../lib/permissions';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useModule } from '../hooks/useModule';
 
 interface DashboardStats {
   totalReservations: number;
@@ -23,6 +24,8 @@ export default function AdminDashboard() {
   const { user, isAdmin, loading: authLoading } = useAuth();
   const { t, dir } = useLanguage();
   const [isClient, setIsClient] = useState(false);
+  const accommodationEnabled = useModule('accommodation');
+  const flightEnabled = useModule('flight');
   const [stats, setStats] = useState<DashboardStats>({
     totalReservations: 0,
     todayReservations: 0,
@@ -316,15 +319,27 @@ export default function AdminDashboard() {
                 </div>
               </Link>
               
-              <Link
-                href="/admin/flight-status"
-                className="flex items-center justify-center p-4 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
-              >
-                <div className="text-center">
-                  <div className="text-2xl mb-2">{emojisEnabled ? '✈️' : '🛫'}</div>
-                  <div className="text-sm font-medium text-orange-800">{t('admin.dashboard.quickActions.flightStatus')}</div>
+              {flightEnabled ? (
+                <Link
+                  href="/admin/flight-status"
+                  className="flex items-center justify-center p-4 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
+                >
+                  <div className="text-center">
+                    <div className="text-2xl mb-2">{emojisEnabled ? '✈️' : '🛫'}</div>
+                    <div className="text-sm font-medium text-orange-800">{t('admin.dashboard.quickActions.flightStatus')}</div>
+                  </div>
+                </Link>
+              ) : (
+                <div
+                  className="flex items-center justify-center p-4 bg-gray-50 border border-gray-200 rounded-lg opacity-50 cursor-not-allowed"
+                  title="Uçuş modülü kapalı - Modül Yönetimi'nden aktifleştirin"
+                >
+                  <div className="text-center">
+                    <div className="text-2xl mb-2">{emojisEnabled ? '✈️' : '🛫'}</div>
+                    <div className="text-sm font-medium text-gray-500">{t('admin.dashboard.quickActions.flightStatus')}</div>
+                  </div>
                 </div>
-              </Link>
+              )}
               
               <Link
                 href="/admin/reports"
