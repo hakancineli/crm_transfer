@@ -109,10 +109,10 @@ export async function GET(request: NextRequest) {
       const averageReservationsPerDay = recentReservations.length / 30;
 
       // Calculate detailed sales metrics
-      const paidReservations = user.reservations.filter(res => res.status === 'PAID');
-      const approvedReservations = user.reservations.filter(res => res.status === 'APPROVED');
-      const pendingReservations = user.reservations.filter(res => res.status === 'PENDING');
-      const unpaidReservations = user.reservations.filter(res => res.status === 'UNPAID');
+      const paidReservations = user.reservations.filter(res => res.paymentStatus === 'PAID');
+      const approvedReservations = user.reservations.filter(res => res.paymentStatus === 'APPROVED');
+      const pendingReservations = user.reservations.filter(res => res.paymentStatus === 'PENDING');
+      const unpaidReservations = user.reservations.filter(res => res.paymentStatus === 'UNPAID');
       
       const salesRevenue = [...paidReservations, ...approvedReservations]
         .reduce((sum, res) => sum + res.price, 0);
