@@ -61,12 +61,9 @@ export default function CompanySettingsPage() {
 
   useEffect(() => {
     if (!user) return;
-    if (user.role === 'SUPERUSER') {
-      fetchTenants();
-    } else {
-      const tid = (user.tenantIds && user.tenantIds[0]) || undefined;
-      fetchTenants(tid);
-    }
+    // API kullanıcı token'ına göre izinli tenantları döner.
+    // SUPERUSER için tümü, diğer roller için kendi tenant(lar)ı.
+    fetchTenants();
   }, [user]);
 
   const handleTenantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
