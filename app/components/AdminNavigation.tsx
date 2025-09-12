@@ -244,11 +244,6 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               shouldShow = user?.role === 'SUPERUSER';
             } else if (item.name === 'Personel Performansı') {
               shouldShow = user?.role === 'AGENCY_ADMIN' || user?.role === 'SUPERUSER';
-              console.log('Personel Performansı visibility check:', { 
-                userRole: user?.role, 
-                shouldShow, 
-                itemName: item.name 
-              });
             } else if (item.name === 'Denetim Logları') {
               shouldShow = false; // Only SUPERUSER can see this
             } else if (item.name === 'Ayarlar') {

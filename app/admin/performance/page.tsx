@@ -15,6 +15,13 @@ interface UserPerformance {
   averageReservationsPerDay: number;
   lastActivity: string;
   isActive: boolean;
+  // New sales and profitability metrics
+  salesRevenue: number;
+  pendingRevenue: number;
+  unpaidRevenue: number;
+  totalCommission: number;
+  netProfit: number;
+  profitMargin: number;
 }
 
 interface PerformanceStats {
@@ -32,7 +39,7 @@ export default function PerformancePage() {
   const [stats, setStats] = useState<PerformanceStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [sortBy, setSortBy] = useState<'revenue' | 'reservations' | 'name'>('revenue');
+  const [sortBy, setSortBy] = useState<'revenue' | 'salesRevenue' | 'netProfit' | 'profitMargin' | 'reservations' | 'name'>('revenue');
   const [filterRole, setFilterRole] = useState<string>('all');
 
   useEffect(() => {
@@ -110,6 +117,12 @@ export default function PerformancePage() {
       switch (sortBy) {
         case 'revenue':
           return b.totalRevenue - a.totalRevenue;
+        case 'salesRevenue':
+          return b.salesRevenue - a.salesRevenue;
+        case 'netProfit':
+          return b.netProfit - a.netProfit;
+        case 'profitMargin':
+          return b.profitMargin - a.profitMargin;
         case 'reservations':
           return b.totalReservations - a.totalReservations;
         case 'name':
@@ -234,7 +247,10 @@ export default function PerformancePage() {
                   onChange={(e) => setSortBy(e.target.value as any)}
                   className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="revenue">Gelire Göre</option>
+                  <option value="revenue">Toplam Gelire Göre</option>
+                  <option value="salesRevenue">Satış Gelirine Göre</option>
+                  <option value="netProfit">Net Kâra Göre</option>
+                  <option value="profitMargin">Kâr Marjına Göre</option>
                   <option value="reservations">Rezervasyon Sayısına Göre</option>
                   <option value="name">İsme Göre</option>
                 </select>
@@ -289,6 +305,15 @@ export default function PerformancePage() {
                     Toplam Gelir
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Satış Geliri
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Net Kar
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Kar Marjı
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Bu Ay
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -328,6 +353,23 @@ export default function PerformancePage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {formatCurrency(user.totalRevenue)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <div className="font-medium">{formatCurrency(user.salesRevenue)}</div>
+                      <div className="text-xs text-gray-500">
+                        Bekleyen: {formatCurrency(user.pendingRevenue)}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <div className="font-medium text-green-600">{formatCurrency(user.netProfit)}</div>
+                      <div className="text-xs text-gray-500">
+                        Komisyon: {formatCurrency(user.totalCommission)}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <div className={`font-medium ${user.profitMargin >= 15 ? 'text-green-600' : user.profitMargin >= 10 ? 'text-yellow-600' : 'text-red-600'}`}>
+                        %{user.profitMargin.toFixed(1)}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div>{user.thisMonthReservations} rezervasyon</div>

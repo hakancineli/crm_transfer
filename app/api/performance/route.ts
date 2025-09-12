@@ -73,6 +73,25 @@ export async function GET(request: NextRequest) {
       });
       const averageReservationsPerDay = recentReservations.length / 30;
 
+      // Calculate sales metrics
+      const salesRevenue = user.reservations
+        .filter(res => res.status === 'PAID' || res.status === 'APPROVED')
+        .reduce((sum, res) => sum + res.price, 0);
+      
+      const pendingRevenue = user.reservations
+        .filter(res => res.status === 'PENDING')
+        .reduce((sum, res) => sum + res.price, 0);
+      
+      const unpaidRevenue = user.reservations
+        .filter(res => res.status === 'UNPAID')
+        .reduce((sum, res) => sum + res.price, 0);
+
+      // Calculate profitability (assuming 20% commission rate for now)
+      const commissionRate = 0.20; // 20% commission
+      const totalCommission = totalRevenue * commissionRate;
+      const netProfit = totalRevenue - totalCommission;
+      const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
+
       // Get last activity (most recent reservation date)
       const lastActivity = user.reservations.length > 0 
         ? user.reservations.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0].date
@@ -89,7 +108,14 @@ export async function GET(request: NextRequest) {
         thisMonthRevenue,
         averageReservationsPerDay,
         lastActivity,
-        isActive: user.isActive
+        isActive: user.isActive,
+        // New sales and profitability metrics
+        salesRevenue,
+        pendingRevenue,
+        unpaidRevenue,
+        totalCommission,
+        netProfit,
+        profitMargin
       };
     });
 
