@@ -319,7 +319,7 @@ export default function AdminDashboard() {
                 </div>
               </Link>
               
-              {flightEnabled ? (
+              {user?.role === 'SUPERUSER' || flightEnabled ? (
                 <Link
                   href="/admin/flight-status"
                   className="flex items-center justify-center p-4 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
@@ -354,7 +354,8 @@ export default function AdminDashboard() {
           </div>
 
           {/* Hızlı İşlemler - Konaklama */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          {user?.role === 'SUPERUSER' || accommodationEnabled ? (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.dashboard.quickActions.accommodationOperations')}</h3>
             <div className="grid grid-cols-2 gap-4">
               <Link
@@ -398,6 +399,16 @@ export default function AdminDashboard() {
               </Link>
             </div>
           </div>
+          ) : (
+            <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-6 opacity-50">
+              <h3 className="text-lg font-semibold text-gray-500 mb-4">{t('admin.dashboard.quickActions.accommodationOperations')}</h3>
+              <div className="text-center py-8">
+                <div className="text-4xl mb-4">{emojisEnabled ? '🏨' : '🏢'}</div>
+                <p className="text-gray-500">Konaklama modülü kapalı</p>
+                <p className="text-sm text-gray-400 mt-2">Modül Yönetimi'nden aktifleştirin</p>
+              </div>
+            </div>
+          )}
 
           {/* Son Aktiviteler */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
