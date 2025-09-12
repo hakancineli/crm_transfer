@@ -231,18 +231,21 @@ export async function POST(request: NextRequest) {
             }
         });
 
-        // Telegram bildirimi (opsiyonel)
-        const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-        const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
-        if (BOT_TOKEN && CHAT_ID) {
-            try {
+        // Telegram bildirimi (opsiyonel + log)
+        let telegramAttempted = false;
+        let telegramOk = false;
+        try {
+            const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+            const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+            if (BOT_TOKEN && CHAT_ID) {
+                telegramAttempted = true;
                 const textLines = [
-                    `Yeni Müşteri Talebi ✅`,
+                    isCustomerReservation ? 'Yeni Müşteri Talebi ✅' : 'Yeni Rezervasyon Oluşturuldu ✅',
                     `Voucher: ${voucherNumber}`,
                     `Tarih: ${data.date} ${data.time}`,
                     `Güzergah: ${data.from} → ${data.to}`,
                     `Yolcular: ${(Array.isArray(data.passengerNames) ? data.passengerNames.join(', ') : '') || '-'}`,
-                    `Telefon: ${data.phoneNumber}`,
+                    data.phoneNumber ? `Telefon: ${data.phoneNumber}` : undefined,
                     data.flightCode ? `Uçuş: ${data.flightCode}` : undefined,
                     data.specialRequests ? `Not: ${data.specialRequests}` : undefined
                 ].filter(Boolean).join('\n');
@@ -255,16 +258,22 @@ export async function POST(request: NextRequest) {
 
                 if (!tgRes.ok) {
                     const errText = await tgRes.text();
-                    console.error('Telegram bildirim hatası (response):', errText);
+                    console.error('Telegram bildirim hatası (response):', tgRes.status, errText);
+                } else {
+                    telegramOk = true;
                 }
-            } catch (notifyErr) {
-                console.error('Telegram bildirim hatası (fetch):', notifyErr);
+            } else {
+                console.warn('Telegram env eksik: BOT_TOKEN veya CHAT_ID yok');
             }
+        } catch (notifyErr) {
+            console.error('Telegram bildirim hatası (fetch):', notifyErr);
         }
 
         return NextResponse.json({
             ...reservation,
-            passengerNames: JSON.parse(passengerNames)
+            passengerNames: JSON.parse(passengerNames),
+            telegramAttempted,
+            telegramOk
         });
     } catch (error) {
         console.error('Rezervasyon oluşturma hatası:', error);
