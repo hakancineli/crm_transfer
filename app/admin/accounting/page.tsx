@@ -52,9 +52,8 @@ export default function AccountingPage() {
 
   useEffect(() => {
     // Check if user has permission to view accounting
-    const hasViewAccountingPermission = user?.permissions?.some(p => 
-      p.permission === 'VIEW_ACCOUNTING' && p.isActive
-    );
+    const hasViewAccountingPermission = user?.role === 'SUPERUSER' || 
+      user?.permissions?.some(p => p.permission === 'VIEW_ACCOUNTING' && p.isActive);
     
     if (user && !hasViewAccountingPermission) {
       window.location.href = '/admin';
@@ -249,12 +248,11 @@ export default function AccountingPage() {
     }, 0);
 
   // Check permissions before rendering
-  const hasViewAccountingPermission = user?.permissions?.some(p => 
-    p.permission === 'VIEW_ACCOUNTING' && p.isActive
-  );
+  const hasViewAccountingPermission = user?.role === 'SUPERUSER' || 
+    user?.permissions?.some(p => p.permission === 'VIEW_ACCOUNTING' && p.isActive);
   
-  // Check if user is SUPERUSER or has VIEW_ACCOUNTING permission
-  if (user && user.role !== 'SUPERUSER' && !hasViewAccountingPermission) {
+  // Check if user has VIEW_ACCOUNTING permission
+  if (user && !hasViewAccountingPermission) {
     return (
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
