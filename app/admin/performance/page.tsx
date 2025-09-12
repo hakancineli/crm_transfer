@@ -12,7 +12,6 @@ interface UserPerformance {
   totalRevenue: number;
   thisMonthReservations: number;
   thisMonthRevenue: number;
-  averageReservationsPerDay: number;
   lastActivity: string;
   isActive: boolean;
   // Revenue breakdown
@@ -401,9 +400,6 @@ export default function PerformancePage() {
                     Bu Ay
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Günlük Ortalama
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Son Aktivite
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -501,9 +497,6 @@ export default function PerformancePage() {
                           Toplam: {formatCurrency(user.thisMonthRevenue)}
                         </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {user.averageReservationsPerDay.toFixed(1)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(user.lastActivity)}

@@ -125,13 +125,6 @@ export async function GET(request: NextRequest) {
         
       const thisMonthRevenue = thisMonthTransferRevenue + thisMonthHotelRevenue;
 
-      // Calculate average reservations per day (last 30 days)
-      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-      const recentReservations = user.reservations.filter(res => {
-        const resDate = new Date(res.date);
-        return resDate >= thirtyDaysAgo;
-      });
-      const averageReservationsPerDay = recentReservations.length / 30;
 
       // Calculate detailed sales metrics
       const paidReservations = user.reservations.filter(res => res.paymentStatus === 'PAID');
@@ -188,7 +181,6 @@ export async function GET(request: NextRequest) {
         totalRevenue,
         thisMonthReservations,
         thisMonthRevenue,
-        averageReservationsPerDay,
         lastActivity,
         isActive: user.isActive,
         // Revenue breakdown
