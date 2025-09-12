@@ -20,7 +20,7 @@ interface DashboardStats {
 
 export default function AdminDashboard() {
   const { emojisEnabled } = useEmoji();
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, loading } = useAuth();
   const { t, dir } = useLanguage();
   const [isClient, setIsClient] = useState(false);
   const [stats, setStats] = useState<DashboardStats>({
@@ -58,6 +58,18 @@ export default function AdminDashboard() {
       fetchDashboardStats();
     }
   }, [canViewDashboard]);
+
+  // Loading state - authentication henüz tamamlanmadıysa loading göster
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!canViewDashboard) {
     return (

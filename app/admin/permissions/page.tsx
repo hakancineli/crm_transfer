@@ -22,7 +22,7 @@ interface UserPermission {
 }
 
 export default function PermissionsPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -30,6 +30,11 @@ export default function PermissionsPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    // Wait for auth to load
+    if (authLoading) {
+      return;
+    }
+    
     // SUPERUSER veya MANAGE_PERMISSIONS izni olan kullanıcı erişebilir
     if (!user) return;
 
@@ -43,7 +48,7 @@ export default function PermissionsPage() {
     }
 
     fetchUsers();
-  }, [user]);
+  }, [user, authLoading]);
 
   const fetchUsers = async () => {
     try {

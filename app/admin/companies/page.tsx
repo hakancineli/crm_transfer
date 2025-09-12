@@ -46,7 +46,7 @@ interface Reservation {
 }
 
 export default function CompaniesPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
   const [tenantUsers, setTenantUsers] = useState<TenantUser[]>([]);
@@ -57,13 +57,18 @@ export default function CompaniesPage() {
   const [newCompany, setNewCompany] = useState({ companyName: '' });
 
   useEffect(() => {
+    // Wait for auth to load
+    if (authLoading) {
+      return;
+    }
+    
     if (user?.role !== 'SUPERUSER') {
       window.location.href = '/admin';
       return;
     }
     
     fetchTenants();
-  }, [user]);
+  }, [user, authLoading]);
 
   const fetchTenants = async () => {
     try {

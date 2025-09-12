@@ -15,7 +15,7 @@ interface FlightStatusData {
 }
 
 export default function FlightStatusPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [flights, setFlights] = useState<FlightStatusData[]>([]);
   const [filteredFlights, setFilteredFlights] = useState<FlightStatusData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,6 +29,11 @@ export default function FlightStatusPage() {
   const [lookupError, setLookupError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Wait for auth to load
+    if (authLoading) {
+      return;
+    }
+    
     // Guard: SUPERUSER veya izinli kullanıcılar
     const hasViewFlights = user?.role === 'SUPERUSER' || user?.permissions?.some(p => p.permission === 'VIEW_ALL_RESERVATIONS' && p.isActive);
     if (!hasViewFlights) {
@@ -37,7 +42,7 @@ export default function FlightStatusPage() {
       return;
     }
     fetchFlightStatus();
-  }, [user]);
+  }, [user, authLoading]);
 
   const fetchFlightStatus = async () => {
     try {
