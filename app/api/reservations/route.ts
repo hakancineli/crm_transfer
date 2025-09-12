@@ -124,6 +124,17 @@ export async function GET(request: NextRequest) {
       }
     });
     console.log('API: Bulunan rezervasyon sayısı:', reservations.length);
+    
+    // Debug: Tenant ID'lerini kontrol et
+    const tenantIds = [...new Set(reservations.map(r => r.tenantId))];
+    console.log('API: Rezervasyonlardaki tenant ID\'leri:', tenantIds);
+    
+    // Debug: Her tenant için rezervasyon sayısı
+    const tenantCounts = {};
+    reservations.forEach(r => {
+      tenantCounts[r.tenantId] = (tenantCounts[r.tenantId] || 0) + 1;
+    });
+    console.log('API: Tenant başına rezervasyon sayıları:', tenantCounts);
 
     // Her rezervasyon için yolcu isimlerini parse et
     const parsedReservations = reservations.map(reservation => {
