@@ -238,9 +238,14 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
           } else {
             // Check specific permissions for non-superusers
             if (item.name === 'Yeni Rezervasyon') {
-              shouldShow = user?.permissions?.some(p => 
-                p.permission === 'VIEW_OWN_SALES' && p.isActive
-              ) || false;
+              // AGENCY_ADMIN her zaman görsün; diğer roller izinle görsün
+              if (user?.role === 'AGENCY_ADMIN') {
+                shouldShow = true;
+              } else {
+                shouldShow = user?.permissions?.some(p => 
+                  p.permission === 'VIEW_OWN_SALES' && p.isActive
+                ) || false;
+              }
             } else if (item.name === 'Son Aktiviteler') {
               shouldShow = user?.permissions?.some(p => 
                 p.permission === 'MANAGE_ACTIVITIES' && p.isActive
