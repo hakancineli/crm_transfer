@@ -66,11 +66,16 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    // Get all users with their reservations (scoped)
+    // Get all users with their reservations and hotel bookings (scoped)
     const users = await prisma.user.findMany({
       where: userWhere,
       include: {
-        reservations: { where: reservationWhere },
+        reservations: { 
+          where: reservationWhere,
+          include: {
+            hotelBookings: true
+          }
+        },
         _count: {
           select: {
             reservations: true
@@ -86,19 +91,39 @@ export async function GET(request: NextRequest) {
     // Calculate performance for each user
     const performance = users.map(user => {
       const totalReservations = user.reservations.length;
-      const totalRevenue = user.reservations.reduce((sum, res) => sum + res.price, 0);
+      
+      // Calculate transfer revenue
+      const transferRevenue = user.reservations.reduce((sum, res) => sum + res.price, 0);
+      
+      // Calculate hotel revenue from reservations
+      const hotelRevenue = user.reservations.reduce((sum, res) => {
+        return sum + res.hotelBookings.reduce((hotelSum, booking) => hotelSum + booking.totalPrice, 0);
+      }, 0);
+      
+      const totalRevenue = transferRevenue + hotelRevenue;
       
       const thisMonthReservations = user.reservations.filter(res => {
         const resDate = new Date(res.date);
         return resDate >= startOfMonth && resDate <= endOfMonth;
       }).length;
       
-      const thisMonthRevenue = user.reservations
+      const thisMonthTransferRevenue = user.reservations
         .filter(res => {
           const resDate = new Date(res.date);
           return resDate >= startOfMonth && resDate <= endOfMonth;
         })
         .reduce((sum, res) => sum + res.price, 0);
+        
+      const thisMonthHotelRevenue = user.reservations
+        .filter(res => {
+          const resDate = new Date(res.date);
+          return resDate >= startOfMonth && resDate <= endOfMonth;
+        })
+        .reduce((sum, res) => {
+          return sum + res.hotelBookings.reduce((hotelSum, booking) => hotelSum + booking.totalPrice, 0);
+        }, 0);
+        
+      const thisMonthRevenue = thisMonthTransferRevenue + thisMonthHotelRevenue;
 
       // Calculate average reservations per day (last 30 days)
       const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -128,11 +153,26 @@ export async function GET(request: NextRequest) {
       const pendingSalesCount = pendingReservations.length;
       const unpaidSalesCount = unpaidReservations.length;
 
-      // Calculate profitability (assuming 20% commission rate for now)
-      const commissionRate = 0.20; // 20% commission
-      const totalCommission = totalRevenue * commissionRate;
-      const netProfit = totalRevenue - totalCommission;
+      // Calculate detailed costs and profitability
+      const transferCommissionRate = 0.20; // 20% commission for transfers
+      const hotelCommissionRate = 0.15; // 15% commission for hotels
+      
+      // Calculate driver fees (from reservations)
+      const totalDriverFees = user.reservations.reduce((sum, res) => sum + (res.driverFee || 0), 0);
+      
+      // Calculate transfer commissions
+      const transferCommission = transferRevenue * transferCommissionRate;
+      
+      // Calculate hotel commissions
+      const hotelCommission = hotelRevenue * hotelCommissionRate;
+      
+      const totalCommission = transferCommission + hotelCommission;
+      const totalCosts = totalDriverFees + totalCommission;
+      const netProfit = totalRevenue - totalCosts;
       const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
+      
+      // Calculate hotel bookings count
+      const totalHotelBookings = user.reservations.reduce((sum, res) => sum + res.hotelBookings.length, 0);
 
       // Get last activity (most recent reservation date)
       const lastActivity = user.reservations.length > 0 
@@ -151,6 +191,11 @@ export async function GET(request: NextRequest) {
         averageReservationsPerDay,
         lastActivity,
         isActive: user.isActive,
+        // Revenue breakdown
+        transferRevenue,
+        hotelRevenue,
+        thisMonthTransferRevenue,
+        thisMonthHotelRevenue,
         // Sales and profitability metrics
         salesRevenue,
         pendingRevenue,
@@ -158,12 +203,19 @@ export async function GET(request: NextRequest) {
         totalCommission,
         netProfit,
         profitMargin,
+        // Detailed costs
+        totalDriverFees,
+        transferCommission,
+        hotelCommission,
+        totalCosts,
         // Detailed sales counts
         totalSalesCount,
         pendingSalesCount,
         unpaidSalesCount,
         paidSalesCount: paidReservations.length,
-        approvedSalesCount: approvedReservations.length
+        approvedSalesCount: approvedReservations.length,
+        // Hotel metrics
+        totalHotelBookings
       };
     });
 

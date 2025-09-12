@@ -15,6 +15,11 @@ interface UserPerformance {
   averageReservationsPerDay: number;
   lastActivity: string;
   isActive: boolean;
+  // Revenue breakdown
+  transferRevenue: number;
+  hotelRevenue: number;
+  thisMonthTransferRevenue: number;
+  thisMonthHotelRevenue: number;
   // Sales and profitability metrics
   salesRevenue: number;
   pendingRevenue: number;
@@ -22,12 +27,19 @@ interface UserPerformance {
   totalCommission: number;
   netProfit: number;
   profitMargin: number;
+  // Detailed costs
+  totalDriverFees: number;
+  transferCommission: number;
+  hotelCommission: number;
+  totalCosts: number;
   // Detailed sales counts
   totalSalesCount: number;
   pendingSalesCount: number;
   unpaidSalesCount: number;
   paidSalesCount: number;
   approvedSalesCount: number;
+  // Hotel metrics
+  totalHotelBookings: number;
 }
 
 interface PerformanceStats {
@@ -377,13 +389,13 @@ export default function PerformancePage() {
                     Toplam Rezervasyon
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Toplam Gelir
+                    Gelir Dağılımı
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Satış Detayları
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Kar Analizi
+                    Maliyet & Kar
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Bu Ay
@@ -424,7 +436,22 @@ export default function PerformancePage() {
                       {user.totalReservations}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {formatCurrency(user.totalRevenue)}
+                      <div className="space-y-1">
+                        <div className="font-medium text-blue-600">
+                          🚗 Transfer: {formatCurrency(user.transferRevenue)}
+                        </div>
+                        <div className="font-medium text-purple-600">
+                          🏨 Konaklama: {formatCurrency(user.hotelRevenue)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Toplam: {formatCurrency(user.totalRevenue)}
+                        </div>
+                        {user.totalHotelBookings > 0 && (
+                          <div className="text-xs text-purple-500">
+                            {user.totalHotelBookings} otel rezervasyonu
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div className="space-y-1">
@@ -445,19 +472,35 @@ export default function PerformancePage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div className="space-y-1">
                         <div className="font-medium text-green-600">
-                          Net Kar: {formatCurrency(user.netProfit)}
+                          💰 Net Kar: {formatCurrency(user.netProfit)}
                         </div>
                         <div className="text-xs text-gray-500">
-                          Komisyon: {formatCurrency(user.totalCommission)}
+                          🚗 Transfer Kom.: {formatCurrency(user.transferCommission)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          🏨 Otel Kom.: {formatCurrency(user.hotelCommission)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          👨‍💼 Şoför Ücreti: {formatCurrency(user.totalDriverFees)}
                         </div>
                         <div className={`font-medium ${user.profitMargin >= 15 ? 'text-green-600' : user.profitMargin >= 10 ? 'text-yellow-600' : 'text-red-600'}`}>
-                          Kar Marjı: %{user.profitMargin.toFixed(1)}
+                          📊 Kar Marjı: %{user.profitMargin.toFixed(1)}
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <div>{user.thisMonthReservations} rezervasyon</div>
-                      <div className="text-gray-500">{formatCurrency(user.thisMonthRevenue)}</div>
+                      <div className="space-y-1">
+                        <div className="font-medium">{user.thisMonthReservations} rezervasyon</div>
+                        <div className="text-xs text-blue-600">
+                          🚗 {formatCurrency(user.thisMonthTransferRevenue)}
+                        </div>
+                        <div className="text-xs text-purple-600">
+                          🏨 {formatCurrency(user.thisMonthHotelRevenue)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Toplam: {formatCurrency(user.thisMonthRevenue)}
+                        </div>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {user.averageReservationsPerDay.toFixed(1)}
