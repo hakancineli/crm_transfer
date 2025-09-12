@@ -211,20 +211,6 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               shouldShow = user?.permissions?.some(p => 
                 p.permission === 'VIEW_OWN_SALES' && p.isActive
               ) || false;
-            } else if (item.name === 'Raporlar') {
-              shouldShow = user?.permissions?.some(p => 
-                p.permission === 'VIEW_REPORTS' && p.isActive
-              ) || false;
-            } else if (item.name === 'Muhasebe') {
-              shouldShow = user?.permissions?.some(p => 
-                p.permission === 'VIEW_ACCOUNTING' && p.isActive
-              ) || false;
-            } else if (item.href === '/admin/customers' || item.name === 'Müşteriler') {
-              // Customers menu: require explicit view/manage customer permission
-              const hasExplicit = user?.permissions?.some(p => 
-                (p.permission === 'VIEW_CUSTOMER_DATA' || p.permission === 'MANAGE_CUSTOMERS') && p.isActive
-              ) || false;
-              shouldShow = hasExplicit;
             } else if (item.name === 'Son Aktiviteler') {
               shouldShow = user?.permissions?.some(p => 
                 p.permission === 'MANAGE_ACTIVITIES' && p.isActive
@@ -237,6 +223,34 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
                 shouldShow = user?.permissions?.some(p => 
                   p.permission === 'MANAGE_USERS' && p.isActive
                 ) || false;
+              }
+            } else if (item.name === 'Raporlar') {
+              // AGENCY_ADMIN her zaman görsün; diğer roller izinle görsün
+              if (user?.role === 'AGENCY_ADMIN') {
+                shouldShow = true;
+              } else {
+                shouldShow = user?.permissions?.some(p => 
+                  p.permission === 'VIEW_REPORTS' && p.isActive
+                ) || false;
+              }
+            } else if (item.name === 'Muhasebe') {
+              // AGENCY_ADMIN her zaman görsün; diğer roller izinle görsün
+              if (user?.role === 'AGENCY_ADMIN') {
+                shouldShow = true;
+              } else {
+                shouldShow = user?.permissions?.some(p => 
+                  p.permission === 'VIEW_ACCOUNTING' && p.isActive
+                ) || false;
+              }
+            } else if (item.href === '/admin/customers' || item.name === 'Müşteriler') {
+              // AGENCY_ADMIN her zaman görsün; diğer roller izinle görsün
+              if (user?.role === 'AGENCY_ADMIN') {
+                shouldShow = true;
+              } else {
+                const hasExplicit = user?.permissions?.some(p => 
+                  (p.permission === 'VIEW_CUSTOMER_DATA' || p.permission === 'MANAGE_CUSTOMERS') && p.isActive
+                ) || false;
+                shouldShow = hasExplicit;
               }
             } else if (item.name === 'Şirketler') {
               shouldShow = user?.role === 'SUPERUSER';
