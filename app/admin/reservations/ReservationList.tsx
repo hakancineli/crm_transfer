@@ -443,7 +443,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Müşteri
                                 </th>
-                                {(user?.role === 'SUPERUSER' || user?.role === 'AGENCY_ADMIN') && (
+                                {user?.role === 'SUPERUSER' && (
                                     <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-32">
                                         Acente
                                     </th>
@@ -595,7 +595,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     )}
                                                 </div>
                                             </td>
-                                            {(user?.role === 'SUPERUSER' || user?.role === 'AGENCY_ADMIN') && (
+                                            {user?.role === 'SUPERUSER' && (
                                                 <td className="px-6 py-4 text-sm text-gray-900 align-middle">
                                                     <div className="font-medium text-blue-600">
                                                         {reservation.tenant?.companyName || 'Bilinmiyor'}
