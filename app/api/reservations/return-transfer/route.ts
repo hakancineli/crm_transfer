@@ -74,6 +74,32 @@ export async function POST(request: NextRequest) {
             }
         });
 
+        // Telegram bildirimi (opsiyonel)
+        try {
+            const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+            const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+            if (BOT_TOKEN && CHAT_ID) {
+                const names = (() => { try { return JSON.parse(originalReservation.passengerNames || '[]'); } catch { return []; } })();
+                const textLines = [
+                    'Dönüş Transferi Oluşturuldu 🔄',
+                    `Voucher: ${returnVoucherNumber}`,
+                    `Orijinal: ${originalVoucherNumber}`,
+                    `Tarih: ${returnDate} ${returnTime}`,
+                    `Güzergah: ${originalReservation.to} → ${originalReservation.from}`,
+                    names.length ? `Yolcular: ${names.join(', ')}` : undefined,
+                    originalReservation.phoneNumber ? `Telefon: ${originalReservation.phoneNumber}` : undefined,
+                    originalReservation.flightCode ? `Uçuş: ${originalReservation.flightCode}` : undefined
+                ].filter(Boolean).join('\n');
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: String(CHAT_ID), text: textLines })
+                });
+            }
+        } catch (notifyErr) {
+            console.error('Telegram bildirim hatası:', notifyErr);
+        }
+
         // Update original reservation to mark it as having a return transfer
         await prisma.reservation.update({
             where: { voucherNumber: originalVoucherNumber },
