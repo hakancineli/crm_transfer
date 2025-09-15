@@ -117,5 +117,35 @@
       "driverWaiting": "Şoför Bekleniyor",
       "all": "Tümü"
     }
+  },
+  "tourVoucher": {
+    "title": "TUR REZERVASYON VOUCHERI",
+    "tourInfo": "Tur Bilgileri",
+    "routeName": "Tur Rotası",
+    "vehicleType": "Araç Tipi",
+    "groupSize": "Kişi Sayısı",
+    "price": "Fiyat",
+    "pickupInfo": "Toplanma Bilgileri",
+    "pickupLocation": "Toplanma Yeri",
+    "reservationStatus": "Rezervasyon Durumu",
+    "status": "Durum",
+    "reservationDate": "Rezervasyon Tarihi",
+    "dateTime": "Tarih & Saat",
+    "tourDate": "Tur Tarihi",
+    "departureTime": "Kalkış Saati",
+    "passengerList": "Yolcu Listesi",
+    "driverInfo": "Şoför Bilgileri",
+    "driverName": "Şoför Adı",
+    "phone": "Telefon",
+    "companyInfo": "Acente Bilgileri",
+    "company": "Acente",
+    "subdomain": "Subdomain",
+    "footerNote": "Bu voucher tur rezervasyonunuzu doğrular. Tur günü yanınızda bulundurunuz.",
+    "createdDate": "Oluşturulma Tarihi",
+    "print": "Yazdır",
+    "confirmed": "Onaylandı",
+    "pending": "Beklemede",
+    "cancelled": "İptal Edildi",
+    "person": "kişi"
   }
 }

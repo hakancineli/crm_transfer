@@ -64,6 +64,10 @@ body, html {
     display: none !important;
   }
 
+  .no-print {
+    display: none !important;
+  }
+
   .print\:p-2 {
     padding: 0.5rem !important;
   }
@@ -84,5 +88,36 @@ body, html {
 
   .print\:mb-2 {
     margin-bottom: 0.5rem !important;
+  }
+
+  /* Print sırasında tüm butonları gizle */
+  button {
+    display: none !important;
+  }
+
+  /* Print sırasında select elementlerini gizle */
+  select {
+    display: none !important;
+  }
+
+  /* Print sırasında form elementlerini gizle */
+  input, textarea, select, button {
+    display: none !important;
+  }
+
+  /* Print sırasında sadece içeriği göster */
+  body * {
+    visibility: hidden;
+  }
+
+  .print-content, .print-content * {
+    visibility: visible;
+  }
+
+  .print-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
   }
 }

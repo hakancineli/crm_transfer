@@ -8,26 +8,27 @@ datasource db {
 }
 
 model Tenant {
-  id               String           @id @default(uuid())
-  subdomain        String           @unique
-  companyName      String
-  domain           String?
-  isActive         Boolean          @default(true)
-  subscriptionPlan String           @default("basic")
-  // Ödeme bilgileri
-  paymentIban           String?
-  paymentAccountHolder  String?
-  paymentBank           String?
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  activities       Activity[]
-  reservations     Reservation[]
-  hotelBookings    HotelBooking[]
-  hotelPricePool   HotelPricePool[]
-  hotelRequests    HotelRequest[]
-  modules          TenantModule[]
-  users            TenantUser[]
-  drivers          Driver[]
+  id                   String           @id @default(uuid())
+  subdomain            String           @unique
+  companyName          String
+  domain               String?
+  isActive             Boolean          @default(true)
+  subscriptionPlan     String           @default("basic")
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+  paymentAccountHolder String?
+  paymentBank          String?
+  paymentIban          String?
+  activities           Activity[]
+  reservations         Reservation[]
+  drivers              Driver[]
+  vehicles             Vehicle[]
+  hotelBookings        HotelBooking[]
+  hotelPricePool       HotelPricePool[]
+  hotelRequests        HotelRequest[]
+  modules              TenantModule[]
+  users                TenantUser[]
+  tourBookings         TourBooking[]
 
   @@map("tenants")
 }
@@ -87,7 +88,8 @@ model Driver {
   tenantId     String?
   createdAt    DateTime      @default(now())
   reservations Reservation[]
-  tenant       Tenant?       @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  tenant       Tenant?       @relation(fields: [tenantId], references: [id])
+  tourBookings TourBooking[]
 
   @@map("drivers")
 }
@@ -275,6 +277,48 @@ model HotelPricePool {
   @@index([hotelCity, validFrom, validTo])
   @@index([isActive, validFrom, validTo])
   @@map("hotel_price_pool")
+}
+
+model Vehicle {
+  id             String    @id @default(uuid())
+  type           String
+  capacity       Int
+  licensePlate   String
+  driverName     String?
+  driverPhone    String?
+  isAvailable    Boolean   @default(true)
+  lastMaintenance DateTime?
+  tenantId       String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  tenant         Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("vehicles")
+}
+
+model TourBooking {
+  id             String   @id @default(uuid())
+  voucherNumber  String   @unique
+  routeName      String
+  vehicleType    String
+  groupSize      Int
+  price          Float
+  currency       String   @default("USD")
+  pickupLocation String
+  tourDate       DateTime
+  tourTime       String?
+  passengerNames String
+  notes          String?
+  status         String   @default("PENDING")
+  tenantId       String
+  driverId       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  tourDuration   Int      @default(1)
+  driver         Driver?  @relation(fields: [driverId], references: [id])
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("tour_bookings")
 }
 
 enum UserRole {

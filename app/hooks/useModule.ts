@@ -7,16 +7,19 @@ interface ModuleSettings {
   transfer: boolean;
   accommodation: boolean;
   flight: boolean;
+  tour: boolean;
 }
 
 const defaultModules: ModuleSettings = {
   transfer: true,
   accommodation: false,
-  flight: false
+  flight: false,
+  tour: true
 };
 
 export function useModule(moduleName: keyof ModuleSettings) {
   const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isEnabled, setIsEnabled] = useState<boolean>(() => {
     if (moduleName === 'transfer') return true; // Transfer her zaman aktif
     
@@ -58,8 +61,12 @@ export function useModule(moduleName: keyof ModuleSettings) {
   // Tenant bazlı modül kontrolü için API çağrısı
   useEffect(() => {
     const checkTenantModule = async () => {
-      // SUPERUSER için localStorage kontrolü yeterli
+      setIsLoading(true);
+      
+      // SUPERUSER için tüm modüllere erişim var
       if (user?.role === 'SUPERUSER') {
+        setIsEnabled(true);
+        setIsLoading(false);
         return;
       }
 
@@ -88,7 +95,8 @@ export function useModule(moduleName: keyof ModuleSettings) {
             const moduleIdMap: Record<string, string> = {
               'transfer': '7151a226-3a15-493d-b663-4b05bf5ca37d', // Transfer Yönetimi
               'accommodation': 'd7ed6d22-e836-47f2-93fe-f2b6d5cefe55', // Konaklama Yönetimi
-              'flight': '4555dbae-4051-4d0e-a10d-b8c728fc2402' // Uçuş Yönetimi
+              'flight': '4555dbae-4051-4d0e-a10d-b8c728fc2402', // Uçuş Yönetimi
+              'tour': 'b7cf5f36-ac23-4cb9-922e-54f30204fb13' // Tur Yönetimi
             };
             
             const moduleId = moduleIdMap[moduleName];
@@ -108,14 +116,22 @@ export function useModule(moduleName: keyof ModuleSettings) {
           console.error('Tenant modül kontrolü hatası:', error);
           // Hata durumunda default değeri kullan
           setIsEnabled(defaultModules[moduleName]);
+        } finally {
+          setIsLoading(false);
         }
+      } else {
+        setIsLoading(false);
       }
     };
 
-    checkTenantModule();
+    if (user) {
+      checkTenantModule();
+    } else {
+      setIsLoading(false);
+    }
   }, [user, moduleName]);
 
-  return isEnabled;
+  return { isEnabled, isLoading };
 }
 
 export function useAllModules() {

@@ -117,5 +117,35 @@
       "driverWaiting": "Driver Waiting",
       "all": "All"
     }
+  },
+  "tourVoucher": {
+    "title": "TOUR RESERVATION VOUCHER",
+    "tourInfo": "Tour Information",
+    "routeName": "Tour Route",
+    "vehicleType": "Vehicle Type",
+    "groupSize": "Group Size",
+    "price": "Price",
+    "pickupInfo": "Pickup Information",
+    "pickupLocation": "Pickup Location",
+    "reservationStatus": "Reservation Status",
+    "status": "Status",
+    "reservationDate": "Reservation Date",
+    "dateTime": "Date & Time",
+    "tourDate": "Tour Date",
+    "departureTime": "Departure Time",
+    "passengerList": "Passenger List",
+    "driverInfo": "Driver Information",
+    "driverName": "Driver Name",
+    "phone": "Phone",
+    "companyInfo": "Agency Information",
+    "company": "Agency",
+    "subdomain": "Subdomain",
+    "footerNote": "This voucher confirms your tour reservation. Please keep it with you on the tour day.",
+    "createdDate": "Created Date",
+    "print": "Print",
+    "confirmed": "Confirmed",
+    "pending": "Pending",
+    "cancelled": "Cancelled",
+    "person": "person"
   }
 }

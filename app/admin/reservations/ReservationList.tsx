@@ -23,6 +23,7 @@ interface Reservation {
     createdAt: Date;
     phoneNumber?: string;
     paymentStatus: string;
+    type?: string;
     driver?: {
         id: string;
         name: string;
@@ -541,17 +542,25 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             <td className="px-6 py-4 text-sm text-gray-900 align-middle">
                                                 <div className="flex flex-col gap-2">
                                                     <span className={`inline-flex items-center justify-center px-4 py-2 rounded-full text-xs font-semibold min-w-[80px] ${
-                                                        reservation.from.includes('IST') || reservation.from.includes('SAW') 
-                                                            ? 'bg-green-100 text-green-800 border border-green-200' 
-                                                            : reservation.to.includes('IST') || reservation.to.includes('SAW')
-                                                                ? 'bg-orange-100 text-orange-800 border border-orange-200'
-                                                                : 'bg-gray-100 text-gray-800 border border-gray-200'
+                                                        reservation.type === 'Tur' 
+                                                            ? 'bg-green-100 text-green-800 border border-green-200'
+                                                            : reservation.type === 'Konaklama'
+                                                                ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                                                                : reservation.from.includes('IST') || reservation.from.includes('SAW') 
+                                                                    ? 'bg-green-100 text-green-800 border border-green-200' 
+                                                                    : reservation.to.includes('IST') || reservation.to.includes('SAW')
+                                                                        ? 'bg-orange-100 text-orange-800 border border-orange-200'
+                                                                        : 'bg-gray-100 text-gray-800 border border-gray-200'
                                                     }`}>
-                                                        {reservation.from.includes('IST') || reservation.from.includes('SAW') 
-                                                            ? 'Karşılama'
-                                                            : reservation.to.includes('IST') || reservation.to.includes('SAW')
-                                                                ? 'Çıkış'
-                                                                : 'Ara Transfer'
+                                                        {reservation.type === 'Tur' 
+                                                            ? 'Tur'
+                                                            : reservation.type === 'Konaklama'
+                                                                ? 'Konaklama'
+                                                                : reservation.from.includes('IST') || reservation.from.includes('SAW') 
+                                                                    ? 'Karşılama'
+                                                                    : reservation.to.includes('IST') || reservation.to.includes('SAW')
+                                                                        ? 'Çıkış'
+                                                                        : 'Ara Transfer'
                                                         }
                                                     </span>
                                                 </div>
@@ -728,7 +737,10 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                                 🔄
                                                             </button>
                                                             <Link 
-                                                                href={`/admin/reservations/${reservation.voucherNumber}/customer-voucher`}
+                                                                href={reservation.type === 'Tur' 
+                                                                    ? `/admin/tour/reservations/${reservation.id}/customer-voucher`
+                                                                    : `/admin/reservations/${reservation.voucherNumber}/customer-voucher`
+                                                                }
                                                                 className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-lg font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                                                 title="Müşteri Voucherı"
                                                             >
@@ -752,14 +764,20 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                                 🔄
                                                             </button>
                                                             <Link 
-                                                                href={`/admin/reservations/${reservation.voucherNumber}/driver-voucher`}
+                                                                href={reservation.type === 'Tur' 
+                                                                    ? `/admin/tour/reservations/${reservation.id}/driver-voucher`
+                                                                    : `/admin/reservations/${reservation.voucherNumber}/driver-voucher`
+                                                                }
                                                                 className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
                                                                 title="Şoför Voucherı"
                                                             >
                                                                 👨‍✈️
                                                             </Link>
                                                             <Link 
-                                                                href={`/admin/reservations/${reservation.voucherNumber}/customer-voucher`}
+                                                                href={reservation.type === 'Tur' 
+                                                                    ? `/admin/tour/reservations/${reservation.id}/customer-voucher`
+                                                                    : `/admin/reservations/${reservation.voucherNumber}/customer-voucher`
+                                                                }
                                                                 className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
                                                                 title="Müşteri Voucherı"
                                                             >
@@ -981,7 +999,10 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                 🔄 Dönüş
                                             </button>
                                             <Link 
-                                                href={`/admin/reservations/${reservation.voucherNumber}/customer-voucher`}
+                                                href={reservation.type === 'Tur' 
+                                                    ? `/admin/tour/reservations/${reservation.id}/customer-voucher`
+                                                    : `/admin/reservations/${reservation.voucherNumber}/customer-voucher`
+                                                }
                                                 className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
                                             >
                                                 Müşteri
@@ -1002,13 +1023,19 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                 🔄 Dönüş
                                             </button>
                                             <Link 
-                                                href={`/admin/reservations/${reservation.voucherNumber}/driver-voucher`}
+                                                href={reservation.type === 'Tur' 
+                                                    ? `/admin/tour/reservations/${reservation.id}/driver-voucher`
+                                                    : `/admin/reservations/${reservation.voucherNumber}/driver-voucher`
+                                                }
                                                 className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
                                             >
                                                 Şoför
                                             </Link>
                                             <Link 
-                                                href={`/admin/reservations/${reservation.voucherNumber}/customer-voucher`}
+                                                href={reservation.type === 'Tur' 
+                                                    ? `/admin/tour/reservations/${reservation.id}/customer-voucher`
+                                                    : `/admin/reservations/${reservation.voucherNumber}/customer-voucher`
+                                                }
                                                 className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
                                             >
                                                 Müşteri

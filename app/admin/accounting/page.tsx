@@ -36,6 +36,7 @@ interface Reservation {
   };
   createdAt: string;
   companyCommissionStatus?: 'PENDING' | 'APPROVED' | 'REJECTED';
+  type?: 'Transfer' | 'Tur' | 'Konaklama' | 'Uçuş';
 }
 
 export default function AccountingPage() {
@@ -184,11 +185,17 @@ export default function AccountingPage() {
     .filter(r => r.paymentStatus === 'PAID' && r.currency === 'USD')
     .reduce((sum, r) => sum + r.price, 0);
 
+  const totalRevenueEUR = filteredReservations
+    .filter(r => r.paymentStatus === 'PAID' && r.currency === 'EUR')
+    .reduce((sum, r) => sum + r.price, 0);
+
   const totalRevenueTL = filteredReservations
     .filter(r => r.paymentStatus === 'PAID')
     .reduce((sum, r) => {
       if (r.currency === 'USD') {
         return sum + (r.price * usdRate);
+      } else if (r.currency === 'EUR') {
+        return sum + (r.price * usdRate * 0.85); // EUR to TL conversion (approximate)
       }
       return sum + r.price;
     }, 0);
@@ -198,6 +205,8 @@ export default function AccountingPage() {
     .reduce((sum, r) => {
       if (r.currency === 'USD') {
         return sum + (r.price * usdRate);
+      } else if (r.currency === 'EUR') {
+        return sum + (r.price * usdRate * 0.85);
       }
       return sum + r.price;
     }, 0);
@@ -207,6 +216,8 @@ export default function AccountingPage() {
     .reduce((sum, r) => {
       if (r.currency === 'USD') {
         return sum + (r.price * usdRate);
+      } else if (r.currency === 'EUR') {
+        return sum + (r.price * usdRate * 0.85);
       }
       return sum + r.price;
     }, 0);
@@ -237,7 +248,12 @@ export default function AccountingPage() {
         ? r.driverFee 
         : 0; // Şoför atanmamışsa 0
       
-      const revenue = r.currency === 'USD' ? r.price * usdRate : r.price;
+      let revenue = r.price;
+      if (r.currency === 'USD') {
+        revenue = r.price * usdRate;
+      } else if (r.currency === 'EUR') {
+        revenue = r.price * usdRate * 0.85;
+      }
       return sum + (revenue - driverCommission);
     }, 0);
 
@@ -248,7 +264,12 @@ export default function AccountingPage() {
         ? r.driverFee 
         : 0; // Şoför atanmamışsa 0
       
-      const revenue = r.currency === 'USD' ? r.price * usdRate : r.price;
+      let revenue = r.price;
+      if (r.currency === 'USD') {
+        revenue = r.price * usdRate;
+      } else if (r.currency === 'EUR') {
+        revenue = r.price * usdRate * 0.85;
+      }
       return sum + (revenue - driverCommission);
     }, 0);
 
@@ -332,7 +353,7 @@ export default function AccountingPage() {
       </div>
 
       {/* Özet Kartları - Raporlar sayfasındaki mantığa göre */}
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-7 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="p-2 bg-green-100 rounded-lg">
@@ -353,6 +374,18 @@ export default function AccountingPage() {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">{t('admin.accounting.stats.usdTlRate')}</p>
               <p className="text-2xl font-bold text-gray-900">{usdRate.toFixed(2)} TL</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex items-center">
+            <div className="p-2 bg-yellow-100 rounded-lg">
+              <span className="text-yellow-600 text-2xl">🇪🇺</span>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">EUR Satış Toplamı</p>
+              <p className="text-2xl font-bold text-gray-900">€{totalRevenueEUR.toFixed(2)}</p>
             </div>
           </div>
         </div>
@@ -485,6 +518,9 @@ export default function AccountingPage() {
                   {t('admin.accounting.table.commissionApproval')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Tip
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   {t('admin.accounting.table.salesPerson')}
                 </th>
               </tr>
@@ -497,7 +533,12 @@ export default function AccountingPage() {
                   : 0; // Şoför atanmamışsa 0
                 
                 // Şirket karı hesaplama (TL cinsinden)
-                const revenueTL = reservation.currency === 'USD' ? reservation.price * usdRate : reservation.price;
+                let revenueTL = reservation.price;
+                if (reservation.currency === 'USD') {
+                  revenueTL = reservation.price * usdRate;
+                } else if (reservation.currency === 'EUR') {
+                  revenueTL = reservation.price * usdRate * 0.85;
+                }
                 const companyProfitTL = revenueTL - driverCommissionTL;
                 const companyCommissionStatus = reservation.companyCommissionStatus || 'PENDING';
                 
@@ -585,6 +626,16 @@ export default function AccountingPage() {
                           </div>
                         )}
                       </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                        reservation.type === 'Tur' ? 'bg-green-100 text-green-800' :
+                        reservation.type === 'Transfer' ? 'bg-blue-100 text-blue-800' :
+                        reservation.type === 'Konaklama' ? 'bg-purple-100 text-purple-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {reservation.type || 'Transfer'}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">

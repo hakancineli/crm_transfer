@@ -107,5 +107,35 @@
       "driverWaiting": "في انتظار السائق",
       "all": "الكل"
     }
+  },
+  "tourVoucher": {
+    "title": "قسيمة حجز الجولة السياحية",
+    "tourInfo": "معلومات الجولة",
+    "routeName": "مسار الجولة",
+    "vehicleType": "نوع المركبة",
+    "groupSize": "حجم المجموعة",
+    "price": "السعر",
+    "pickupInfo": "معلومات الاستقبال",
+    "pickupLocation": "مكان الاستقبال",
+    "reservationStatus": "حالة الحجز",
+    "status": "الحالة",
+    "reservationDate": "تاريخ الحجز",
+    "dateTime": "التاريخ والوقت",
+    "tourDate": "تاريخ الجولة",
+    "departureTime": "وقت المغادرة",
+    "passengerList": "قائمة المسافرين",
+    "driverInfo": "معلومات السائق",
+    "driverName": "اسم السائق",
+    "phone": "الهاتف",
+    "companyInfo": "معلومات الوكالة",
+    "company": "الوكالة",
+    "subdomain": "النطاق الفرعي",
+    "footerNote": "هذه القسيمة تؤكد حجز جولتك السياحية. يرجى الاحتفاظ بها معك في يوم الجولة.",
+    "createdDate": "تاريخ الإنشاء",
+    "print": "طباعة",
+    "confirmed": "مؤكد",
+    "pending": "معلق",
+    "cancelled": "ملغي",
+    "person": "شخص"
   }
 }

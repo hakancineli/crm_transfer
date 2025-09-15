@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/app/lib/prisma';
 
 export interface RequestUserContext {
   userId: string | null;
@@ -20,6 +20,7 @@ export async function getRequestUserContext(request: NextRequest): Promise<Reque
       const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
       userId = decoded.userId || null;
       role = decoded.role || null;
+      
       if (decoded?.userId) {
         const links = await prisma.tenantUser.findMany({
           where: { userId: decoded.userId, isActive: true },
@@ -28,7 +29,7 @@ export async function getRequestUserContext(request: NextRequest): Promise<Reque
         tenantIds = links.map((l) => l.tenantId);
       }
     } catch (e) {
-      // ignore invalid token
+      // Token verification failed - ignore
     }
   }
 

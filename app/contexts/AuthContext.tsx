@@ -85,6 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (response.ok) {
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('token', data.token);
+        localStorage.setItem('refreshToken', data.refreshToken);
         localStorage.setItem('isAdmin', 'false');
         setUser(data.user);
 
@@ -130,20 +131,67 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('isAdmin');
     sessionStorage.clear();
     setUser(null);
     router.push('/login');
   };
 
+  const refreshToken = async () => {
+    try {
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (!refreshToken) return false;
+
+      const res = await fetch('/api/auth/refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!res.ok) return false;
+
+      const data = await res.json();
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      setUser(data.user);
+      return true;
+    } catch (e) {
+      console.error('Token refresh error:', e);
+      return false;
+    }
+  };
+
   const refreshUser = async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
+      
       const res = await fetch('/api/auth/me', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) return;
+      
+      if (!res.ok) {
+        // Token expired, try to refresh
+        const refreshed = await refreshToken();
+        if (!refreshed) {
+          // Refresh failed, logout user
+          logout();
+          return;
+        }
+        // Retry with new token
+        const newToken = localStorage.getItem('token');
+        const retryRes = await fetch('/api/auth/me', {
+          headers: { Authorization: `Bearer ${newToken}` },
+        });
+        if (!retryRes.ok) return;
+        const fresh = await retryRes.json();
+        localStorage.setItem('user', JSON.stringify(fresh));
+        setUser(fresh);
+        return;
+      }
+      
       const fresh = await res.json();
       
       // Sadece gerçekten değişiklik varsa state'i güncelle

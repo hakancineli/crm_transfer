@@ -20,6 +20,9 @@ interface ReportData {
         pickup: number;
         dropoff: number;
         transfer: number;
+        tour: number;
+        accommodation: number;
+        flight: number;
     };
     popularRoutes: {
         route: string;
@@ -101,6 +104,9 @@ export default function ReportsDashboard() {
                     pickup: Number(data?.transfersByType?.pickup) || 0,
                     dropoff: Number(data?.transfersByType?.dropoff) || 0,
                     transfer: Number(data?.transfersByType?.transfer) || 0,
+                    tour: Number(data?.transfersByType?.tour) || 0,
+                    accommodation: Number(data?.transfersByType?.accommodation) || 0,
+                    flight: Number(data?.transfersByType?.flight) || 0,
                 },
                 popularRoutes: Array.isArray(data.popularRoutes) ? data.popularRoutes : [],
             };

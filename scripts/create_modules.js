@@ -68,14 +68,36 @@ async function createModules() {
     });
     console.log('✅ Uçuş modülü oluşturuldu:', flightModule.id);
 
+    // Tur modülü
+    const tourModule = await prisma.module.upsert({
+      where: { name: 'Tur Yönetimi' },
+      update: {},
+      create: {
+        name: 'Tur Yönetimi',
+        description: 'Tur rezervasyonları ve tur yönetimi',
+        isActive: true,
+        priceMonthly: 60,
+        priceYearly: 600,
+        features: JSON.stringify([
+          'tur-rezervasyon',
+          'rota-yonetimi',
+          'arac-yonetimi',
+          'tur-raporlari',
+          'musteri-yonetimi'
+        ])
+      }
+    });
+    console.log('✅ Tur modülü oluşturuldu:', tourModule.id);
+
     console.log('\n🎉 Tüm modüller başarıyla oluşturuldu!');
     
-    // Mevcut tenant'lara transfer modülünü varsayılan olarak ekle
+    // Mevcut tenant'lara modülleri varsayılan olarak ekle
     const tenants = await prisma.tenant.findMany();
-    console.log(`\n${tenants.length} tenant bulundu, transfer modülü ekleniyor...`);
+    console.log(`\n${tenants.length} tenant bulundu, modüller ekleniyor...`);
     
     for (const tenant of tenants) {
-      const existingModule = await prisma.tenantModule.findUnique({
+      // Transfer modülü
+      const existingTransferModule = await prisma.tenantModule.findUnique({
         where: {
           tenantId_moduleId: {
             tenantId: tenant.id,
@@ -84,7 +106,7 @@ async function createModules() {
         }
       });
 
-      if (!existingModule) {
+      if (!existingTransferModule) {
         await prisma.tenantModule.create({
           data: {
             tenantId: tenant.id,
@@ -103,6 +125,37 @@ async function createModules() {
         console.log(`✅ ${tenant.companyName} için transfer modülü eklendi`);
       } else {
         console.log(`ℹ️  ${tenant.companyName} zaten transfer modülüne sahip`);
+      }
+
+      // Tur modülü
+      const existingTourModule = await prisma.tenantModule.findUnique({
+        where: {
+          tenantId_moduleId: {
+            tenantId: tenant.id,
+            moduleId: tourModule.id
+          }
+        }
+      });
+
+      if (!existingTourModule) {
+        await prisma.tenantModule.create({
+          data: {
+            tenantId: tenant.id,
+            moduleId: tourModule.id,
+            isEnabled: true,
+            activatedAt: new Date(),
+            features: JSON.stringify([
+              'tur-rezervasyon',
+              'rota-yonetimi',
+              'arac-yonetimi',
+              'tur-raporlari',
+              'musteri-yonetimi'
+            ])
+          }
+        });
+        console.log(`✅ ${tenant.companyName} için tur modülü eklendi`);
+      } else {
+        console.log(`ℹ️  ${tenant.companyName} zaten tur modülüne sahip`);
       }
     }
 

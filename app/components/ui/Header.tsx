@@ -8,6 +8,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useEmoji } from '../../contexts/EmojiContext';
 import LanguageSelector from '../LanguageSelector';
+import ReservationTypeSelector from '../ReservationTypeSelector';
 
 interface HeaderProps {
     onSidebarToggle?: () => void;
@@ -27,7 +28,7 @@ export default function Header({ onSidebarToggle, showSidebarToggle = false }: H
     const isCustomerContext = pathname === '/' || pathname.startsWith('/customer-reservation') || pathname.startsWith('/customer-panel');
 
     const adminNavigation = [
-        { name: t('header.newReservation'), href: '/admin/new-reservation' },
+        { name: t('header.newReservation'), href: '/admin/new-reservation', isSpecial: true },
         { name: t('header.allReservations'), href: '/admin/reservations' },
         { name: 'Admin Panel', href: '/admin' },
     ];
@@ -68,20 +69,32 @@ export default function Header({ onSidebarToggle, showSidebarToggle = false }: H
                             </Link>
                         </div>
                         <div className="hidden md:ml-6 md:flex md:space-x-8">
-                            {navigation.map((item) => (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    className={cn(
-                                        'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                                        pathname === item.href
-                                            ? 'border-green-500 text-gray-900'
-                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                                    )}
-                                >
-                                    {item.name}
-                                </Link>
-                            ))}
+                            {navigation.map((item) => {
+                                // Özel component kullanılacak öğeler için
+                                if ((item as any).isSpecial) {
+                                    return (
+                                        <div key={item.href} className="relative">
+                                            <ReservationTypeSelector variant="header" />
+                                        </div>
+                                    );
+                                }
+                                
+                                // Normal link öğeleri için
+                                return (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        className={cn(
+                                            'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
+                                            pathname === item.href
+                                                ? 'border-green-500 text-gray-900'
+                                                : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                        )}
+                                    >
+                                        {item.name}
+                                    </Link>
+                                );
+                            })}
                         </div>
                     </div>
                     
@@ -138,21 +151,33 @@ export default function Header({ onSidebarToggle, showSidebarToggle = false }: H
                 {mobileMenuOpen && (
                     <div className="md:hidden">
                         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
-                            {navigation.map((item) => (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className={cn(
-                                        'block px-3 py-2 rounded-md text-base font-medium',
-                                        pathname === item.href
-                                            ? 'bg-green-50 text-green-700 border-l-4 border-green-500'
-                                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                                    )}
-                                >
-                                    {item.name}
-                                </Link>
-                            ))}
+                            {navigation.map((item) => {
+                                // Özel component kullanılacak öğeler için
+                                if ((item as any).isSpecial) {
+                                    return (
+                                        <div key={item.href} className="px-3 py-2">
+                                            <ReservationTypeSelector onClose={() => setMobileMenuOpen(false)} />
+                                        </div>
+                                    );
+                                }
+                                
+                                // Normal link öğeleri için
+                                return (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className={cn(
+                                            'block px-3 py-2 rounded-md text-base font-medium',
+                                            pathname === item.href
+                                                ? 'bg-green-50 text-green-700 border-l-4 border-green-500'
+                                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                        )}
+                                    >
+                                        {item.name}
+                                    </Link>
+                                );
+                            })}
                             
                             {/* Mobil çıkış butonu */}
                             {isAuthenticated && user && !isCustomerContext && (

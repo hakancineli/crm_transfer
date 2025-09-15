@@ -6,6 +6,7 @@ import { useAuth } from '@/app/contexts/AuthContext';
 import { useEmoji } from '@/app/contexts/EmojiContext';
 import { useModule } from '@/app/hooks/useModule';
 import { useLanguage } from '@/app/contexts/LanguageContext';
+import ReservationTypeSelector from './ReservationTypeSelector';
 
 interface AdminNavigationProps {
   onClose?: () => void;
@@ -19,6 +20,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
   const { t, dir } = useLanguage();
   const accommodationEnabled = useModule('accommodation');
   const flightEnabled = useModule('flight');
+  const tourEnabled = useModule('tour');
 
 
   // Client-side rendering kontrolü
@@ -52,7 +54,8 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         icon: '➕',
         description: t('admin.navigation.newReservation'),
         module: 'transfer',
-        order: role === 'SUPERUSER' ? 6 : 3
+        order: role === 'SUPERUSER' ? 6 : 3,
+        isSpecial: true // Özel component kullanılacak
       },
       {
         name: 'Uçuş Durumu',
@@ -175,6 +178,38 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         order: 999
       },
       {
+        name: 'Tur Yönetimi',
+        href: '/admin/tour',
+        icon: '🚌',
+        description: 'Grup turları ve turizm acenteleri için özel yönetim',
+        module: 'tour',
+        order: role === 'SUPERUSER' ? 15 : (role === 'AGENCY_ADMIN' ? 6 : 999)
+      },
+      {
+        name: 'Tur Rezervasyonları',
+        href: '/admin/tour/reservations',
+        icon: '📋',
+        description: 'Tüm tur rezervasyonlarını görüntüle',
+        module: 'tour',
+        order: role === 'SUPERUSER' ? 16 : (role === 'AGENCY_ADMIN' ? 7 : 999)
+      },
+      {
+        name: 'Tur Rotaları',
+        href: '/admin/tour/routes',
+        icon: '🗺️',
+        description: 'Tur rotalarını yönet',
+        module: 'tour',
+        order: role === 'SUPERUSER' ? 17 : (role === 'AGENCY_ADMIN' ? 8 : 999)
+      },
+      {
+        name: 'Araç Yönetimi',
+        href: '/admin/tour/vehicles',
+        icon: '🚐',
+        description: 'Tur araçlarını yönet',
+        module: 'tour',
+        order: role === 'SUPERUSER' ? 18 : (role === 'AGENCY_ADMIN' ? 9 : 999)
+      },
+      {
         name: 'Modül Yönetimi',
         href: '/admin/modules',
         icon: '🔧',
@@ -207,7 +242,8 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
     visible: item.module === 'transfer' || 
              item.module === 'system' ||
              (item.module === 'accommodation' && accommodationEnabled) ||
-             (item.module === 'flight' && flightEnabled)
+             (item.module === 'flight' && flightEnabled) ||
+             (item.module === 'tour' && tourEnabled)
   }));
 
   return (
@@ -299,12 +335,31 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               shouldShow = false; // Only SUPERUSER can see this
             } else if (item.name === 'Modül Yönetimi') {
               shouldShow = user?.role === 'SUPERUSER';
+            } else if (item.module === 'tour') {
+              // AGENCY_ADMIN her zaman görsün; diğer roller izinle görsün
+              if (user?.role === 'AGENCY_ADMIN') {
+                shouldShow = true;
+              } else {
+                shouldShow = user?.permissions?.some(p => 
+                  p.permission === 'VIEW_TOUR_MODULE' && p.isActive
+                ) || false;
+              }
             }
           }
           
           // Hem modül durumu hem de izin kontrolü
           if (!item.visible || !shouldShow) {
             return null;
+          }
+          
+          // Özel component kullanılacak öğeler için
+          if ((item as any).isSpecial && item.name === t('admin.navigation.newReservation')) {
+            return (
+              <ReservationTypeSelector
+                key={item.name}
+                onClose={onClose}
+              />
+            );
           }
           
           return (

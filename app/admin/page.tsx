@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useEmoji } from '../contexts/EmojiContext';
 import { useAuth } from '../contexts/AuthContext';
-import { PERMISSIONS, ROLE_PERMISSIONS } from '../lib/permissions';
+import { PERMISSIONS, ROLE_PERMISSIONS, canViewTourModule, canManageTourBookings, canManageTourRoutes, canManageTourVehicles } from '../lib/permissions';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useModule } from '../hooks/useModule';
 
@@ -26,6 +26,7 @@ export default function AdminDashboard() {
   const [isClient, setIsClient] = useState(false);
   const accommodationEnabled = useModule('accommodation');
   const flightEnabled = useModule('flight');
+  const tourEnabled = useModule('tour');
   const [stats, setStats] = useState<DashboardStats>({
     totalReservations: 0,
     todayReservations: 0,
@@ -294,7 +295,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Hızlı İşlemler - Transfer */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.dashboard.quickActions.transferOperations')}</h3>
@@ -405,6 +406,111 @@ export default function AdminDashboard() {
               <div className="text-center py-8">
                 <div className="text-4xl mb-4">{emojisEnabled ? '🏨' : '🏢'}</div>
                 <p className="text-gray-500">Konaklama modülü kapalı</p>
+                <p className="text-sm text-gray-400 mt-2">Modül Yönetimi'nden aktifleştirin</p>
+              </div>
+            </div>
+          )}
+
+          {/* Hızlı İşlemler - Tur */}
+          {(user?.role === 'SUPERUSER' || (tourEnabled && canViewTourModule(user?.role || '', user?.permissions))) ? (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Tur İşlemleri</h3>
+              <div className="grid grid-cols-2 gap-4">
+                {canManageTourBookings(user?.role || '', user?.permissions) ? (
+                  <Link
+                    href="/admin/tour/reservations/new"
+                    className="flex items-center justify-center p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
+                  >
+                    <div className="text-center">
+                      <div className="text-2xl mb-2">{emojisEnabled ? '🚌' : '🚐'}</div>
+                      <div className="text-sm font-medium text-green-800">Yeni Tur Rezervasyonu</div>
+                    </div>
+                  </Link>
+                ) : (
+                  <div
+                    className="flex items-center justify-center p-4 bg-gray-50 border border-gray-200 rounded-lg opacity-50 cursor-not-allowed"
+                    title="Tur rezervasyonu oluşturma yetkiniz yok"
+                  >
+                    <div className="text-center">
+                      <div className="text-2xl mb-2">{emojisEnabled ? '🚌' : '🚐'}</div>
+                      <div className="text-sm font-medium text-gray-500">Yeni Tur Rezervasyonu</div>
+                    </div>
+                  </div>
+                )}
+                
+                {canViewTourModule(user?.role || '', user?.permissions) ? (
+                  <Link
+                    href="/admin/tour/reservations"
+                    className="flex items-center justify-center p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+                  >
+                    <div className="text-center">
+                      <div className="text-2xl mb-2">{isClient && emojisEnabled ? '📋' : '📄'}</div>
+                      <div className="text-sm font-medium text-blue-800">Tur Rezervasyonları</div>
+                    </div>
+                  </Link>
+                ) : (
+                  <div
+                    className="flex items-center justify-center p-4 bg-gray-50 border border-gray-200 rounded-lg opacity-50 cursor-not-allowed"
+                    title="Tur rezervasyonlarını görme yetkiniz yok"
+                  >
+                    <div className="text-center">
+                      <div className="text-2xl mb-2">{isClient && emojisEnabled ? '📋' : '📄'}</div>
+                      <div className="text-sm font-medium text-gray-500">Tur Rezervasyonları</div>
+                    </div>
+                  </div>
+                )}
+                
+                {canManageTourRoutes(user?.role || '', user?.permissions) ? (
+                  <Link
+                    href="/admin/tour/routes"
+                    className="flex items-center justify-center p-4 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
+                  >
+                    <div className="text-center">
+                      <div className="text-2xl mb-2">{emojisEnabled ? '🗺️' : '📍'}</div>
+                      <div className="text-sm font-medium text-orange-800">Tur Rotaları</div>
+                    </div>
+                  </Link>
+                ) : (
+                  <div
+                    className="flex items-center justify-center p-4 bg-gray-50 border border-gray-200 rounded-lg opacity-50 cursor-not-allowed"
+                    title="Tur rotalarını yönetme yetkiniz yok"
+                  >
+                    <div className="text-center">
+                      <div className="text-2xl mb-2">{emojisEnabled ? '🗺️' : '📍'}</div>
+                      <div className="text-sm font-medium text-gray-500">Tur Rotaları</div>
+                    </div>
+                  </div>
+                )}
+                
+                {canManageTourVehicles(user?.role || '', user?.permissions) ? (
+                  <Link
+                    href="/admin/tour/vehicles"
+                    className="flex items-center justify-center p-4 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors"
+                  >
+                    <div className="text-center">
+                      <div className="text-2xl mb-2">{emojisEnabled ? '🚐' : '🚗'}</div>
+                      <div className="text-sm font-medium text-purple-800">Araç Yönetimi</div>
+                    </div>
+                  </Link>
+                ) : (
+                  <div
+                    className="flex items-center justify-center p-4 bg-gray-50 border border-gray-200 rounded-lg opacity-50 cursor-not-allowed"
+                    title="Araç yönetimi yetkiniz yok"
+                  >
+                    <div className="text-center">
+                      <div className="text-2xl mb-2">{emojisEnabled ? '🚐' : '🚗'}</div>
+                      <div className="text-sm font-medium text-gray-500">Araç Yönetimi</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-6 opacity-50">
+              <h3 className="text-lg font-semibold text-gray-500 mb-4">Tur İşlemleri</h3>
+              <div className="text-center py-8">
+                <div className="text-4xl mb-4">{emojisEnabled ? '🚌' : '🚐'}</div>
+                <p className="text-gray-500">Tur modülü kapalı</p>
                 <p className="text-sm text-gray-400 mt-2">Modül Yönetimi'nden aktifleştirin</p>
               </div>
             </div>

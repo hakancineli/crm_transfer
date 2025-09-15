@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate JWT token
+    // Generate JWT token with refresh token
     const token = jwt.sign(
       { 
         userId: user.id, 
@@ -133,7 +133,17 @@ export async function POST(request: NextRequest) {
         role: user.role 
       },
       process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: '24h' }
+      { expiresIn: '1h' } // 1 saat
+    );
+
+    // Generate refresh token (7 gün)
+    const refreshToken = jwt.sign(
+      { 
+        userId: user.id, 
+        type: 'refresh' 
+      },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '7d' }
     );
 
     // Return user data without password
@@ -142,7 +152,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       message: 'Giriş başarılı',
       user: userWithoutPassword,
-      token
+      token,
+      refreshToken
     });
 
   } catch (error) {

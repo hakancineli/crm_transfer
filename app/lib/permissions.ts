@@ -40,7 +40,14 @@ export const PERMISSIONS = {
   
   // Performans İzinleri
   VIEW_PERFORMANCE: 'VIEW_PERFORMANCE',
-  MANAGE_PERFORMANCE: 'MANAGE_PERFORMANCE'
+  MANAGE_PERFORMANCE: 'MANAGE_PERFORMANCE',
+  
+  // Tur Modülü İzinleri
+  VIEW_TOUR_MODULE: 'VIEW_TOUR_MODULE',
+  MANAGE_TOUR_BOOKINGS: 'MANAGE_TOUR_BOOKINGS',
+  MANAGE_TOUR_ROUTES: 'MANAGE_TOUR_ROUTES',
+  MANAGE_TOUR_VEHICLES: 'MANAGE_TOUR_VEHICLES',
+  VIEW_TOUR_REPORTS: 'VIEW_TOUR_REPORTS'
 } as const;
 
 export const PERMISSION_LABELS = {
@@ -85,7 +92,14 @@ export const PERMISSION_LABELS = {
   
   // Performans İzinleri
   VIEW_PERFORMANCE: 'Performans Verilerini Görme',
-  MANAGE_PERFORMANCE: 'Performans Yönetimi'
+  MANAGE_PERFORMANCE: 'Performans Yönetimi',
+  
+  // Tur Modülü İzinleri
+  VIEW_TOUR_MODULE: 'Tur Modülünü Görme',
+  MANAGE_TOUR_BOOKINGS: 'Tur Rezervasyonlarını Yönetme',
+  MANAGE_TOUR_ROUTES: 'Tur Rotalarını Yönetme',
+  MANAGE_TOUR_VEHICLES: 'Tur Araçlarını Yönetme',
+  VIEW_TOUR_REPORTS: 'Tur Raporlarını Görme'
 } as const;
 
 export const ROLE_PERMISSIONS = {
@@ -111,7 +125,14 @@ export const ROLE_PERMISSIONS = {
     PERMISSIONS.MANAGE_CUSTOMERS, // Kendi şirketinin müşterileri
     PERMISSIONS.VIEW_CUSTOMER_DATA,
     PERMISSIONS.MANAGE_USERS, // Kendi şirketinin kullanıcıları
-    PERMISSIONS.MANAGE_PERMISSIONS // Kendi şirketinin kullanıcılarına yetki verme
+    PERMISSIONS.MANAGE_PERMISSIONS, // Kendi şirketinin kullanıcılarına yetki verme
+    
+    // Tur Modülü İzinleri
+    PERMISSIONS.VIEW_TOUR_MODULE,
+    PERMISSIONS.MANAGE_TOUR_BOOKINGS,
+    PERMISSIONS.MANAGE_TOUR_ROUTES,
+    PERMISSIONS.MANAGE_TOUR_VEHICLES,
+    PERMISSIONS.VIEW_TOUR_REPORTS
   ],
   AGENCY_USER: [
     // Varsayılan olarak hiçbir şeye erişim yok
@@ -217,6 +238,92 @@ export function canViewTenantUsers(role: string, userTenantId: string, targetTen
   // AGENCY_ADMIN sadece kendi tenant'ının kullanıcılarını görebilir
   if (role === 'AGENCY_ADMIN') {
     return userTenantId === targetTenantId;
+  }
+  
+  return false;
+}
+
+// Tur modülü izin fonksiyonları
+export function canViewTourModule(role: string, userPermissions?: any[]): boolean {
+  // SUPERUSER her zaman erişebilir
+  if (role === 'SUPERUSER') return true;
+  
+  // AGENCY_ADMIN her zaman erişebilir
+  if (role === 'AGENCY_ADMIN') return true;
+  
+  // Diğer roller için özel izin kontrolü
+  if (userPermissions) {
+    return userPermissions.some(p => 
+      p.permission === PERMISSIONS.VIEW_TOUR_MODULE && p.isActive
+    );
+  }
+  
+  return false;
+}
+
+export function canManageTourBookings(role: string, userPermissions?: any[]): boolean {
+  // SUPERUSER her zaman erişebilir
+  if (role === 'SUPERUSER') return true;
+  
+  // AGENCY_ADMIN her zaman erişebilir
+  if (role === 'AGENCY_ADMIN') return true;
+  
+  // Diğer roller için özel izin kontrolü
+  if (userPermissions) {
+    return userPermissions.some(p => 
+      p.permission === PERMISSIONS.MANAGE_TOUR_BOOKINGS && p.isActive
+    );
+  }
+  
+  return false;
+}
+
+export function canManageTourRoutes(role: string, userPermissions?: any[]): boolean {
+  // SUPERUSER her zaman erişebilir
+  if (role === 'SUPERUSER') return true;
+  
+  // AGENCY_ADMIN her zaman erişebilir
+  if (role === 'AGENCY_ADMIN') return true;
+  
+  // Diğer roller için özel izin kontrolü
+  if (userPermissions) {
+    return userPermissions.some(p => 
+      p.permission === PERMISSIONS.MANAGE_TOUR_ROUTES && p.isActive
+    );
+  }
+  
+  return false;
+}
+
+export function canManageTourVehicles(role: string, userPermissions?: any[]): boolean {
+  // SUPERUSER her zaman erişebilir
+  if (role === 'SUPERUSER') return true;
+  
+  // AGENCY_ADMIN her zaman erişebilir
+  if (role === 'AGENCY_ADMIN') return true;
+  
+  // Diğer roller için özel izin kontrolü
+  if (userPermissions) {
+    return userPermissions.some(p => 
+      p.permission === PERMISSIONS.MANAGE_TOUR_VEHICLES && p.isActive
+    );
+  }
+  
+  return false;
+}
+
+export function canViewTourReports(role: string, userPermissions?: any[]): boolean {
+  // SUPERUSER her zaman erişebilir
+  if (role === 'SUPERUSER') return true;
+  
+  // AGENCY_ADMIN her zaman erişebilir
+  if (role === 'AGENCY_ADMIN') return true;
+  
+  // Diğer roller için özel izin kontrolü
+  if (userPermissions) {
+    return userPermissions.some(p => 
+      p.permission === PERMISSIONS.VIEW_TOUR_REPORTS && p.isActive
+    );
   }
   
   return false;

@@ -1,102 +1,107 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import jwt from 'jsonwebtoken';
-import { getRequestUserContext, buildTenantWhere } from '@/app/lib/requestContext';
-import { PERMISSIONS, ROLE_PERMISSIONS } from '@/app/lib/permissions';
-import { evaluatePermissions, shouldRestrictToOwnReservations } from '@/app/lib/authorization';
+import { prisma } from '@/app/lib/prisma';
+import { getRequestUserContext } from '@/app/lib/requestContext';
+
+// Modül durumunu kontrol eden yardımcı fonksiyon
+async function getModuleStatus(userRole: string | null, tenantIds: string[]) {
+  // SUPERUSER için tüm modüller aktif
+  if (userRole === 'SUPERUSER') {
+    return {
+      transfer: true,
+      accommodation: true,
+      flight: true,
+      tour: true
+    };
+  }
+
+  // Diğer roller için tenant modüllerini kontrol et
+  if (tenantIds && tenantIds.length > 0) {
+    try {
+      const tenantModules = await prisma.tenantModule.findMany({
+        where: {
+          tenantId: { in: tenantIds },
+          isEnabled: true
+        },
+        include: {
+          module: true
+        }
+      });
+
+      const modules = {
+        transfer: true, // Transfer her zaman aktif
+        accommodation: false,
+        flight: false,
+        tour: false
+      };
+
+      tenantModules.forEach(tm => {
+        const moduleName = tm.module.name.toLowerCase();
+        if (moduleName.includes('konaklama') || moduleName.includes('accommodation')) {
+          modules.accommodation = true;
+        } else if (moduleName.includes('uçuş') || moduleName.includes('flight')) {
+          modules.flight = true;
+        } else if (moduleName.includes('tur') || moduleName.includes('tour')) {
+          modules.tour = true;
+        }
+      });
+
+      return modules;
+    } catch (error) {
+      console.error('Modül durumu kontrol hatası:', error);
+    }
+  }
+
+  // Varsayılan durum
+  return {
+    transfer: true,
+    accommodation: false,
+    flight: false,
+    tour: false
+  };
+}
 
 export async function GET(request: NextRequest) {
   try {
     console.log('API: Rezervasyonlar getiriliyor...');
+    
+    const { userId, role, tenantIds } = await getRequestUserContext(request);
+    
+    // Modül durumunu kontrol et
+    const moduleStatus = await getModuleStatus(role, tenantIds || []);
+    console.log('API: Modül durumu:', moduleStatus);
+    
+    // URL parametrelerini al
     const { searchParams } = new URL(request.url);
-    const phone = searchParams.get('phone');
-    const tenantId = searchParams.get('tenantId');
-    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
-    const pageSize = Math.min(200, Math.max(1, parseInt(searchParams.get('pageSize') || '50', 10))); // default 50
-    const fromDate = searchParams.get('from'); // YYYY-MM-DD
-    const toDate = searchParams.get('to');     // YYYY-MM-DD
-    const { userId: currentUserId, role: currentUserRole, tenantIds: currentTenantIds } = await getRequestUserContext(request);
+    const page = parseInt(searchParams.get('page') || '1');
+    const pageSize = parseInt(searchParams.get('pageSize') || '50');
+    const filter = searchParams.get('filter') || 'all';
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
 
-    // If phone parameter is provided, search by phone number
-    if (phone) {
-      const normalized = phone.trim();
-      const noSpaces = normalized.replace(/\s+/g, '');
-      const digitsOnly = normalized.replace(/\D+/g, ''); // keep only numbers
-      const digitsNoLeadingZero = digitsOnly.replace(/^0+/, '');
+    // Where clause oluştur
+    let whereClause: any = {};
 
-      const reservations = await prisma.reservation.findMany({
-        where: {
-          OR: [
-            { phoneNumber: { equals: normalized } },
-            { phoneNumber: { equals: noSpaces } },
-            { phoneNumber: { contains: normalized } },
-            { phoneNumber: { contains: digitsOnly } },
-            { phoneNumber: { contains: digitsNoLeadingZero } },
-            { phoneNumber: { contains: `+${digitsNoLeadingZero}` } }
-          ]
-        },
-        orderBy: [
-          { date: 'desc' },
-          { time: 'desc' }
-        ],
-        skip: (page - 1) * pageSize,
-        take: pageSize,
-        include: {
-          driver: true,
-          user: {
-            select: {
-              id: true,
-              name: true,
-              username: true
-            }
-          },
-          tenant: {
-            select: {
-              id: true,
-              companyName: true,
-              subdomain: true
-            }
-          }
-        }
-      });
-
-      // Parse passenger names for each reservation
-      const parsedReservations = reservations.map(reservation => {
-        try {
-          return {
-            ...reservation,
-            passengerNames: JSON.parse(reservation.passengerNames || '[]'),
-            createdAt: reservation.createdAt.toISOString()
-          };
-        } catch (error) {
-          console.error('Yolcu isimleri parse hatası:', error);
-          return {
-            ...reservation,
-            passengerNames: [],
-            createdAt: reservation.createdAt.toISOString()
-          };
-        }
-      });
-
-      return NextResponse.json(parsedReservations);
+    // Tenant filtrelemesi ekle
+    if (role !== 'SUPERUSER' && tenantIds && tenantIds.length > 0) {
+      whereClause.tenantId = { in: tenantIds };
     }
 
-    // If no phone parameter, return reservations (scoped)
-    console.log('API: Tüm rezervasyonlar getiriliyor...');
-    console.log('API: Kullanıcı bilgileri:', { currentUserId, currentUserRole, currentTenantIds });
-    const whereClause: any = buildTenantWhere(currentUserRole, currentTenantIds, tenantId || undefined);
+    // Tarih filtresi
+    if (dateFrom && dateTo) {
+      whereClause.date = {
+        gte: dateFrom,
+        lte: dateTo
+      };
+    }
+
+    // Durum filtresi
+    if (filter !== 'all') {
+      whereClause.paymentStatus = filter;
+    }
+
     console.log('API: Where clause:', whereClause);
-    // Optional date range on string field `date` (YYYY-MM-DD)
-    if (fromDate || toDate) {
-      whereClause.date = {} as any;
-      if (fromDate) (whereClause.date as any).gte = fromDate;
-      if (toDate) (whereClause.date as any).lte = toDate;
-    }
-    const evald = await evaluatePermissions(currentUserId, currentUserRole);
-    if (shouldRestrictToOwnReservations(evald) && currentUserId) {
-      whereClause.userId = currentUserId;
-    }
 
+    // Transfer rezervasyonlarını getir
     const reservations = await prisma.reservation.findMany({
       where: whereClause,
       orderBy: [
@@ -106,12 +111,18 @@ export async function GET(request: NextRequest) {
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {
-        driver: true,
+        driver: {
+          select: {
+            id: true,
+            name: true,
+            phoneNumber: true
+          }
+        },
         user: {
           select: {
             id: true,
-            username: true,
-            name: true
+            name: true,
+            username: true
           }
         },
         tenant: {
@@ -123,40 +134,112 @@ export async function GET(request: NextRequest) {
         }
       }
     });
+
     console.log('API: Bulunan rezervasyon sayısı:', reservations.length);
-    
-    // Debug: Tenant ID'lerini kontrol et
-    const tenantIds = [...new Set(reservations.map(r => r.tenantId))];
-    console.log('API: Rezervasyonlardaki tenant ID\'leri:', tenantIds);
-    
-    // Debug: Her tenant için rezervasyon sayısı
-    const tenantCounts: Record<string, number> = {};
-    reservations.forEach(r => {
-      if (r.tenantId) {
-        tenantCounts[r.tenantId] = (tenantCounts[r.tenantId] || 0) + 1;
-      }
-    });
-    console.log('API: Tenant başına rezervasyon sayıları:', tenantCounts);
 
-    // Her rezervasyon için yolcu isimlerini parse et
+    // Rezervasyonları parse et
     const parsedReservations = reservations.map(reservation => {
-      try {
-        return {
-          ...reservation,
-          passengerNames: JSON.parse(reservation.passengerNames || '[]'),
-          createdAt: reservation.createdAt.toISOString()
-        };
-      } catch (error) {
-        console.error('Yolcu isimleri parse hatası:', error);
-        return {
-          ...reservation,
-          passengerNames: [],
-          createdAt: reservation.createdAt.toISOString()
-        };
+      // Rezervasyon tipini belirle
+      let reservationType = 'Transfer';
+      
+      // Modül durumuna göre tip belirleme
+      if (moduleStatus.tour && reservation.from?.toLowerCase().includes('tur')) {
+        reservationType = 'Tur';
+      } else if (moduleStatus.accommodation && reservation.from?.toLowerCase().includes('otel')) {
+        reservationType = 'Konaklama';
       }
+      // Uçuş etiketi kaldırıldı - sadece Transfer, Tur ve Konaklama kullanılıyor
+      
+      return {
+        id: reservation.id,
+        voucherNumber: reservation.voucherNumber,
+        date: reservation.date,
+        time: reservation.time,
+        from: reservation.from,
+        to: reservation.to,
+        passengerNames: JSON.parse(reservation.passengerNames || '[]'),
+        price: reservation.price,
+        currency: reservation.currency,
+        paymentStatus: reservation.paymentStatus,
+        driverFee: reservation.driverFee,
+        user: reservation.user,
+        createdAt: reservation.createdAt.toISOString(),
+        companyCommissionStatus: reservation.companyCommissionStatus,
+        type: reservationType as const
+      };
     });
 
-    return NextResponse.json(parsedReservations);
+    // Tur rezervasyonlarını getir - sadece tur modülü aktifse
+    let tourBookings: any[] = [];
+    console.log('API: Tur modülü aktif mi?', moduleStatus.tour);
+    if (moduleStatus.tour) {
+      // Tur rezervasyonları için ayrı where clause
+      const tourWhereClause: any = {};
+      if (role !== 'SUPERUSER' && tenantIds && tenantIds.length > 0) {
+        tourWhereClause.tenantId = { in: tenantIds };
+      }
+      
+      // Tarih filtresi
+      if (dateFrom && dateTo) {
+        tourWhereClause.tourDate = {
+          gte: new Date(dateFrom),
+          lte: new Date(dateTo)
+        };
+      }
+      
+      // Durum filtresi
+      if (filter !== 'all') {
+        tourWhereClause.status = filter;
+      }
+
+      tourBookings = await prisma.tourBooking.findMany({
+        where: tourWhereClause,
+        orderBy: {
+          createdAt: 'desc'
+        },
+        include: {
+          tenant: {
+            select: {
+              id: true,
+              companyName: true,
+              subdomain: true
+            }
+          },
+          driver: {
+            select: {
+              id: true,
+              name: true,
+              phoneNumber: true
+            }
+          }
+        }
+      });
+      console.log('API: Bulunan tur rezervasyon sayısı:', tourBookings.length);
+    }
+
+    const parsedTourBookings = tourBookings.map(booking => ({
+      id: booking.id,
+      voucherNumber: booking.voucherNumber,
+      date: booking.tourDate.toISOString().split('T')[0],
+      time: booking.tourTime || '00:00',
+      from: booking.pickupLocation,
+      to: booking.routeName,
+      passengerNames: JSON.parse(booking.passengerNames || '[]'),
+      price: booking.price,
+      currency: booking.currency,
+      paymentStatus: booking.status,
+      driverFee: null,
+      user: null,
+      createdAt: booking.createdAt.toISOString(),
+      companyCommissionStatus: 'PENDING',
+      type: 'Tur' as const
+    }));
+
+    // Tüm rezervasyonları birleştir ve tarihe göre sırala
+    const allReservations = [...parsedReservations, ...parsedTourBookings]
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    return NextResponse.json(allReservations);
   } catch (error) {
     console.error('Rezervasyonları getirme hatası:', error);
     return NextResponse.json(
@@ -308,3 +391,4 @@ export async function POST(request: NextRequest) {
         );
     }
 } 
+
