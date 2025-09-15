@@ -165,7 +165,7 @@ export async function GET(request: NextRequest) {
         user: reservation.user,
         createdAt: reservation.createdAt.toISOString(),
         companyCommissionStatus: reservation.companyCommissionStatus,
-        type: reservationType as const
+        type: 'transfer' as const
       };
     });
 
@@ -259,13 +259,13 @@ export async function POST(request: NextRequest) {
         
         // Permission: require CREATE_RESERVATIONS unless SUPERUSER or customer reservation
         if (role !== 'SUPERUSER' && !isCustomerReservation) {
-          let allowed = role && (ROLE_PERMISSIONS as any)[role]?.includes(PERMISSIONS.CREATE_RESERVATIONS) ? true : false;
+          let allowed = false;
           if (currentUserId) {
             const perms = await prisma.userPermission.findMany({
               where: { userId: currentUserId, isActive: true },
               select: { permission: true }
             });
-            allowed = perms.some(p => p.permission === PERMISSIONS.CREATE_RESERVATIONS);
+            allowed = perms.some(p => p.permission === 'CREATE_RESERVATIONS');
           }
           if (!allowed) {
             return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 403 });

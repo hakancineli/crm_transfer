@@ -120,13 +120,13 @@ export default function NewTourReservationPage() {
       
       setFormData(prev => ({
         ...prev,
-        [name]: name === 'groupSize' ? parseInt(value) || 1 : value,
+        groupSize: newGroupSize,
         passengerNames: newPassengerNames
       }));
     } else {
       setFormData(prev => ({
         ...prev,
-        [name]: name === 'groupSize' ? parseInt(value) || 1 : value
+        [name]: value
       }));
     }
   };
