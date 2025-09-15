@@ -20,6 +20,7 @@ interface TourRoute {
   name: string;
   duration: number;
   price: number;
+  capacity?: number;
 }
 
 const VEHICLE_TYPES: VehicleType[] = [
@@ -30,12 +31,12 @@ const VEHICLE_TYPES: VehicleType[] = [
 ];
 
 const TOUR_ROUTES: TourRoute[] = [
-  { id: 'istanbul-city', name: 'İstanbul Şehir Turu', duration: 10, price: 150 },
-  { id: 'cappadocia', name: 'Kapadokya Turu', duration: 10, price: 300 },
-  { id: 'trabzon', name: 'Trabzon Turu', duration: 10, price: 250 },
-  { id: 'sapanca', name: 'Sapanca Turu', duration: 10, price: 200 },
-  { id: 'abant', name: 'Abant Turu', duration: 10, price: 180 },
-  { id: 'bursa', name: 'Bursa Turu', duration: 10, price: 220 },
+  { id: 'istanbul-city', name: 'İstanbul Şehir Turu', duration: 10, price: 150, capacity: 16 },
+  { id: 'cappadocia', name: 'Kapadokya Turu', duration: 10, price: 300, capacity: 16 },
+  { id: 'trabzon', name: 'Trabzon Turu', duration: 10, price: 250, capacity: 16 },
+  { id: 'sapanca', name: 'Sapanca Turu', duration: 10, price: 200, capacity: 16 },
+  { id: 'abant', name: 'Abant Turu', duration: 10, price: 180, capacity: 16 },
+  { id: 'bursa', name: 'Bursa Turu', duration: 10, price: 220, capacity: 16 },
 ];
 
 export default function NewTourReservationPage() {
