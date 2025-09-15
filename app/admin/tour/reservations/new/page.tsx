@@ -106,7 +106,7 @@ export default function NewTourReservationPage() {
       const newGroupSize = parseInt(value) || 1;
       const currentPassengerNames = formData.passengerNames;
       
-      let newPassengerNames;
+      let newPassengerNames: string[];
       if (newGroupSize > currentPassengerNames.length) {
         // Daha fazla kişi eklendi, boş isimler ekle
         newPassengerNames = [...currentPassengerNames, ...Array(newGroupSize - currentPassengerNames.length).fill('')];
