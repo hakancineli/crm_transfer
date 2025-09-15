@@ -126,7 +126,7 @@ export default function NewTourReservationPage() {
     } else {
       setFormData(prev => ({
         ...prev,
-        [name]: value
+        [name]: name === 'groupSize' ? parseInt(value) || 1 : value
       }));
     }
   };
