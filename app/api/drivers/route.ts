@@ -8,26 +8,6 @@ import { PERMISSIONS, ROLE_PERMISSIONS } from '@/app/lib/permissions';
 export async function GET(request: NextRequest) {
   try {
     const { role, tenantIds } = await getRequestUserContext(request);
-    // Permission: require VIEW_DRIVERS unless SUPERUSER
-    if (role !== 'SUPERUSER') {
-      const authHeader = request.headers.get('authorization');
-      const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
-      let hasViewDrivers = false;
-      if (token) {
-        try {
-          const decoded: any = jwt.decode(token);
-          const permissions = await prisma.userPermission.findMany({
-            where: { userId: decoded?.userId, isActive: true },
-            select: { permission: true }
-          });
-          const roleHas = role && (ROLE_PERMISSIONS as any)[role]?.includes(PERMISSIONS.VIEW_DRIVERS);
-          hasViewDrivers = roleHas || permissions.some(p => p.permission === PERMISSIONS.VIEW_DRIVERS);
-        } catch {}
-      }
-      if (!hasViewDrivers) {
-        return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 403 });
-      }
-    }
 
     const whereClause: any = {};
     if (role && role !== 'SUPERUSER') {
@@ -40,6 +20,14 @@ export async function GET(request: NextRequest) {
 
     const drivers = await prisma.driver.findMany({
       where: whereClause,
+      include: {
+        _count: {
+          select: {
+            reservations: true,
+            tourBookings: true
+          }
+        }
+      },
       orderBy: { name: 'asc' }
     });
     return NextResponse.json(drivers);

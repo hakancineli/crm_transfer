@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
 import { getRequestUserContext } from '@/app/lib/requestContext';
+import { ensureTenantId, assertModuleEnabled, loadActiveUserPermissions, assertPermission, getModuleManageChecker } from '@/app/lib/moduleAccess';
 
 export async function GET(
   request: NextRequest,
@@ -69,6 +70,10 @@ export async function PUT(
     const { userId, role, tenantIds } = await getRequestUserContext(request);
     const bookingId = params.id;
     const body = await request.json();
+    const tenantId = await ensureTenantId({ role, tenantIds });
+    await assertModuleEnabled({ role, tenantId, moduleName: 'tour' });
+    const perms = await loadActiveUserPermissions(userId);
+    assertPermission(role, perms, getModuleManageChecker('tour'));
 
     const {
       routeName,
@@ -81,14 +86,13 @@ export async function PUT(
       tourTime,
       passengerNames,
       notes,
-      status
+      status,
+      driverId,
+      driverFee
     } = body;
 
     // Build where clause based on user role
-    let whereClause: any = { id: bookingId };
-    if (role !== 'SUPERUSER' && tenantIds && tenantIds.length > 0) {
-      whereClause.tenantId = { in: tenantIds };
-    }
+    let whereClause: any = role === 'SUPERUSER' ? { id: bookingId } : { id: bookingId, tenantId };
 
     // Check if booking exists
     const existingBooking = await prisma.tourBooking.findFirst({
@@ -116,7 +120,9 @@ export async function PUT(
         tourTime: tourTime || existingBooking.tourTime,
         passengerNames: passengerNames ? JSON.stringify(passengerNames.filter((name: string) => name.trim() !== '')) : existingBooking.passengerNames,
         notes: notes !== undefined ? notes : existingBooking.notes,
-        status: status || existingBooking.status
+        status: status || existingBooking.status,
+        driverId: driverId !== undefined ? driverId : existingBooking.driverId,
+        driverFee: driverFee !== undefined ? parseFloat(driverFee) : existingBooking.driverFee
       },
       include: {
         tenant: {
@@ -161,12 +167,13 @@ export async function DELETE(
   try {
     const { userId, role, tenantIds } = await getRequestUserContext(request);
     const bookingId = params.id;
+    const tenantId = await ensureTenantId({ role, tenantIds });
+    await assertModuleEnabled({ role, tenantId, moduleName: 'tour' });
+    const perms = await loadActiveUserPermissions(userId);
+    assertPermission(role, perms, getModuleManageChecker('tour'));
 
     // Build where clause based on user role
-    let whereClause: any = { id: bookingId };
-    if (role !== 'SUPERUSER' && tenantIds && tenantIds.length > 0) {
-      whereClause.tenantId = { in: tenantIds };
-    }
+    let whereClause: any = role === 'SUPERUSER' ? { id: bookingId } : { id: bookingId, tenantId };
 
     // Check if booking exists
     const existingBooking = await prisma.tourBooking.findFirst({

@@ -253,7 +253,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         <span className="text-lg font-semibold text-gray-900">ProTransfer</span>
         <button
           onClick={onClose}
-          className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+          className="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
         >
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -410,7 +410,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
             </div>
             <a
               href="/admin-login"
-              className="w-full inline-block bg-blue-600 text-white text-sm font-medium px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              className="w-full inline-block bg-green-600 text-white text-sm font-medium px-3 py-2 rounded-lg hover:bg-green-700 transition-colors"
             >
               {isClient && emojisEnabled ? '🔑 ' : ''}Giriş Yap
             </a>

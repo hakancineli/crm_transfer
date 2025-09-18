@@ -1,21 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getRequestUserContext } from '@/app/lib/requestContext';
+import { ensureTenantId, assertModuleEnabled } from '@/app/lib/moduleAccess';
 import { FlightTracker } from '@/app/lib/flightTracker';
 
 export async function POST(request: NextRequest) {
   try {
+    // Guard: uçuş modülü
+    const { role, tenantIds } = await getRequestUserContext(request);
+    const tenantId = await ensureTenantId({ role, tenantIds });
+    await assertModuleEnabled({ role, tenantId, moduleName: 'flight' });
     // Tüm aktif rezervasyonları al (bugün ve gelecek)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
     const reservations = await prisma.reservation.findMany({
       where: {
-        date: {
-          gte: today.toISOString().split('T')[0]
-        },
-        flightCode: {
-          not: ""
-        }
+        date: { gte: today.toISOString().split('T')[0] },
+        flightCode: { not: "" },
+        ...(role === 'SUPERUSER' ? {} : { tenantId })
       },
       select: {
         id: true,

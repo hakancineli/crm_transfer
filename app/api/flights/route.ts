@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FlightTracker } from '@/app/lib/flightTracker';
+import { getRequestUserContext } from '@/app/lib/requestContext';
+import { ensureTenantId, assertModuleEnabled } from '@/app/lib/moduleAccess';
 
 export async function GET(request: NextRequest) {
   try {
+    // Guard: uçuş modülü
+    const { role, tenantIds } = await getRequestUserContext(request);
+    const tenantId = await ensureTenantId({ role, tenantIds });
+    await assertModuleEnabled({ role, tenantId, moduleName: 'flight' });
     const { searchParams } = new URL(request.url);
     const flightNumber = searchParams.get('flightNumber');
     const multiple = searchParams.get('multiple');
@@ -42,6 +48,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Guard: uçuş modülü
+    const { role, tenantIds } = await getRequestUserContext(request);
+    const tenantId = await ensureTenantId({ role, tenantIds });
+    await assertModuleEnabled({ role, tenantId, moduleName: 'flight' });
     const { flightNumbers } = await request.json();
     
     if (!Array.isArray(flightNumbers)) {

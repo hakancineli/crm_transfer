@@ -203,7 +203,12 @@ export default function TourReservationsPage() {
                   {bookings.map((booking) => (
                     <tr key={booking.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {booking.voucherNumber}
+                        <div className="font-mono text-xs px-2 py-1 rounded border inline-block whitespace-nowrap text-gray-700 bg-gray-100 border-gray-200">
+                          {booking.voucherNumber.startsWith('TUR-') 
+                            ? `TUR${new Date(booking.tourDate).toISOString().slice(2,10).replace(/-/g, '')}-${Math.floor(Math.random() * 9) + 1}`
+                            : booking.voucherNumber
+                          }
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {booking.routeName}

@@ -145,6 +145,37 @@ export class TenantService {
 
   static async toggleModule(tenantId: string, moduleId: string): Promise<boolean> {
     try {
+      // Helper: default permissions per module for AGENCY_ADMIN
+      const defaultPermsByModule: Record<string, string[]> = {
+        tour: [
+          'VIEW_TOUR_MODULE',
+          'MANAGE_TOUR_BOOKINGS',
+          'MANAGE_TOUR_ROUTES',
+          'MANAGE_TOUR_VEHICLES',
+          'VIEW_TOUR_REPORTS'
+        ],
+        transfer: [
+          'VIEW_ALL_RESERVATIONS',
+          'CREATE_RESERVATIONS',
+          'EDIT_RESERVATIONS',
+          'DELETE_RESERVATIONS',
+          'VIEW_DRIVERS',
+          'MANAGE_DRIVERS',
+          'ASSIGN_DRIVERS'
+        ],
+        accommodation: [
+          // Konaklama için temel yetkiler (gerekirse genişletilebilir)
+          'VIEW_TOUR_MODULE' // geçici placeholder; gerçek permissionlar eklendiğinde güncellenir
+        ],
+        flight: [
+          // Uçuş için görüntüleme yetkisi (gerekirse genişletilebilir)
+          'VIEW_REPORTS'
+        ]
+      };
+
+      const mod = await prisma.module.findUnique({ where: { id: moduleId } });
+      const moduleName = (mod?.name || '').toLowerCase();
+
       const existingModule = await prisma.tenantModule.findUnique({
         where: {
           tenantId_moduleId: {
@@ -156,7 +187,7 @@ export class TenantService {
 
       if (existingModule) {
         // Toggle existing module
-        await prisma.tenantModule.update({
+        const updated = await prisma.tenantModule.update({
           where: {
             tenantId_moduleId: {
               tenantId,
@@ -168,6 +199,21 @@ export class TenantService {
             activatedAt: !existingModule.isEnabled ? new Date() : existingModule.activatedAt
           }
         });
+        // If enabling now, grant default permissions to AGENCY_ADMIN users of this tenant
+        if (!existingModule.isEnabled && moduleName) {
+          const perms = defaultPermsByModule[moduleName] || [];
+          if (perms.length > 0) {
+            const adminLinks = await prisma.tenantUser.findMany({ where: { tenantId, role: 'AGENCY_ADMIN', isActive: true }, select: { userId: true } });
+            for (const { userId } of adminLinks) {
+              for (const permission of perms) {
+                // Upsert-like: try create; ignore if exists
+                try {
+                  await prisma.userPermission.create({ data: { userId, permission, isActive: true } });
+                } catch {}
+              }
+            }
+          }
+        }
       } else {
         // Create new module assignment
         await prisma.tenantModule.create({
@@ -178,6 +224,20 @@ export class TenantService {
             activatedAt: new Date()
           }
         });
+        // Grant default permissions to tenant admins on first enable
+        if (moduleName) {
+          const perms = defaultPermsByModule[moduleName] || [];
+          if (perms.length > 0) {
+            const adminLinks = await prisma.tenantUser.findMany({ where: { tenantId, role: 'AGENCY_ADMIN', isActive: true }, select: { userId: true } });
+            for (const { userId } of adminLinks) {
+              for (const permission of perms) {
+                try {
+                  await prisma.userPermission.create({ data: { userId, permission, isActive: true } });
+                } catch {}
+              }
+            }
+          }
+        }
       }
 
       return true;

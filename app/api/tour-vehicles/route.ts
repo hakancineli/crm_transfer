@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { ensureTenantId, assertModuleEnabled, loadActiveUserPermissions, assertPermission, getModuleManageChecker } from '@/app/lib/moduleAccess';
 import { getRequestUserContext } from '@/app/lib/requestContext';
 
 export async function GET(request: NextRequest) {
   try {
     const { userId, role, tenantIds } = await getRequestUserContext(request);
-    
+    const tenantId = await ensureTenantId({ role, tenantIds });
+    await assertModuleEnabled({ role, tenantId, moduleName: 'tour' });
     // Build where clause based on user role
-    let whereClause: any = {};
-    if (role !== 'SUPERUSER' && tenantIds && tenantIds.length > 0) {
-      whereClause.tenantId = { in: tenantIds };
-    }
+    let whereClause: any = role === 'SUPERUSER' ? {} : { tenantId: { in: [tenantId] } };
 
     const vehicles = await prisma.vehicle.findMany({
       where: whereClause,
@@ -50,26 +49,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Determine tenant ID
-    let currentTenantId: string | null = null;
-    
-    if (role === 'SUPERUSER') {
-      // For superuser, use first available tenant from database
-      const firstTenant = await prisma.tenant.findFirst({
-        select: { id: true }
-      });
-      currentTenantId = firstTenant?.id || null;
-    } else {
-      // For other roles, use their tenant
-      currentTenantId = tenantIds && tenantIds[0];
-    }
-
-    if (!currentTenantId) {
-      return NextResponse.json(
-        { error: 'Tenant ID gerekli' },
-        { status: 400 }
-      );
-    }
+    // Determine tenant and guard access
+    const currentTenantId = await ensureTenantId({ role, tenantIds });
+    await assertModuleEnabled({ role, tenantId: currentTenantId, moduleName: 'tour' });
+    const perms = await loadActiveUserPermissions(userId);
+    assertPermission(role, perms, getModuleManageChecker('tour'));
 
     const vehicle = await prisma.vehicle.create({
       data: {
@@ -103,22 +87,16 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const { userId, role, tenantIds } = await getRequestUserContext(request);
-    
-    // Only superuser can clear all vehicles
-    if (role !== 'SUPERUSER') {
-      return NextResponse.json(
-        { error: 'Bu işlem için yetkiniz yok' },
-        { status: 403 }
-      );
-    }
+    const tenantId = await ensureTenantId({ role, tenantIds });
+    await assertModuleEnabled({ role, tenantId, moduleName: 'tour' });
+    const perms = await loadActiveUserPermissions(userId);
+    assertPermission(role, perms, getModuleManageChecker('tour'));
 
-    // Delete all vehicles
-    const result = await prisma.vehicle.deleteMany({});
-    
-    return NextResponse.json({ 
-      message: `${result.count} araç silindi`,
-      deletedCount: result.count 
-    });
+    // Delete only tenant vehicles for non-superuser; SUPERUSER can delete all
+    const result = await prisma.vehicle.deleteMany(
+      role === 'SUPERUSER' ? {} : { where: { tenantId } as any }
+    );
+    return NextResponse.json({ message: `${result.count} araç silindi`, deletedCount: result.count });
   } catch (error) {
     console.error('Araçları temizleme hatası:', error);
     return NextResponse.json(

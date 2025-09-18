@@ -337,31 +337,54 @@ export default function UserPermissionsPage() {
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Yetki Ayarları</h2>
-        
-        <div className="space-y-4">
-          {Object.values(PERMISSIONS).map((permission) => {
-            const permissionInfo = getPermissionInfo(permission);
-            return (
-              <div key={permission} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div className="flex-1">
-                  <h3 className="font-medium text-gray-900">{permissionInfo.title}</h3>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {permissionInfo.description}
-                  </p>
+
+        {(() => {
+          const GROUPS: { title: string; keys: (keyof typeof PERMISSIONS)[] }[] = [
+            { title: 'Genel', keys: ['VIEW_DASHBOARD'] },
+            { title: 'Rezervasyon', keys: ['VIEW_OWN_SALES','VIEW_ALL_RESERVATIONS','CREATE_RESERVATIONS','EDIT_RESERVATIONS','DELETE_RESERVATIONS'] },
+            { title: 'Şoför', keys: ['VIEW_DRIVERS','MANAGE_DRIVERS','ASSIGN_DRIVERS'] },
+            { title: 'Rapor / Muhasebe', keys: ['VIEW_REPORTS','EXPORT_REPORTS','VIEW_ACCOUNTING'] },
+            { title: 'Kullanıcı / İzin / Aktivite', keys: ['MANAGE_USERS','MANAGE_PERMISSIONS','MANAGE_ACTIVITIES','VIEW_ACTIVITIES'] },
+            { title: 'Sistem', keys: ['SYSTEM_SETTINGS','BACKUP_RESTORE','AUDIT_LOGS'] },
+            { title: 'Müşteri', keys: ['MANAGE_CUSTOMERS','VIEW_CUSTOMER_DATA'] },
+            { title: 'Finansal', keys: ['MANAGE_PAYMENTS','VIEW_FINANCIAL_DATA','MANAGE_COMMISSIONS'] },
+            { title: 'Performans', keys: ['VIEW_PERFORMANCE','MANAGE_PERFORMANCE'] },
+            { title: 'Tur Modülü', keys: ['VIEW_TOUR_MODULE','MANAGE_TOUR_BOOKINGS','MANAGE_TOUR_ROUTES','MANAGE_TOUR_VEHICLES','VIEW_TOUR_REPORTS'] }
+          ];
+
+          return (
+            <div className="space-y-8">
+              {GROUPS.map(group => (
+                <div key={group.title}>
+                  <h3 className="text-base font-semibold text-gray-900 mb-3">{group.title}</h3>
+                  <div className="space-y-3">
+                    {group.keys.map((k) => {
+                      const permission = PERMISSIONS[k];
+                      const permissionInfo = getPermissionInfo(permission);
+                      return (
+                        <div key={permission} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                          <div className="flex-1">
+                            <h4 className="font-medium text-gray-900">{permissionInfo.title}</h4>
+                            <p className="text-sm text-gray-600 mt-1">{permissionInfo.description}</p>
+                          </div>
+                          <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={permissions[permission] || false}
+                              onChange={(e) => handlePermissionChange(permission, e.target.checked)}
+                              className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                          </label>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={permissions[permission] || false}
-                    onChange={(e) => handlePermissionChange(permission, e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
-              </div>
-            );
-          })}
-        </div>
+              ))}
+            </div>
+          );
+        })()}
       </div>
 
       <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">

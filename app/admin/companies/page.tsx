@@ -11,7 +11,7 @@ interface Tenant {
   isActive: boolean;
   subscriptionPlan: string;
   createdAt: string;
-  _count: {
+  _count?: {
     users: number;
   };
 }
@@ -73,7 +73,8 @@ export default function CompaniesPage() {
   const fetchTenants = async () => {
     try {
       const token = localStorage.getItem('token');
-      const url = new URL('/api/tenants', window.location.origin).toString();
+      // Modül yönetimi ile aynı kaynağı kullan: /api/admin/modules
+      const url = new URL('/api/admin/modules', window.location.origin).toString();
       const response = await fetch(url, {
         headers: {
           'Authorization': token ? `Bearer ${token}` : ''
@@ -81,7 +82,8 @@ export default function CompaniesPage() {
       });
       if (response.ok) {
         const data = await response.json();
-        setTenants(data);
+        // { success: true, data: { tenants, modules } }
+        setTenants(data?.data?.tenants || []);
       } else if (response.status === 401 || response.status === 403) {
         // Token geçersiz, login sayfasına yönlendir
         localStorage.removeItem('token');
@@ -307,7 +309,7 @@ export default function CompaniesPage() {
                     </div>
                     <p className="text-sm text-gray-500">{tenant.subdomain}</p>
                     <p className="text-xs text-gray-400">
-                      {tenant._count.users} kullanıcı • {tenant.subscriptionPlan}
+                      {(tenant._count?.users ?? 0)} kullanıcı • {tenant.subscriptionPlan}
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">

@@ -22,6 +22,12 @@ interface TourBooking {
   notes: string;
   status: string;
   createdAt: string;
+  driverId?: string;
+  driver?: {
+    id: string;
+    name: string;
+    phoneNumber?: string;
+  };
 }
 
 const VEHICLE_TYPES = [
@@ -65,6 +71,8 @@ export default function EditTourReservationPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [drivers, setDrivers] = useState<any[]>([]);
+  const [driversLoading, setDriversLoading] = useState(false);
 
   useEffect(() => {
     // Check if user has permission to view tour module
@@ -81,6 +89,7 @@ export default function EditTourReservationPage() {
   useEffect(() => {
     if (bookingId) {
       fetchBooking();
+      fetchDrivers();
     }
   }, [bookingId]);
 
@@ -111,6 +120,21 @@ export default function EditTourReservationPage() {
       setError('Tur rezervasyonu getirilemedi');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDrivers = async () => {
+    try {
+      setDriversLoading(true);
+      const response = await apiGet('/api/drivers');
+      if (response.ok) {
+        const data = await response.json();
+        setDrivers(data.drivers || data);
+      }
+    } catch (error) {
+      console.error('Şoförler getirme hatası:', error);
+    } finally {
+      setDriversLoading(false);
     }
   };
 
@@ -387,6 +411,7 @@ export default function EditTourReservationPage() {
                   <option value="COMPLETED">Tamamlandı</option>
                 </select>
               </div>
+
             </div>
 
             <div>

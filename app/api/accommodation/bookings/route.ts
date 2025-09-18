@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
+import { ensureTenantId, assertModuleEnabled } from '@/app/lib/moduleAccess';
 
 // Tüm konaklama rezervasyonlarını getir
 export async function GET(request: NextRequest) {
@@ -86,11 +87,16 @@ export async function POST(request: NextRequest) {
       voucherNumber
     } = body;
 
+    // Determine tenant and guard module
+    const { role, tenantIds } = await (await import('@/app/lib/requestContext')).getRequestUserContext(request);
+    const tenantId = await ensureTenantId({ role, tenantIds, bodyTenantId: body.tenantId });
+    await assertModuleEnabled({ role, tenantId, moduleName: 'accommodation' });
+
     // Rezervasyon oluştur
     const booking = await prisma.hotelBooking.create({
       data: {
         hotelId,
-        tenantId: 'demo', // Geçici olarak demo tenant
+        tenantId,
         hotelName: 'Hotel', // Geçici
         hotelAddress: 'Address', // Geçici
         roomType: roomTypeId || 'Standard Room',

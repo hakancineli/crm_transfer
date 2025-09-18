@@ -22,13 +22,13 @@ model Tenant {
   activities           Activity[]
   reservations         Reservation[]
   drivers              Driver[]
-  vehicles             Vehicle[]
   hotelBookings        HotelBooking[]
   hotelPricePool       HotelPricePool[]
   hotelRequests        HotelRequest[]
   modules              TenantModule[]
   users                TenantUser[]
   tourBookings         TourBooking[]
+  vehicles             Vehicle[]
 
   @@map("tenants")
 }
@@ -112,6 +112,7 @@ model User {
   permissions   UserPermission[]
   hotelRequests HotelRequest[]
   tenantUsers   TenantUser[]
+  tour_bookings TourBooking[]
 }
 
 model UserPermission {
@@ -280,18 +281,18 @@ model HotelPricePool {
 }
 
 model Vehicle {
-  id             String    @id @default(uuid())
-  type           String
-  capacity       Int
-  licensePlate   String
-  driverName     String?
-  driverPhone    String?
-  isAvailable    Boolean   @default(true)
+  id              String    @id @default(uuid())
+  type            String
+  capacity        Int
+  licensePlate    String
+  driverName      String?
+  driverPhone     String?
+  isAvailable     Boolean   @default(true)
   lastMaintenance DateTime?
-  tenantId       String
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  tenant         Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId        String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  tenant          Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@map("vehicles")
 }
@@ -311,12 +312,14 @@ model TourBooking {
   notes          String?
   status         String   @default("PENDING")
   tenantId       String
+  userId         String?
   driverId       String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   tourDuration   Int      @default(1)
   driver         Driver?  @relation(fields: [driverId], references: [id])
   tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  User           User?    @relation(fields: [userId], references: [id])
 
   @@map("tour_bookings")
 }

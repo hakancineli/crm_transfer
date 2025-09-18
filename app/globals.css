@@ -5,6 +5,28 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* ProTransfer Renk Paleti */
+  --primary-green: #16a34a;
+  --primary-green-hover: #15803d;
+  --primary-green-light: #dcfce7;
+  --primary-green-dark: #166534;
+  
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+  --red-600: #dc2626;
+  --red-700: #b91c1c;
 }
 
 @theme inline {
@@ -29,6 +51,43 @@ body {
 
 body, html {
   overflow-x: hidden;
+}
+
+/* ProTransfer Özel Sınıfları */
+.btn-primary {
+  @apply bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors font-medium;
+}
+
+.btn-danger {
+  @apply bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium;
+}
+
+.card {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+}
+
+.text-primary {
+  @apply text-green-600;
+}
+
+.text-secondary {
+  @apply text-gray-600;
+}
+
+.bg-primary {
+  @apply bg-green-600;
+}
+
+.bg-primary-light {
+  @apply bg-green-50;
+}
+
+.border-primary {
+  @apply border-green-600;
 }
 
 @media print {

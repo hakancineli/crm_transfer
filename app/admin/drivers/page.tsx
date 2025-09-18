@@ -11,6 +11,10 @@ interface Driver {
   phoneNumber: string;
   createdAt: string;
   reservations?: any[];
+  _count?: {
+    reservations: number;
+    tourBookings: number;
+  };
 }
 
 export default function DriversPage() {
@@ -107,7 +111,7 @@ export default function DriversPage() {
             {canManageDrivers && (
               <button
                 onClick={() => setShowAddForm(true)}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium"
               >
                 ➕ Yeni Şoför Ekle
               </button>
@@ -184,7 +188,9 @@ export default function DriversPage() {
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Toplam Transfer:</span>
-                  <span className="font-medium">{driver.reservations?.length || 0}</span>
+                  <span className="font-medium">
+                    {(driver._count?.reservations || 0) + (driver._count?.tourBookings || 0)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Kayıt Tarihi:</span>
@@ -194,10 +200,10 @@ export default function DriversPage() {
                 </div>
               </div>
               
-              <div className="flex space-x-2">
+                <div className="flex space-x-2">
                 <Link
                   href={`/admin/drivers/${driver.id}`}
-                  className="flex-1 bg-blue-50 text-blue-700 py-2 px-3 rounded-lg text-center text-sm font-medium hover:bg-blue-100 transition-colors"
+                  className="flex-1 bg-green-50 text-green-700 py-2 px-3 rounded-lg text-center text-sm font-medium hover:bg-green-100 transition-colors"
                 >
                   Detaylar
                 </Link>
@@ -218,7 +224,7 @@ export default function DriversPage() {
             </p>
             <button
               onClick={() => setShowAddForm(true)}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium"
             >
               ➕ İlk Şoförü Ekle
             </button>

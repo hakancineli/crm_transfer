@@ -50,19 +50,17 @@ export async function GET(request: NextRequest) {
 
     // Tenant'ların modül ayarlarını al
     const tenantModules = await prisma.tenantModule.findMany({
-      where: {
-        tenantId: { in: tenantIds },
-        isEnabled: true
-      },
+      where: { tenantId: { in: tenantIds }, isEnabled: true },
       select: {
         moduleId: true,
-        isEnabled: true
+        isEnabled: true,
+        module: { select: { name: true } }
       }
     });
 
     return NextResponse.json({
       success: true,
-      tenantModules: tenantModules
+      tenantModules
     });
 
   } catch (error) {

@@ -64,6 +64,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
         isOpen: boolean;
         reservation: any;
     }>({ isOpen: false, reservation: null });
+    const [activeFilter, setActiveFilter] = useState<string>('all');
 
     // Sayfalama ve tarih filtreleri
     const [page, setPage] = useState(1);
@@ -277,6 +278,28 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                     return reservationDate >= today && reservationDate < nextWeek;
                 });
                 break;
+            case 'karsilama':
+                filtered = filtered.filter(r => 
+                    (r.type !== 'tur' && !r.voucherNumber.startsWith('TUR-')) && // Tur rezervasyonlarını hariç tut
+                    (r.from.includes('IST') || r.from.includes('SAW'))
+                );
+                break;
+            case 'cikis':
+                filtered = filtered.filter(r => 
+                    (r.type !== 'tur' && !r.voucherNumber.startsWith('TUR-')) && // Tur rezervasyonlarını hariç tut
+                    (r.to.includes('IST') || r.to.includes('SAW'))
+                );
+                break;
+            case 'araTransfer':
+                filtered = filtered.filter(r => 
+                    r.type !== 'tur' && !r.voucherNumber.startsWith('TUR-') && // Tur rezervasyonlarını hariç tut
+                    !r.from.includes('IST') && !r.from.includes('SAW') && 
+                    !r.to.includes('IST') && !r.to.includes('SAW')
+                );
+                break;
+            case 'tur':
+                filtered = filtered.filter(r => r.type === 'tur' || r.voucherNumber.startsWith('TUR-'));
+                break;
             default:
                 break;
         }
@@ -342,30 +365,79 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
     }
 
     // Transfer sayılarını hesapla
-    const karsilamaCount = filteredReservations.filter(r => r.from.includes('IST') || r.from.includes('SAW')).length;
-    const cikisCount = filteredReservations.filter(r => r.to.includes('IST') || r.to.includes('SAW')).length;
+    const karsilamaCount = filteredReservations.filter(r => 
+        (r.type !== 'tur' && !r.voucherNumber.startsWith('TUR-')) && 
+        (r.from.includes('IST') || r.from.includes('SAW'))
+    ).length;
+    const cikisCount = filteredReservations.filter(r => 
+        (r.type !== 'tur' && !r.voucherNumber.startsWith('TUR-')) && 
+        (r.to.includes('IST') || r.to.includes('SAW'))
+    ).length;
     const araTransferCount = filteredReservations.filter(r => 
+        r.type !== 'tur' && !r.voucherNumber.startsWith('TUR-') && // Tur rezervasyonlarını hariç tut
         (!r.from.includes('IST') && !r.from.includes('SAW')) && 
         (!r.to.includes('IST') && !r.to.includes('SAW'))
     ).length;
+    const turCount = filteredReservations.filter(r => r.type === 'tur' || r.voucherNumber.startsWith('TUR-')).length;
 
     return (<>
         <div className="w-full">
             {/* Transfer Özeti (sticky) */}
-            <div className="bg-white p-4 rounded-lg shadow mb-6 sticky top-4 z-50 border border-gray-200">
+            <div className="bg-white p-4 rounded-lg shadow mb-6 sticky top-4 z-10 border border-gray-200">
                 <div className="text-sm text-gray-600">
-                    <span className="font-medium">Toplam {filteredReservations.length} Transfer</span>
+                    <span className="font-medium">Toplam {filteredReservations.length} Rezervasyon</span>
                     {filteredReservations.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-3">
-                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800 border border-blue-200">
-                                {karsilamaCount} Karşılama
-                            </span>
-                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-orange-100 text-orange-800 border border-orange-200">
+        <button 
+            onClick={() => handleFilter('karsilama')}
+            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${
+                activeFilter === 'karsilama' 
+                    ? 'bg-green-600 text-white border-green-600' 
+                    : 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200'
+            }`}
+        >
+            {karsilamaCount} Karşılama
+        </button>
+                            <button 
+                                onClick={() => handleFilter('cikis')}
+                                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${
+                                    activeFilter === 'cikis' 
+                                        ? 'bg-orange-600 text-white border-orange-600' 
+                                        : 'bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200'
+                                }`}
+                            >
                                 {cikisCount} Çıkış
-                            </span>
-                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-800 border border-gray-200">
+                            </button>
+                            <button 
+                                onClick={() => handleFilter('araTransfer')}
+                                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${
+                                    activeFilter === 'araTransfer' 
+                                        ? 'bg-gray-600 text-white border-gray-600' 
+                                        : 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200'
+                                }`}
+                            >
                                 {araTransferCount} Ara Transfer
-                            </span>
+                            </button>
+        <button 
+            onClick={() => handleFilter('tur')}
+            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${
+                activeFilter === 'tur' 
+                    ? 'bg-blue-600 text-white border-blue-600' 
+                    : 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200'
+            }`}
+        >
+            {turCount} Tur
+        </button>
+                            <button 
+                                onClick={() => handleFilter('all')}
+                                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${
+                                    activeFilter === 'all' 
+                                        ? 'bg-green-600 text-white border-green-600' 
+                                        : 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200'
+                                }`}
+                            >
+                                Tümü
+                            </button>
                         </div>
                     )}
                 </div>
@@ -534,17 +606,20 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             className={`transition-all duration-200 cursor-pointer ${
                                                 isUrgent ? 'bg-red-50 hover:bg-red-100 border-l-4 border-red-500' : 'hover:bg-gray-50 hover:shadow-sm'
                                             }`}>
-                                            <td className="px-6 py-4 text-sm font-bold text-purple-700 align-middle">
-                                                <div className="text-purple-700 font-mono text-xs bg-purple-50 px-2 py-1 rounded border border-purple-200 inline-block">
-                                                    {reservation.voucherNumber}
+                                            <td className="px-6 py-4 text-sm font-bold align-middle">
+                                                <div className="font-mono text-xs px-2 py-1 rounded border inline-block whitespace-nowrap text-gray-700 bg-gray-100 border-gray-200">
+                                                    {reservation.voucherNumber.startsWith('TUR-') 
+                                                        ? `TUR${new Date(reservation.date).toISOString().slice(2,10).replace(/-/g, '')}-${Math.floor(Math.random() * 9) + 1}`
+                                                        : reservation.voucherNumber
+                                                    }
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-900 align-middle">
                                                 <div className="flex flex-col gap-2">
                                                     <span className={`inline-flex items-center justify-center px-4 py-2 rounded-full text-xs font-semibold min-w-[80px] ${
-                                                        reservation.type === 'Tur' 
-                                                            ? 'bg-green-100 text-green-800 border border-green-200'
-                                                            : reservation.type === 'Konaklama'
+                                                        reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')
+                                                            ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                                                            : reservation.type === 'Konaklama' || reservation.voucherNumber.startsWith('HOTEL-')
                                                                 ? 'bg-purple-100 text-purple-800 border border-purple-200'
                                                                 : reservation.from.includes('IST') || reservation.from.includes('SAW') 
                                                                     ? 'bg-green-100 text-green-800 border border-green-200' 
@@ -552,9 +627,9 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                                         ? 'bg-orange-100 text-orange-800 border border-orange-200'
                                                                         : 'bg-gray-100 text-gray-800 border border-gray-200'
                                                     }`}>
-                                                        {reservation.type === 'Tur' 
+                                                        {reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')
                                                             ? 'Tur'
-                                                            : reservation.type === 'Konaklama'
+                                                            : reservation.type === 'Konaklama' || reservation.voucherNumber.startsWith('HOTEL-')
                                                                 ? 'Konaklama'
                                                                 : reservation.from.includes('IST') || reservation.from.includes('SAW') 
                                                                     ? 'Karşılama'
@@ -724,7 +799,13 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     {!reservation.driver ? (
                                                         <div className="flex space-x-1">
                                                             <button
-                                                                onClick={() => window.location.href = `/admin/reservations/${reservation.voucherNumber}?edit=driver`}
+                                                                onClick={() => {
+                                                                    if (reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')) {
+                                                                        window.location.href = `/admin/tour/reservations/${reservation.id}/driver-assign`;
+                                                                    } else {
+                                                                        window.location.href = `/admin/reservations/${reservation.voucherNumber}?edit=driver`;
+                                                                    }
+                                                                }}
                                                                 className="inline-flex items-center px-3 py-2 border border-transparent text-xs font-semibold rounded-lg text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 shadow-sm transition-colors"
                                                             >
                                                                 Şoför Ata
@@ -987,7 +1068,13 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                     {!reservation.driver ? (
                                         <>
                                             <button
-                                                onClick={() => window.location.href = `/admin/reservations/${reservation.voucherNumber}?edit=driver`}
+                                                onClick={() => {
+                                                    if (reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')) {
+                                                        window.location.href = `/admin/tour/reservations/${reservation.id}/driver-assign`;
+                                                    } else {
+                                                        window.location.href = `/admin/reservations/${reservation.voucherNumber}?edit=driver`;
+                                                    }
+                                                }}
                                                 className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded text-white bg-purple-600 hover:bg-purple-700"
                                             >
                                                 Şoför Ata
