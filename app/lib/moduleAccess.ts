@@ -1,7 +1,7 @@
 import { prisma } from '@/app/lib/prisma';
 import { canManageTourBookings, canManageTourRoutes, canManageTourVehicles, canViewTourModule } from '@/app/lib/permissions';
 
-export async function ensureTenantId(params: { role: string; tenantIds?: string[] | null; bodyTenantId?: string; }): Promise<string> {
+export async function ensureTenantId(params: { role: string | null; tenantIds?: string[] | null; bodyTenantId?: string; }): Promise<string> {
   const { role, tenantIds, bodyTenantId } = params;
   if (role === 'SUPERUSER') {
     if (bodyTenantId) return bodyTenantId;
@@ -13,7 +13,7 @@ export async function ensureTenantId(params: { role: string; tenantIds?: string[
   throw new Error('NO_TENANT');
 }
 
-export async function assertModuleEnabled(params: { role: string; tenantId: string; moduleName: 'tour' | 'transfer' | 'accommodation' | 'flight'; }): Promise<void> {
+export async function assertModuleEnabled(params: { role: string | null; tenantId: string; moduleName: 'tour' | 'transfer' | 'accommodation' | 'flight'; }): Promise<void> {
   const { role, tenantId, moduleName } = params;
   if (role === 'SUPERUSER') return; // SUPERUSER tüm modüllere erişir
   const mod = await prisma.module.findUnique({ where: { name: moduleName } });
@@ -27,9 +27,9 @@ export async function loadActiveUserPermissions(userId: string | null | undefine
   return prisma.userPermission.findMany({ where: { userId, isActive: true }, select: { permission: true, isActive: true } });
 }
 
-export function assertPermission(role: string, userPerms: { permission: string; isActive: boolean }[], checker: (role: string, userPerms?: any[]) => boolean) {
+export function assertPermission(role: string | null, userPerms: { permission: string; isActive: boolean }[], checker: (role: string, userPerms?: any[]) => boolean) {
   if (role === 'SUPERUSER') return; // her şeye yetkili
-  const ok = checker(role, userPerms);
+  const ok = checker(role || '', userPerms);
   if (!ok) throw new Error('FORBIDDEN');
 }
 

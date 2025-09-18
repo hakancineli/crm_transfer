@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/app/lib/prisma';
 import jwt from 'jsonwebtoken';
 
 export async function GET(request: NextRequest) {
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    const tenantIds = tenantUsers.map(tu => tu.tenantId);
+    const tenantIds = tenantUsers.map((tu: any) => tu.tenantId);
 
     if (tenantIds.length === 0) {
       return NextResponse.json({

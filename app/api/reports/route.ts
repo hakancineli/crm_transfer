@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/app/lib/prisma';
 import { Reservation } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
                         where: { userId: decoded.userId, isActive: true },
                         select: { tenantId: true }
                     });
-                    currentTenantIds = links.map(l => l.tenantId);
+                    currentTenantIds = links.map((l: any) => l.tenantId);
                 }
             } catch (_) {}
         }
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
         }, {});
 
         const popularRoutes = Object.entries(routeCounts)
-            .map(([route, count]) => ({ route, count }))
+            .map(([route, count]) => ({ route, count: count as number }))
             .sort((a, b) => b.count - a.count)
             .slice(0, 10);
 
@@ -113,8 +113,8 @@ export async function POST(request: NextRequest) {
             totalRevenueTL,
             usdRate,
             totalTransfers: reservations.length,
-            paidTransfers: reservations.filter(r => r.paymentStatus === 'PAID').length,
-            unpaidTransfers: reservations.filter(r => r.paymentStatus === 'UNPAID').length,
+            paidTransfers: reservations.filter((r: any) => r.paymentStatus === 'PAID').length,
+            unpaidTransfers: reservations.filter((r: any) => r.paymentStatus === 'UNPAID').length,
             driverPayments,
             netIncome: totalRevenueTL - driverPayments,
             transfersByType,

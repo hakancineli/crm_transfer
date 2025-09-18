@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/app/lib/prisma';
 import jwt from 'jsonwebtoken';
 import { getRequestUserContext } from '@/app/lib/requestContext';
 import { PERMISSIONS, ROLE_PERMISSIONS } from '@/app/lib/permissions';
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
         where: { userId, isActive: true },
         select: { permission: true }
       });
-      allowed = perms.some(p => p.permission === PERMISSIONS.MANAGE_DRIVERS);
+      allowed = perms.some((p: any) => p.permission === PERMISSIONS.MANAGE_DRIVERS);
     }
     if (!allowed) {
       return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 403 });

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/app/lib/prisma';
 import { ensureTenantId, assertModuleEnabled, loadActiveUserPermissions, assertPermission, getModuleManageChecker } from '@/app/lib/moduleAccess';
 import { getRequestUserContext } from '@/app/lib/requestContext';
 
@@ -93,9 +93,8 @@ export async function DELETE(request: NextRequest) {
     assertPermission(role, perms, getModuleManageChecker('tour'));
 
     // Delete only tenant vehicles for non-superuser; SUPERUSER can delete all
-    const result = await prisma.vehicle.deleteMany(
-      role === 'SUPERUSER' ? {} : { where: { tenantId } as any }
-    );
+    const whereClause = role === 'SUPERUSER' ? {} : { tenantId };
+    const result = await prisma.vehicle.deleteMany({ where: whereClause });
     return NextResponse.json({ message: `${result.count} araç silindi`, deletedCount: result.count });
   } catch (error) {
     console.error('Araçları temizleme hatası:', error);

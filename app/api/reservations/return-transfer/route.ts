@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/app/lib/prisma';
 import { getRequestUserContext } from '@/app/lib/requestContext';
 
 
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
         // Find next number
         let nextNumber = 1;
         if (todayVouchers.length > 0) {
-            const numbers = todayVouchers.map(v => {
+            const numbers = todayVouchers.map((v: any) => {
                 const match = v.voucherNumber.match(/VIP\d+-(\d+)/);
                 return match ? parseInt(match[1]) : 0;
             });

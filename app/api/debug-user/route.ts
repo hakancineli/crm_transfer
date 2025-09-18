@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/app/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
       message: 'User debug info',
       users: users,
       totalUsers: users.length,
-      superusers: users.filter(u => u.role === 'SUPERUSER')
+      superusers: users.filter((u: any) => u.role === 'SUPERUSER')
     });
 
   } catch (error) {

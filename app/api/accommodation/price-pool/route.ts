@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/app/lib/prisma';
 import { BookingApiReal } from '@/app/lib/bookingApiReal';
 
 
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({
       success: true,
-      pricePool: pricePool.map(item => ({
+      pricePool: pricePool.map((item: any) => ({
         id: item.id,
         hotelId: item.hotelId,
         hotelName: item.hotelName,

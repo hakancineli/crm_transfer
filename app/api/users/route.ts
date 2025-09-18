@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/app/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { ActivityLogger } from '@/app/lib/activityLogger';
 import jwt from 'jsonwebtoken';
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
             where: { userId: decoded.userId, isActive: true },
             select: { tenantId: true }
           });
-          currentTenantIds = links.map(l => l.tenantId);
+          currentTenantIds = links.map((l: any) => l.tenantId);
         }
       } catch (_) {}
     }
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
             where: { userId: decoded.userId, isActive: true },
             select: { tenantId: true }
           });
-          currentTenantIds = links.map(l => l.tenantId);
+          currentTenantIds = links.map((l: any) => l.tenantId);
         }
       } catch (_) {}
     }
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
         where: { userId: currentUserId, isActive: true },
         select: { tenantId: true }
       });
-      await Promise.all(adminLinks.map(l =>
+      await Promise.all(adminLinks.map((l: any) =>
         prisma.tenantUser.upsert({
           where: { tenantId_userId: { tenantId: l.tenantId, userId: user.id } },
           update: { isActive: true },

@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/app/lib/prisma';
 import { PERMISSIONS, ROLE_PERMISSIONS } from '@/app/lib/permissions';
 
 export interface EvaluatedPermissions {
@@ -15,7 +15,7 @@ export async function evaluatePermissions(userId: string | null, role: string | 
       where: { userId, isActive: true },
       select: { permission: true }
     });
-    explicit = rows.map(r => r.permission);
+    explicit = rows.map((r: any) => r.permission);
   }
 
   const rolePerms: string[] = role ? ((ROLE_PERMISSIONS as any)[role] || []) : [];

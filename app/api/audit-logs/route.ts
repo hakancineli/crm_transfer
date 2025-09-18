@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/app/lib/prisma';
 import { getRequestUserContext } from '@/app/lib/requestContext';
 import { PERMISSIONS, ROLE_PERMISSIONS } from '@/app/lib/permissions';
 
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
         where: { userId: requesterId, isActive: true },
         select: { permission: true }
       });
-      hasExplicit = perms.some(p => p.permission === PERMISSIONS.AUDIT_LOGS);
+      hasExplicit = perms.some((p: any) => p.permission === PERMISSIONS.AUDIT_LOGS);
     }
     if (!(roleAllows || hasExplicit)) {
       return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 403 });

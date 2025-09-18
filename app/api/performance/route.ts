@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/app/lib/prisma';
 import jwt from 'jsonwebtoken';
 
 export async function GET(request: NextRequest) {
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
             where: { userId: decoded.userId, isActive: true },
             select: { tenantId: true }
           });
-          currentTenantIds = links.map(l => l.tenantId);
+          currentTenantIds = links.map((l: any) => l.tenantId);
         }
       } catch (_) {}
     }
@@ -89,57 +89,57 @@ export async function GET(request: NextRequest) {
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
     // Calculate performance for each user
-    const performance = users.map(user => {
+    const performance = users.map((user: any) => {
       const totalReservations = user.reservations.length;
       
       // Calculate transfer revenue
-      const transferRevenue = user.reservations.reduce((sum, res) => sum + res.price, 0);
+      const transferRevenue = user.reservations.reduce((sum: number, res: any) => sum + res.price, 0);
       
       // Calculate hotel revenue from reservations
-      const hotelRevenue = user.reservations.reduce((sum, res) => {
-        return sum + res.hotelBookings.reduce((hotelSum, booking) => hotelSum + booking.totalPrice, 0);
+      const hotelRevenue = user.reservations.reduce((sum: number, res: any) => {
+        return sum + res.hotelBookings.reduce((hotelSum: number, booking: any) => hotelSum + booking.totalPrice, 0);
       }, 0);
       
       const totalRevenue = transferRevenue + hotelRevenue;
       
-      const thisMonthReservations = user.reservations.filter(res => {
+      const thisMonthReservations = user.reservations.filter((res: any) => {
         const resDate = new Date(res.date);
         return resDate >= startOfMonth && resDate <= endOfMonth;
       }).length;
       
       const thisMonthTransferRevenue = user.reservations
-        .filter(res => {
+        .filter((res: any) => {
           const resDate = new Date(res.date);
           return resDate >= startOfMonth && resDate <= endOfMonth;
         })
-        .reduce((sum, res) => sum + res.price, 0);
+        .reduce((sum: number, res: any) => sum + res.price, 0);
         
       const thisMonthHotelRevenue = user.reservations
-        .filter(res => {
+        .filter((res: any) => {
           const resDate = new Date(res.date);
           return resDate >= startOfMonth && resDate <= endOfMonth;
         })
-        .reduce((sum, res) => {
-          return sum + res.hotelBookings.reduce((hotelSum, booking) => hotelSum + booking.totalPrice, 0);
+        .reduce((sum: number, res: any) => {
+          return sum + res.hotelBookings.reduce((hotelSum: number, booking: any) => hotelSum + booking.totalPrice, 0);
         }, 0);
         
       const thisMonthRevenue = thisMonthTransferRevenue + thisMonthHotelRevenue;
 
 
       // Calculate detailed sales metrics
-      const paidReservations = user.reservations.filter(res => res.paymentStatus === 'PAID');
-      const approvedReservations = user.reservations.filter(res => res.paymentStatus === 'APPROVED');
-      const pendingReservations = user.reservations.filter(res => res.paymentStatus === 'PENDING');
-      const unpaidReservations = user.reservations.filter(res => res.paymentStatus === 'UNPAID');
+      const paidReservations = user.reservations.filter((res: any) => res.paymentStatus === 'PAID');
+      const approvedReservations = user.reservations.filter((res: any) => res.paymentStatus === 'APPROVED');
+      const pendingReservations = user.reservations.filter((res: any) => res.paymentStatus === 'PENDING');
+      const unpaidReservations = user.reservations.filter((res: any) => res.paymentStatus === 'UNPAID');
       
       const salesRevenue = [...paidReservations, ...approvedReservations]
-        .reduce((sum, res) => sum + res.price, 0);
+        .reduce((sum: number, res: any) => sum + res.price, 0);
       
       const pendingRevenue = pendingReservations
-        .reduce((sum, res) => sum + res.price, 0);
+        .reduce((sum: number, res: any) => sum + res.price, 0);
       
       const unpaidRevenue = unpaidReservations
-        .reduce((sum, res) => sum + res.price, 0);
+        .reduce((sum: number, res: any) => sum + res.price, 0);
 
       // Count different types of sales
       const totalSalesCount = paidReservations.length + approvedReservations.length;
@@ -151,7 +151,7 @@ export async function GET(request: NextRequest) {
       const hotelCommissionRate = 0.15; // 15% commission for hotels
       
       // Calculate driver fees (from reservations)
-      const totalDriverFees = user.reservations.reduce((sum, res) => sum + (res.driverFee || 0), 0);
+      const totalDriverFees = user.reservations.reduce((sum: number, res: any) => sum + (res.driverFee || 0), 0);
       
       // Calculate transfer commissions
       const transferCommission = transferRevenue * transferCommissionRate;
@@ -165,11 +165,11 @@ export async function GET(request: NextRequest) {
       const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
       
       // Calculate hotel bookings count
-      const totalHotelBookings = user.reservations.reduce((sum, res) => sum + res.hotelBookings.length, 0);
+      const totalHotelBookings = user.reservations.reduce((sum: number, res: any) => sum + res.hotelBookings.length, 0);
 
       // Get last activity (most recent reservation date)
       const lastActivity = user.reservations.length > 0 
-        ? user.reservations.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0].date
+        ? user.reservations.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())[0].date
         : user.createdAt.toISOString();
 
       return {
@@ -213,14 +213,14 @@ export async function GET(request: NextRequest) {
 
     // Calculate overall statistics
     const totalUsers = users.length;
-    const activeUsers = users.filter(user => user.isActive).length;
-    const totalReservations = users.reduce((sum, user) => sum + user.reservations.length, 0);
-    const totalRevenue = users.reduce((sum, user) => 
-      sum + user.reservations.reduce((userSum, res) => userSum + res.price, 0), 0
+    const activeUsers = users.filter((user: any) => user.isActive).length;
+    const totalReservations = users.reduce((sum: number, user: any) => sum + user.reservations.length, 0);
+    const totalRevenue = users.reduce((sum: number, user: any) => 
+      sum + user.reservations.reduce((userSum: number, res: any) => userSum + res.price, 0), 0
     );
 
     // Find top performer by revenue
-    const topPerformer = performance.reduce((top, current) => 
+    const topPerformer = performance.reduce((top: any, current: any) => 
       current.totalRevenue > top.totalRevenue ? current : top, performance[0] || null
     );
 

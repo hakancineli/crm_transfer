@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/app/lib/prisma';
 
 export async function GET(
   request: NextRequest,
@@ -28,7 +28,7 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      modules: tenant.modules.map(tm => ({
+      modules: tenant.modules.map((tm: any) => ({
         moduleId: tm.moduleId,
         isEnabled: tm.isEnabled,
         activatedAt: tm.activatedAt,

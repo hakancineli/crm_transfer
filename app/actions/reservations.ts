@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma'; // Prisma importu en üste eklenmeli
+import { prisma } from '@/app/lib/prisma'; // Prisma importu en üste eklenmeli
 
 export async function getReservation(voucherNumber: string) {
     try {
