@@ -99,3 +99,40 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    console.log('API: Yeni rezervasyon oluşturuluyor...', body);
+    
+    // Basit rezervasyon oluşturma
+    const reservation = await prisma.reservation.create({
+      data: {
+        date: body.date || new Date().toISOString().split('T')[0],
+        time: body.time || '12:00',
+        from: body.from || 'IST',
+        to: body.to || 'Merkez',
+        flightCode: body.flightCode || '',
+        passengerNames: JSON.stringify(body.passengerNames || ['Test Yolcu']),
+        luggageCount: body.luggageCount || 1,
+        price: body.price || 50.0,
+        currency: body.currency || 'USD',
+        phoneNumber: body.phoneNumber || '',
+        voucherNumber: body.voucherNumber || `VIP${new Date().toISOString().slice(2,10).replace(/-/g, '')}-${Math.floor(Math.random() * 1000)}`,
+        driverFee: body.driverFee || 0,
+        userId: body.userId || null,
+        paymentStatus: body.paymentStatus || 'PENDING',
+        isReturn: body.isReturn || false
+      }
+    });
+    
+    console.log('API: Rezervasyon oluşturuldu:', reservation.id);
+    return NextResponse.json(reservation);
+  } catch (error) {
+    console.error('Rezervasyon oluşturma hatası:', error);
+    return NextResponse.json(
+      { error: 'Rezervasyon oluşturulamadı' },
+      { status: 500 }
+    );
+  }
+}
