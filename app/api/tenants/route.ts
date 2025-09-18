@@ -132,19 +132,56 @@ export async function POST(request: NextRequest) {
           }
         });
 
-        // Add permissions to User Permissions table
+        // Add all modules to tenant
+        const modules = await prisma.module.findMany({
+          where: { isActive: true },
+          select: { id: true, name: true }
+        });
+
+        for (const module of modules) {
+          await prisma.tenantModule.create({
+            data: {
+              tenantId: tenant.id,
+              moduleId: module.id,
+              isEnabled: true,
+              activatedAt: new Date()
+            }
+          });
+        }
+
+        // Add comprehensive permissions to User Permissions table
         const userPermissions = [
           'VIEW_DASHBOARD',
           'VIEW_OWN_SALES',
           'VIEW_ALL_RESERVATIONS',
-          'CREATE_RESERVATION',
-          'EDIT_RESERVATION',
-          'DELETE_RESERVATION',
+          'CREATE_RESERVATIONS',
+          'EDIT_RESERVATIONS',
+          'DELETE_RESERVATIONS',
+          'VIEW_DRIVERS',
+          'MANAGE_DRIVERS',
+          'ASSIGN_DRIVERS',
+          'VIEW_REPORTS',
+          'EXPORT_REPORTS',
+          'VIEW_ACCOUNTING',
+          'MANAGE_PAYMENTS',
+          'MANAGE_COMMISSIONS',
+          'MANAGE_CUSTOMERS',
+          'VIEW_CUSTOMER_DATA',
           'MANAGE_USERS',
           'MANAGE_PERMISSIONS',
-          'VIEW_REPORTS',
-          'MANAGE_ACTIVITIES',
-          'VIEW_ACCOUNTING'
+          'VIEW_ACTIVITIES',
+          'SYSTEM_SETTINGS',
+          'BACKUP_RESTORE',
+          'AUDIT_LOGS',
+          'VIEW_FINANCIAL_DATA',
+          'VIEW_PERFORMANCE',
+          'MANAGE_PERFORMANCE',
+          // Tur modülü izinleri
+          'VIEW_TOUR_MODULE',
+          'MANAGE_TOUR_BOOKINGS',
+          'MANAGE_TOUR_ROUTES',
+          'MANAGE_TOUR_VEHICLES',
+          'VIEW_TOUR_REPORTS'
         ];
 
         for (const permission of userPermissions) {
@@ -152,7 +189,8 @@ export async function POST(request: NextRequest) {
             data: {
               userId: adminUser.id,
               permission: permission,
-              isActive: true
+              isActive: true,
+              grantedAt: new Date()
             }
           });
         }
