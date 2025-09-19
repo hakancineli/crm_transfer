@@ -219,6 +219,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
     };
 
     const handleFilter = (filter: string) => {
+        console.log('handleFilter called with:', filter, 'user:', user, 'reservations count:', reservations.length);
         let filtered = [...reservations];
         
         // Apply permission-based filtering first (role-aware)
@@ -304,6 +305,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                 break;
         }
         
+        console.log('Final filtered count:', filtered.length, 'filtered reservations:', filtered.map(r => ({type: r.type, voucher: r.voucherNumber})));
         setFilteredReservations(filtered);
         onFilterChange(filter);
     };

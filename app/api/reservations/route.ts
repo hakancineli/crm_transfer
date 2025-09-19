@@ -5,9 +5,18 @@ export async function GET(request: NextRequest) {
   try {
     console.log('API: Rezervasyonlar getiriliyor...');
     
+    // URL parametrelerini al
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const pageSize = parseInt(searchParams.get('pageSize') || '50');
+    const offset = (page - 1) * pageSize;
+    
+    console.log(`API: Sayfa ${page}, Boyut ${pageSize}, Offset ${offset}`);
+    
     // Transfer rezervasyonlarını getir
     const reservations = await prisma.reservation.findMany({
-      take: 50,
+      take: pageSize,
+      skip: offset,
       include: {
         user: {
           select: {
@@ -28,7 +37,8 @@ export async function GET(request: NextRequest) {
 
     // Tur rezervasyonlarını getir
     const tourBookings = await prisma.tourBooking.findMany({
-      take: 50,
+      take: pageSize,
+      skip: offset,
       include: {
         User: {
           select: {
