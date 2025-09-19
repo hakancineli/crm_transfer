@@ -10,7 +10,10 @@
     "tenant:create": "ts-node scripts/tenant_create.ts",
     "test:tenant-scope": "node scripts/test_tenant_scope.js",
     "backup": "node scripts/backup-database.js",
-    "backup:local": "BACKUP_DIR=./local-backups node scripts/backup-database.js"
+    "backup:local": "BACKUP_DIR=./local-backups node scripts/backup-database.js",
+    "backup:mac": "./scripts/mac-daily-backup.sh",
+    "backup:setup-cron": "./scripts/setup-mac-cron.sh",
+    "backup:setup-launchagent": "./scripts/setup-mac-launchagent.sh"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.10",
