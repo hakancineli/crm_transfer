@@ -99,6 +99,7 @@ export async function GET(request: NextRequest) {
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     console.log('API: Toplam rezervasyon sayısı:', allResults.length);
+    console.log('API: Rezervasyon detayları:', allResults.map(r => ({ id: r.id, type: r.type, voucherNumber: r.voucherNumber })));
 
     return NextResponse.json(allResults);
   } catch (error) {
