@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "tenant:create": "ts-node scripts/tenant_create.ts",
-    "test:tenant-scope": "node scripts/test_tenant_scope.js"
+    "test:tenant-scope": "node scripts/test_tenant_scope.js",
+    "backup": "node scripts/backup-database.js",
+    "backup:local": "BACKUP_DIR=./local-backups node scripts/backup-database.js"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.10",
