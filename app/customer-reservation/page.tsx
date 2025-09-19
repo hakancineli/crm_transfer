@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
+import { useGoogleMaps } from '@/app/hooks/useGoogleMaps';
 
 type Currency = 'TRY' | 'USD' | 'EUR';
 
@@ -32,60 +33,23 @@ export default function CustomerReservationPage() {
   const fromDebounceRef = useRef<number | undefined>(undefined);
   const toDebounceRef = useRef<number | undefined>(undefined);
 
-  // Load Google Maps JS Places and attach Autocomplete
+  // Google Maps API hook kullan
+  const { isLoaded: googleReady, isLoading: googleLoading, error: googleError } = useGoogleMaps();
+  
+  // Debug bilgilerini güncelle
   useEffect(() => {
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || process.env.GOOGLE_MAPS_API_KEY;
     const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : undefined;
     const enableDebug = params?.get('debug') === '1';
-    if (enableDebug) setDebug(prev => ({ ...prev, hasKey: Boolean(apiKey) }));
-    if (!apiKey) return; // avoid client crash if key missing
-
-    function initAutocomplete() {
-      if (typeof window === 'undefined' || !(window as any).google?.maps?.places) {
-        if (enableDebug) setDebug(prev => ({ ...prev, googleReady: false }));
-        return;
-      }
-      if (enableDebug) setDebug(prev => ({ ...prev, googleReady: true }));
-
-      // Avoid direct typing against global `google` namespace during SSR
-      const options: any = {
-        fields: ['formatted_address', 'geometry', 'name'],
-        componentRestrictions: { country: ['tr'] },
-        types: ['geocode']
-      };
-
-      // We intentionally skip binding native Autocomplete to avoid any browser autofill/IME conflicts.
-      // Fallback prediction dropdown below is used instead.
+    if (enableDebug) {
+      setDebug(prev => ({ 
+        ...prev, 
+        hasKey: Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY),
+        script: !googleLoading,
+        googleReady: googleReady,
+        lastStatus: googleError || 'OK'
+      }));
     }
-
-    const scriptId = 'gmaps-places-script';
-    if (document.getElementById(scriptId)) {
-      if (enableDebug) setDebug(prev => ({ ...prev, script: true }));
-      initAutocomplete();
-      return;
-    }
-    const s = document.createElement('script');
-    s.id = scriptId;
-    s.async = true;
-    s.defer = true;
-    s.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=tr`;
-    s.onload = () => {
-      initAutocomplete();
-      // retry a few times in case widget couldn't bind instantly
-      let attempts = 0;
-      const i = window.setInterval(() => {
-        attempts += 1;
-        initAutocomplete();
-        if (attempts > 5) window.clearInterval(i);
-      }, 500);
-    };
-    s.onerror = () => {
-      if (enableDebug) setDebug(prev => ({ ...prev, script: false }));
-      console.error('Google Maps script failed to load');
-    };
-    document.head.appendChild(s);
-    if (enableDebug) setDebug(prev => ({ ...prev, script: true }));
-  }, []);
+  }, [googleReady, googleLoading, googleError]);
 
   // Fallback: manual predictions via AutocompleteService
   const requestPredictions = (value: string, which: 'from' | 'to') => {

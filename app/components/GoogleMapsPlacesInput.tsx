@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useGoogleMaps } from '@/app/hooks/useGoogleMaps';
 
 interface GoogleMapsPlacesInputProps {
   value: string;
@@ -20,58 +21,7 @@ export default function GoogleMapsPlacesInput({
   const inputRef = useRef<HTMLInputElement>(null);
   const [predictions, setPredictions] = useState<Array<{ description: string }>>([]);
   const [showPredictions, setShowPredictions] = useState(false);
-  const [googleReady, setGoogleReady] = useState(false);
-
-  // Google Maps API'nin yüklenip yüklenmediğini kontrol et
-  useEffect(() => {
-    const checkGoogleMaps = () => {
-      const g = (window as any).google;
-      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || process.env.GOOGLE_MAPS_API_KEY;
-      
-      console.log('Checking Google Maps API:', {
-        google: !!g,
-        maps: !!g?.maps,
-        places: !!g?.maps?.places,
-        autocompleteService: !!g?.maps?.places?.AutocompleteService,
-        apiKey: apiKey ? (apiKey === 'your_google_maps_api_key_here' ? 'INVALID' : 'VALID') : 'MISSING'
-      });
-      
-      // API key geçersizse veya yoksa fallback kullan
-      if (!apiKey || apiKey === 'your_google_maps_api_key_here') {
-        console.log('❌ Invalid API key, using fallback mode');
-        setGoogleReady(false);
-        return false;
-      }
-      
-      if (g?.maps?.places?.AutocompleteService) {
-        setGoogleReady(true);
-        console.log('✅ Google Maps API is ready!');
-        return true;
-      }
-      return false;
-    };
-
-    // Hemen kontrol et
-    if (checkGoogleMaps()) return;
-
-    // Eğer henüz yüklenmemişse, kısa aralıklarla kontrol et
-    const interval = setInterval(() => {
-      if (checkGoogleMaps()) {
-        clearInterval(interval);
-      }
-    }, 500);
-
-    // 10 saniye sonra timeout
-    const timeout = setTimeout(() => {
-      clearInterval(interval);
-      console.warn('❌ Google Maps API did not load within 10 seconds, using fallback suggestions');
-    }, 10000);
-
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
-    };
-  }, []);
+  const { isLoaded: googleReady, isLoading, error } = useGoogleMaps();
 
   // Fallback adres önerileri (Google Maps API olmadan)
   const fallbackAddresses = [

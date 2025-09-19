@@ -1,38 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
 import ReservationForm from '@/app/components/ReservationForm';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { PERMISSIONS, ROLE_PERMISSIONS } from '@/app/lib/permissions';
+import { useGoogleMaps } from '@/app/hooks/useGoogleMaps';
 
 export default function AdminNewReservationPage() {
   const { user } = useAuth();
-  // Google Maps API'yi yükle
-  useEffect(() => {
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || process.env.GOOGLE_MAPS_API_KEY;
-    if (!apiKey || apiKey === 'your_google_maps_api_key_here') {
-      console.warn('Google Maps API key not found or invalid, using fallback mode');
-      return;
-    }
-
-    const scriptId = 'gmaps-places-script';
-    if (document.getElementById(scriptId)) {
-      return; // Script zaten yüklenmiş
-    }
-
-    const script = document.createElement('script');
-    script.id = scriptId;
-    script.async = true;
-    script.defer = true;
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=tr`;
-    script.onload = () => {
-      console.log('Google Maps API loaded successfully');
-    };
-    script.onerror = () => {
-      console.error('Google Maps script failed to load');
-    };
-    document.head.appendChild(script);
-  }, []);
+  const { isLoaded, isLoading, error } = useGoogleMaps();
 
   const canCreate =
     user?.role === 'SUPERUSER' ||
