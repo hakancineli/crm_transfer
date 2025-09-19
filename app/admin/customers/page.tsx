@@ -18,6 +18,8 @@ export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTenant, setSelectedTenant] = useState<string>('all');
+  const [tenants, setTenants] = useState<Array<{ id: string; companyName: string; subdomain: string }>>([]);
   
   const canViewCustomers =
     user?.role === 'SUPERUSER' ||
@@ -28,7 +30,7 @@ export default function CustomersPage() {
   useEffect(() => {
     if (!canViewCustomers) return;
     fetchCustomers();
-  }, [canViewCustomers]);
+  }, [canViewCustomers, selectedTenant]);
 
   const fetchCustomers = async () => {
     try {
@@ -39,10 +41,30 @@ export default function CustomersPage() {
       });
       const reservations = await response.json();
       
+      // SUPERUSER için acente listesini hazırla
+      if (user?.role === 'SUPERUSER') {
+        const foundTenants = new Map<string, { id: string; companyName: string; subdomain: string }>();
+        reservations.forEach((r: any) => {
+          if (r.tenant?.id) {
+            foundTenants.set(r.tenant.id, {
+              id: r.tenant.id,
+              companyName: r.tenant.companyName,
+              subdomain: r.tenant.subdomain
+            });
+          }
+        });
+        setTenants(Array.from(foundTenants.values()).sort((a, b) => a.companyName.localeCompare(b.companyName)));
+      }
+      
+      // SUPERUSER tenant filtresi uygula
+      const scopedReservations = user?.role === 'SUPERUSER' && selectedTenant !== 'all'
+        ? reservations.filter((r: any) => r.tenant?.id === selectedTenant)
+        : reservations;
+      
       // Müşterileri telefon numarasına göre grupla
       const customerMap = new Map<string, Customer>();
       
-      reservations.forEach((reservation: any) => {
+      scopedReservations.forEach((reservation: any) => {
         if (!reservation.phoneNumber) return;
         
         const phone = reservation.phoneNumber;
@@ -117,6 +139,21 @@ export default function CustomersPage() {
                 Müşteri bilgilerini görüntüleyin ve yönetin
               </p>
             </div>
+            {user?.role === 'SUPERUSER' && tenants.length > 0 && (
+              <div className="flex items-center gap-3">
+                <label className="text-sm text-gray-600">Acente:</label>
+                <select
+                  value={selectedTenant}
+                  onChange={(e) => setSelectedTenant(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="all">Tüm Acenteler</option>
+                  {tenants.map((t) => (
+                    <option key={t.id} value={t.id}>{t.companyName}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
         </div>
       </div>
