@@ -113,12 +113,15 @@ export default function EditReservationForm({ voucherNumber, initialData }: Edit
         setError('');
 
         try {
+            const token = localStorage.getItem('token');
             const response = await fetch(`/api/reservations/${voucherNumber}`, {
                 method: 'DELETE',
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
             });
 
             if (!response.ok) {
-                throw new Error('Rezervasyon silinemedi');
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Rezervasyon silinemedi');
             }
 
             router.push('/admin/reservations');

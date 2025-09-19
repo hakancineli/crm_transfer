@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
+import jwt from 'jsonwebtoken';
 
 export async function GET(request: NextRequest, { params }: { params: { voucherNumber: string } }) {
   try {
@@ -284,10 +285,84 @@ export async function DELETE(request: NextRequest, { params }: { params: { vouch
       );
     }
 
+    // Yetkilendirme kontrolü
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+
+    const token = authHeader.substring(7);
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    const userId = decoded?.userId;
+    const role = decoded?.role;
+
+    if (!userId || !role) {
+      return NextResponse.json({ error: 'Geçersiz token' }, { status: 401 });
+    }
+
+    // Rezervasyonu bul ve tenant kontrolü yap
+    let reservation = await prisma.reservation.findUnique({
+      where: { voucherNumber },
+      include: { tenant: true }
+    });
+
+    // Transfer rezervasyonu bulunamazsa tur rezervasyonunu kontrol et
+    if (!reservation && voucherNumber.startsWith('TUR-')) {
+      const tourBooking = await prisma.tourBooking.findUnique({
+        where: { voucherNumber },
+        include: { tenant: true }
+      });
+
+      if (tourBooking) {
+        // Tur rezervasyonu için tenant kontrolü
+        if (role !== 'SUPERUSER') {
+          const userTenant = await prisma.tenantUser.findFirst({
+            where: { userId, isActive: true },
+            select: { tenantId: true }
+          });
+
+          if (!userTenant || userTenant.tenantId !== tourBooking.tenantId) {
+            return NextResponse.json(
+              { error: 'Bu rezervasyonu silme yetkiniz yok' },
+              { status: 403 }
+            );
+          }
+        }
+
+        // Tur rezervasyonunu sil
+        await prisma.tourBooking.delete({
+          where: { voucherNumber }
+        });
+
+        return NextResponse.json({ message: 'Tur rezervasyonu başarıyla silindi' });
+      }
+    }
+
+    if (!reservation) {
+      return NextResponse.json(
+        { error: 'Rezervasyon bulunamadı' },
+        { status: 404 }
+      );
+    }
+
+    // Transfer rezervasyonu için tenant kontrolü
+    if (role !== 'SUPERUSER') {
+      const userTenant = await prisma.tenantUser.findFirst({
+        where: { userId, isActive: true },
+        select: { tenantId: true }
+      });
+
+      if (!userTenant || userTenant.tenantId !== reservation.tenantId) {
+        return NextResponse.json(
+          { error: 'Bu rezervasyonu silme yetkiniz yok' },
+          { status: 403 }
+        );
+      }
+    }
+
+    // Transfer rezervasyonunu sil
     await prisma.reservation.delete({
-      where: {
-        voucherNumber: voucherNumber,
-      },
+      where: { voucherNumber }
     });
 
     return NextResponse.json({ message: 'Rezervasyon başarıyla silindi' });
