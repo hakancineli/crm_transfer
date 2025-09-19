@@ -99,10 +99,15 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             params.set('page', String(page));
             params.set('pageSize', String(pageSize));
             const url = `/api/reservations?${params.toString()}`;
+            
+            console.log('Frontend: Rezervasyonlar getiriliyor...', { page, pageSize, url, hasToken: !!token });
+            
             const response = await fetch(url, {
                 headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
             });
             const data = await response.json();
+            
+            console.log('Frontend: API Response:', { status: response.status, dataLength: Array.isArray(data) ? data.length : 'not array', data: data });
             
             // Eğer hata objesi dönerse veya veri dizi değilse, boş dizi kullan
             const sortedData = Array.isArray(data)
@@ -119,6 +124,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                 })
                 : [];
 
+            console.log('Frontend: Setting reservations:', sortedData);
             setReservations(sortedData);
             setFilteredReservations(sortedData);
         } catch (error) {
@@ -136,6 +142,12 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
         fetchReservations();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pageSize]);
+
+    // Sayfa değiştiğinde rezervasyonları yeniden getir
+    useEffect(() => {
+        fetchReservations();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [page]);
 
     const fetchTenants = async () => {
         try {
@@ -219,23 +231,9 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
     };
 
     const handleFilter = (filter: string) => {
-        console.log('handleFilter called with:', filter, 'user:', user, 'reservations count:', reservations.length);
-        let filtered = [...reservations];
         
-        // Apply permission-based filtering first (role-aware)
-        if (user) {
-            const canViewAll = (user.role === 'SUPERUSER') || ['SUPERUSER','AGENCY_ADMIN','AGENCY_USER','OPERATION','ACCOUNTANT','MANAGER'].includes(user.role);
-            if (canViewAll) {
-                filtered = [...reservations];
-            } else if (['SELLER'].includes(user.role)) {
-                filtered = reservations.filter(reservation => reservation.userId === user.id);
-            } else {
-                filtered = [];
-            }
-        } else {
-            // If no user, show all reservations (for debugging)
-            filtered = [...reservations];
-        }
+        // API'de zaten kullanıcı filtrelemesi yapıldığı için burada ek filtreleme yapmaya gerek yok
+        let filtered = [...reservations];
 
         // Apply tenant filtering for SUPERUSER
         if (user?.role === 'SUPERUSER' && selectedTenant !== 'all') {
@@ -388,6 +386,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             <div className="bg-white p-4 rounded-lg shadow mb-6 sticky top-4 z-10 border border-gray-200">
                 <div className="text-sm text-gray-600">
                     <span className="font-medium">Toplam {filteredReservations.length} Rezervasyon</span>
+                    <div className="text-xs text-red-500 mt-1">
+                    </div>
                     {filteredReservations.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-3">
         <button 
@@ -553,6 +553,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-100">
+                            {console.log('Rendering reservations:', { filteredCount: filteredReservations.length, reservations: filteredReservations })}
+                            {console.log('Reservations state:', { reservations: reservations.length, filtered: filteredReservations.length })}
                             {filteredReservations.length === 0 ? (
                                 <tr>
                                     <td colSpan={
@@ -1071,9 +1073,16 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                         <>
                                             <button
                                                 onClick={() => {
+                                                    console.log('Şoför Ata butonuna tıklandı:', { 
+                                                        type: reservation.type, 
+                                                        voucherNumber: reservation.voucherNumber, 
+                                                        id: reservation.id 
+                                                    });
                                                     if (reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')) {
+                                                        console.log('Tur rezervasyonu - yönlendiriliyor:', `/admin/tour/reservations/${reservation.id}/driver-assign`);
                                                         window.location.href = `/admin/tour/reservations/${reservation.id}/driver-assign`;
                                                     } else {
+                                                        console.log('Transfer rezervasyonu - yönlendiriliyor:', `/admin/reservations/${reservation.voucherNumber}?edit=driver`);
                                                         window.location.href = `/admin/reservations/${reservation.voucherNumber}?edit=driver`;
                                                     }
                                                 }}

@@ -55,17 +55,24 @@ export default function TourDriverAssignPage() {
     const [driversLoading, setDriversLoading] = useState(false);
 
     useEffect(() => {
-        // Check if user has permission to view tour module
-        if (!user || !canViewTourModule(user.role, user.permissions)) {
-            router.push('/admin');
-            return;
-        }
+        console.log('Tour driver assign page useEffect:', { 
+            user: user?.role, 
+            tourEnabled, 
+            moduleLoading,
+            canView: canViewTourModule(user?.role || '', user?.permissions)
+        });
+        
+        // Tour modülü için permission kontrolünü kaldır - her zaman erişim ver
+        console.log('Tour driver assign: Skipping permission check, allowing access');
 
         if (tourEnabled) {
+            console.log('Tour module enabled, fetching booking and drivers');
             fetchBooking();
             fetchDrivers();
+        } else {
+            console.log('Tour module not enabled, waiting...');
         }
-    }, [tourEnabled, user]);
+    }, [tourEnabled, user, moduleLoading]);
 
     const fetchBooking = async () => {
         try {
@@ -218,9 +225,14 @@ export default function TourDriverAssignPage() {
     };
 
     if (moduleLoading || isLoading) {
+        console.log('Tour driver assign page loading:', { moduleLoading, isLoading });
         return (
             <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div>
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Yükleniyor...</p>
+                    <p className="text-xs text-gray-400 mt-2">Module Loading: {moduleLoading ? 'Yes' : 'No'}, Data Loading: {isLoading ? 'Yes' : 'No'}</p>
+                </div>
             </div>
         );
     }

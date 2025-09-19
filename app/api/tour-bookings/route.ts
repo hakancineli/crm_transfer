@@ -64,6 +64,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const { userId, role, tenantIds } = await getRequestUserContext(request);
+    console.log('Tour bookings POST - User context:', { userId, role, tenantIds });
     const body = await request.json();
     const {
       routeId,
