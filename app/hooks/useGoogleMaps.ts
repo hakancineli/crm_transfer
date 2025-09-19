@@ -50,14 +50,39 @@ export function useGoogleMaps(): GoogleMapsHook {
     
     script.onload = () => {
       console.log('✅ Google Maps API loaded successfully');
-      setIsLoaded(true);
-      setIsLoading(false);
-      setError(null);
+      
+      // Billing hatası kontrolü
+      if ((window as any).google?.maps?.places) {
+        // Test request yaparak billing durumunu kontrol et
+        const service = new (window as any).google.maps.places.AutocompleteService();
+        const request = {
+          input: 'test',
+          componentRestrictions: { country: 'tr' }
+        };
+        
+        service.getPlacePredictions(request, (predictions: any, status: any) => {
+          if (status === (window as any).google.maps.places.PlacesServiceStatus.BILLING_NOT_ENABLED) {
+            console.error('❌ Google Maps billing not enabled');
+            setError('Google Maps billing not enabled. Please enable billing in Google Cloud Console.');
+            setIsLoading(false);
+            return;
+          }
+          
+          // Billing aktif, API kullanılabilir
+          setIsLoaded(true);
+          setIsLoading(false);
+          setError(null);
+        });
+      } else {
+        setIsLoaded(true);
+        setIsLoading(false);
+        setError(null);
+      }
     };
     
     script.onerror = () => {
       console.error('❌ Google Maps script failed to load');
-      setError('Failed to load Google Maps API');
+      setError('Failed to load Google Maps API - Check billing settings');
       setIsLoading(false);
     };
     
