@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ActivityLogger } from '@/app/lib/activityLogger';
+import { prisma } from '@/app/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,6 +29,32 @@ export async function GET(request: NextRequest) {
     console.error('Error fetching activities:', error);
     return NextResponse.json(
       { error: 'Aktiviteler getirilemedi' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { userId, action, entityType, entityId, description, details, ipAddress, userAgent } = body;
+
+    const activity = await ActivityLogger.logActivity({
+      userId,
+      action,
+      entityType,
+      entityId,
+      description,
+      details,
+      ipAddress: ipAddress || request.headers.get('x-forwarded-for') || '127.0.0.1',
+      userAgent: userAgent || request.headers.get('user-agent') || ''
+    });
+
+    return NextResponse.json(activity, { status: 201 });
+  } catch (error) {
+    console.error('Error creating activity:', error);
+    return NextResponse.json(
+      { error: 'Aktivite oluşturulamadı' },
       { status: 500 }
     );
   }

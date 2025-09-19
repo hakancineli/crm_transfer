@@ -11,7 +11,8 @@ export async function GET(request: NextRequest, { params }: { params: { voucherN
       );
     }
 
-    const reservation = await prisma.reservation.findUnique({
+    // Önce transfer rezervasyonunu ara
+    let reservation = await prisma.reservation.findUnique({
       where: { voucherNumber },
       include: {
         driver: true,
@@ -27,6 +28,48 @@ export async function GET(request: NextRequest, { params }: { params: { voucherN
         }
       }
     });
+
+    // Transfer rezervasyonu bulunamazsa tur rezervasyonunu ara
+    if (!reservation && voucherNumber.startsWith('TUR-')) {
+      const tourBooking = await prisma.tourBooking.findUnique({
+        where: { voucherNumber },
+        include: {
+          driver: true,
+          tenant: {
+            select: {
+              id: true,
+              companyName: true,
+              subdomain: true,
+              paymentIban: true,
+              paymentAccountHolder: true,
+              paymentBank: true
+            }
+          }
+        }
+      });
+
+      if (tourBooking) {
+        // Tur rezervasyonunu transfer formatına çevir
+        reservation = {
+          id: tourBooking.id,
+          voucherNumber: tourBooking.voucherNumber,
+          date: tourBooking.tourDate.toISOString().split('T')[0],
+          time: tourBooking.tourTime || '00:00',
+          from: tourBooking.pickupLocation,
+          to: tourBooking.routeName,
+          passengerNames: tourBooking.passengerNames,
+          price: tourBooking.price,
+          currency: tourBooking.currency,
+          paymentStatus: tourBooking.status,
+          phoneNumber: (tourBooking as any).phoneNumber || '',
+          createdAt: (tourBooking as any).createdAt,
+          tenantId: (tourBooking as any).tenantId,
+          driver: tourBooking.driver,
+          tenant: tourBooking.tenant,
+          type: 'tur'
+        } as any;
+      }
+    }
 
     if (!reservation) {
       return NextResponse.json(
