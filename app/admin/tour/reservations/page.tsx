@@ -231,18 +231,28 @@ export default function TourReservationsPage() {
                         {new Date(booking.tourDate).toLocaleDateString('tr-TR')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <Link
-                          href={`/admin/tour/reservations/${booking.id}/voucher`}
-                          className="text-purple-600 hover:text-purple-900 mr-3"
-                        >
-                          Voucher
-                        </Link>
-                        <Link
-                          href={`/admin/tour/reservations/${booking.id}/edit`}
-                          className="text-green-600 hover:text-green-900"
-                        >
-                          Düzenle
-                        </Link>
+                        <div className="flex items-center space-x-2">
+                          <Link
+                            href={`/admin/tour/reservations/${booking.id}/driver-voucher`}
+                            className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
+                            title="Şoför Voucherı"
+                          >
+                            👨‍✈️
+                          </Link>
+                          <Link
+                            href={`/admin/tour/reservations/${booking.id}/customer-voucher`}
+                            className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
+                            title="Müşteri Voucherı"
+                          >
+                            🎫
+                          </Link>
+                          <Link
+                            href={`/admin/tour/reservations/${booking.id}/edit`}
+                            className="text-green-600 hover:text-green-900 text-sm"
+                          >
+                            Düzenle
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   ))}

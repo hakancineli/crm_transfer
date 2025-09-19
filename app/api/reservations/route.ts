@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
+import jwt from 'jsonwebtoken';
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,6 +11,33 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '50');
     const offset = (page - 1) * pageSize;
+    let tenantId = searchParams.get('tenantId');
+
+    // If caller is an agency user and didn't pass tenantId, scope by token
+    try {
+      const authHeader = request.headers.get('authorization');
+      if (!tenantId && authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+        const role = decoded?.role;
+        if (role && role !== 'SUPERUSER') {
+          const link = await prisma.tenantUser.findFirst({
+            where: { userId: decoded.userId, isActive: true },
+            select: { tenantId: true }
+          });
+          if (link?.tenantId) {
+            tenantId = link.tenantId;
+          } else {
+            // Non-superuser without tenant link should see nothing
+            return NextResponse.json([]);
+          }
+        }
+      }
+    } catch (e) {
+      // ignore scoping errors and continue unscoped only for superuser or public
+    }
+
+    const whereClause: any = tenantId ? { tenantId } : undefined;
     
     console.log(`API: Sayfa ${page}, Boyut ${pageSize}, Offset ${offset}`);
     
@@ -17,6 +45,7 @@ export async function GET(request: NextRequest) {
     const reservations = await prisma.reservation.findMany({
       take: pageSize,
       skip: offset,
+      where: whereClause,
       include: {
         user: {
           select: {
@@ -46,6 +75,7 @@ export async function GET(request: NextRequest) {
     const tourBookings = await prisma.tourBooking.findMany({
       take: pageSize,
       skip: offset,
+      where: whereClause,
       include: {
         User: {
           select: {
@@ -86,6 +116,9 @@ export async function GET(request: NextRequest) {
       price: r.price,
       currency: r.currency,
       paymentStatus: r.paymentStatus,
+      phoneNumber: r.phoneNumber,
+      createdAt: (r as any).createdAt ?? null,
+      tenantId: (r as any).tenantId ?? r.tenant?.id ?? null,
       user: r.user,
       driver: r.driver,
       tenant: r.tenant,
@@ -104,6 +137,9 @@ export async function GET(request: NextRequest) {
       price: t.price,
       currency: t.currency,
       paymentStatus: t.status,
+      phoneNumber: (t as any).phoneNumber ?? '',
+      createdAt: (t as any).createdAt ?? null,
+      tenantId: (t as any).tenantId ?? t.tenant?.id ?? null,
       user: t.User,
       driver: t.driver,
       tenant: t.tenant,
@@ -131,6 +167,23 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     console.log('API: Yeni rezervasyon oluşturuluyor...', body);
+    // Determine user and tenant from token
+    let userIdFromToken: string | null = null;
+    let tenantIdFromToken: string | null = null;
+    try {
+      const authHeader = request.headers.get('authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+        userIdFromToken = decoded?.userId || null;
+        if (decoded?.role && decoded.role !== 'SUPERUSER') {
+          const link = await prisma.tenantUser.findFirst({ where: { userId: userIdFromToken || '', isActive: true }, select: { tenantId: true } });
+          tenantIdFromToken = link?.tenantId || null;
+        } else if (decoded?.role === 'SUPERUSER' && body.tenantId) {
+          tenantIdFromToken = body.tenantId; // allow superuser to specify
+        }
+      }
+    } catch {}
     
     // Basit rezervasyon oluşturma
     const reservation = await prisma.reservation.create({
@@ -147,9 +200,10 @@ export async function POST(request: NextRequest) {
         phoneNumber: body.phoneNumber || '',
         voucherNumber: body.voucherNumber || `VIP${new Date().toISOString().slice(2,10).replace(/-/g, '')}-${Math.floor(Math.random() * 1000)}`,
         driverFee: body.driverFee || 0,
-        userId: body.userId || null,
+        userId: body.userId || userIdFromToken,
         paymentStatus: body.paymentStatus || 'PENDING',
-        isReturn: body.isReturn || false
+        isReturn: body.isReturn || false,
+        tenantId: body.tenantId || tenantIdFromToken || null
       }
     });
     

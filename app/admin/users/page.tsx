@@ -61,7 +61,8 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/users', {
+      const exclude = encodeURIComponent('bayraktravel,Ahjaaz Travel');
+      const response = await fetch(`/api/users?excludeUsernames=${exclude}`, {
         headers: {
           'Authorization': token ? `Bearer ${token}` : ''
         }

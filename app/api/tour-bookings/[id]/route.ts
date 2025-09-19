@@ -67,13 +67,41 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { userId, role, tenantIds } = await getRequestUserContext(request);
+    let { userId, role, tenantIds } = await getRequestUserContext(request);
     const bookingId = params.id;
     const body = await request.json();
-    const tenantId = await ensureTenantId({ role, tenantIds });
-    await assertModuleEnabled({ role, tenantId, moduleName: 'tour' });
-    const perms = await loadActiveUserPermissions(userId);
-    assertPermission(role, perms, getModuleManageChecker('tour'));
+    
+    // Load booking first to determine its tenant
+    const bookingForAuth = await prisma.tourBooking.findUnique({ where: { id: bookingId }, select: { id: true, tenantId: true } });
+    if (!bookingForAuth) {
+      return NextResponse.json({ error: 'Tur rezervasyonu bulunamadı' }, { status: 404 });
+    }
+
+    // Hydrate tenantIds if missing
+    if (role !== 'SUPERUSER' && (!tenantIds || tenantIds.length === 0) && userId) {
+      const links = await prisma.tenantUser.findMany({ where: { userId, isActive: true }, select: { tenantId: true } });
+      tenantIds = links.map((l: any) => l.tenantId);
+    }
+
+    // Authorization: SUPERUSER always allowed; otherwise must belong to booking's tenant
+    const bookingTenantId = bookingForAuth.tenantId;
+    if (role !== 'SUPERUSER') {
+      if (!tenantIds || tenantIds.length === 0 || !tenantIds.includes(bookingTenantId)) {
+        return NextResponse.json({ error: 'Bu rezervasyon için yetkiniz yok' }, { status: 403 });
+      }
+    }
+
+    // Module check: SUPERUSER ve AGENCY_ADMIN için modül kontrolü yok; diğer roller için kontrol et
+    if (role !== 'SUPERUSER' && role !== 'AGENCY_ADMIN') {
+      try {
+        await assertModuleEnabled({ role, tenantId: bookingTenantId, moduleName: 'tour' });
+        const perms = await loadActiveUserPermissions(userId);
+        assertPermission(role, perms, getModuleManageChecker('tour'));
+      } catch (moduleError) {
+        console.error('Module check failed:', moduleError);
+        return NextResponse.json({ error: 'Modül erişim yetkisi yok' }, { status: 403 });
+      }
+    }
 
     const {
       routeName,
@@ -91,13 +119,26 @@ export async function PUT(
       driverFee
     } = body;
 
-    // Build where clause based on user role
-    let whereClause: any = role === 'SUPERUSER' ? { id: bookingId } : { id: bookingId, tenantId };
+    // Validate driver fee if provided
+    let normalizedDriverFee: number | undefined = undefined;
+    if (driverFee !== undefined) {
+      const feeCandidate = typeof driverFee === 'string' ? parseFloat(driverFee) : Number(driverFee);
+      if (Number.isNaN(feeCandidate)) {
+        return NextResponse.json({ error: 'Geçersiz şoför ücreti' }, { status: 400 });
+      }
+      normalizedDriverFee = feeCandidate;
+    }
 
-    // Check if booking exists
-    const existingBooking = await prisma.tourBooking.findFirst({
-      where: whereClause
-    });
+    // Validate driver existence if driverId provided
+    if (driverId) {
+      const driverExists = await prisma.driver.findUnique({ where: { id: driverId }, select: { id: true } });
+      if (!driverExists) {
+        return NextResponse.json({ error: 'Şoför bulunamadı' }, { status: 404 });
+      }
+    }
+
+    // Fetch existing booking (already loaded tenant), ensure it still exists
+    const existingBooking = await prisma.tourBooking.findUnique({ where: { id: bookingId } });
 
     if (!existingBooking) {
       return NextResponse.json(
@@ -122,7 +163,7 @@ export async function PUT(
         notes: notes !== undefined ? notes : existingBooking.notes,
         status: status || existingBooking.status,
         driverId: driverId !== undefined ? driverId : existingBooking.driverId,
-        driverFee: driverFee !== undefined ? parseFloat(driverFee) : existingBooking.driverFee
+        driverFee: normalizedDriverFee !== undefined ? normalizedDriverFee : existingBooking.driverFee
       },
       include: {
         tenant: {
@@ -151,10 +192,11 @@ export async function PUT(
     };
 
     return NextResponse.json(parsedBooking);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Tur rezervasyonu güncelleme hatası:', error);
+    const message = typeof error?.message === 'string' ? error.message : 'Tur rezervasyonu güncellenemedi';
     return NextResponse.json(
-      { error: 'Tur rezervasyonu güncellenemedi' },
+      { error: message },
       { status: 500 }
     );
   }

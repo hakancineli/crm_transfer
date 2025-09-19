@@ -814,24 +814,34 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                             </button>
                                                             <button
                                                                 onClick={() => setReturnTransferModal({ isOpen: true, reservation })}
-                                                                className="inline-flex items-center px-3 py-2 border border-transparent text-xs font-semibold rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm transition-colors"
+                                                                className="w-8 h-8 flex items-center justify-center border border-transparent text-lg font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 shadow-sm transition-colors"
                                                                 title="Dönüş Transferi Ekle"
                                                             >
                                                                 🔄
                                                             </button>
                                                             <Link 
-                                                                href={reservation.type === 'Tur' 
+                                                                href={reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')
+                                                                    ? `/admin/tour/reservations/${reservation.id}/driver-voucher`
+                                                                    : `/admin/reservations/${reservation.voucherNumber}/driver-voucher`
+                                                                }
+                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
+                                                                title="Şoför Voucherı"
+                                                            >
+                                                                👨‍✈️
+                                                            </Link>
+                                                            <Link 
+                                                                href={reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')
                                                                     ? `/admin/tour/reservations/${reservation.id}/customer-voucher`
                                                                     : `/admin/reservations/${reservation.voucherNumber}/customer-voucher`
                                                                 }
-                                                                className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-lg font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
                                                                 title="Müşteri Voucherı"
                                                             >
                                                                 🎫
                                                             </Link>
                                                             <Link 
                                                                 href={`/admin/reservations/${reservation.voucherNumber}/edit`}
-                                                                className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-lg font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
                                                                 title="Rezervasyonu Düzenle"
                                                             >
                                                                 ✏️
@@ -847,7 +857,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                                 🔄
                                                             </button>
                                                             <Link 
-                                                                href={reservation.type === 'Tur' 
+                                                                href={reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')
                                                                     ? `/admin/tour/reservations/${reservation.id}/driver-voucher`
                                                                     : `/admin/reservations/${reservation.voucherNumber}/driver-voucher`
                                                                 }
@@ -857,7 +867,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                                 👨‍✈️
                                                             </Link>
                                                             <Link 
-                                                                href={reservation.type === 'Tur' 
+                                                                href={reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')
                                                                     ? `/admin/tour/reservations/${reservation.id}/customer-voucher`
                                                                     : `/admin/reservations/${reservation.voucherNumber}/customer-voucher`
                                                                 }

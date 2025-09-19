@@ -146,6 +146,13 @@
     "confirmed": "Confirmed",
     "pending": "Pending",
     "cancelled": "Cancelled",
-    "person": "person"
+    "person": "person",
+    "driverInstructions": "Driver Instructions",
+    "instruction1": "Be at the pickup location at least 30 minutes before the tour.",
+    "instruction2": "Check vehicle cleanliness.",
+    "instruction3": "Greet passengers politely.",
+    "instruction4": "Follow safe driving rules.",
+    "instruction5": "Contact the agency in case of emergency.",
+    "instruction6": "Clean the vehicle after the tour."
   }
 }

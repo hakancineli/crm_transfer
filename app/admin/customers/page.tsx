@@ -21,6 +21,68 @@ export default function CustomersPage() {
   const [selectedTenant, setSelectedTenant] = useState<string>('all');
   const [tenants, setTenants] = useState<Array<{ id: string; companyName: string; subdomain: string }>>([]);
   
+  const handleExportCSV = () => {
+    const header = ['Telefon', 'Toplam Rezervasyon', 'Toplam Harcama (USD)', 'Son Rezervasyon'];
+    const rows = filteredCustomers.map(c => [
+      c.phoneNumber,
+      String(c.totalReservations),
+      c.totalSpent.toFixed(2),
+      new Date(c.lastReservation).toLocaleString('tr-TR')
+    ]);
+    const csvContent = [header, ...rows].map(r => r.map(field => `"${String(field).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'musteriler.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportPDF = () => {
+    const win = window.open('', '_blank', 'width=900,height=700');
+    if (!win) return;
+    const rows = filteredCustomers.map(c => `
+      <tr>
+        <td style="padding:8px;border:1px solid #e5e7eb;">${c.phoneNumber}</td>
+        <td style="padding:8px;border:1px solid #e5e7eb;">${c.totalReservations}</td>
+        <td style="padding:8px;border:1px solid #e5e7eb;">$${c.totalSpent.toFixed(2)}</td>
+        <td style="padding:8px;border:1px solid #e5e7eb;">${new Date(c.lastReservation).toLocaleString('tr-TR')}</td>
+      </tr>
+    `).join('');
+    win.document.write(`
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>Müşteriler</title>
+          <style>
+            body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;padding:24px;color:#111827}
+            h1{font-size:20px;margin:0 0 16px;font-weight:700}
+            table{border-collapse:collapse;width:100%}
+            th{background:#f9fafb;text-align:left;padding:8px;border:1px solid #e5e7eb;font-size:12px;text-transform:uppercase;color:#6b7280}
+            td{font-size:13px}
+          </style>
+        </head>
+        <body>
+          <h1>Müşteri Listesi</h1>
+          <table>
+            <thead>
+              <tr>
+                <th>Telefon</th>
+                <th>Toplam Rezervasyon</th>
+                <th>Toplam Harcama (USD)</th>
+                <th>Son Rezervasyon</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+          <script>window.onload = () => { window.print(); setTimeout(() => window.close(), 200); }</script>
+        </body>
+      </html>
+    `);
+    win.document.close();
+  };
+  
   const canViewCustomers =
     user?.role === 'SUPERUSER' ||
     (user?.role && ((ROLE_PERMISSIONS as any)[user.role]?.includes(PERMISSIONS.VIEW_CUSTOMER_DATA) ||
@@ -139,21 +201,35 @@ export default function CustomersPage() {
                 Müşteri bilgilerini görüntüleyin ve yönetin
               </p>
             </div>
-            {user?.role === 'SUPERUSER' && tenants.length > 0 && (
-              <div className="flex items-center gap-3">
-                <label className="text-sm text-gray-600">Acente:</label>
-                <select
-                  value={selectedTenant}
-                  onChange={(e) => setSelectedTenant(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                >
-                  <option value="all">Tüm Acenteler</option>
-                  {tenants.map((t) => (
-                    <option key={t.id} value={t.id}>{t.companyName}</option>
-                  ))}
-                </select>
-              </div>
-            )}
+            <div className="flex items-center gap-3">
+              {user?.role === 'SUPERUSER' && tenants.length > 0 && (
+                <>
+                  <label className="text-sm text-gray-600">Acente:</label>
+                  <select
+                    value={selectedTenant}
+                    onChange={(e) => setSelectedTenant(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="all">Tüm Acenteler</option>
+                    {tenants.map((t) => (
+                      <option key={t.id} value={t.id}>{t.companyName}</option>
+                    ))}
+                  </select>
+                </>
+              )}
+              <button
+                onClick={handleExportCSV}
+                className="px-3 py-2 bg-green-600 text-white rounded-md text-sm hover:bg-green-700"
+              >
+                Excel (CSV)
+              </button>
+              <button
+                onClick={handleExportPDF}
+                className="px-3 py-2 bg-gray-800 text-white rounded-md text-sm hover:bg-gray-900"
+              >
+                PDF
+              </button>
+            </div>
           </div>
         </div>
       </div>

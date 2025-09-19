@@ -54,7 +54,8 @@ export default function CompaniesPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'users' | 'reservations'>('users');
   const [creating, setCreating] = useState(false);
-  const [newCompany, setNewCompany] = useState({ companyName: '' });
+  const [newCompany, setNewCompany] = useState({ companyName: '', subdomain: '', adminUsername: '', adminPassword: '', adminEmail: '' });
+  const [adminUsernameTouched, setAdminUsernameTouched] = useState(false);
 
   useEffect(() => {
     // Wait for auth to load
@@ -111,9 +112,13 @@ export default function CompaniesPage() {
         .replace(/--+/g, '-');
       const payload = {
         companyName: newCompany.companyName,
-        subdomain: slugify(newCompany.companyName || 'company'),
+        subdomain: newCompany.subdomain ? slugify(newCompany.subdomain) : slugify(newCompany.companyName || 'company'),
         isActive: true,
-        subscriptionPlan: 'STANDARD'
+        subscriptionPlan: 'STANDARD',
+        createAdmin: true,
+        adminUsername: newCompany.adminUsername,
+        adminPassword: newCompany.adminPassword,
+        adminEmail: newCompany.adminEmail || undefined
       };
 
       const res = await fetch('/api/tenants', {
@@ -131,12 +136,12 @@ export default function CompaniesPage() {
       
       const result = await res.json();
       if (result.adminUser) {
-        alert(`Şirket oluşturuldu!\n\nAdmin Kullanıcı:\nKullanıcı Adı: ${result.adminUser.username}\nE-posta: ${result.adminUser.email}\nŞifre: admin123`);
+        alert(`Şirket oluşturuldu!\n\nAdmin Kullanıcı:\nKullanıcı Adı: ${result.adminUser.username}\nE-posta: ${result.adminUser.email}`);
       } else {
         alert('Şirket oluşturuldu!');
       }
       
-      setNewCompany({ companyName: '' });
+      setNewCompany({ companyName: '', subdomain: '', adminUsername: '', adminPassword: '', adminEmail: '' });
       await fetchTenants();
     } catch (err) {
       console.error(err);
@@ -185,6 +190,35 @@ export default function CompaniesPage() {
       }
     } catch (error) {
       console.error('Şirket rezervasyonları getirilemedi:', error);
+    }
+  };
+
+  const handleDeleteTenant = async (tenant: Tenant) => {
+    if (!confirm(`${tenant.companyName} şirketini ve tüm ilişkili verilerini silmek istiyor musunuz? Bu işlem geri alınamaz.`)) {
+      return;
+    }
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`/api/tenants/${tenant.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Şirket silinemedi');
+      }
+      if (selectedTenant?.id === tenant.id) {
+        setSelectedTenant(null);
+        setTenantUsers([]);
+        setTenantReservations([]);
+      }
+      await fetchTenants();
+      alert('Şirket silindi.');
+    } catch (error) {
+      console.error(error);
+      alert((error as Error).message);
     }
   };
 
@@ -269,12 +303,42 @@ export default function CompaniesPage() {
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-medium text-gray-900">Yeni Şirket Oluştur</h2>
           </div>
-          <form onSubmit={handleCreateTenant} className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handleCreateTenant} className="p-6 grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="md:col-span-1">
               <label className="block text-sm font-medium text-gray-700 mb-1">Şirket Adı</label>
-              <input value={newCompany.companyName} onChange={(e) => setNewCompany({ ...newCompany, companyName: e.target.value })} required className="w-full px-3 py-2 border rounded-md" />
+              <input value={newCompany.companyName} onChange={(e) => {
+                const v = e.target.value;
+                const slugify = (val: string) => val
+                  .toLowerCase()
+                  .trim()
+                  .replace(/[^a-z0-9-]+/g, '-')
+                  .replace(/^-+|-+$/g, '')
+                  .replace(/--+/g, '-');
+                setNewCompany({
+                  ...newCompany,
+                  companyName: v,
+                  subdomain: newCompany.subdomain ? newCompany.subdomain : slugify(v),
+                  adminUsername: adminUsernameTouched ? newCompany.adminUsername : v
+                });
+              }} required className="w-full px-3 py-2 border rounded-md" />
             </div>
-            <div className="md:col-span-2 flex justify-end">
+            <div className="md:col-span-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Subdomain (opsiyonel)</label>
+              <input value={newCompany.subdomain} onChange={(e) => setNewCompany({ ...newCompany, subdomain: e.target.value })} placeholder="ornek-seyahat" className="w-full px-3 py-2 border rounded-md" />
+            </div>
+            <div className="md:col-span-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Admin Kullanıcı Adı</label>
+              <input value={newCompany.adminUsername} placeholder="admindir" onChange={(e) => { setAdminUsernameTouched(true); setNewCompany({ ...newCompany, adminUsername: e.target.value }); }} required className="w-full px-3 py-2 border rounded-md" />
+            </div>
+            <div className="md:col-span-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Admin Şifre</label>
+              <input type="password" value={newCompany.adminPassword} onChange={(e) => setNewCompany({ ...newCompany, adminPassword: e.target.value })} required className="w-full px-3 py-2 border rounded-md" />
+            </div>
+            <div className="md:col-span-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Admin E-posta (opsiyonel)</label>
+              <input type="email" value={newCompany.adminEmail} onChange={(e) => setNewCompany({ ...newCompany, adminEmail: e.target.value })} placeholder="admin@ornek-seyahat.com" className="w-full px-3 py-2 border rounded-md" />
+            </div>
+            <div className="md:col-span-4 flex justify-end">
               <button disabled={creating} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-60">
                 {creating ? 'Oluşturuluyor...' : 'Oluştur'}
               </button>
@@ -312,12 +376,18 @@ export default function CompaniesPage() {
                       {(tenant._count?.users ?? 0)} kullanıcı • {tenant.subscriptionPlan}
                     </p>
                   </div>
-                  <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       tenant.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                     }`}>
                       {tenant.isActive ? 'Aktif' : 'Pasif'}
                     </span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleDeleteTenant(tenant); }}
+                    className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700"
+                  >
+                    Sil
+                  </button>
                   </div>
                 </div>
               </div>
@@ -383,6 +453,50 @@ export default function CompaniesPage() {
                           }`}>
                             {tenantUser.isActive ? 'Aktif' : 'Pasif'}
                           </span>
+                          <button
+                            onClick={async () => {
+                              try {
+                                const token = localStorage.getItem('token');
+                                const res = await fetch(`/api/tenants/${selectedTenant!.id}/users`, {
+                                  method: 'PATCH',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': token ? `Bearer ${token}` : ''
+                                  },
+                                  body: JSON.stringify({ tenantUserId: tenantUser.id, isActive: !tenantUser.isActive })
+                                });
+                                if (!res.ok) throw new Error('Güncellenemedi');
+                                // Optimistic local update so row stays visible
+                                setTenantUsers(prev => prev.map(tu => tu.id === tenantUser.id ? { ...tu, isActive: !tenantUser.isActive } : tu));
+                              } catch (e) {
+                                alert('Kullanıcı durumu güncellenemedi');
+                              }
+                            }}
+                            className={`px-2 py-1 text-xs rounded ${tenantUser.isActive ? 'bg-yellow-600 hover:bg-yellow-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'}`}
+                          >
+                            {tenantUser.isActive ? 'Pasifleştir' : 'Aktifleştir'}
+                          </button>
+                          <button
+                            onClick={async () => {
+                              if (!confirm('Bu kullanıcıyı bu şirketten silmek istiyor musunuz?')) return;
+                              try {
+                                const token = localStorage.getItem('token');
+                                const res = await fetch(`/api/tenants/${selectedTenant!.id}/users?tenantUserId=${tenantUser.id}`, {
+                                  method: 'DELETE',
+                                  headers: {
+                                    'Authorization': token ? `Bearer ${token}` : ''
+                                  }
+                                });
+                                if (!res.ok) throw new Error('Silinemedi');
+                                await fetchTenantUsers(selectedTenant!.id);
+                              } catch (e) {
+                                alert('Kullanıcı silinemedi');
+                              }
+                            }}
+                            className="px-2 py-1 text-xs rounded bg-red-600 hover:bg-red-700 text-white"
+                          >
+                            Sil
+                          </button>
                         </div>
                       </div>
                     </div>

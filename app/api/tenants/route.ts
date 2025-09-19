@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { companyName, subdomain, subscriptionPlan = 'STANDARD', isActive = true, adminUserId, createAdmin = true } = body;
+    const { companyName, subdomain, subscriptionPlan = 'STANDARD', isActive = true, adminUserId, createAdmin = true, adminUsername, adminPassword, adminEmail } = body;
     if (!companyName || !subdomain) {
       return NextResponse.json({ error: 'Şirket adı ve subdomain zorunludur' }, { status: 400 });
     }
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       .replace(/^-+|-+$/g, '')
       .replace(/--+/g, '-');
     const timestamp = Date.now();
-    const normalizedSub = `${slugify(subdomain)}-${timestamp}`;
+    const normalizedSub = slugify(subdomain);
 
     // Create tenant
     const tenant = await prisma.tenant.create({
@@ -88,25 +88,25 @@ export async function POST(request: NextRequest) {
     if (createAdmin && !adminUserId) {
       // Generate admin credentials with timestamp to avoid duplicates
       const timestamp = Date.now();
-      const adminUsername = `${normalizedSub}-admin-${timestamp}`;
-      const adminEmail = `admin-${timestamp}@${normalizedSub}.com`;
-      const adminPassword = 'admin123'; // Default password
+      const generatedUsername = adminUsername && String(adminUsername).trim().length > 0 ? adminUsername : `${normalizedSub}-admin-${timestamp}`;
+      const finalEmail = adminEmail && String(adminEmail).trim().length > 0 ? adminEmail : `admin-${timestamp}@${normalizedSub}.com`;
+      const plainPassword = adminPassword && String(adminPassword).trim().length > 0 ? adminPassword : 'admin123';
       
       // Check if username already exists
       const existingUser = await prisma.user.findUnique({
-        where: { username: adminUsername }
+        where: { username: generatedUsername }
       });
       
       if (!existingUser) {
         // Hash password
         const bcrypt = require('bcryptjs');
-        const hashedPassword = await bcrypt.hash(adminPassword, 12);
+        const hashedPassword = await bcrypt.hash(plainPassword, 12);
         
         // Create admin user
         adminUser = await prisma.user.create({
           data: {
-            username: adminUsername,
-            email: adminEmail,
+            username: generatedUsername,
+            email: finalEmail,
             password: hashedPassword,
             name: `${companyName} Admin`,
             role: 'AGENCY_ADMIN',
@@ -193,6 +193,67 @@ export async function POST(request: NextRequest) {
               grantedAt: new Date()
             }
           });
+        }
+      } else {
+        // Username already exists: link this existing user as tenant admin
+        adminUser = existingUser as any;
+        try {
+          link = await prisma.tenantUser.create({
+            data: {
+              tenantId: tenant.id,
+              userId: existingUser.id,
+              role: 'AGENCY_ADMIN',
+              isActive: true,
+              permissions: JSON.stringify([
+                'MANAGE_USERS',
+                'MANAGE_PERMISSIONS',
+                'VIEW_REPORTS',
+                'MANAGE_ACTIVITIES',
+                'VIEW_ACCOUNTING'
+              ])
+            }
+          });
+        } catch (e) {
+          // If already linked, ignore
+        }
+
+        // Ensure default user permissions are present for this admin
+        const defaultAdminPermissions = [
+          'VIEW_DASHBOARD',
+          'VIEW_OWN_SALES',
+          'VIEW_ALL_RESERVATIONS',
+          'CREATE_RESERVATIONS',
+          'EDIT_RESERVATIONS',
+          'DELETE_RESERVATIONS',
+          'VIEW_DRIVERS',
+          'MANAGE_DRIVERS',
+          'ASSIGN_DRIVERS',
+          'VIEW_REPORTS',
+          'EXPORT_REPORTS',
+          'VIEW_ACCOUNTING',
+          'MANAGE_PAYMENTS',
+          'MANAGE_COMMISSIONS',
+          'MANAGE_CUSTOMERS',
+          'VIEW_CUSTOMER_DATA',
+          'MANAGE_USERS',
+          'MANAGE_PERMISSIONS',
+          'VIEW_ACTIVITIES',
+          'SYSTEM_SETTINGS',
+          'BACKUP_RESTORE',
+          'AUDIT_LOGS',
+          'VIEW_FINANCIAL_DATA',
+          'VIEW_PERFORMANCE',
+          'MANAGE_PERFORMANCE',
+          'VIEW_TOUR_MODULE',
+          'MANAGE_TOUR_BOOKINGS',
+          'MANAGE_TOUR_ROUTES',
+          'MANAGE_TOUR_VEHICLES',
+          'VIEW_TOUR_REPORTS'
+        ];
+        for (const permission of defaultAdminPermissions) {
+          try {
+            await prisma.userPermission.create({ data: { userId: existingUser.id, permission, isActive: true } });
+          } catch {}
         }
       }
     } else if (adminUserId) {

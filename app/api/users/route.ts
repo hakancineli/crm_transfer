@@ -7,6 +7,12 @@ import jwt from 'jsonwebtoken';
 // Kullanıcıları listele
 export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const excludeUsernamesParam = searchParams.get('excludeUsernames') || '';
+    const excludeUsernames = excludeUsernamesParam
+      .split(',')
+      .map(u => u.trim())
+      .filter(Boolean);
     // Scope by tenant for AGENCY roles
     const authHeader = request.headers.get('authorization');
     let currentUserRole: string | null = null;
@@ -33,6 +39,10 @@ export async function GET(request: NextRequest) {
       } else {
         whereClause.id = '__none__';
       }
+    }
+
+    if (excludeUsernames.length > 0) {
+      whereClause.username = { notIn: excludeUsernames } as any;
     }
 
     const users = await prisma.user.findMany({
@@ -188,6 +198,60 @@ export async function POST(request: NextRequest) {
     console.error('Error creating user:', error);
     return NextResponse.json(
       { error: 'Kullanıcı oluşturulamadı' },
+      { status: 500 }
+    );
+  }
+}
+
+// Kullanıcı sil (by id or username)
+export async function DELETE(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+    const token = authHeader.substring(7);
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    if (decoded?.role !== 'SUPERUSER') {
+      return NextResponse.json({ error: 'Bu işlem için SUPERUSER gerekli' }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const userIdParam = searchParams.get('userId');
+    const usernameParam = searchParams.get('username');
+
+    let userId: string | null = userIdParam;
+    if (!userId) {
+      if (!usernameParam) return NextResponse.json({ error: 'userId veya username gerekli' }, { status: 400 });
+      const user = await prisma.user.findUnique({ where: { username: usernameParam } });
+      if (!user) return NextResponse.json({ error: 'Kullanıcı bulunamadı' }, { status: 404 });
+      userId = user.id;
+    }
+
+    try {
+      await prisma.$transaction(async (tx) => {
+        await tx.tenantUser.deleteMany({ where: { userId: userId! } });
+        await tx.userPermission.deleteMany({ where: { userId: userId! } });
+        await tx.user.updateMany({ where: { createdBy: userId! }, data: { createdBy: null } });
+        await tx.reservation.updateMany({ where: { userId: userId! }, data: { userId: null } });
+        await tx.tourBooking.updateMany({ where: { userId: userId! }, data: { userId: null } });
+        try { await tx.activity.deleteMany({ where: { userId: userId! } }); } catch {}
+        await tx.user.delete({ where: { id: userId! } });
+      });
+      return NextResponse.json({ success: true });
+    } catch (hardErr) {
+      // Fallback: Deactivate and unlink so it disappears everywhere
+      await prisma.$transaction(async (tx) => {
+        await tx.tenantUser.deleteMany({ where: { userId: userId! } });
+        await tx.userPermission.deleteMany({ where: { userId: userId! } });
+        await tx.user.update({ where: { id: userId! }, data: { isActive: false } });
+      });
+      return NextResponse.json({ success: true, deactivated: true });
+    }
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    return NextResponse.json(
+      { error: 'Kullanıcı silinemedi' },
       { status: 500 }
     );
   }

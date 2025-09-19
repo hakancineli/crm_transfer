@@ -142,3 +142,38 @@ export async function PUT(
     );
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+    const token = authHeader.substring(7);
+    const { default: jwt } = await import('jsonwebtoken');
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    if (decoded?.role !== 'SUPERUSER') {
+      return NextResponse.json({ error: 'Bu işlem için SUPERUSER gerekli' }, { status: 403 });
+    }
+
+    const userId = params.id;
+
+    await prisma.$transaction(async (tx) => {
+      await tx.tenantUser.deleteMany({ where: { userId } });
+      await tx.userPermission.deleteMany({ where: { userId } });
+      await tx.reservation.updateMany({ where: { userId }, data: { userId: null } });
+      await tx.tourBooking.updateMany({ where: { userId }, data: { userId: null } });
+      await tx.user.updateMany({ where: { createdBy: userId }, data: { createdBy: null } });
+      try { await tx.activity.deleteMany({ where: { userId } }); } catch {}
+      await tx.user.delete({ where: { id: userId } });
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('User delete error:', error);
+    return NextResponse.json({ error: 'Kullanıcı silinemedi' }, { status: 500 });
+  }
+}

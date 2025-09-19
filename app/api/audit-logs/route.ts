@@ -13,6 +13,11 @@ export async function GET(request: NextRequest) {
     const dateFrom = searchParams.get('dateFrom') || '';
     const dateTo = searchParams.get('dateTo') || '';
     const userId = searchParams.get('userId') || '';
+    const excludeUsernamesParam = searchParams.get('excludeUsernames') || '';
+    const excludeUsernames = excludeUsernamesParam
+      .split(',')
+      .map(u => u.trim())
+      .filter(Boolean);
 
     const { role, tenantIds, userId: requesterId } = await getRequestUserContext(request);
 
@@ -42,6 +47,10 @@ export async function GET(request: NextRequest) {
         end.setHours(23, 59, 59, 999);
         where.createdAt.lte = end;
       }
+    }
+
+    if (excludeUsernames.length > 0) {
+      where.user = { username: { notIn: excludeUsernames } } as any;
     }
 
     // Optional tenant scoping: if not SUPERUSER and there is tenant context, filter to those tenants where applicable

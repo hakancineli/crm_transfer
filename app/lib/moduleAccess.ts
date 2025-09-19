@@ -16,10 +16,31 @@ export async function ensureTenantId(params: { role: string | null; tenantIds?: 
 export async function assertModuleEnabled(params: { role: string | null; tenantId: string; moduleName: 'tour' | 'transfer' | 'accommodation' | 'flight'; }): Promise<void> {
   const { role, tenantId, moduleName } = params;
   if (role === 'SUPERUSER') return; // SUPERUSER tüm modüllere erişir
-  const mod = await prisma.module.findUnique({ where: { name: moduleName } });
-  if (!mod) throw new Error('MODULE_NOT_DEFINED');
-  const tm = await prisma.tenantModule.findFirst({ where: { tenantId, moduleId: mod.id, isEnabled: true } });
-  if (!tm) throw new Error('MODULE_DISABLED');
+  let mod = await prisma.module.findUnique({ where: { name: moduleName } });
+  if (!mod) {
+    // Modül tanımlı değilse, otomatik oluştur ve varsayılan olarak aktif kabul et
+    mod = await prisma.module.create({
+      data: {
+        name: moduleName,
+        description: `${moduleName} module (auto-created)`,
+        isActive: true,
+        features: '[]'
+      }
+    });
+  }
+  let tm = await prisma.tenantModule.findFirst({ where: { tenantId, moduleId: mod.id } });
+  if (!tm) {
+    // Tenant için kayıt yoksa otomatik etkinleştir
+    tm = await prisma.tenantModule.create({
+      data: {
+        tenantId,
+        moduleId: mod.id,
+        isEnabled: true,
+        activatedAt: new Date()
+      }
+    });
+  }
+  if (!tm.isEnabled) throw new Error('MODULE_DISABLED');
 }
 
 export async function loadActiveUserPermissions(userId: string | null | undefined) {

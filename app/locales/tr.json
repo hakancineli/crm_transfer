@@ -146,6 +146,13 @@
     "confirmed": "Onaylandı",
     "pending": "Beklemede",
     "cancelled": "İptal Edildi",
-    "person": "kişi"
+    "person": "kişi",
+    "driverInstructions": "Şoför Talimatları",
+    "instruction1": "Tur günü en az 30 dakika önce toplanma yerinde bulununuz.",
+    "instruction2": "Araç temizliğini kontrol ediniz.",
+    "instruction3": "Yolcuları nazikçe karşılayınız.",
+    "instruction4": "Güvenli sürüş kurallarına uyunuz.",
+    "instruction5": "Acil durumlarda acente ile iletişime geçiniz.",
+    "instruction6": "Tur sonunda araç temizliğini yapınız."
   }
 }
