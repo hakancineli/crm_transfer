@@ -387,9 +387,6 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                 <div className="text-sm text-gray-600">
                     <span className="font-medium">Toplam {filteredReservations.length} Rezervasyon</span>
                     <div className="text-xs text-red-500 mt-1">
-                        Debug: {reservations.length} rezervasyon, {filteredReservations.length} filtrelenmiş
-                    </div>
-                    <div className="text-xs text-red-500 mt-1">
                     </div>
                     {filteredReservations.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-3">
