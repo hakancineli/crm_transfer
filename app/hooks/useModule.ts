@@ -96,75 +96,56 @@ export function useModule(moduleName: keyof ModuleSettings) {
         return;
       }
 
-      // SELLER için tur modülü her zaman aktif
-      if (user?.role === 'SELLER' && moduleName === 'tour') {
-        console.log('useModule: SELLER with tour module, enabling');
-        setIsEnabled(true);
-        setIsLoading(false);
-        return;
-      }
-
-      // SELLER için diğer modüller de aktif
+      // SELLER için modül kontrolü - promise ve yetkilere göre
       if (user?.role === 'SELLER') {
-        console.log('useModule: SELLER, enabling all modules');
-        setIsEnabled(true);
-        setIsLoading(false);
-        return;
-      }
+        console.log('useModule: SELLER role detected, checking permissions');
+        
+        // SELLER için tenant modül kontrolü yap
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) {
+            console.error('useModule: Token bulunamadı');
+            setIsEnabled(defaultModules[moduleName]);
+            setIsLoading(false);
+            return;
+          }
 
-      // SELLER için her durumda aktif
-      if (user?.role === 'SELLER') {
-        console.log('useModule: SELLER fallback, enabling all modules');
-        setIsEnabled(true);
-        setIsLoading(false);
-        return;
-      }
-
-      // SELLER için her durumda aktif (fallback)
-      if (user?.role === 'SELLER') {
-        console.log('useModule: SELLER final fallback, enabling all modules');
-        setIsEnabled(true);
-        setIsLoading(false);
-        return;
-      }
-
-      // SELLER için her durumda aktif (final fallback)
-      if (user?.role === 'SELLER') {
-        console.log('useModule: SELLER ultimate fallback, enabling all modules');
-        setIsEnabled(true);
-        setIsLoading(false);
-        return;
-      }
-
-      // SELLER için her durumda aktif (ultimate fallback)
-      if (user?.role === 'SELLER') {
-        console.log('useModule: SELLER ultimate ultimate fallback, enabling all modules');
-        setIsEnabled(true);
-        setIsLoading(false);
-        return;
-      }
-
-      // SELLER için her durumda aktif (ultimate ultimate fallback)
-      if (user?.role === 'SELLER') {
-        console.log('useModule: SELLER ultimate ultimate ultimate fallback, enabling all modules');
-        setIsEnabled(true);
-        setIsLoading(false);
-        return;
-      }
-
-      // SELLER için her durumda aktif (ultimate ultimate ultimate fallback)
-      if (user?.role === 'SELLER') {
-        console.log('useModule: SELLER ultimate ultimate ultimate ultimate fallback, enabling all modules');
-        setIsEnabled(true);
-        setIsLoading(false);
+          const response = await fetch('/api/tenant-modules', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            const tenantModules = data.tenantModules || [];
+            console.log('useModule: API response for SELLER:', { tenantModules, moduleName });
+            
+            // Modül adından kontrol et
+            const hasModuleAccess = tenantModules.some((tm: any) => 
+              (tm.module?.name || '').toLowerCase().includes(moduleName)
+            );
+            console.log('useModule: SELLER hasModuleAccess:', hasModuleAccess);
+            setIsEnabled(hasModuleAccess);
+          } else {
+            console.error('useModule: API response not ok for SELLER:', response.status);
+            setIsEnabled(defaultModules[moduleName]);
+          }
+        } catch (error) {
+          console.error('useModule: SELLER tenant modül kontrolü hatası:', error);
+          setIsEnabled(defaultModules[moduleName]);
+        } finally {
+          console.log('useModule: SELLER setting loading to false');
+          setIsLoading(false);
+        }
         return;
       }
 
       // AGENCY_ADMIN ve diğer roller için tenant modül kontrolü
-      if (user && (user.role === 'AGENCY_ADMIN' || user.role === 'AGENCY_USER' || user.role === 'SELLER')) {
+      if (user && (user.role === 'AGENCY_ADMIN' || user.role === 'AGENCY_USER')) {
         console.log('useModule: Checking tenant modules for role:', user.role);
         try {
-          // JWT token'ı localStorage'dan al
           const token = localStorage.getItem('token');
           if (!token) {
             console.error('useModule: Token bulunamadı');
@@ -183,7 +164,6 @@ export function useModule(moduleName: keyof ModuleSettings) {
             const data = await response.json();
             const tenantModules = data.tenantModules || [];
             console.log('useModule: API response:', { tenantModules, moduleName });
-            // Modül adından kontrol et (id sabitine bağımlılığı kaldır)
             const hasModuleAccess = tenantModules.some((tm: any) => 
               (tm.module?.name || '').toLowerCase().includes(moduleName)
             );
@@ -194,7 +174,6 @@ export function useModule(moduleName: keyof ModuleSettings) {
           }
         } catch (error) {
           console.error('useModule: Tenant modül kontrolü hatası:', error);
-          // Hata durumunda default değeri kullan
           setIsEnabled(defaultModules[moduleName]);
         } finally {
           console.log('useModule: Setting loading to false');
@@ -205,14 +184,6 @@ export function useModule(moduleName: keyof ModuleSettings) {
         setIsLoading(false);
       }
     };
-
-    // Tour modülü için özel durum - her zaman aktif
-    if (moduleName === 'tour') {
-      console.log('useModule: Tour module always enabled in useEffect (no user check)');
-      setIsEnabled(true);
-      setIsLoading(false);
-      return;
-    }
     
     // Diğer modüller için normal kontrol
     if (user) {
@@ -220,7 +191,7 @@ export function useModule(moduleName: keyof ModuleSettings) {
     } else {
       setIsLoading(false);
     }
-  }, [moduleName]);
+  }, [moduleName, user]);
 
   return { isEnabled, isLoading };
 }
