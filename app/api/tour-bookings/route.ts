@@ -145,6 +145,7 @@ export async function POST(request: NextRequest) {
         notes: notes || '',
         status: 'PENDING',
         tenantId: tenantId,
+        userId: userId, // Kullanıcı ID'sini ekle
       },
       include: {
         tenant: {
