@@ -100,7 +100,7 @@ export default function EditReservationForm({ voucherNumber, initialData }: Edit
             p.permission === 'DELETE_RESERVATIONS' && p.isActive
         );
         
-        if (user?.role !== 'SUPERUSER' && !hasDeletePermission) {
+        if (user?.role !== 'SUPERUSER' && user?.role !== 'AGENCY_ADMIN' && !hasDeletePermission) {
             setError('Bu rezervasyonu silme yetkiniz bulunmamaktadır.');
             return;
         }
@@ -385,8 +385,8 @@ export default function EditReservationForm({ voucherNumber, initialData }: Edit
             </div>
 
             <div className="flex justify-between space-x-4">
-                {/* Show delete button only if user has permission */}
-                {(user?.role === 'SUPERUSER' || user?.permissions?.some(p => 
+                {/* Show delete button for SUPERUSER or AGENCY_ADMIN */}
+                {(user?.role === 'SUPERUSER' || user?.role === 'AGENCY_ADMIN' || user?.permissions?.some(p => 
                     p.permission === 'DELETE_RESERVATIONS' && p.isActive
                 )) && (
                     <button
