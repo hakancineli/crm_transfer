@@ -31,6 +31,13 @@ export async function GET(request: NextRequest) {
             name: true,
             phoneNumber: true
           }
+        },
+        tenant: {
+          select: {
+            id: true,
+            companyName: true,
+            subdomain: true
+          }
         }
       }
     });
@@ -53,6 +60,13 @@ export async function GET(request: NextRequest) {
             name: true,
             phoneNumber: true
           }
+        },
+        tenant: {
+          select: {
+            id: true,
+            companyName: true,
+            subdomain: true
+          }
         }
       }
     });
@@ -74,6 +88,7 @@ export async function GET(request: NextRequest) {
       paymentStatus: r.paymentStatus,
       user: r.user,
       driver: r.driver,
+      tenant: r.tenant,
       type: 'transfer'
     }));
 
@@ -91,6 +106,7 @@ export async function GET(request: NextRequest) {
       paymentStatus: t.status,
       user: t.User,
       driver: t.driver,
+      tenant: t.tenant,
       type: 'tur'
     }));
 
