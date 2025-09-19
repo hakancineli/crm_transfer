@@ -1,3 +1,0 @@
-res-1|tenant-1|2025-01-15|14:30|İstanbul Havalimanı|Beşiktaş|TK1234|["Ahmet Yılmaz", "Ayşe Yılmaz"]|2|150.0|USD|+90 532 111 22 33|45.5|TK1234-001|75.0|driver-1|user-2|RECEIVED|APPROVED|2025-09-06 20:58:47||0
-res-2|tenant-1|2025-01-16|09:15|Sabiha Gökçen|Kadıköy|PC5678|["Mehmet Demir"]|1|120.0|USD|+90 533 222 33 44|38.2|PC5678-002|60.0|driver-2|user-2|PENDING|PENDING|2025-09-06 20:58:47||0
-res-3|tenant-1|2025-01-17|16:45|Taksim|İstanbul Havalimanı|TK9012|["Ali Kaya", "Fatma Kaya", "Zeynep Kaya"]|3|180.0|USD|+90 534 333 44 55|42.8|TK9012-003|90.0|driver-3|user-2|RECEIVED|APPROVED|2025-09-06 20:58:47||0
