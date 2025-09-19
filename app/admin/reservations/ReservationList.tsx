@@ -556,8 +556,6 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-100">
-                            {console.log('Rendering reservations:', { filteredCount: filteredReservations.length, reservations: filteredReservations })}
-                            {console.log('Reservations state:', { reservations: reservations.length, filtered: filteredReservations.length })}
                             {filteredReservations.length === 0 ? (
                                 <tr>
                                     <td colSpan={
