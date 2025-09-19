@@ -44,3 +44,10 @@ instagramRemoveBlockNotify
 
 # backup files
 /backup/
+
+# database files
+*.db
+*.sqlite
+*.sqlite3
+prisma/dev.db
+prisma/*.db
