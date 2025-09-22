@@ -11,7 +11,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify refresh token
-    const decoded: any = jwt.verify(refreshToken, process.env.JWT_SECRET || 'your-secret-key');
+    if (!process.env.JWT_SECRET) {
+      return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
+    }
+    const decoded: any = jwt.verify(refreshToken, process.env.JWT_SECRET);
     
     if (decoded.type !== 'refresh') {
       return NextResponse.json({ error: 'Geçersiz refresh token' }, { status: 401 });
@@ -36,7 +39,7 @@ export async function POST(request: NextRequest) {
         username: user.username, 
         role: user.role 
       },
-      process.env.JWT_SECRET || 'your-secret-key',
+      process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
@@ -46,7 +49,7 @@ export async function POST(request: NextRequest) {
         userId: user.id, 
         type: 'refresh' 
       },
-      process.env.JWT_SECRET || 'your-secret-key',
+      process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 

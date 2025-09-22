@@ -9,7 +9,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const token = auth.slice(7);
-    const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    if (!process.env.JWT_SECRET) {
+      return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
+    }
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded?.userId;
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

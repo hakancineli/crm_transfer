@@ -11,10 +11,10 @@ interface ModuleSettings {
 }
 
 const defaultModules: ModuleSettings = {
-  transfer: true,
+  transfer: false,
   accommodation: false,
   flight: false,
-  tour: true
+  tour: false
 };
 
 export function useModule(moduleName: keyof ModuleSettings) {
@@ -23,30 +23,8 @@ export function useModule(moduleName: keyof ModuleSettings) {
   console.log('useModule user:', user);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isEnabled, setIsEnabled] = useState<boolean>(() => {
-    if (moduleName === 'transfer') return true; // Transfer her zaman aktif
-    
-    // Tour modülü için özel durum - her zaman aktif
-    if (moduleName === 'tour') {
-      console.log('useModule: Tour module enabled by default');
-      return true;
-    }
-
-    // SSR sırasında localStorage'a erişmeyi önle
-    if (typeof window === 'undefined') {
-      return defaultModules[moduleName];
-    }
-
-    try {
-      const saved = localStorage.getItem('moduleSettings');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return parsed[moduleName] || false;
-      }
-    } catch (error) {
-      console.error('Modül ayarları yüklenirken hata:', error);
-    }
-
-    return defaultModules[moduleName];
+    // Giriş yapılmadıysa hiçbir modül varsayılan olarak görünmesin
+    return false;
   });
 
   useEffect(() => {
@@ -72,18 +50,10 @@ export function useModule(moduleName: keyof ModuleSettings) {
       console.log('useModule checkTenantModule:', { moduleName, user: user?.role });
       setIsLoading(true);
       
-      // Tour modülü için özel durum - her zaman aktif
-      if (moduleName === 'tour') {
-        console.log('useModule: Tour module always enabled in useEffect');
-        setIsEnabled(true);
-        setIsLoading(false);
-        return;
-      }
-      
-      // User null ise, default değerleri kullan
+      // User null ise, modülleri gizle
       if (!user) {
-        console.log('useModule: User is null, using default values');
-        setIsEnabled(defaultModules[moduleName]);
+        console.log('useModule: User is null, hiding all modules');
+        setIsEnabled(false);
         setIsLoading(false);
         return;
       }
@@ -105,7 +75,7 @@ export function useModule(moduleName: keyof ModuleSettings) {
           const token = localStorage.getItem('token');
           if (!token) {
             console.error('useModule: Token bulunamadı');
-            setIsEnabled(defaultModules[moduleName]);
+            setIsEnabled(false);
             setIsLoading(false);
             return;
           }
@@ -130,11 +100,11 @@ export function useModule(moduleName: keyof ModuleSettings) {
             setIsEnabled(hasModuleAccess);
           } else {
             console.error('useModule: API response not ok for SELLER:', response.status);
-            setIsEnabled(defaultModules[moduleName]);
+            setIsEnabled(false);
           }
         } catch (error) {
           console.error('useModule: SELLER tenant modül kontrolü hatası:', error);
-          setIsEnabled(defaultModules[moduleName]);
+          setIsEnabled(false);
         } finally {
           console.log('useModule: SELLER setting loading to false');
           setIsLoading(false);
@@ -149,7 +119,7 @@ export function useModule(moduleName: keyof ModuleSettings) {
           const token = localStorage.getItem('token');
           if (!token) {
             console.error('useModule: Token bulunamadı');
-            setIsEnabled(defaultModules[moduleName]);
+            setIsEnabled(false);
             setIsLoading(false);
             return;
           }
@@ -174,7 +144,7 @@ export function useModule(moduleName: keyof ModuleSettings) {
           }
         } catch (error) {
           console.error('useModule: Tenant modül kontrolü hatası:', error);
-          setIsEnabled(defaultModules[moduleName]);
+          setIsEnabled(false);
         } finally {
           console.log('useModule: Setting loading to false');
           setIsLoading(false);

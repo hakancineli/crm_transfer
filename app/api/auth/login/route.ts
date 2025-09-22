@@ -25,9 +25,10 @@ export async function POST(request: NextRequest) {
 
       const match = pairs.find(x => x.u === username && x.p === password);
       if (match) {
+        if (!process.env.JWT_SECRET) return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
         const token = jwt.sign(
           { userId: 'fallback', username: match.u, role: match.r },
-          process.env.JWT_SECRET || 'your-secret-key',
+          process.env.JWT_SECRET,
           { expiresIn: '24h' }
         );
         return NextResponse.json({
@@ -64,9 +65,10 @@ export async function POST(request: NextRequest) {
 
         const matched = fallbackUsers.find(u => u.username === username && u.password === password);
         if (matched) {
+          if (!process.env.JWT_SECRET) return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
           const token = jwt.sign(
             { userId: 'fallback', username: matched.username, role: matched.role },
-            process.env.JWT_SECRET || 'your-secret-key',
+            process.env.JWT_SECRET,
             { expiresIn: '24h' }
           );
           return NextResponse.json({

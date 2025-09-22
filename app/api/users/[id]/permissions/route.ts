@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
+import jwt from 'jsonwebtoken';
 
 
 export async function PUT(
@@ -36,13 +37,23 @@ export async function PUT(
     });
 
     // Create new permissions
+    // Aktör bilgisini JWT'den al
+    let grantedBy: string | null = null;
+    const auth = request.headers.get('authorization') || '';
+    if (auth.startsWith('Bearer ')) {
+      try {
+        const token = auth.slice(7);
+        const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+        grantedBy = decoded?.userId || null;
+      } catch {}
+    }
     const permissionEntries = Object.entries(permissions)
       .filter(([_, isActive]) => isActive)
       .map(([permission, _]) => ({
         userId,
         permission,
         isActive: true,
-        grantedBy: 'system' // In real app, this should be the current user ID
+        grantedBy: grantedBy || 'system'
       }));
 
     if (permissionEntries.length > 0) {
@@ -51,17 +62,12 @@ export async function PUT(
       });
     }
 
-    // Log activity - for now, use the first superuser as the actor
-    // In a real app, you'd get the current user from the JWT token
-    const superuser = await prisma.user.findFirst({
-      where: { role: 'SUPERUSER' },
-      select: { id: true }
-    });
-    
-    if (superuser) {
+    // Log activity - aktör olarak JWT'deki kullanıcıyı kullan
+    const actorUserId = grantedBy || undefined;
+    if (actorUserId) {
       await prisma.activity.create({
         data: {
-          userId: superuser.id, // Use superuser as the actor
+          userId: actorUserId,
           action: 'UPDATE',
           entityType: 'USER_PERMISSIONS',
           entityId: params.id,

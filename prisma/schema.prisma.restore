@@ -1,0 +1,335 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id                   String           @id @default(uuid())
+  subdomain            String           @unique
+  companyName          String
+  domain               String?
+  isActive             Boolean          @default(true)
+  subscriptionPlan     String           @default("basic")
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+  paymentAccountHolder String?
+  paymentBank          String?
+  paymentIban          String?
+  activities           Activity[]
+  reservations         Reservation[]
+  drivers              Driver[]
+  hotelBookings        HotelBooking[]
+  hotelPricePool       HotelPricePool[]
+  hotelRequests        HotelRequest[]
+  modules              TenantModule[]
+  users                TenantUser[]
+  tourBookings         TourBooking[]
+  vehicles             Vehicle[]
+
+  @@map("tenants")
+}
+
+model Module {
+  id            String         @id @default(uuid())
+  name          String         @unique
+  description   String?
+  isActive      Boolean        @default(true)
+  priceMonthly  Float          @default(0)
+  priceYearly   Float          @default(0)
+  features      String         @default("[]")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  tenantModules TenantModule[]
+
+  @@map("modules")
+}
+
+model TenantModule {
+  id          String    @id @default(uuid())
+  tenantId    String
+  moduleId    String
+  isEnabled   Boolean   @default(false)
+  activatedAt DateTime?
+  expiresAt   DateTime?
+  features    String    @default("[]")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  module      Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, moduleId])
+  @@map("tenant_modules")
+}
+
+model TenantUser {
+  id          String   @id @default(uuid())
+  tenantId    String
+  userId      String
+  role        String   @default("USER")
+  permissions String   @default("[]")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId])
+  @@map("tenant_users")
+}
+
+model Driver {
+  id           String        @id @default(uuid())
+  name         String
+  phoneNumber  String?
+  tenantId     String?
+  createdAt    DateTime      @default(now())
+  reservations Reservation[]
+  tenant       Tenant?       @relation(fields: [tenantId], references: [id])
+  tourBookings TourBooking[]
+
+  @@map("drivers")
+}
+
+model User {
+  id            String           @id @default(uuid())
+  username      String           @unique
+  email         String           @unique
+  password      String
+  name          String
+  role          UserRole         @default(SELLER)
+  isActive      Boolean          @default(true)
+  createdBy     String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  activities    Activity[]       @relation("UserActivities")
+  reservations  Reservation[]
+  creator       User?            @relation("UserCreator", fields: [createdBy], references: [id])
+  createdUsers  User[]           @relation("UserCreator")
+  permissions   UserPermission[]
+  hotelRequests HotelRequest[]
+  tenantUsers   TenantUser[]
+  tour_bookings TourBooking[]
+}
+
+model UserPermission {
+  id         String   @id @default(uuid())
+  userId     String
+  permission String
+  grantedBy  String?
+  grantedAt  DateTime @default(now())
+  isActive   Boolean  @default(true)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Activity {
+  id          String   @id @default(uuid())
+  userId      String
+  action      String
+  entityType  String
+  entityId    String?
+  description String
+  details     Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+  tenantId    String?
+  tenant      Tenant?  @relation(fields: [tenantId], references: [id])
+  user        User     @relation("UserActivities", fields: [userId], references: [id])
+}
+
+model Reservation {
+  id                      String         @id @default(uuid())
+  date                    String
+  time                    String
+  from                    String
+  to                      String
+  flightCode              String
+  passengerNames          String
+  luggageCount            Int
+  price                   Float
+  currency                String
+  phoneNumber             String?
+  voucherNumber           String         @unique
+  driverFee               Float?
+  driverId                String?
+  paymentStatus           String         @default("PENDING")
+  createdAt               DateTime       @default(now())
+  returnTransferId        String?        @unique
+  isReturn                Boolean        @default(false)
+  distanceKm              Float?
+  userId                  String?
+  tenantId                String?
+  companyCommissionStatus String         @default("PENDING")
+  driver                  Driver?        @relation(fields: [driverId], references: [id])
+  returnTransfer          Reservation?   @relation("ReturnTransfer", fields: [returnTransferId], references: [id])
+  originalTransfer        Reservation?   @relation("ReturnTransfer")
+  tenant                  Tenant?        @relation(fields: [tenantId], references: [id])
+  user                    User?          @relation(fields: [userId], references: [id])
+  hotelBookings           HotelBooking[]
+}
+
+model HotelRequest {
+  id              String         @id @default(uuid())
+  tenantId        String?
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  checkin         DateTime
+  checkout        DateTime
+  adults          Int
+  children        Int            @default(0)
+  rooms           Int            @default(1)
+  city            String
+  region          String?
+  budget          Float?
+  roomType        String?
+  breakfast       Boolean        @default(false)
+  amenities       String         @default("[]")
+  specialRequests String?
+  status          String         @default("PENDING")
+  assignedTo      String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  hotelBookings   HotelBooking[]
+  user            User?          @relation(fields: [assignedTo], references: [id])
+  tenant          Tenant?        @relation(fields: [tenantId], references: [id])
+
+  @@map("hotel_requests")
+}
+
+model HotelBooking {
+  id                 String        @id @default(uuid())
+  tenantId           String?
+  requestId          String?
+  reservationId      String?
+  hotelId            String
+  hotelName          String
+  hotelAddress       String
+  roomType           String
+  checkin            DateTime
+  checkout           DateTime
+  adults             Int
+  children           Int
+  rooms              Int
+  totalPrice         Float
+  currency           String        @default("EUR")
+  bookingReference   String        @unique
+  status             String        @default("CONFIRMED")
+  customerInfo       Json
+  specialRequests    String?
+  cancellationPolicy String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  agentPrice         Float
+  customerPrice      Float
+  profitMargin       Float
+  voucherNumber      String        @unique
+  request            HotelRequest? @relation(fields: [requestId], references: [id])
+  reservation        Reservation?  @relation(fields: [reservationId], references: [id])
+  tenant             Tenant?       @relation(fields: [tenantId], references: [id])
+
+  @@map("hotel_bookings")
+}
+
+model HotelPricePool {
+  id                 String   @id @default(uuid())
+  tenantId           String
+  hotelId            String
+  hotelName          String
+  hotelAddress       String
+  hotelCity          String
+  hotelCountry       String
+  hotelRating        Float
+  hotelStars         Int
+  hotelImage         String?
+  hotelAmenities     String   @default("[]")
+  roomType           String
+  roomName           String
+  roomDescription    String?
+  roomAmenities      String   @default("[]")
+  maxOccupancy       Int
+  bedType            String
+  roomSize           String?
+  roomView           String?
+  basePrice          Float
+  agentPrice         Float
+  customerPrice      Float
+  profitMargin       Float
+  profitPercentage   Float
+  currency           String   @default("EUR")
+  validFrom          DateTime
+  validTo            DateTime
+  cancellationPolicy String?
+  breakfastIncluded  Boolean  @default(false)
+  freeCancellation   Boolean  @default(false)
+  source             String   @default("booking.com")
+  lastUpdated        DateTime @default(now())
+  updatedBy          String
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  tenant             Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, hotelId, validFrom, validTo])
+  @@index([hotelCity, validFrom, validTo])
+  @@index([isActive, validFrom, validTo])
+  @@map("hotel_price_pool")
+}
+
+model Vehicle {
+  id              String    @id @default(uuid())
+  type            String
+  capacity        Int
+  licensePlate    String
+  driverName      String?
+  driverPhone     String?
+  isAvailable     Boolean   @default(true)
+  lastMaintenance DateTime?
+  tenantId        String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  tenant          Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("vehicles")
+}
+
+model TourBooking {
+  id             String   @id @default(uuid())
+  voucherNumber  String   @unique
+  routeName      String
+  vehicleType    String
+  groupSize      Int
+  price          Float
+  currency       String   @default("USD")
+  pickupLocation String
+  tourDate       DateTime
+  tourTime       String?
+  passengerNames String
+  notes          String?
+  status         String   @default("PENDING")
+  tenantId       String
+  userId         String?
+  driverId       String?
+  driverFee      Float?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  tourDuration   Int      @default(1)
+  driver         Driver?  @relation(fields: [driverId], references: [id])
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  User           User?    @relation(fields: [userId], references: [id])
+
+  @@map("tour_bookings")
+}
+
+enum UserRole {
+  SUPERUSER
+  OPERATION
+  SELLER
+  ACCOUNTANT
+  AGENCY_ADMIN
+  AGENCY_USER
+}
