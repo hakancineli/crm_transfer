@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Hardcoded fallback for superuser
-    if (username === 'superuser' && password === 'ProAcente2024!') {
+    if (username === 'superuser' && password === 'admin123') {
       if (!process.env.JWT_SECRET) {
         return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
       }
