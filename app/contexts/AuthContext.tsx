@@ -43,8 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (storedUser && token) {
           const userData = JSON.parse(storedUser);
           setUser(userData);
-          // Immediately fetch latest user from server
-          refreshUser().catch(() => {});
+          // Don't immediately refresh on mount to avoid double login
         }
       } catch (error) {
         console.error('Auth check error:', error);
@@ -55,20 +54,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     checkAuth();
-    // Soft refresh on focus
+  }, []); // Empty dependency array - only run on mount
+
+  useEffect(() => {
+    // Set up focus and interval listeners only after user is set
+    if (!user) return;
+
+    // Soft refresh on focus - only if user is already authenticated
     const onFocus = () => {
       refreshUser().catch(() => {});
     };
     window.addEventListener('focus', onFocus);
-    // Periodic refresh every 5 minutes to propagate permission changes (reduced frequency)
+    
+    // Periodic refresh every 10 minutes to propagate permission changes (reduced frequency)
     const interval = window.setInterval(() => {
       refreshUser().catch(() => {});
-    }, 300000); // 5 dakika = 300000ms
+    }, 600000); // 10 dakika = 600000ms
+    
     return () => {
       window.removeEventListener('focus', onFocus);
       clearInterval(interval);
     };
-  }, []);
+  }, [user?.id]); // Only depend on user ID, not the entire user object
 
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
@@ -86,18 +93,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('token', data.token);
         localStorage.setItem('refreshToken', data.refreshToken);
-        localStorage.setItem('isAdmin', 'false');
+        localStorage.setItem('isAdmin', 'true');
+        
+        // State'i güncelle ve kısa bir delay ekle
         setUser(data.user);
+        
+        // State güncellemesinin tamamlanması için kısa bir bekleme
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-        // Log activity
-        await fetch('/api/activities', {
+        // Log activity (optional, don't block login if it fails)
+        fetch('/api/activities', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             userId: data.user.id,
             action: 'LOGIN',
             entityType: 'SYSTEM',
-            description: `${data.user.name} giriş yaptı`,
+            description: `${data.user.name || data.user.username} giriş yaptı`,
             ipAddress: '127.0.0.1'
           })
         }).catch(console.error);

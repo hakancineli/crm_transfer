@@ -16,6 +16,17 @@ export interface ActivityData {
 export class ActivityLogger {
   static async logActivity(data: ActivityData) {
     try {
+      // Ensure details is JSON serializable
+      let serializableDetails = null;
+      if (data.details) {
+        try {
+          serializableDetails = JSON.parse(JSON.stringify(data.details));
+        } catch (e) {
+          console.warn('Details not JSON serializable, converting to string:', e);
+          serializableDetails = String(data.details);
+        }
+      }
+
       await prisma.activity.create({
         data: {
           userId: data.userId,
@@ -23,7 +34,7 @@ export class ActivityLogger {
           entityType: data.entityType,
           entityId: data.entityId,
           description: data.description,
-          details: data.details || undefined,
+          details: serializableDetails,
           ipAddress: data.ipAddress,
           userAgent: data.userAgent,
         },

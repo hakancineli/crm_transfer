@@ -1,0 +1,53 @@
+# Ignore files to reduce deployment size
+node_modules
+.next
+.git
+*.log
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Development files
+scripts/
+docs/
+*.md
+BACKUP_STRATEGY.md
+BOOKING_API_SETUP.md
+CUSTOMER_HOMEPAGE_FEATURES.md
+FORMAT_SONRASI_KURULUM.md
+MAC_BACKUP_GUIDE.md
+PRODUCTION_DEPLOYMENT.md
+README.md
+TELEGRAM_BOT_SETUP.md
+
+# Database files
+prisma/dev.db
+prisma/dev.db-journal
+*.db
+*.db-journal
+
+# Backup files
+*.backup
+*.bak
+*.old
+*.restore
+
+# Test files
+test-*
+*.test.*
+*.spec.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+tmp/
+temp/

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/app/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { ensureTenantId, assertModuleEnabled, loadActiveUserPermissions, assertPermission, getModuleManageChecker } from '@/app/lib/moduleAccess';
 import { getRequestUserContext } from '@/app/lib/requestContext';
 

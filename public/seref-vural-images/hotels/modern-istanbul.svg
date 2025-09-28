@@ -1,0 +1,26 @@
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" fill="url(#paint0_linear_modern)"/>
+  <defs>
+    <linearGradient id="paint0_linear_modern" x1="200" y1="0" x2="200" y2="300" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E0E0E0"/>
+      <stop offset="1" stop-color="#B0B0B0"/>
+    </linearGradient>
+  </defs>
+  <path d="M0 200L400 150V300H0V200Z" fill="#696969"/>
+  <path d="M0 250L400 250L400 300L0 300L0 250Z" fill="#2F2F2F"/>
+  <path d="M100 180L120 100L140 180H100Z" fill="#FFFFFF"/>
+  <path d="M250 170L270 90L290 170H250Z" fill="#FFFFFF"/>
+  <path d="M50 200L150 200L150 250L50 250L50 200Z" fill="#808080"/>
+  <path d="M200 150L300 150L300 200L200 200L200 150Z" fill="#808080"/>
+  <path d="M100 200L100 150L125 150L125 200L100 200Z" fill="#A9A9A9"/>
+  <path d="M250 150L250 100L275 100L275 150L250 150Z" fill="#A9A9A9"/>
+  <path d="M0 200L400 150V300H0V200Z" fill="url(#paint1_linear_overlay_modern)"/>
+  <defs>
+    <linearGradient id="paint1_linear_overlay_modern" x1="200" y1="150" x2="200" y2="300" gradientUnits="userSpaceOnUse">
+      <stop stop-color="black" stop-opacity="0"/>
+      <stop offset="1" stop-color="black" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+

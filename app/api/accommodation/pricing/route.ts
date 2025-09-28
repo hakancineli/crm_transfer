@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/app/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 // Acente fiyatlandırma güncelleme
 export async function PUT(request: NextRequest) {

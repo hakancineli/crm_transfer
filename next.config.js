@@ -1,5 +1,35 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Build optimizations for Vercel
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ['lucide-react', '@prisma/client']
+  },
+  
+  // Reduce bundle size
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      }
+    }
+    return config
+  },
+  
+  // Domain configuration
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/admin-login',
+        permanent: false,
+      },
+    ]
+  },
+  
   async headers() {
     // Development modunda CSP'yi tamamen devre dışı bırak
     const isDev = process.env.NODE_ENV === 'development';

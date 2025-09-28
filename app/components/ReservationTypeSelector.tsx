@@ -70,8 +70,8 @@ const ReservationTypeSelector = ({ onClose, variant = 'default' }: ReservationTy
   const availableTypes = reservationTypes.filter(type => {
     if (type.alwaysVisible) return true;
     
-    if (type.module === 'tour' && tourEnabled) return true;
-    if (type.module === 'accommodation' && accommodationEnabled) return true;
+    if (type.module === 'tour' && tourEnabled.isEnabled) return true;
+    if (type.module === 'accommodation' && accommodationEnabled.isEnabled) return true;
     
     return false;
   });

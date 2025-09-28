@@ -1,0 +1,186 @@
+{
+  "landing": {
+    "title": "Şeref Vural Travel - İstanbul Havalimanı Transfer Hizmeti",
+    "description": "İstanbul Havalimanı'ndan şehir merkezine konforlu ve güvenli transfer hizmeti. Profesyonel şoförlerimiz ve Mercedes Vito araçlarımızla 7/24 hizmetinizdeyiz. Ayrıca İstanbul, Sapanca, Bursa, Abant turları ve kaliteli otel konaklama seçenekleri sunuyoruz.",
+    "cta": {
+      "reservation": "Rezervasyon Talebi Gönder",
+      "whatsapp": "WhatsApp'tan Yaz"
+    },
+    "features": {
+      "service24": "7/24 Hizmet",
+      "service24Desc": "Her zaman yanınızdayız",
+      "fixedPrice": "Sabit Fiyat",
+      "fixedPriceDesc": "Sürpriz yok",
+      "professionalDriver": "Profesyonel Şoför",
+      "professionalDriverDesc": "Deneyimli kadro",
+            "capacity": "7 Kişilik Kapasite",
+            "capacityDesc": "Mercedes Vito"
+    }
+  },
+  "whyProTransfer": {
+    "title": "Neden ProTransfer?",
+    "description": "Profesyonel hizmet anlayışımız ve müşteri memnuniyeti odaklı yaklaşımımızla İstanbul'un en güvenilir transfer hizmeti sunuyoruz.",
+    "features": {
+      "flightTracking": "Uçuş Takibi",
+      "flightTrackingDesc": "Uçuşunuzu takip eder, gecikme durumunda bekleriz",
+      "meetingService": "Karşılama Hizmeti",
+      "meetingServiceDesc": "Havalimanında karşılar, bagajlarınızı taşırız",
+      "babySeat": "Bebek Koltuğu",
+      "babySeatDesc": "Bebek koltuğu ve özel taleplere hızlı cevap",
+      "corporateTransfer": "Kurumsal Transfer",
+      "corporateTransferDesc": "Kurumsal sözleşmeli transfer seçenekleri"
+    },
+    "pricing": {
+      "title": "Şeffaf Fiyatlandırma",
+      "description": "Konumları girdiğiniz anda ücretinizi anında görün. Sabit fiyat, sürpriz yok."
+    }
+  },
+  "vehicleSlider": {
+    "title": "Mercedes Vito Transfer Aracı",
+    "description": "7 kişilik kapasite • Klima • WiFi • Profesyonel şoför"
+  },
+  "reviews": {
+    "title": "Müşteri Yorumları",
+    "description": "Müşterilerimizin deneyimlerini okuyun",
+    "googleReviews": "Google Yorumları"
+  },
+  "faq": {
+    "title": "Sık Sorulan Sorular",
+    "description": "Merak ettiğiniz soruların cevapları",
+    "questions": {
+      "reservation": "Rezervasyon nasıl yapılır?",
+      "reservationAnswer": "Rezervasyon yapmak için 'Rezervasyon Talebi Gönder' butonuna tıklayın veya WhatsApp'tan bizimle iletişime geçin. Size en uygun zamanı belirleyip rezervasyonunuzu oluşturuyoruz.",
+      "pricing": "Fiyatlar sabit mi?",
+      "pricingAnswer": "Evet, fiyatlarımız tamamen sabittir. Konumları girdiğiniz anda ücretinizi anında görürsünüz. Hiçbir sürpriz ücret yoktur.",
+      "flightDelay": "Uçuş gecikmesi durumunda ne olur?",
+      "flightDelayAnswer": "Uçuşunuzu takip ederiz ve gecikme durumunda ek ücret almadan bekleriz. Müşteri memnuniyeti bizim önceliğimizdir.",
+      "luggage": "Bagaj limiti var mı?",
+      "luggageAnswer": "Mercedes Vito araçlarımız geniş bagaj kapasitesine sahiptir. Normal seyahat bagajları için limit yoktur. Özel eşyalar için önceden bilgi veriniz.",
+      "babySeat": "Bebek koltuğu mevcut mu?",
+      "babySeatAnswer": "Evet, bebek koltuğu hizmetimiz mevcuttur. Rezervasyon yaparken bu talebinizi belirtmeniz yeterlidir.",
+      "payment": "Ödeme nasıl yapılır?",
+      "paymentAnswer": "Nakit, kredi kartı veya havale ile ödeme yapabilirsiniz. Ödeme seçenekleri rezervasyon sırasında belirlenir.",
+      "cancellation": "İptal politikası nedir?",
+      "cancellationAnswer": "24 saat önceden iptal edilen rezervasyonlar için ücret alınmaz. Son dakika iptalleri için belirli koşullar geçerlidir.",
+      "driverInfo": "Şoför bilgileri nasıl alınır?",
+      "driverInfoAnswer": "Rezervasyonunuz onaylandıktan sonra şoför bilgileri WhatsApp'tan size gönderilir. Şoförümüz sizi belirlenen noktada karşılar.",
+      "meetingPoint": "Havaalanında buluşma noktası nerede?",
+      "meetingPointAnswer": "İstanbul Havalimanı'nda çıkış kapısında, Sabiha Gökçen'de ise belirlenen karşılama noktasında buluşuyoruz.",
+      "groupReservation": "Grup rezervasyonu yapılabilir mi?",
+      "groupReservationAnswer": "Evet, grup rezervasyonları için özel fiyatlandırma yapıyoruz. WhatsApp'tan bizimle iletişime geçerek detayları öğrenebilirsiniz."
+    }
+  },
+  "contact": {
+    "title": "İletişim",
+    "description": "Bizimle iletişime geçin",
+    "whatsapp": {
+      "title": "WhatsApp",
+      "description": "Hızlı cevap için WhatsApp'tan yazın"
+    },
+    "phone": {
+      "title": "Telefon",
+      "description": "7/24 telefon desteği"
+    },
+    "locations": {
+      "title": "Hizmet Alanları",
+      "ist": "İstanbul Havalimanı (IST)",
+      "saw": "Sabiha Gökçen (SAW)",
+      "besiktas": "Beşiktaş, İstanbul"
+    },
+    "dailyDriver": {
+      "title": "Günlük Şoför Hizmeti",
+      "description": "Şehir içi ve şehirler arası günlük şoför hizmeti. 8 saatlik paketler halinde esnek rota planlaması.",
+      "cta": "WhatsApp'tan Fiyat Al"
+    },
+    "intercityTransfer": {
+      "title": "Şehirler Arası Transfer",
+      "description": "İstanbul'dan Ankara, İzmir, Bursa, Antalya'ya konforlu transfer. VIP Mercedes Vito ve lüks sedan seçenekleri.",
+      "cta": "Detaylı Bilgi Al"
+    }
+  },
+  "finalCta": {
+    "title": "Hazır mısınız?",
+    "description": "İstanbul Havalimanı transfer hizmetimizden yararlanmaya hazır olduğunuzu belirten metin. Profesyonel ekibimiz ve konforlu araçlarımızla güvenli bir yolculuk için rezervasyon yapın.",
+    "stats": {
+      "customers": "Mutlu Müşteri",
+      "service": "Hizmet",
+      "rating": "Müşteri Puanı",
+      "transfer": "Güvenli Transfer"
+    }
+  },
+  "language": {
+    "select": "Dil Seçin",
+    "turkish": "Türkçe",
+    "english": "English",
+    "arabic": "العربية"
+  },
+  "tours": {
+    "title": "Günlük Turlar",
+    "description": "İstanbul ve çevresindeki en popüler destinasyonlara günlük turlar",
+    "capacity": "7 kişilik kapasite",
+    "departure": "İstanbul'dan kalkış",
+    "bookNow": "Rezervasyon Yap",
+    "viewAll": "Tüm Turları Gör",
+    "istanbul": {
+      "name": "İstanbul Turu",
+      "description": "Sultanahmet, Ayasofya, Topkapı Sarayı ve Kapalıçarşı'yı keşfedin",
+      "duration": "8 saat",
+      "price": "₺2,500"
+    },
+    "sapanca": {
+      "name": "Sapanca Turu",
+      "description": "Doğal güzellikleri ve temiz havasıyla ünlü Sapanca Gölü",
+      "duration": "10 saat",
+      "price": "₺3,200"
+    },
+    "bursa": {
+      "name": "Bursa Turu",
+      "description": "Osmanlı'nın ilk başkenti, Uludağ ve tarihi çarşılar",
+      "duration": "12 saat",
+      "price": "₺3,800"
+    },
+    "abant": {
+      "name": "Abant Turu",
+      "description": "Muhteşem doğası ve temiz havasıyla Abant Gölü",
+      "duration": "10 saat",
+      "price": "₺3,500"
+    }
+  },
+  "hotels": {
+    "title": "Otel Konaklama",
+    "description": "İstanbul'da konforlu ve güvenli konaklama seçenekleri",
+    "bookNow": "Rezervasyon Yap",
+    "viewAll": "Tüm Otelleri Gör",
+    "noImage": "Görsel yok",
+    "features": {
+      "wifi": "Ücretsiz WiFi",
+      "parking": "Otopark",
+      "breakfast": "Kahvaltı",
+      "familyFriendly": "Aile Dostu"
+    },
+    "sultanahmetPalace": {
+      "name": "Sultanahmet Palace Hotel",
+      "description": "Tarihi yarımadada lüks konaklama deneyimi",
+      "location": "Sultanahmet, İstanbul",
+      "price": "₺2,800/gece"
+    },
+    "bosphorusHotel": {
+      "name": "Bosphorus View Hotel",
+      "description": "Boğaz manzaralı modern otel",
+      "location": "Beşiktaş, İstanbul",
+      "price": "₺3,200/gece"
+    },
+    "oldCityInn": {
+      "name": "Old City Inn",
+      "description": "Geleneksel Türk mimarisinde butik otel",
+      "location": "Fatih, İstanbul",
+      "price": "₺1,800/gece"
+    },
+    "modernIstanbul": {
+      "name": "Modern Istanbul Hotel",
+      "description": "Şehrin kalbinde modern konfor",
+      "location": "Şişli, İstanbul",
+      "price": "₺2,200/gece"
+    }
+  }
+}

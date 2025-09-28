@@ -29,7 +29,11 @@ export default function AdminNewReservationPage() {
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">Yeni Rezervasyon (Admin)</h1>
         <div className="bg-white shadow-sm rounded-lg border border-gray-200 p-6">
-          <ReservationForm />
+          <ReservationForm 
+            isOpen={true} 
+            onClose={() => {}} 
+            tenantId={undefined}
+          />
         </div>
       </div>
     </div>

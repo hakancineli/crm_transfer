@@ -21,6 +21,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
   const accommodationEnabled = useModule('accommodation');
   const flightEnabled = useModule('flight');
   const tourEnabled = useModule('tour');
+  const websiteEnabled = useModule('website');
 
 
   // Client-side rendering kontrolü
@@ -178,12 +179,20 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         order: 999
       },
       {
+        name: 'Website Yönetimi',
+        href: '/admin/website',
+        icon: '🌐',
+        description: 'Website modülü ve içerik yönetimi',
+        module: 'website',
+        order: role === 'SUPERUSER' ? 15 : (role === 'AGENCY_ADMIN' ? 6 : 999)
+      },
+      {
         name: 'Tur Yönetimi',
         href: '/admin/tour',
         icon: '🚌',
         description: 'Grup turları ve turizm acenteleri için özel yönetim',
         module: 'tour',
-        order: role === 'SUPERUSER' ? 15 : (role === 'AGENCY_ADMIN' ? 6 : 999)
+        order: role === 'SUPERUSER' ? 16 : (role === 'AGENCY_ADMIN' ? 7 : 999)
       },
       {
         name: 'Tur Rezervasyonları',
@@ -191,7 +200,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         icon: '📋',
         description: 'Tüm tur rezervasyonlarını görüntüle',
         module: 'tour',
-        order: role === 'SUPERUSER' ? 16 : (role === 'AGENCY_ADMIN' ? 7 : 999)
+        order: role === 'SUPERUSER' ? 17 : (role === 'AGENCY_ADMIN' ? 8 : 999)
       },
       {
         name: 'Tur Rotaları',
@@ -199,7 +208,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         icon: '🗺️',
         description: 'Tur rotalarını yönet',
         module: 'tour',
-        order: role === 'SUPERUSER' ? 17 : (role === 'AGENCY_ADMIN' ? 8 : 999)
+        order: role === 'SUPERUSER' ? 18 : (role === 'AGENCY_ADMIN' ? 9 : 999)
       },
       {
         name: 'Araç Yönetimi',
@@ -207,7 +216,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         icon: '🚐',
         description: 'Tur araçlarını yönet',
         module: 'tour',
-        order: role === 'SUPERUSER' ? 18 : (role === 'AGENCY_ADMIN' ? 9 : 999)
+        order: role === 'SUPERUSER' ? 19 : (role === 'AGENCY_ADMIN' ? 10 : 999)
       },
       {
         name: 'Modül Yönetimi',
@@ -243,7 +252,8 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
              item.module === 'system' ||
              (item.module === 'accommodation' && accommodationEnabled) ||
              (item.module === 'flight' && flightEnabled) ||
-             (item.module === 'tour' && tourEnabled)
+             (item.module === 'tour' && tourEnabled) ||
+             (item.module === 'website' && websiteEnabled)
   }));
 
   return (

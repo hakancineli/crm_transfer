@@ -8,13 +8,15 @@ interface ModuleSettings {
   accommodation: boolean;
   flight: boolean;
   tour: boolean;
+  website: boolean;
 }
 
 const defaultModules: ModuleSettings = {
   transfer: false,
   accommodation: false,
   flight: false,
-  tour: false
+  tour: false,
+  website: false
 };
 
 export function useModule(moduleName: keyof ModuleSettings) {
@@ -161,7 +163,7 @@ export function useModule(moduleName: keyof ModuleSettings) {
     } else {
       setIsLoading(false);
     }
-  }, [moduleName, user]);
+  }, [moduleName, user?.id, user?.role]); // Sadece gerekli değerleri dependency olarak kullan
 
   return { isEnabled, isLoading };
 }

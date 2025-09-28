@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { useGoogleMaps } from '@/app/hooks/useGoogleMaps';
+import GoogleMapsPlacesInput from '@/app/components/GoogleMapsPlacesInput';
 
 type Currency = 'TRY' | 'USD' | 'EUR';
 
@@ -26,12 +27,6 @@ export default function CustomerReservationPage() {
   const [fxRates, setFxRates] = useState<Partial<Record<Currency, number>>>({});
   const [fxError, setFxError] = useState<string>('');
 
-  const fromInputRef = useRef<HTMLInputElement | null>(null);
-  const toInputRef = useRef<HTMLInputElement | null>(null);
-  const [fromPredictions, setFromPredictions] = useState<Array<{ description: string }>>([]);
-  const [toPredictions, setToPredictions] = useState<Array<{ description: string }>>([]);
-  const fromDebounceRef = useRef<number | undefined>(undefined);
-  const toDebounceRef = useRef<number | undefined>(undefined);
 
   // Google Maps API hook kullan
   const { isLoaded: googleReady, isLoading: googleLoading, error: googleError } = useGoogleMaps();
@@ -51,31 +46,6 @@ export default function CustomerReservationPage() {
     }
   }, [googleReady, googleLoading, googleError]);
 
-  // Fallback: manual predictions via AutocompleteService
-  const requestPredictions = (value: string, which: 'from' | 'to') => {
-    setError('');
-    if (!value || value.length < 1) {
-      if (which === 'from') setFromPredictions([]);
-      else setToPredictions([]);
-      return;
-    }
-    const g = (window as any).google;
-    if (!g?.maps?.places?.AutocompleteService) return; // wait for script
-    const service = new g.maps.places.AutocompleteService();
-    const sessionToken = g.maps.places.AutocompleteSessionToken ? new g.maps.places.AutocompleteSessionToken() : undefined;
-    service.getPlacePredictions(
-      { input: value, componentRestrictions: { country: ['tr'] }, sessionToken, language: 'tr', region: 'TR' },
-      (preds: Array<{ description: string }> | null, status: string) => {
-        const list = preds || [];
-        if (which === 'from') setFromPredictions(list);
-        else setToPredictions(list);
-        setDebug(prev => ({ ...prev, lastPredFrom: which === 'from' ? list.length : prev.lastPredFrom, lastPredTo: which === 'to' ? list.length : prev.lastPredTo, lastStatus: status }));
-        if (status && status !== 'OK') {
-          console.warn('Places getPlacePredictions status:', status);
-        }
-      }
-    );
-  };
 
   // Kur bilgilerini çek (TRY bazlı)
   useEffect(() => {
@@ -240,77 +210,21 @@ export default function CustomerReservationPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">{t('customerForm.from') || 'From'}</label>
-                <input
-                  ref={fromInputRef}
-                  type="text"
+                <GoogleMapsPlacesInput
                   value={from}
-                  onChange={e => {
-                    const v = e.target.value;
-                    setFrom(v);
-                    if (fromDebounceRef.current) window.clearTimeout(fromDebounceRef.current);
-                    fromDebounceRef.current = window.setTimeout(() => requestPredictions(v, 'from'), 150);
-                  }}
+                  onChange={setFrom}
                   placeholder={t('customerForm.fromPlaceholder') || 'Adres yazın (örn. Şirinevler)'}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
-                  autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="off"
-                  spellCheck={false}
-                  inputMode="search"
-                  name="from-address-no-autofill"
                   required
                 />
-                {fromPredictions.length > 0 && (
-                  <div className="mt-1 border border-gray-200 rounded-md bg-white shadow-sm max-h-60 overflow-auto z-10 relative">
-                    {fromPredictions.map((p, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => { setFrom(p.description); setFromPredictions([]); }}
-                        className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
-                      >
-                        {p.description}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">{t('customerForm.to') || 'To'}</label>
-                <input
-                  ref={toInputRef}
-                  type="text"
+                <GoogleMapsPlacesInput
                   value={to}
-                  onChange={e => {
-                    const v = e.target.value;
-                    setTo(v);
-                    if (toDebounceRef.current) window.clearTimeout(toDebounceRef.current);
-                    toDebounceRef.current = window.setTimeout(() => requestPredictions(v, 'to'), 150);
-                  }}
+                  onChange={setTo}
                   placeholder={t('customerForm.toPlaceholder') || 'Adres yazın (örn. Havalimanı)'}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
-                  autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="off"
-                  spellCheck={false}
-                  inputMode="search"
-                  name="to-address-no-autofill"
                   required
                 />
-                {toPredictions.length > 0 && (
-                  <div className="mt-1 border border-gray-200 rounded-md bg-white shadow-sm max-h-60 overflow-auto z-10 relative">
-                    {toPredictions.map((p, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => { setTo(p.description); setToPredictions([]); }}
-                        className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
-                      >
-                        {p.description}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
 
@@ -334,22 +248,57 @@ export default function CustomerReservationPage() {
               </div>
             )}
 
-            {/* Compact fiyatlandırma bilgilendirmesi */}
-            <div className="mt-3 text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded p-2">
-              <div className="font-medium text-gray-700 mb-1">Fiyat nasıl hesaplanır?</div>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-                <div>0–10 km: 800 TRY</div>
-                <div>11–20 km: 1100 TRY</div>
-                <div>21–30 km: 1400 TRY</div>
-                <div>31–40 km: 1500 TRY</div>
-                <div>41–45 km: 1700 TRY</div>
-                <div>46–50 km: 1850 TRY</div>
-                <div>51–60 km: 2200 TRY</div>
-                <div>61–70 km: 2300 TRY</div>
-                <div>71–80 km: 2400 TRY</div>
-                <div>81–90 km: 2500 TRY</div>
+            {/* Fiyatlandırma bilgilendirmesi */}
+            <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <h3 className="font-semibold text-blue-800">Fiyat Nasıl Hesaplanır?</h3>
               </div>
-              <div className="mt-1 text-gray-500">90 km üzeri her +10 km için +300 TRY eklenir. Bu tahmini fiyattır.</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                <div className="flex justify-between items-center py-1 px-2 bg-white rounded border">
+                  <span className="text-gray-700">0–10 km:</span>
+                  <span className="font-medium text-green-600">800 TRY</span>
+                </div>
+                <div className="flex justify-between items-center py-1 px-2 bg-white rounded border">
+                  <span className="text-gray-700">11–20 km:</span>
+                  <span className="font-medium text-green-600">1100 TRY</span>
+                </div>
+                <div className="flex justify-between items-center py-1 px-2 bg-white rounded border">
+                  <span className="text-gray-700">21–30 km:</span>
+                  <span className="font-medium text-green-600">1400 TRY</span>
+                </div>
+                <div className="flex justify-between items-center py-1 px-2 bg-white rounded border">
+                  <span className="text-gray-700">31–40 km:</span>
+                  <span className="font-medium text-green-600">1500 TRY</span>
+                </div>
+                <div className="flex justify-between items-center py-1 px-2 bg-white rounded border">
+                  <span className="text-gray-700">41–45 km:</span>
+                  <span className="font-medium text-green-600">1700 TRY</span>
+                </div>
+                <div className="flex justify-between items-center py-1 px-2 bg-white rounded border">
+                  <span className="text-gray-700">46–50 km:</span>
+                  <span className="font-medium text-green-600">1850 TRY</span>
+                </div>
+                <div className="flex justify-between items-center py-1 px-2 bg-white rounded border">
+                  <span className="text-gray-700">51–60 km:</span>
+                  <span className="font-medium text-green-600">2200 TRY</span>
+                </div>
+                <div className="flex justify-between items-center py-1 px-2 bg-white rounded border">
+                  <span className="text-gray-700">61–70 km:</span>
+                  <span className="font-medium text-green-600">2300 TRY</span>
+                </div>
+                <div className="flex justify-between items-center py-1 px-2 bg-white rounded border">
+                  <span className="text-gray-700">71–80 km:</span>
+                  <span className="font-medium text-green-600">2400 TRY</span>
+                </div>
+                <div className="flex justify-between items-center py-1 px-2 bg-white rounded border">
+                  <span className="text-gray-700">81–90 km:</span>
+                  <span className="font-medium text-green-600">2500 TRY</span>
+                </div>
+              </div>
+              <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                <strong>Not:</strong> 90 km üzeri her +10 km için +300 TRY eklenir. Bu tahmini fiyattır.
+              </div>
             </div>
           </div>
 

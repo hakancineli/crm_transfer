@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/app/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
 
 export async function GET(request: NextRequest) {
@@ -185,6 +185,27 @@ export async function POST(request: NextRequest) {
       }
     } catch {}
     
+    // Website rezervasyonu için tenant ID'yi domain'den bul
+    let targetTenantId = body.tenantId || tenantIdFromToken;
+    
+    if (body.source === 'website' && body.tenantId) {
+      // Domain'den tenant ID'yi bul
+      const tenant = await prisma.tenant.findFirst({
+        where: { 
+          OR: [
+            { domain: body.tenantId },
+            { subdomain: body.tenantId }
+          ]
+        }
+      });
+      if (tenant) {
+        targetTenantId = tenant.id;
+        console.log('API: Website tenant bulundu:', tenant.id, tenant.companyName);
+      } else {
+        console.log('API: Website tenant bulunamadı:', body.tenantId);
+      }
+    }
+
     // Basit rezervasyon oluşturma
     const reservation = await prisma.reservation.create({
       data: {
@@ -193,17 +214,20 @@ export async function POST(request: NextRequest) {
         from: body.from || 'IST',
         to: body.to || 'Merkez',
         flightCode: body.flightCode || '',
-        passengerNames: JSON.stringify(body.passengerNames || ['Test Yolcu']),
-        luggageCount: body.luggageCount || 1,
+        passengerNames: JSON.stringify(body.passengerNames || [body.name || 'Test Yolcu']),
+        luggageCount: body.luggageCount || body.passengers || 1,
         price: body.price || 50.0,
         currency: body.currency || 'USD',
-        phoneNumber: body.phoneNumber || '',
+        phoneNumber: body.phoneNumber || body.phone || '',
         voucherNumber: body.voucherNumber || `VIP${new Date().toISOString().slice(2,10).replace(/-/g, '')}-${Math.floor(Math.random() * 1000)}`,
         driverFee: body.driverFee || 0,
-        userId: body.userId || userIdFromToken,
+        userId: userIdFromToken,
         paymentStatus: body.paymentStatus || 'PENDING',
         isReturn: body.isReturn || false,
-        tenantId: body.tenantId || tenantIdFromToken || null
+        tenantId: targetTenantId,
+        notes: body.notes || '',
+        email: body.email || '',
+        type: body.type || 'transfer'
       }
     });
     
@@ -211,8 +235,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(reservation);
   } catch (error) {
     console.error('Rezervasyon oluşturma hatası:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
     return NextResponse.json(
-      { error: 'Rezervasyon oluşturulamadı' },
+      { error: 'Rezervasyon oluşturulamadı', details: errorMessage },
       { status: 500 }
     );
   }

@@ -1,0 +1,46 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lakeGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#4682B4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2F4F4F;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="mountainGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#90EE90;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#228B22;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#006400;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Sky background -->
+  <rect width="400" height="300" fill="#E0F6FF"/>
+  
+  <!-- Mountains in background -->
+  <path d="M0,200 L80,120 L160,140 L240,100 L320,130 L400,110 L400,300 L0,300 Z" fill="url(#mountainGradient)"/>
+  
+  <!-- Lake -->
+  <ellipse cx="200" cy="200" rx="180" ry="60" fill="url(#lakeGradient)"/>
+  
+  <!-- Lake reflection -->
+  <ellipse cx="200" cy="200" rx="180" ry="30" fill="#4682B4" opacity="0.3"/>
+  
+  <!-- Trees around the lake -->
+  <circle cx="100" cy="180" r="15" fill="#228B22"/>
+  <circle cx="120" cy="170" r="12" fill="#228B22"/>
+  <circle cx="280" cy="185" r="18" fill="#228B22"/>
+  <circle cx="300" cy="175" r="14" fill="#228B22"/>
+  <circle cx="320" cy="180" r="16" fill="#228B22"/>
+  
+  <!-- Pine trees -->
+  <polygon points="80,200 85,170 90,200" fill="#006400"/>
+  <polygon points="310,195 315,165 320,195" fill="#006400"/>
+  
+  <!-- Birds flying -->
+  <path d="M150,80 Q155,75 160,80" stroke="#333" stroke-width="2" fill="none"/>
+  <path d="M200,85 Q205,80 210,85" stroke="#333" stroke-width="2" fill="none"/>
+  <path d="M250,75 Q255,70 260,75" stroke="#333" stroke-width="2" fill="none"/>
+  
+  <!-- Text overlay -->
+  <text x="200" y="250" text-anchor="middle" fill="white" font-family="Arial" font-size="20" font-weight="bold">Sapanca</text>
+  <text x="200" y="270" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Doğal Güzellik</text>
+</svg>

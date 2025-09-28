@@ -170,6 +170,12 @@ export class TenantService {
         flight: [
           // Uçuş için görüntüleme yetkisi (gerekirse genişletilebilir)
           'VIEW_REPORTS'
+        ],
+        website: [
+          'MANAGE_WEBSITE',
+          'EDIT_WEBSITE_CONTENT',
+          'MANAGE_WEBSITE_SETTINGS',
+          'VIEW_WEBSITE_ANALYTICS'
         ]
       };
 

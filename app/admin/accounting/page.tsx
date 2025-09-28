@@ -79,9 +79,11 @@ export default function AccountingPage() {
         headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
       });
       const data = await response.json();
-      setReservations(data);
+      // Ensure data is an array
+      setReservations(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching reservations:', error);
+      setReservations([]);
     } finally {
       setLoading(false);
     }
@@ -175,10 +177,10 @@ export default function AccountingPage() {
     }
   };
 
-  const filteredReservations = reservations.filter(reservation => {
+  const filteredReservations = Array.isArray(reservations) ? reservations.filter(reservation => {
     if (filter === 'all') return true;
     return reservation.paymentStatus === filter;
-  });
+  }) : [];
 
   // Raporlar sayfasındaki mantığa göre hesaplamalar
   const totalRevenueUSD = filteredReservations

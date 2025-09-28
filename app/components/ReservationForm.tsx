@@ -1,376 +1,472 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Airport, AIRPORTS, Currency, CURRENCIES } from '../types';
-import { HOTELS } from '@/app/types';
-import GoogleMapsPlacesInput from './GoogleMapsPlacesInput';
+import { useState, useEffect, useRef } from 'react';
+import { Calendar, MapPin, Users, Clock, X } from 'lucide-react';
 
-export default function ReservationForm() {
-    const router = useRouter();
+type Currency = 'TRY' | 'USD' | 'EUR';
 
-    // Bugünün tarihini YYYY-MM-DD formatında al
-    const today = new Date().toISOString().split('T')[0];
-    
-    // Son saati ayarla (23:59)
-    const defaultTime = '23:59';
+interface ReservationFormProps {
+  isOpen: boolean;
+  onClose: () => void;
+  tenantId?: string;
+}
 
+export default function ReservationForm({ isOpen, onClose, tenantId }: ReservationFormProps) {
     const [formData, setFormData] = useState({
-        date: today,
-        time: defaultTime,
-        from: '' as Airport | string,
-        to: '' as Airport | string,
-        flightCode: '',
-        passengerNames: [''],
+    type: 'transfer',
+    from: '',
+    to: '',
+    date: new Date().toISOString().split('T')[0],
+    time: '12:00',
+    passengers: [''],
         luggageCount: 0,
-        price: 0,
-        currency: 'USD' as Currency,
-        phoneNumber: ''
-    });
+    name: '',
+    phone: '',
+    email: '',
+    notes: '',
+    flightCode: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currency, setCurrency] = useState<Currency>('TRY');
+  const [distanceKm, setDistanceKm] = useState<number | null>(null);
+  const [estimatedPriceTRY, setEstimatedPriceTRY] = useState<number | null>(null);
+  const [estimating, setEstimating] = useState<boolean>(false);
+  const [fxRates, setFxRates] = useState<Partial<Record<Currency, number>>>({});
+  const [fromPredictions, setFromPredictions] = useState<Array<{ description: string }>>([]);
+  const [toPredictions, setToPredictions] = useState<Array<{ description: string }>>([]);
+  const [error, setError] = useState<string>('');
 
-    const [customFrom, setCustomFrom] = useState(true);
-    const [customTo, setCustomTo] = useState(true);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState(false);
+  const fromInputRef = useRef<HTMLInputElement | null>(null);
+  const toInputRef = useRef<HTMLInputElement | null>(null);
+  const fromDebounceRef = useRef<number | undefined>(undefined);
+  const toDebounceRef = useRef<number | undefined>(undefined);
+
+  // Kur bilgilerini çek
+  useEffect(() => {
+    async function fetchFx() {
+      try {
+        const res = await fetch('https://api.exchangerate-api.com/v4/latest/TRY');
+        const data = await res.json();
+        const next: Partial<Record<Currency, number>> = {
+          TRY: 1,
+          USD: data?.rates?.USD ?? undefined,
+          EUR: data?.rates?.EUR ?? undefined
+        };
+        setFxRates(next);
+      } catch (err) {
+        setFxRates({ TRY: 1, USD: 0.03, EUR: 0.03 });
+      }
+    }
+    fetchFx();
+  }, []);
+
+  // Fiyat hesaplama
+  function getPriceFromKm(km: number): number | null {
+    if (km <= 0) return 800;
+    if (km <= 10) return 800;
+    if (km <= 20) return 1100;
+    if (km <= 30) return 1400;
+    if (km <= 40) return 1500;
+    if (km <= 45) return 1700;
+    if (km <= 50) return 1850;
+    if (km <= 60) return 2200;
+    if (km <= 70) return 2300;
+    if (km <= 80) return 2400;
+    if (km <= 90) return 2500;
+    const extraBlocks = Math.ceil((km - 90) / 10);
+    return 2500 + extraBlocks * 300;
+  }
+
+  // Mesafe hesaplama
+  useEffect(() => {
+    const g = (window as any).google;
+    if (!formData.from || !formData.to || !g?.maps?.DistanceMatrixService) return;
+    let cancelled = false;
+    setEstimating(true);
+    const svc = new g.maps.DistanceMatrixService();
+    svc.getDistanceMatrix({
+      origins: [formData.from],
+      destinations: [formData.to],
+      travelMode: g.maps.TravelMode.DRIVING,
+      unitSystem: g.maps.UnitSystem.METRIC,
+      language: 'tr',
+      region: 'TR'
+    }, (res: any, status: string) => {
+      if (cancelled) return;
+      try {
+        if (status === 'OK' && res?.rows?.[0]?.elements?.[0]?.status === 'OK') {
+          const meters = res.rows[0].elements[0].distance.value as number;
+          const km = meters / 1000;
+          setDistanceKm(km);
+          setEstimatedPriceTRY(getPriceFromKm(km));
+        } else {
+          setDistanceKm(null);
+          setEstimatedPriceTRY(null);
+        }
+      } finally {
+        setEstimating(false);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [formData.from, formData.to]);
+
+  // Google Places API
+  const requestPredictions = (value: string, which: 'from' | 'to') => {
+    setError('');
+    if (!value || value.length < 1) {
+      if (which === 'from') setFromPredictions([]);
+      else setToPredictions([]);
+      return;
+    }
+    const g = (window as any).google;
+    if (!g?.maps?.places?.AutocompleteService) return;
+    const service = new g.maps.places.AutocompleteService();
+    const sessionToken = g.maps.places.AutocompleteSessionToken ? new g.maps.places.AutocompleteSessionToken() : undefined;
+    service.getPlacePredictions(
+      { input: value, componentRestrictions: { country: ['tr'] }, sessionToken, language: 'tr', region: 'TR' },
+      (preds: Array<{ description: string }> | null, status: string) => {
+        const list = preds || [];
+        if (which === 'from') setFromPredictions(list);
+        else setToPredictions(list);
+      }
+    );
+  };
+
+  // Yolcu yönetimi
+  const addPassenger = () => setFormData(prev => ({ ...prev, passengers: [...prev.passengers, ''] }));
+  const updatePassenger = (i: number, v: string) => setFormData(prev => ({ 
+    ...prev, 
+    passengers: prev.passengers.map((p, idx) => (idx === i ? v : p)) 
+  }));
+  const removePassenger = (i: number) => setFormData(prev => ({ 
+    ...prev, 
+    passengers: prev.passengers.filter((_, idx) => idx !== i) 
+  }));
+
+  if (!isOpen) return null;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
+    setIsSubmitting(true);
         setError('');
-        setSuccess(false);
 
-        try {
-            const token = localStorage.getItem('token');
+    try {
+      const priceToSubmit = (() => {
+        if (estimatedPriceTRY == null) return 0;
+        if (currency === 'TRY') return estimatedPriceTRY;
+        const rate = fxRates[currency];
+        return rate ? estimatedPriceTRY * rate : estimatedPriceTRY;
+      })();
+
             const response = await fetch('/api/reservations', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': token ? `Bearer ${token}` : ''
                 },
                 body: JSON.stringify({
+          type: formData.type,
+          from: formData.from,
+          to: formData.to,
                     date: formData.date,
                     time: formData.time,
-                    from: formData.from,
-                    to: formData.to,
+          passengerNames: formData.passengers,
+          luggageCount: formData.luggageCount,
+          price: priceToSubmit,
+          currency,
+          phoneNumber: formData.phone,
+          name: formData.name,
+          email: formData.email,
+          notes: formData.notes,
                     flightCode: formData.flightCode,
-                    passengerNames: formData.passengerNames,
-                    luggageCount: formData.luggageCount,
-                    price: formData.price,
-                    currency: formData.currency,
-                    phoneNumber: formData.phoneNumber
+          distanceKm: distanceKm || null,
+          tenantId,
+          source: 'website'
                 }),
             });
 
-            if (!response.ok) {
-                throw new Error('Rezervasyon oluşturulamadı');
-            }
-
-            const result = await response.json();
-            setSuccess(true);
-
-            router.push(`/admin/reservations/${result.voucherNumber}`);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Bir hata oluştu');
-            console.error('Form gönderme hatası:', err);
+      if (response.ok) {
+        alert('Rezervasyon talebiniz başarıyla gönderildi! En kısa sürede sizinle iletişime geçeceğiz.');
+        onClose();
+        // Reset form
+        setFormData({
+          type: 'transfer',
+          from: '',
+          to: '',
+          date: new Date().toISOString().split('T')[0],
+          time: '12:00',
+          passengers: [''],
+          luggageCount: 0,
+          name: '',
+          phone: '',
+          email: '',
+          notes: '',
+          flightCode: ''
+        });
+        setDistanceKm(null);
+        setEstimatedPriceTRY(null);
+      } else {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Request failed');
+      }
+    } catch (error: any) {
+      console.error('Error submitting reservation:', error);
+      setError(error?.message || 'Rezervasyon talebi gönderilirken bir hata oluştu. Lütfen tekrar deneyin.');
         } finally {
-            setLoading(false);
+      setIsSubmitting(false);
         }
     };
 
-
-
-    const addPassenger = () => {
+  const handleInputChange = (field: string, value: string | number) => {
         setFormData(prev => ({
             ...prev,
-            passengerNames: [...prev.passengerNames, '']
+      [field]: value
         }));
     };
 
-    const updatePassengerName = (index: number, value: string) => {
-        const newPassengerNames = [...formData.passengerNames];
-        newPassengerNames[index] = value;
-        setFormData(prev => ({
-            ...prev,
-            passengerNames: newPassengerNames
-        }));
-    };
-
-    const removePassenger = (index: number) => {
-        if (formData.passengerNames.length > 1) {
-            const newPassengerNames = formData.passengerNames.filter((_, i) => i !== index);
-            setFormData(prev => ({
-                ...prev,
-                passengerNames: newPassengerNames
-            }));
-        }
+  const convertFromTRY = (amountTRY: number | null, to: Currency): number | null => {
+    if (amountTRY == null) return null;
+    if (to === 'TRY') return amountTRY;
+    const rate = fxRates[to];
+    if (!rate || rate <= 0) return null;
+    return amountTRY * rate;
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 py-6">
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                <form onSubmit={handleSubmit} className="space-y-3">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b">
+          <h2 className="text-2xl font-bold text-gray-900">Rezervasyon Talebi</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600"
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
                     {error && (
-                        <div className="bg-red-50 border border-red-200 rounded-md p-1.5">
-                            <div className="flex">
-                                <div className="flex-shrink-0">
-                                    <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                    </svg>
+            <div className="bg-red-50 border border-red-200 rounded-md p-2 text-sm text-red-700">{error}</div>
+          )}
+
+          {/* Service Type */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Hizmet Türü
+            </label>
+            <select
+              value={formData.type}
+              onChange={(e) => handleInputChange('type', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              <option value="transfer">Transfer</option>
+              <option value="tour">Tur</option>
+              <option value="accommodation">Konaklama</option>
+            </select>
+          </div>
+
+          {/* Location Fields with Google Maps */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <MapPin className="inline h-4 w-4 mr-1" />
+                Nereden
+              </label>
+              <input
+                ref={fromInputRef}
+                type="text"
+                value={formData.from}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  handleInputChange('from', v);
+                  if (fromDebounceRef.current) window.clearTimeout(fromDebounceRef.current);
+                  fromDebounceRef.current = window.setTimeout(() => requestPredictions(v, 'from'), 150);
+                }}
+                placeholder="Adres yazın (örn. İstanbul Havalimanı)"
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                inputMode="search"
+                name="from-address-no-autofill"
+              />
+              {fromPredictions.length > 0 && (
+                <div className="mt-1 border border-gray-200 rounded-md bg-white shadow-sm max-h-60 overflow-auto z-10 relative">
+                  {fromPredictions.map((p, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => { 
+                        handleInputChange('from', p.description); 
+                        setFromPredictions([]); 
+                      }}
+                      className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
+                    >
+                      {p.description}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <MapPin className="inline h-4 w-4 mr-1" />
+                Nereye
+              </label>
+              <input
+                ref={toInputRef}
+                type="text"
+                value={formData.to}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  handleInputChange('to', v);
+                  if (toDebounceRef.current) window.clearTimeout(toDebounceRef.current);
+                  toDebounceRef.current = window.setTimeout(() => requestPredictions(v, 'to'), 150);
+                }}
+                placeholder="Adres yazın (örn: Taksim)"
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                inputMode="search"
+                name="to-address-no-autofill"
+              />
+              {toPredictions.length > 0 && (
+                <div className="mt-1 border border-gray-200 rounded-md bg-white shadow-sm max-h-60 overflow-auto z-10 relative">
+                  {toPredictions.map((p, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => { 
+                        handleInputChange('to', p.description); 
+                        setToPredictions([]); 
+                      }}
+                      className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
+                    >
+                      {p.description}
+                    </button>
+                  ))}
                                 </div>
-                                <div className="ml-3">
-                                    <p className="text-sm text-red-700">{error}</p>
+              )}
                                 </div>
                             </div>
+
+          {/* Distance and Price Display */}
+          {(formData.from && formData.to) && (
+            <div className="text-sm text-gray-700 flex items-center gap-3">
+              <span className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-2 py-1">
+                {estimating || distanceKm === null ? 'Hesaplanıyor…' : `${distanceKm.toFixed(1)} km`}
+              </span>
+              {estimatedPriceTRY !== null && (
+                <>
+                  <span className="inline-flex items-center rounded-md border border-green-200 bg-green-50 px-2 py-1 font-medium text-green-700">
+                    Tahmini Fiyat: {estimatedPriceTRY.toLocaleString('tr-TR')} TRY
+                  </span>
+                  {currency !== 'TRY' && (
+                    <span className="inline-flex items-center rounded-md border border-blue-200 bg-blue-50 px-2 py-1 font-medium text-blue-700">
+                      ≈ {(() => {
+                        const converted = convertFromTRY(estimatedPriceTRY, currency);
+                        return converted != null ? converted.toLocaleString('tr-TR', { maximumFractionDigits: 2 }) : '-';
+                      })()} {currency}
+                    </span>
+                  )}
+                </>
+              )}
                         </div>
                     )}
 
-                    {/* Tarih ve Saat */}
-                    <div className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
-                        <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
-                            <span role="img" aria-label="calendar" className="text-xl">📅</span>
-                            Transfer Zamanı
-                        </h3>
-                        <div className="grid grid-cols-2 gap-3">
-                            <div className="space-y-1">
-                                <label className="block text-sm font-medium text-gray-700">Tarih</label>
+          {/* Date and Time */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Calendar className="inline h-4 w-4 mr-1" />
+                Tarih
+              </label>
                                 <input
                                     type="date"
                                     value={formData.date}
-                                    onChange={e => setFormData(prev => ({ ...prev, date: e.target.value }))}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                onChange={(e) => handleInputChange('date', e.target.value)}
                                     required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                                 />
                             </div>
-                            <div className="space-y-1">
-                                <label className="block text-sm font-medium text-gray-700">Saat</label>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Clock className="inline h-4 w-4 mr-1" />
+                Saat
+              </label>
                                 <input
                                     type="time"
                                     value={formData.time}
-                                    onChange={e => setFormData(prev => ({ ...prev, time: e.target.value }))}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                onChange={(e) => handleInputChange('time', e.target.value)}
                                     required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                                 />
-                            </div>
                         </div>
                     </div>
 
-                    {/* Güzergah */}
-                    <div className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
-                        <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
-                            <span role="img" aria-label="route" className="text-xl">🚗</span>
-                            Transfer Güzergahı
-                        </h3>
-                        <div className="grid grid-cols-2 gap-3">
-                            <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">Nereden</label>
-                                <div className="flex items-center space-x-2 mb-2">
-                                    <input
-                                        type="checkbox"
-                                        checked={!customFrom}
-                                        onChange={() => {
-                                            setCustomFrom(!customFrom);
-                                            if (customFrom) {
-                                                setFormData(prev => ({ ...prev, from: '' }));
-                                            } else {
-                                                setFormData(prev => ({ ...prev, from: '' }));
-                                            }
-                                        }}
-                                        className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-                                    />
-                                    <span className="text-sm text-gray-600">Havalimanı/Otel Seç</span>
-                                </div>
-                                {!customFrom ? (
-                                    <select
-                                        value={formData.from}
-                                        onChange={e => setFormData(prev => ({ ...prev, from: e.target.value }))}
-                                        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
-                                        required
-                                    >
-                                        <option value="">Konum Seçin</option>
-                                        <optgroup label="Havalimanları">
-                                            {Object.entries(AIRPORTS).map(([key, value]) => (
-                                                <option key={key} value={key}>{value}</option>
-                                            ))}
-                                        </optgroup>
-                                        <optgroup label="Taksim Bölgesi">
-                                            {Object.entries(HOTELS)
-                                                .filter(([key]) => key.includes('TAKSIM') || key.includes('CVK') || key.includes('HYATT'))
-                                                .map(([key, value]) => (
-                                                    <option key={key} value={key}>{String(value)}</option>
-                                                ))
-                                            }
-                                        </optgroup>
-                                        <optgroup label="Beşiktaş/Boğaz Bölgesi">
-                                            {Object.entries(HOTELS)
-                                                .filter(([key]) => key.includes('BOSPHORUS') || key.includes('CIRAGAN') || key.includes('SHANGRI') || key.includes('RITZ') || key.includes('SWISSOTEL') || key.includes('CONRAD'))
-                                                .map(([key, value]) => (
-                                                    <option key={key} value={key}>{String(value)}</option>
-                                                ))
-                                            }
-                                        </optgroup>
-                                        <optgroup label="Şişli/Levent Bölgesi">
-                                            {Object.entries(HOTELS)
-                                                .filter(([key]) => key.includes('SISLI') || key.includes('LEVENT') || key.includes('DEDEMAN') || key.includes('POINT') || key.includes('FAIRMONT') || key.includes('RAFFLES'))
-                                                .map(([key, value]) => (
-                                                    <option key={key} value={key}>{String(value)}</option>
-                                                ))
-                                            }
-                                        </optgroup>
-                                        <optgroup label="Bakırköy Bölgesi">
-                                            {Object.entries(HOTELS)
-                                                .filter(([key]) => key.includes('BAKIRKOY') || key.includes('FLORYA') || key.includes('YESILKOY'))
-                                                .map(([key, value]) => (
-                                                    <option key={key} value={key}>{String(value)}</option>
-                                                ))
-                                            }
-                                        </optgroup>
-                                        <optgroup label="Sultanahmet Bölgesi">
-                                            {Object.entries(HOTELS)
-                                                .filter(([key]) => key.includes('SULTANAHMET') || key.includes('SURA') || key.includes('ARMADA') || key.includes('YASMAK') || key.includes('LEVNI'))
-                                                .map(([key, value]) => (
-                                                    <option key={key} value={key}>{String(value)}</option>
-                                                ))
-                                            }
-                                        </optgroup>
-                                    </select>
-                                ) : (
-                                    <GoogleMapsPlacesInput
-                                        value={formData.from}
-                                        onChange={(value) => setFormData(prev => ({ ...prev, from: value }))}
-                                        placeholder="Adres arayın veya giriniz..."
-                                        required
-                                    />
-                                )}
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">Nereye</label>
-                                <div className="flex items-center space-x-2 mb-2">
-                                    <input
-                                        type="checkbox"
-                                        checked={!customTo}
-                                        onChange={() => {
-                                            setCustomTo(!customTo);
-                                            if (customTo) {
-                                                setFormData(prev => ({ ...prev, to: '' }));
-                                            } else {
-                                                setFormData(prev => ({ ...prev, to: '' }));
-                                            }
-                                        }}
-                                        className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-                                    />
-                                    <span className="text-sm text-gray-600">Havalimanı/Otel Seç</span>
-                                </div>
-                                {!customTo ? (
-                                    <select
-                                        value={formData.to}
-                                        onChange={e => setFormData(prev => ({ ...prev, to: e.target.value }))}
-                                        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
-                                        required
-                                    >
-                                        <option value="">Konum Seçin</option>
-                                        <optgroup label="Havalimanları">
-                                            {Object.entries(AIRPORTS).map(([key, value]) => (
-                                                <option key={key} value={key}>{value}</option>
-                                            ))}
-                                        </optgroup>
-                                        <optgroup label="Taksim Bölgesi">
-                                            {Object.entries(HOTELS)
-                                                .filter(([key]) => key.includes('TAKSIM') || key.includes('CVK') || key.includes('HYATT'))
-                                                .map(([key, value]) => (
-                                                    <option key={key} value={key}>{String(value)}</option>
-                                                ))
-                                            }
-                                        </optgroup>
-                                        <optgroup label="Beşiktaş/Boğaz Bölgesi">
-                                            {Object.entries(HOTELS)
-                                                .filter(([key]) => key.includes('BOSPHORUS') || key.includes('CIRAGAN') || key.includes('SHANGRI') || key.includes('RITZ') || key.includes('SWISSOTEL') || key.includes('CONRAD'))
-                                                .map(([key, value]) => (
-                                                    <option key={key} value={key}>{String(value)}</option>
-                                                ))
-                                            }
-                                        </optgroup>
-                                        <optgroup label="Şişli/Levent Bölgesi">
-                                            {Object.entries(HOTELS)
-                                                .filter(([key]) => key.includes('SISLI') || key.includes('LEVENT') || key.includes('DEDEMAN') || key.includes('POINT') || key.includes('FAIRMONT') || key.includes('RAFFLES'))
-                                                .map(([key, value]) => (
-                                                    <option key={key} value={key}>{String(value)}</option>
-                                                ))
-                                            }
-                                        </optgroup>
-                                        <optgroup label="Bakırköy Bölgesi">
-                                            {Object.entries(HOTELS)
-                                                .filter(([key]) => key.includes('BAKIRKOY') || key.includes('FLORYA') || key.includes('YESILKOY'))
-                                                .map(([key, value]) => (
-                                                    <option key={key} value={key}>{String(value)}</option>
-                                                ))
-                                            }
-                                        </optgroup>
-                                        <optgroup label="Sultanahmet Bölgesi">
-                                            {Object.entries(HOTELS)
-                                                .filter(([key]) => key.includes('SULTANAHMET') || key.includes('SURA') || key.includes('ARMADA') || key.includes('YASMAK') || key.includes('LEVNI'))
-                                                .map(([key, value]) => (
-                                                    <option key={key} value={key}>{String(value)}</option>
-                                                ))
-                                            }
-                                        </optgroup>
-                                    </select>
-                                ) : (
-                                    <GoogleMapsPlacesInput
-                                        value={formData.to}
-                                        onChange={(value) => setFormData(prev => ({ ...prev, to: value }))}
-                                        placeholder="Adres arayın veya giriniz..."
-                                        required
-                                    />
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Uçuş Kodu */}
-                        <div className="mt-2">
-                            <label className="block text-sm font-medium text-gray-700">Uçuş Kodu</label>
-                            <div className="mt-1 relative rounded-md shadow-sm">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span role="img" aria-label="airplane" className="text-gray-400">✈️</span>
-                                </div>
+          {/* Flight Code and Currency */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Uçuş Kodu (Opsiyonel)
+              </label>
                                 <input
                                     type="text"
                                     value={formData.flightCode}
-                                    onChange={e => setFormData(prev => ({ ...prev, flightCode: e.target.value }))}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 pl-10 pr-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                onChange={(e) => handleInputChange('flightCode', e.target.value)}
                                     placeholder="TK1234"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                                 />
                             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Para Birimi
+              </label>
+              <select
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value as Currency)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="TRY">TRY</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+              </select>
                         </div>
                     </div>
 
-                    {/* Yolcu Bilgileri */}
-                    <div className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
-                        <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
-                            <span role="img" aria-label="passengers" className="text-xl">👥</span>
+          {/* Multi-Passenger Management */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <Users className="inline h-4 w-4 mr-1" />
                             Yolcu Bilgileri
-                        </h3>
+            </label>
                         <div className="space-y-2">
-                            {formData.passengerNames.map((name, index) => (
-                                <div key={index} className="flex gap-2">
+              {formData.passengers.map((passenger, i) => (
+                <div key={i} className="flex gap-2">
                                     <input
                                         type="text"
-                                        value={name}
-                                        onChange={e => updatePassengerName(index, e.target.value)}
-                                        className="flex-1 mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                                        placeholder={`${index + 1}. Yolcu`}
+                    value={passenger}
+                    onChange={(e) => updatePassenger(i, e.target.value)}
+                    placeholder={`Yolcu ${i + 1} adı`}
                                         required
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                                     />
-                                    {formData.passengerNames.length > 1 && (
+                  {formData.passengers.length > 1 && (
                                         <button
                                             type="button"
-                                            onClick={() => removePassenger(index)}
-                                            className="mt-1 inline-flex items-center p-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                      onClick={() => removePassenger(i)}
+                      className="px-3 py-2 border border-red-300 text-red-600 rounded-md hover:bg-red-50"
                                         >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                            </svg>
+                      Sil
                                         </button>
                                     )}
                                 </div>
@@ -378,128 +474,130 @@ export default function ReservationForm() {
                             <button
                                 type="button"
                                 onClick={addPassenger}
-                                className="mt-2 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                className="px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                                </svg>
-                                Yolcu Ekle
+                + Yolcu Ekle
                             </button>
+              <p className="text-xs text-gray-600">Lütfen tüm yolcuların pasaporttaki tam isimlerini giriniz.</p>
+            </div>
                         </div>
 
-                        {/* İletişim Numarası */}
-                        <div className="mt-2">
-                            <label className="block text-sm font-medium text-gray-700">
-                                İletişim Numarası
-                                <span className="text-red-500 ml-1">*</span>
+          {/* Luggage Count */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Bagaj Sayısı
                             </label>
-                            <div className="mt-1 relative rounded-md shadow-sm">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span role="img" aria-label="phone" className="text-gray-400">📱</span>
+            <input
+              type="number"
+              min={0}
+              value={formData.luggageCount === 0 ? '' : formData.luggageCount}
+              onChange={(e) => {
+                const value = e.target.value;
+                const numValue = value === '' ? 0 : parseInt(value, 10);
+                handleInputChange('luggageCount', Number.isNaN(numValue) ? 0 : numValue);
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
                                 </div>
+
+          {/* Contact Information */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Ad Soyad
+              </label>
                                 <input
-                                    type="tel"
-                                    value={formData.phoneNumber}
-                                    onChange={e => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 pl-10 pr-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                                    placeholder="0555 555 5555"
+                type="text"
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
                                     required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                                 />
-                            </div>
-                        </div>
                     </div>
 
-                    {/* Bagaj ve Ödeme */}
-                    <div className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
-                        <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
-                            <span role="img" aria-label="payment" className="text-xl">💰</span>
-                            Bagaj ve Ödeme Bilgileri
-                        </h3>
-                        <div className="grid grid-cols-3 gap-3">
-                            <div className="space-y-1">
-                                <label className="block text-sm font-medium text-gray-700">Bagaj Sayısı</label>
-                                <div className="mt-1 relative rounded-md shadow-sm">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <span role="img" aria-label="luggage" className="text-gray-400">🧳</span>
-                                    </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Telefon
+              </label>
                                     <input
-                                        type="number"
-                                        value={Number.isNaN(formData.luggageCount) ? 0 : formData.luggageCount}
-                                        onChange={e => {
-                                            const raw = e.target.value;
-                                            const parsed = parseInt(raw, 10);
-                                            setFormData(prev => ({
-                                                ...prev,
-                                                luggageCount: Number.isNaN(parsed) ? 0 : parsed
-                                            }));
-                                        }}
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 pl-10 pr-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                                        min="0"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
                                         required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                                     />
                                 </div>
                             </div>
 
-                            <div className="space-y-1">
-                                <label className="block text-sm font-medium text-gray-700">Fiyat</label>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </label>
                                 <input
-                                    type="number"
-                                    value={Number.isNaN(formData.price) ? 0 : formData.price}
-                                    onChange={e => {
-                                        const raw = e.target.value;
-                                        const parsed = parseFloat(raw);
-                                        setFormData(prev => ({
-                                            ...prev,
-                                            price: Number.isNaN(parsed) ? 0 : parsed
-                                        }));
-                                    }}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                                    min="0"
-                                    step="0.01"
-                                    required
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleInputChange('email', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+
+          {/* Notes */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Özel Notlar
+            </label>
+            <textarea
+              value={formData.notes}
+              onChange={(e) => handleInputChange('notes', e.target.value)}
+              rows={3}
+              placeholder="Özel taleplerinizi buraya yazabilirsiniz..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                                 />
                             </div>
 
-                            <div className="space-y-1">
-                                <label className="block text-sm font-medium text-gray-700">Para Birimi</label>
-                                <select
-                                    value={formData.currency}
-                                    onChange={e => setFormData(prev => ({ ...prev, currency: e.target.value as Currency }))}
-                                    className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
-                                    required
-                                >
-                                    {Object.entries(CURRENCIES).map(([key, value]) => (
-                                        <option key={key} value={key}>{value}</option>
-                                    ))}
-                                </select>
+          {/* Price Information */}
+          {estimatedPriceTRY !== null && (
+            <div className="bg-gray-50 border border-gray-200 rounded p-3">
+              <div className="text-sm text-gray-700">
+                <div className="font-medium text-gray-800 mb-2">Fiyat Bilgisi</div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                  <div>0–10 km: 800 TRY</div>
+                  <div>11–20 km: 1100 TRY</div>
+                  <div>21–30 km: 1400 TRY</div>
+                  <div>31–40 km: 1500 TRY</div>
+                  <div>41–45 km: 1700 TRY</div>
+                  <div>46–50 km: 1850 TRY</div>
+                  <div>51–60 km: 2200 TRY</div>
+                  <div>61–70 km: 2300 TRY</div>
+                  <div>71–80 km: 2400 TRY</div>
+                  <div>81–90 km: 2500 TRY</div>
                             </div>
+                <div className="mt-2 text-gray-500">90 km üzeri her +10 km için +300 TRY eklenir. Bu tahmini fiyattır.</div>
                         </div>
                     </div>
+          )}
 
-                    {/* Gönder Butonu */}
-                    <div className="flex justify-end mt-2">
+          {/* Submit Button */}
+          <div className="flex justify-end space-x-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              İptal
+            </button>
                         <button
                             type="submit"
-                            disabled={loading}
-                            className={`inline-flex justify-center items-center gap-2 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${
-                                loading 
-                                    ? 'bg-green-400 cursor-not-allowed' 
-                                    : 'bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500'
-                            }`}
-                        >
-                            {loading ? (
-                                <>
-                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    İşleniyor...
+              disabled={isSubmitting}
+              className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-6 py-2 rounded-md transition-colors flex items-center"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Gönderiliyor...
                                 </>
                             ) : (
-                                <>
-                                    <span role="img" aria-label="save" className="text-xl">💾</span>
-                                    Rezervasyon Oluştur
-                                </>
+                'Rezervasyon Talebi Gönder'
                             )}
                         </button>
                     </div>

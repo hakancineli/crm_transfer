@@ -95,13 +95,15 @@ export default function AdminDashboard() {
       const reservationsResponse = await fetch('/api/reservations', {
         headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
       });
-      const reservations = await reservationsResponse.json();
+      const reservationsData = await reservationsResponse.json();
+      const reservations = Array.isArray(reservationsData) ? reservationsData : [];
       
       // Sürücü istatistikleri (token ile)
       const driversResponse = await fetch('/api/drivers', {
         headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
       });
-      const drivers = await driversResponse.json();
+      const driversData = await driversResponse.json();
+      const drivers = Array.isArray(driversData) ? driversData : [];
       
       // Bugünkü tarih
       const today = new Date().toISOString().split('T')[0];

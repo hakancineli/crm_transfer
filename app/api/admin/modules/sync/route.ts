@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/app/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 // Tüm tenantlarda açık modüllerin varsayılan izinlerini admin kullanıcılara senkronlar (idempotent)
 export async function POST(_request: NextRequest) {

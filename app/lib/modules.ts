@@ -39,6 +39,20 @@ export const MODULES = {
       'bilet-yonetimi',
       'ucus-raporlari'
     ]
+  },
+  WEBSITE: {
+    id: 'website',
+    name: 'Website Modülü',
+    description: 'Multi-tenant website builder ve domain yönetimi',
+    priceMonthly: 30,
+    priceYearly: 300,
+    features: [
+      'website-builder',
+      'domain-yonetimi',
+      'seo-optimizasyonu',
+      'analytics-entegrasyonu',
+      'custom-tasarim'
+    ]
   }
 } as const;
 
@@ -55,7 +69,12 @@ export const MODULE_FEATURES = {
   'musteri-tercihleri': 'Müşteri Tercihleri',
   'ucus-rezervasyon': 'Uçuş Rezervasyonu',
   'bilet-yonetimi': 'Bilet Yönetimi',
-  'ucus-raporlari': 'Uçuş Raporları'
+  'ucus-raporlari': 'Uçuş Raporları',
+  'website-builder': 'Website Builder',
+  'domain-yonetimi': 'Domain Yönetimi',
+  'seo-optimizasyonu': 'SEO Optimizasyonu',
+  'analytics-entegrasyonu': 'Analytics Entegrasyonu',
+  'custom-tasarim': 'Custom Tasarım'
 } as const;
 
 export const SUBSCRIPTION_PLANS = {
