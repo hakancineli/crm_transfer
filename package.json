@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "prisma generate && next build --no-lint",
+    "postinstall": "prisma generate",
     "start": "next start",
     "lint": "next lint",
     "tenant:create": "ts-node scripts/tenant_create.ts",
