@@ -12,6 +12,18 @@ export async function middleware(request: NextRequest) {
 	
 	// Public routes that don't need authentication
 	const publicRoutes = ['/login', '/admin-login', '/', '/customer-reservation', '/customer-panel', '/reservation-lookup'];
+
+	// Always allow public assets and manifest
+	if (
+		pathname.startsWith('/api/') ||
+		pathname.startsWith('/website/') ||
+		pathname === '/site.webmanifest' ||
+		pathname === '/robots.txt' ||
+		pathname === '/sitemap.xml' ||
+		pathname === '/manifest.json'
+	) {
+		return NextResponse.next();
+	}
 	
 	// Check if it's a website route
 	if (pathname.startsWith('/website/')) {
