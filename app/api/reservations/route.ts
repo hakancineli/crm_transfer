@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
       skip: offset,
       where: whereClause,
       include: {
-        User: {
+        user: {
           select: {
             id: true,
             name: true,
