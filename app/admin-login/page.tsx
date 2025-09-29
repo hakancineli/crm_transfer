@@ -6,7 +6,7 @@ import { useAuth } from '@/app/contexts/AuthContext';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('superuser');
-  const [password, setPassword] = useState('admin123');
+  const [password, setPassword] = useState('Pamukkale34.');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -120,7 +120,7 @@ export default function AdminLoginPage() {
                        <p className="text-sm text-gray-700 font-medium">Superuser</p>
                        <p className="text-xs text-gray-500 mt-1">
                          Kullanıcı: <span className="font-mono">superuser</span><br />
-                         Şifre: <span className="font-mono">admin123</span>
+                        Şifre: <span className="font-mono">Pamukkale34.</span>
                        </p>
                      </div>
             </div>
