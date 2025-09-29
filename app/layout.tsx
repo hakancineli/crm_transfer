@@ -9,7 +9,7 @@ import { EmojiProvider } from "./contexts/EmojiContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.protransfer.com.tr"),
+  metadataBase: new URL("https://proacente.com"),
   title: {
     default: "ProTransfer - İstanbul Havalimanı Transfer Hizmeti",
     template: "%s | ProTransfer",
@@ -37,9 +37,9 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    url: "https://www.protransfer.com.tr/",
-    siteName: "ProTransfer",
-    title: "ProTransfer - İstanbul Havalimanı Transfer",
+    url: "https://proacente.com/",
+    siteName: "ProAcente",
+    title: "ProAcente - CRM",
     description:
       "IST ve SAW için VIP transfer. Sabit fiyat, uçuş takibi, karşılama hizmeti.",
     images: [
