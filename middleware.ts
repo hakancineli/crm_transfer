@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { prisma } from '@/app/lib/prisma';
 
 export async function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
@@ -41,33 +40,7 @@ export async function middleware(request: NextRequest) {
 		return NextResponse.next();
 	}
 	
-	// Check if it's a custom domain request
-	if (hostname !== 'localhost:3000' && !hostname.includes('vercel.app') && !hostname.includes('proacente.com') && !hostname.includes('protransfer.com.tr')) {
-		try {
-			// Check if this is a custom domain
-			const website = await prisma.tenantWebsite.findFirst({
-				where: {
-					OR: [
-						{ domain: hostname },
-						{ subdomain: subdomain }
-					],
-					isActive: true
-				},
-				include: {
-					tenant: true
-				}
-			});
-
-			if (website) {
-				// Redirect to website route
-				const url = request.nextUrl.clone();
-				url.pathname = `/website/${website.domain || website.subdomain}`;
-				return NextResponse.rewrite(url);
-			}
-		} catch (error) {
-			console.error('Error checking custom domain:', error);
-		}
-	}
+	// Skip DB lookups in middleware; custom domain handling moved to runtime routes if needed
 	
 	// Check if it's a public route
 	if (publicRoutes.includes(pathname)) {
