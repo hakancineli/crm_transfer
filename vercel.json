@@ -2,9 +2,9 @@
   "version": 2,
   "framework": "nextjs",
   "regions": ["iad1"],
-  "buildCommand": "npm run build",
+  "buildCommand": "npx prisma generate && npm run build",
   "outputDirectory": ".next",
-  "installCommand": "npm install --production=false",
+  "installCommand": "npm install --production=false && npx prisma generate",
   "env": {
     "NODE_ENV": "production"
   },
