@@ -47,17 +47,23 @@ export async function POST(request: NextRequest) {
           if (!process.env.JWT_SECRET) {
             return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
           }
-          
-          const token = jwt.sign(
+
+          const accessToken = jwt.sign(
             { userId: user.id, username: user.username, role: user.role },
             process.env.JWT_SECRET,
-            { expiresIn: '24h' }
+            { expiresIn: '1h' }
+          );
+
+          const refreshToken = jwt.sign(
+            { userId: user.id, type: 'refresh' },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
           );
 
           return NextResponse.json({
             success: true,
-            token,
-            refreshToken: token,
+            token: accessToken,
+            refreshToken,
             user: {
               id: user.id,
               username: user.username,
@@ -79,16 +85,22 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
       }
       
-      const token = jwt.sign(
+      const accessToken = jwt.sign(
         { userId: '1', username: 'superuser', role: 'SUPERUSER' },
         process.env.JWT_SECRET,
-        { expiresIn: '24h' }
+        { expiresIn: '1h' }
+      );
+
+      const refreshToken = jwt.sign(
+        { userId: '1', type: 'refresh' },
+        process.env.JWT_SECRET,
+        { expiresIn: '7d' }
       );
 
       return NextResponse.json({
         success: true,
-        token,
-        refreshToken: token,
+        token: accessToken,
+        refreshToken,
         user: {
           id: '1',
           username: 'superuser',

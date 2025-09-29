@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 
 // Basit kur oranları (gerçek uygulamada bir API'den alınmalı)
 const EXCHANGE_RATES = {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 import { prisma } from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
 
@@ -47,7 +48,7 @@ export async function GET(request: NextRequest) {
       skip: offset,
       where: whereClause,
       include: {
-        User: {
+        user: {
           select: {
             id: true,
             name: true,
@@ -77,7 +78,7 @@ export async function GET(request: NextRequest) {
       skip: offset,
       where: whereClause,
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -104,6 +105,18 @@ export async function GET(request: NextRequest) {
     console.log('API: Bulunan transfer sayısı:', reservations.length);
     console.log('API: Bulunan tur sayısı:', tourBookings.length);
 
+    // Güvenli JSON parse helper
+    const safeParseArray = (value: any): any[] => {
+      if (Array.isArray(value)) return value;
+      if (value == null || value === '') return [];
+      try {
+        const parsed = typeof value === 'string' ? JSON.parse(value) : value;
+        return Array.isArray(parsed) ? parsed : [parsed].filter(Boolean);
+      } catch {
+        return typeof value === 'string' ? [value] : [];
+      }
+    };
+
     // Transfer rezervasyonlarını formatla
     const transferResults = reservations.map(r => ({
       id: r.id,
@@ -112,7 +125,7 @@ export async function GET(request: NextRequest) {
       time: r.time,
       from: r.from,
       to: r.to,
-      passengerNames: JSON.parse(r.passengerNames || '[]'),
+      passengerNames: safeParseArray((r as any).passengerNames),
       price: r.price,
       currency: r.currency,
       paymentStatus: r.paymentStatus,
@@ -133,7 +146,7 @@ export async function GET(request: NextRequest) {
       time: t.tourTime || '00:00',
       from: t.pickupLocation,
       to: t.routeName,
-      passengerNames: JSON.parse(t.passengerNames || '[]'),
+      passengerNames: safeParseArray((t as any).passengerNames),
       price: t.price,
       currency: t.currency,
       paymentStatus: t.status,

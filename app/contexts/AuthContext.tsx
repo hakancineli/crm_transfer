@@ -147,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('isAdmin');
     sessionStorage.clear();
     setUser(null);
-    router.push('/login');
+    router.push('/admin-login');
   };
 
   const refreshToken = async () => {

@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export interface ActivityData {
   userId: string;
@@ -27,7 +25,7 @@ export class ActivityLogger {
         }
       }
 
-      await prisma.activity.create({
+      const created = await prisma.activity.create({
         data: {
           userId: data.userId,
           action: data.action,
@@ -39,9 +37,11 @@ export class ActivityLogger {
           userAgent: data.userAgent,
         },
       });
+      return created;
     } catch (error) {
       console.error('Activity logging failed:', error);
-      // Don't throw error to avoid breaking main functionality
+      // Return null to avoid breaking main functionality
+      return null;
     }
   }
 

@@ -51,11 +51,11 @@ export default function AdminDashboard() {
 
   // Kullanıcı kontrolü - sadece giriş yapmış kullanıcılar erişebilir
   useEffect(() => {
-    if (isClient && !user) {
+    if (isClient && !authLoading && !user) {
       window.location.href = '/admin-login';
       return;
     }
-  }, [isClient, user]);
+  }, [isClient, authLoading, user]);
 
   useEffect(() => {
     if (canViewDashboard) {

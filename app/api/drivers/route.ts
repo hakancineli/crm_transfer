@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 import { prisma } from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
 import { getRequestUserContext } from '@/app/lib/requestContext';
