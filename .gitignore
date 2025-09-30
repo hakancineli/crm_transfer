@@ -52,3 +52,4 @@ instagramRemoveBlockNotify
 *.sqlite3
 prisma/dev.db
 prisma/*.db
+prisma-client/
