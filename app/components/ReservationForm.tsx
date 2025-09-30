@@ -33,14 +33,10 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
   const [estimatedPriceTRY, setEstimatedPriceTRY] = useState<number | null>(null);
   const [estimating, setEstimating] = useState<boolean>(false);
   const [fxRates, setFxRates] = useState<Partial<Record<Currency, number>>>({});
-  const [fromPredictions, setFromPredictions] = useState<Array<{ description: string }>>([]);
-  const [toPredictions, setToPredictions] = useState<Array<{ description: string }>>([]);
   const [error, setError] = useState<string>('');
 
   const fromInputRef = useRef<HTMLInputElement | null>(null);
   const toInputRef = useRef<HTMLInputElement | null>(null);
-  const fromDebounceRef = useRef<number | undefined>(undefined);
-  const toDebounceRef = useRef<number | undefined>(undefined);
 
   // Kur bilgilerini çek
   useEffect(() => {
@@ -111,27 +107,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
     return () => { cancelled = true; };
   }, [formData.from, formData.to]);
 
-  // Google Places API
-  const requestPredictions = (value: string, which: 'from' | 'to') => {
-    setError('');
-    if (!value || value.length < 1) {
-      if (which === 'from') setFromPredictions([]);
-      else setToPredictions([]);
-      return;
-    }
-    const g = (window as any).google;
-    if (!g?.maps?.places?.AutocompleteService) return;
-    const service = new g.maps.places.AutocompleteService();
-    const sessionToken = g.maps.places.AutocompleteSessionToken ? new g.maps.places.AutocompleteSessionToken() : undefined;
-    service.getPlacePredictions(
-      { input: value, componentRestrictions: { country: ['tr'] }, sessionToken, language: 'tr', region: 'TR' },
-      (preds: Array<{ description: string }> | null, status: string) => {
-        const list = preds || [];
-        if (which === 'from') setFromPredictions(list);
-        else setToPredictions(list);
-      }
-    );
-  };
+  // Google Places API handled by GoogleMapsPlacesInput component
 
   // Yolcu yönetimi
   const addPassenger = () => setFormData(prev => ({ ...prev, passengers: [...prev.passengers, ''] }));
