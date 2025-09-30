@@ -79,8 +79,13 @@ export async function POST(request: NextRequest) {
       // Fall through to hardcoded login
     }
 
-    // Hardcoded fallback for superuser
-    if (username === 'superuser' && password === 'Pamukkale34.') {
+    // Hardcoded fallback for superuser (disabled by default in production)
+    // Enable only by setting ENABLE_HARDCODED_LOGIN=true (use with caution)
+    if (
+      process.env.ENABLE_HARDCODED_LOGIN === 'true' &&
+      username === 'superuser' &&
+      password === 'Pamukkale34.'
+    ) {
       if (!process.env.JWT_SECRET) {
         return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
       }
