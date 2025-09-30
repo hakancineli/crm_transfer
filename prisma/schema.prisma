@@ -15,12 +15,12 @@ model Tenant {
   domain               String?
   isActive             Boolean          @default(true)
   subscriptionPlan     String           @default("basic")
-  websiteModuleEnabled Boolean          @default(false)
   createdAt            DateTime         @default(now())
   updatedAt            DateTime         @updatedAt
   paymentAccountHolder String?
   paymentBank          String?
   paymentIban          String?
+  websiteModuleEnabled Boolean          @default(false)
   activities           Activity[]
   reservations         Reservation[]
   drivers              Driver[]
@@ -29,9 +29,9 @@ model Tenant {
   hotelRequests        HotelRequest[]
   modules              TenantModule[]
   users                TenantUser[]
+  websites             TenantWebsite[]
   tourBookings         TourBooking[]
   vehicles             Vehicle[]
-  websites             TenantWebsite[]
 
   @@map("tenants")
 }
@@ -167,8 +167,8 @@ model Reservation {
   userId                  String?
   tenantId                String?
   companyCommissionStatus String         @default("PENDING")
-  notes                   String?
   email                   String?
+  notes                   String?
   type                    String         @default("transfer")
   driver                  Driver?        @relation(fields: [driverId], references: [id])
   returnTransfer          Reservation?   @relation("ReturnTransfer", fields: [returnTransferId], references: [id])
@@ -331,6 +331,81 @@ model TourBooking {
   @@map("tour_bookings")
 }
 
+model TenantWebsite {
+  id        String           @id @default(uuid())
+  tenantId  String
+  domain    String?          @unique
+  subdomain String?          @unique
+  isActive  Boolean          @default(true)
+  theme     String           @default("default")
+  customCSS String?
+  favicon   String?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  tenant    Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  pages     WebsitePage[]
+  sections  WebsiteSection[]
+  settings  WebsiteSettings?
+
+  @@map("tenant_websites")
+}
+
+model WebsitePage {
+  id              String        @id @default(uuid())
+  websiteId       String
+  slug            String
+  title           String
+  content         Json
+  metaTitle       String?
+  metaDescription String?
+  isPublished     Boolean       @default(false)
+  isHomepage      Boolean       @default(false)
+  sortOrder       Int           @default(0)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  website         TenantWebsite @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@unique([websiteId, slug])
+  @@map("website_pages")
+}
+
+model WebsiteSettings {
+  id            String        @id @default(uuid())
+  websiteId     String        @unique
+  companyName   String
+  logo          String?
+  heroTitle     String
+  heroSubtitle  String
+  heroImage     String?
+  contactInfo   Json
+  socialMedia   Json
+  seoSettings   Json
+  colorScheme   Json
+  customCSS     String?
+  analyticsCode String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  website       TenantWebsite @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@map("website_settings")
+}
+
+model WebsiteSection {
+  id          String        @id @default(uuid())
+  websiteId   String
+  sectionType String
+  title       String?
+  content     Json
+  isActive    Boolean       @default(true)
+  sortOrder   Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  website     TenantWebsite @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@unique([websiteId, sectionType])
+  @@map("website_sections")
+}
+
 enum UserRole {
   SUPERUSER
   OPERATION
@@ -338,80 +413,4 @@ enum UserRole {
   ACCOUNTANT
   AGENCY_ADMIN
   AGENCY_USER
-}
-
-// Website Module Models
-model TenantWebsite {
-  id              String   @id @default(uuid())
-  tenantId        String
-  domain          String?  @unique
-  subdomain       String?  @unique
-  isActive        Boolean  @default(true)
-  theme           String   @default("default")
-  customCSS       String?
-  favicon         String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  pages           WebsitePage[]
-  settings        WebsiteSettings?
-  sections        WebsiteSection[]
-
-  @@map("tenant_websites")
-}
-
-model WebsitePage {
-  id          String   @id @default(uuid())
-  websiteId   String
-  slug        String
-  title       String
-  content     Json
-  metaTitle   String?
-  metaDescription String?
-  isPublished Boolean  @default(false)
-  isHomepage  Boolean  @default(false)
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  website     TenantWebsite @relation(fields: [websiteId], references: [id], onDelete: Cascade)
-
-  @@unique([websiteId, slug])
-  @@map("website_pages")
-}
-
-model WebsiteSettings {
-  id              String   @id @default(uuid())
-  websiteId       String   @unique
-  companyName     String
-  logo            String?
-  heroTitle       String
-  heroSubtitle    String
-  heroImage       String?
-  contactInfo     Json     // {phone, email, address, whatsapp}
-  socialMedia     Json     // {facebook, instagram, twitter, linkedin}
-  seoSettings     Json     // {title, description, keywords, ogImage}
-  colorScheme     Json     // {primary, secondary, accent}
-  customCSS       String?
-  analyticsCode   String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  website         TenantWebsite @relation(fields: [websiteId], references: [id], onDelete: Cascade)
-
-  @@map("website_settings")
-}
-
-model WebsiteSection {
-  id          String   @id @default(uuid())
-  websiteId   String
-  sectionType String   // hero, features, reviews, faq, contact, etc.
-  title       String?
-  content     Json
-  isActive    Boolean  @default(true)
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  website     TenantWebsite @relation(fields: [websiteId], references: [id], onDelete: Cascade)
-
-  @@unique([websiteId, sectionType])
-  @@map("website_sections")
 }
