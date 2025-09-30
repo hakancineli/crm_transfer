@@ -14,6 +14,17 @@ export interface ActivityData {
 export class ActivityLogger {
   static async logActivity(data: ActivityData) {
     try {
+      // If no userId provided, skip logging to avoid FK errors
+      if (!data.userId) {
+        return null;
+      }
+
+      // Ensure the user exists to satisfy FK constraint
+      const existingUser = await prisma.user.findUnique({ where: { id: data.userId } });
+      if (!existingUser) {
+        return null;
+      }
+
       // Ensure details is JSON serializable
       let serializableDetails = null;
       if (data.details) {
