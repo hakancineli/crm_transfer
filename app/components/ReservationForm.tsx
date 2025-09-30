@@ -458,19 +458,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
 
           {/* Email alanı kaldırıldı */}
 
-          {/* Notes */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Özel Notlar
-            </label>
-            <textarea
-              value={formData.notes}
-              onChange={(e) => handleInputChange('notes', e.target.value)}
-              rows={3}
-              placeholder="Özel taleplerinizi buraya yazabilirsiniz..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                                />
-                            </div>
+          {/* Notes removed per request */}
 
           {/* Price Information */}
           {estimatedPriceTRY !== null && (
