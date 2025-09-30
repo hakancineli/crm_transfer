@@ -75,11 +75,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(users);
   } catch (error) {
-    console.error('Error fetching users:', error);
-    return NextResponse.json(
-      { error: 'Kullanıcılar getirilemedi' },
-      { status: 500 }
-    );
+    const msg = error instanceof Error ? error.message : 'Bilinmeyen hata';
+    console.error('Error fetching users:', msg, error);
+    return NextResponse.json({ error: 'Kullanıcılar getirilemedi', details: msg }, { status: 500 });
   }
 }
 
@@ -197,11 +195,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(user, { status: 201 });
   } catch (error) {
-    console.error('Error creating user:', error);
-    return NextResponse.json(
-      { error: 'Kullanıcı oluşturulamadı' },
-      { status: 500 }
-    );
+    const msg = error instanceof Error ? error.message : 'Bilinmeyen hata';
+    console.error('Error creating user:', msg, error);
+    return NextResponse.json({ error: 'Kullanıcı oluşturulamadı', details: msg }, { status: 500 });
   }
 }
 
@@ -251,10 +247,8 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ success: true, deactivated: true });
     }
   } catch (error) {
-    console.error('Error deleting user:', error);
-    return NextResponse.json(
-      { error: 'Kullanıcı silinemedi' },
-      { status: 500 }
-    );
+    const msg = error instanceof Error ? error.message : 'Bilinmeyen hata';
+    console.error('Error deleting user:', msg, error);
+    return NextResponse.json({ error: 'Kullanıcı silinemedi', details: msg }, { status: 500 });
   }
 }

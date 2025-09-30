@@ -67,10 +67,19 @@ export default function UsersPage() {
           'Authorization': token ? `Bearer ${token}` : ''
         }
       });
+
       const data = await response.json();
-      setUsers(data);
+
+      if (!response.ok) {
+        console.error('Users API error:', data);
+        setUsers([]);
+        return;
+      }
+
+      setUsers(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching users:', error);
+      setUsers([]);
     } finally {
       setLoading(false);
     }

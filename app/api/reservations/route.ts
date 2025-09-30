@@ -169,11 +169,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(allResults);
   } catch (error) {
-    console.error('Rezervasyonları getirme hatası:', error);
-    return NextResponse.json(
-      { error: 'Rezervasyonlar getirilemedi' },
-      { status: 500 }
-    );
+    const msg = error instanceof Error ? error.message : 'Bilinmeyen hata';
+    console.error('Rezervasyonları getirme hatası:', msg, error);
+    return NextResponse.json({ error: 'Rezervasyonlar getirilemedi', details: msg }, { status: 500 });
   }
 }
 
@@ -248,11 +246,8 @@ export async function POST(request: NextRequest) {
     console.log('API: Rezervasyon oluşturuldu:', reservation.id);
     return NextResponse.json(reservation);
   } catch (error) {
-    console.error('Rezervasyon oluşturma hatası:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
-    return NextResponse.json(
-      { error: 'Rezervasyon oluşturulamadı', details: errorMessage },
-      { status: 500 }
-    );
+    const msg = error instanceof Error ? error.message : 'Bilinmeyen hata';
+    console.error('Rezervasyon oluşturma hatası:', msg, error);
+    return NextResponse.json({ error: 'Rezervasyon oluşturulamadı', details: msg }, { status: 500 });
   }
 }

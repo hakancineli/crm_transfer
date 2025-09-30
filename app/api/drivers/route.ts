@@ -34,11 +34,9 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.json(drivers);
   } catch (error) {
-    console.error('Sürücü listesi getirme hatası:', error);
-    return NextResponse.json(
-      { error: 'Sürücüler getirilemedi' },
-      { status: 500 }
-    );
+    const msg = error instanceof Error ? error.message : 'Bilinmeyen hata';
+    console.error('Sürücü listesi getirme hatası:', msg, error);
+    return NextResponse.json({ error: 'Sürücüler getirilemedi', details: msg }, { status: 500 });
   }
 }
 
@@ -81,10 +79,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(driver);
   } catch (error) {
-    console.error('Şoför ekleme hatası:', error);
-    return NextResponse.json(
-      { error: 'Şoför eklenirken bir hata oluştu' },
-      { status: 500 }
-    );
+    const msg = error instanceof Error ? error.message : 'Bilinmeyen hata';
+    console.error('Şoför ekleme hatası:', msg, error);
+    return NextResponse.json({ error: 'Şoför eklenirken bir hata oluştu', details: msg }, { status: 500 });
   }
 } 
