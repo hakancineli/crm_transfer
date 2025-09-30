@@ -280,6 +280,8 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
                 placeholder="Adres yazın (örn. İstanbul Havalimanı)"
                 className=""
                 required
+                id="from-address"
+                name="from-address"
               />
             </div>
 
@@ -294,6 +296,8 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
                 placeholder="Adres yazın (örn: Taksim)"
                 className=""
                 required
+                id="to-address"
+                name="to-address"
               />
             </div>
                             </div>

@@ -9,6 +9,8 @@ interface GoogleMapsPlacesInputProps {
   placeholder: string;
   className?: string;
   required?: boolean;
+  id?: string;
+  name?: string;
 }
 
 export default function GoogleMapsPlacesInput({
@@ -16,7 +18,9 @@ export default function GoogleMapsPlacesInput({
   onChange,
   placeholder,
   className = '',
-  required = false
+  required = false,
+  id,
+  name
 }: GoogleMapsPlacesInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [predictions, setPredictions] = useState<Array<{ description: string }>>([]);
@@ -182,6 +186,8 @@ export default function GoogleMapsPlacesInput({
         className={`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm ${className}`}
         required={required}
         autoComplete="off"
+        id={id}
+        name={name}
       />
       
       {showPredictions && predictions.length > 0 && (
