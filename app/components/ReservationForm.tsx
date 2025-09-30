@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Calendar, MapPin, Users, Clock, X } from 'lucide-react';
+import GoogleMapsPlacesInput from '@/app/components/GoogleMapsPlacesInput';
 
 type Currency = 'TRY' | 'USD' | 'EUR';
 
@@ -175,7 +176,6 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
           currency,
           phoneNumber: formData.phone,
           name: formData.name,
-          email: formData.email,
           notes: formData.notes,
                     flightCode: formData.flightCode,
           distanceKm: distanceKm || null,
@@ -274,43 +274,13 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
                 <MapPin className="inline h-4 w-4 mr-1" />
                 Nereden
               </label>
-              <input
-                ref={fromInputRef}
-                type="text"
+              <GoogleMapsPlacesInput
                 value={formData.from}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  handleInputChange('from', v);
-                  if (fromDebounceRef.current) window.clearTimeout(fromDebounceRef.current);
-                  fromDebounceRef.current = window.setTimeout(() => requestPredictions(v, 'from'), 150);
-                }}
+                onChange={(v) => handleInputChange('from', v)}
                 placeholder="Adres yazın (örn. İstanbul Havalimanı)"
+                className=""
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="off"
-                spellCheck={false}
-                inputMode="search"
-                name="from-address-no-autofill"
               />
-              {fromPredictions.length > 0 && (
-                <div className="mt-1 border border-gray-200 rounded-md bg-white shadow-sm max-h-60 overflow-auto z-10 relative">
-                  {fromPredictions.map((p, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => { 
-                        handleInputChange('from', p.description); 
-                        setFromPredictions([]); 
-                      }}
-                      className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
-                    >
-                      {p.description}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
 
             <div>
@@ -318,44 +288,14 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
                 <MapPin className="inline h-4 w-4 mr-1" />
                 Nereye
               </label>
-              <input
-                ref={toInputRef}
-                type="text"
+              <GoogleMapsPlacesInput
                 value={formData.to}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  handleInputChange('to', v);
-                  if (toDebounceRef.current) window.clearTimeout(toDebounceRef.current);
-                  toDebounceRef.current = window.setTimeout(() => requestPredictions(v, 'to'), 150);
-                }}
+                onChange={(v) => handleInputChange('to', v)}
                 placeholder="Adres yazın (örn: Taksim)"
+                className=""
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="off"
-                spellCheck={false}
-                inputMode="search"
-                name="to-address-no-autofill"
               />
-              {toPredictions.length > 0 && (
-                <div className="mt-1 border border-gray-200 rounded-md bg-white shadow-sm max-h-60 overflow-auto z-10 relative">
-                  {toPredictions.map((p, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => { 
-                        handleInputChange('to', p.description); 
-                        setToPredictions([]); 
-                      }}
-                      className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
-                    >
-                      {p.description}
-                    </button>
-                  ))}
-                                </div>
-              )}
-                                </div>
+            </div>
                             </div>
 
           {/* Distance and Price Display */}
@@ -529,17 +469,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
                                 </div>
                             </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
-                                <input
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleInputChange('email', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-          </div>
+          {/* Email alanı kaldırıldı */}
 
           {/* Notes */}
           <div>

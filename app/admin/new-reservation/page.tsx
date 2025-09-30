@@ -31,7 +31,7 @@ export default function AdminNewReservationPage() {
         <div className="bg-white shadow-sm rounded-lg border border-gray-200 p-6">
           <ReservationForm 
             isOpen={true} 
-            onClose={() => {}} 
+            onClose={() => { window.location.href = '/admin/reservations'; }} 
             tenantId={undefined}
           />
         </div>
