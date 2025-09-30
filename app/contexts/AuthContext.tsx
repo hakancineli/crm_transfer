@@ -188,8 +188,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Token expired, try to refresh
         const refreshed = await refreshToken();
         if (!refreshed) {
-          // Refresh failed, logout user
-          logout();
+          // Refresh failed; do not force logout on page reload
+          // Keep current local session to avoid redirect loop, let next actions re-auth if needed
           return;
         }
         // Retry with new token
