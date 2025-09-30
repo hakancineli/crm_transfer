@@ -3,7 +3,7 @@ const nextConfig = {
   // Build optimizations for Vercel
   experimental: {
     optimizeCss: true,
-    optimizePackageImports: ['lucide-react', '@prisma/client']
+    optimizePackageImports: ['lucide-react']
   },
   
   // Reduce bundle size
