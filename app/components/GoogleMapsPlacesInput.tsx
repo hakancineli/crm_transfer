@@ -92,30 +92,17 @@ export default function GoogleMapsPlacesInput({
   // v1 HTTP Autocomplete (Places API New) – JS API yoksa gerçek öneriler için
   const requestPredictionsViaHttp = async (inputValue: string) => {
     try {
-      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-      if (!apiKey) throw new Error('No API key');
-      const resp = await fetch(`https://places.googleapis.com/v1/places:autocomplete`, {
+      const resp = await fetch(`/api/places-autocomplete`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Goog-Api-Key': apiKey,
-          'X-Goog-FieldMask': 'suggestions.placePrediction.text.text,suggestions.queryPrediction.text.text',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          input: inputValue,
-          languageCode: 'tr',
-          regionCode: 'TR',
-          includedRegionCodes: ['TR'],
+          input: inputValue
         }),
       });
       if (!resp.ok) throw new Error('HTTP autocomplete failed');
       const data = await resp.json();
       const list = Array.isArray(data?.suggestions) ? data.suggestions : [];
-      const mapped = list
-        .map((s: any) => s?.placePrediction?.text?.text || s?.queryPrediction?.text?.text)
-        .filter(Boolean)
-        .slice(0, 5)
-        .map((description: string) => ({ description }));
+      const mapped = list.slice(0, 5);
       if (mapped.length > 0) {
         setPredictions(mapped);
         setShowPredictions(true);
