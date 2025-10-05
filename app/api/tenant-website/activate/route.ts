@@ -141,10 +141,19 @@ export async function POST(request: NextRequest) {
             slug: page.slug
           }
         },
-        update: page,
+        update: {
+          title: page.title,
+          content: page.content as any, // JSON field için type assertion
+          isPublished: page.isPublished,
+          isHomepage: page.isHomepage
+        },
         create: {
           websiteId: website.id,
-          ...page
+          slug: page.slug,
+          title: page.title,
+          content: page.content as any, // JSON field için type assertion
+          isPublished: page.isPublished,
+          isHomepage: page.isHomepage
         }
       });
     }
