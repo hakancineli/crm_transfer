@@ -12,6 +12,7 @@ interface GoogleMapsPlacesInputProps {
   required?: boolean;
   id?: string;
   name?: string;
+  forceFallback?: boolean;
 }
 
 export default function GoogleMapsPlacesInput({
@@ -21,7 +22,8 @@ export default function GoogleMapsPlacesInput({
   className = '',
   required = false,
   id,
-  name
+  name,
+  forceFallback = false
 }: GoogleMapsPlacesInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [predictions, setPredictions] = useState<Array<{ description: string }>>([]);
@@ -98,7 +100,7 @@ export default function GoogleMapsPlacesInput({
     }
 
     // API key geçersizse veya Google hazır değilse fallback kullan
-    if (!googleReady) {
+    if (forceFallback || !googleReady) {
       console.log('📝 Using fallback suggestions (Google not ready)');
       const filtered = fallbackAddresses.filter(addr =>
         addr.toLowerCase().includes(inputValue.toLowerCase())
