@@ -119,6 +119,54 @@ export default function ModuleManagement() {
     }
   };
 
+  const activateWebsite = async (tenantId: string) => {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const response = await fetch('/api/tenant-website/activate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ tenantId }),
+      });
+      
+      if (response.ok) {
+        await fetchData(); // Refresh data
+        alert('Website modülü başarıyla aktifleştirildi!');
+      } else {
+        setError('Website modülü aktifleştirilirken hata oluştu');
+      }
+    } catch (err) {
+      setError('Website modülü aktifleştirilirken hata oluştu');
+      console.error('Error activating website:', err);
+    }
+  };
+
+  const updateDomain = async (tenantId: string, domain: string) => {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const response = await fetch('/api/tenant-website', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ tenantId, domain }),
+      });
+      
+      if (response.ok) {
+        await fetchData(); // Refresh data
+        alert('Domain başarıyla güncellendi!');
+      } else {
+        setError('Domain güncellenirken hata oluştu');
+      }
+    } catch (err) {
+      setError('Domain güncellenirken hata oluştu');
+      console.error('Error updating domain:', err);
+    }
+  };
+
   const getModuleInfo = (moduleId: string) => {
     return Object.values(MODULES).find(m => m.id === moduleId);
   };
@@ -196,6 +244,32 @@ export default function ModuleManagement() {
                   }`}>
                     {tenant.isActive ? 'Aktif' : 'Pasif'}
                   </span>
+                </div>
+              </div>
+
+              {/* Domain Management */}
+              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 className="font-medium text-gray-900 mb-2">Domain Yönetimi</h4>
+                <div className="flex items-center space-x-4">
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      placeholder="www.example.com"
+                      defaultValue={tenant.domain || ''}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onBlur={(e) => {
+                        if (e.target.value !== tenant.domain) {
+                          updateDomain(tenant.id, e.target.value);
+                        }
+                      }}
+                    />
+                  </div>
+                  <button
+                    onClick={() => activateWebsite(tenant.id)}
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                  >
+                    Websiteyi Aktif Et
+                  </button>
                 </div>
               </div>
 

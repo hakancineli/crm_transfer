@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export async function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 	const hostname = request.headers.get('host') || '';
-	
 	
 	// Extract subdomain
 	const subdomain = hostname.split('.')[0];
@@ -24,11 +26,6 @@ export async function middleware(request: NextRequest) {
 		return NextResponse.next();
 	}
 	
-	// Check if it's a website route
-	if (pathname.startsWith('/website/')) {
-		return NextResponse.next();
-	}
-	
 	// Domain-specific routing
 	if (hostname.includes('proacente.com')) {
 		// ProAcente CRM - redirect to admin login
@@ -40,7 +37,32 @@ export async function middleware(request: NextRequest) {
 		return NextResponse.next();
 	}
 	
-	// Skip DB lookups in middleware; custom domain handling moved to runtime routes if needed
+	// Custom domain handling - check if hostname belongs to a tenant
+	let tenantId = null;
+	try {
+		const tenant = await prisma.tenant.findFirst({
+			where: {
+				OR: [
+					{ domain: hostname },
+					{ domain: `www.${hostname}` }
+				]
+			},
+			select: { id: true }
+		});
+		
+		if (tenant) {
+			tenantId = tenant.id;
+		}
+	} catch (error) {
+		console.error('Tenant lookup error:', error);
+	}
+	
+	// If custom domain found, redirect to website
+	if (tenantId && pathname === '/') {
+		const url = request.nextUrl.clone();
+		url.pathname = '/website';
+		return NextResponse.redirect(url);
+	}
 	
 	// Check if it's a public route
 	if (publicRoutes.includes(pathname)) {
@@ -50,6 +72,9 @@ export async function middleware(request: NextRequest) {
 	// Add tenant context to request headers
 	const response = NextResponse.next();
 	response.headers.set('x-subdomain', subdomain);
+	if (tenantId) {
+		response.headers.set('x-tenant-id', tenantId);
+	}
 	
 	// For now, allow all routes - authentication will be handled client-side
 	return response;
