@@ -23,23 +23,37 @@ export async function POST(request: NextRequest) {
     // Activate website module for tenant
     await prisma.tenantModule.upsert({
       where: {
-        tenantId_module: {
+        tenantId_moduleId: {
           tenantId: tenantId,
-          module: 'WEBSITE'
+          moduleId: 'WEBSITE'
         }
       },
       update: {
-        isActive: true
+        isEnabled: true
       },
       create: {
         tenantId: tenantId,
-        module: 'WEBSITE',
-        isActive: true
+        moduleId: 'WEBSITE',
+        isEnabled: true
       }
     });
 
     // Create default website settings
+    const website = await prisma.tenantWebsite.upsert({
+      where: { tenantId },
+      update: {
+        isActive: true,
+        theme: 'seref-vural'
+      },
+      create: {
+        tenantId,
+        isActive: true,
+        theme: 'seref-vural'
+      }
+    });
+
     const defaultSettings = {
+      companyName: 'Şeref Vural Turizm',
       logo: '/seref-vural-images/logo.svg',
       primaryColor: '#16a34a',
       secondaryColor: '#059669',
@@ -71,11 +85,11 @@ export async function POST(request: NextRequest) {
       }
     };
 
-    await prisma.tenantWebsiteSettings.upsert({
-      where: { tenantId },
+    await prisma.websiteSettings.upsert({
+      where: { websiteId: website.id },
       update: defaultSettings,
       create: {
-        tenantId,
+        websiteId: website.id,
         ...defaultSettings
       }
     });
@@ -107,14 +121,14 @@ export async function POST(request: NextRequest) {
     for (const page of pages) {
       await prisma.websitePage.upsert({
         where: {
-          tenantId_slug: {
-            tenantId,
+          websiteId_slug: {
+            websiteId: website.id,
             slug: page.slug
           }
         },
         update: page,
         create: {
-          tenantId,
+          websiteId: website.id,
           ...page
         }
       });

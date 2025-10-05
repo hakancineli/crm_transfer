@@ -23,7 +23,11 @@ export async function GET(request: NextRequest) {
         id: true,
         name: true,
         domain: true,
-        websiteSettings: true
+        websites: {
+          include: {
+            settings: true
+          }
+        }
       }
     });
 

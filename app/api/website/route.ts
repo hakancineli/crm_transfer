@@ -16,9 +16,14 @@ export async function GET(request: NextRequest) {
         ]
       },
       include: {
-        websiteSettings: true,
+        websites: {
+          include: {
+            settings: true,
+            pages: true
+          }
+        },
         modules: {
-          where: { module: 'WEBSITE', isActive: true }
+          where: { moduleId: 'WEBSITE', isEnabled: true }
         }
       }
     });
@@ -31,10 +36,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Website module not active' }, { status: 403 });
     }
 
-    // Get pages for this tenant
-    const pages = await prisma.websitePage.findMany({
-      where: { tenantId: tenant.id }
-    });
+    const website = tenant.websites[0];
+    if (!website) {
+      return NextResponse.json({ error: 'Website not found' }, { status: 404 });
+    }
 
     return NextResponse.json({
       tenant: {
@@ -42,8 +47,8 @@ export async function GET(request: NextRequest) {
         name: tenant.name,
         domain: tenant.domain
       },
-      settings: tenant.websiteSettings,
-      pages
+      settings: website.settings,
+      pages: website.pages
     });
 
   } catch (error) {
