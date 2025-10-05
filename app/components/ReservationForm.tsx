@@ -258,7 +258,6 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
                 required
                 id="from-address"
                 name="from-address"
-                forceFallback
               />
             </div>
 
@@ -275,7 +274,6 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
                 required
                 id="to-address"
                 name="to-address"
-                forceFallback
               />
             </div>
                             </div>

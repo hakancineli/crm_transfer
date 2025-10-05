@@ -94,10 +94,12 @@ export default function GoogleMapsPlacesInput({
     try {
       const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
       if (!apiKey) throw new Error('No API key');
-      const resp = await fetch(`https://places.googleapis.com/v1/places:autocomplete?key=${apiKey}`, {
+      const resp = await fetch(`https://places.googleapis.com/v1/places:autocomplete`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-Goog-Api-Key': apiKey,
+          'X-Goog-FieldMask': 'suggestions.placePrediction.text.text,suggestions.queryPrediction.text.text',
         },
         body: JSON.stringify({
           input: inputValue,
