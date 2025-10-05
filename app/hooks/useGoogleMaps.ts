@@ -46,7 +46,7 @@ export function useGoogleMaps(): GoogleMapsHook {
     script.id = 'google-maps-script';
     script.async = true;
     script.defer = true;
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=tr`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=tr&v=weekly&loading=async`;
     
     script.onload = () => {
       console.log('✅ Google Maps API loaded successfully');
