@@ -440,27 +440,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
 
           {/* Notes removed per request */}
 
-          {/* Price Information */}
-          {estimatedPriceTRY !== null && (
-            <div className="bg-gray-50 border border-gray-200 rounded p-3">
-              <div className="text-sm text-gray-700">
-                <div className="font-medium text-gray-800 mb-2">Fiyat Bilgisi</div>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-                  <div>0–10 km: 800 TRY</div>
-                  <div>11–20 km: 1100 TRY</div>
-                  <div>21–30 km: 1400 TRY</div>
-                  <div>31–40 km: 1500 TRY</div>
-                  <div>41–45 km: 1700 TRY</div>
-                  <div>46–50 km: 1850 TRY</div>
-                  <div>51–60 km: 2200 TRY</div>
-                  <div>61–70 km: 2300 TRY</div>
-                  <div>71–80 km: 2400 TRY</div>
-                  <div>81–90 km: 2500 TRY</div>
-                            </div>
-                <div className="mt-2 text-gray-500">90 km üzeri her +10 km için +300 TRY eklenir. Bu tahmini fiyattır.</div>
-                        </div>
-                    </div>
-          )}
+          
 
           {/* Submit Button */}
           <div className="flex justify-end space-x-4">

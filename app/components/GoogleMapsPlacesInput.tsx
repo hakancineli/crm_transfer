@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useGoogleMaps } from '@/app/hooks/useGoogleMaps';
 
 interface GoogleMapsPlacesInputProps {
@@ -26,6 +27,15 @@ export default function GoogleMapsPlacesInput({
   const [predictions, setPredictions] = useState<Array<{ description: string }>>([]);
   const [showPredictions, setShowPredictions] = useState(false);
   const { isLoaded: googleReady, isLoading, error } = useGoogleMaps();
+  const [portalRect, setPortalRect] = useState<{ top: number; left: number; width: number } | null>(null);
+
+  const updatePortalRect = () => {
+    if (typeof window === 'undefined') return;
+    const el = inputRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    setPortalRect({ top: r.bottom + window.scrollY, left: r.left + window.scrollX, width: r.width });
+  };
 
   // Fallback adres önerileri (Google Maps API olmadan)
   const fallbackAddresses = [
@@ -152,6 +162,7 @@ export default function GoogleMapsPlacesInput({
     const inputValue = e.target.value;
     onChange(inputValue);
     requestPredictions(inputValue);
+    updatePortalRect();
   };
 
   const handleSuggestionClick = (prediction: { description: string }) => {
@@ -171,7 +182,21 @@ export default function GoogleMapsPlacesInput({
     if (predictions.length > 0) {
       setShowPredictions(true);
     }
+    updatePortalRect();
   };
+
+  // Reposition on scroll/resize while dropdown is visible
+  useEffect(() => {
+    if (!showPredictions) return;
+    const handler = () => updatePortalRect();
+    window.addEventListener('scroll', handler, true);
+    window.addEventListener('resize', handler);
+    handler();
+    return () => {
+      window.removeEventListener('scroll', handler, true);
+      window.removeEventListener('resize', handler);
+    };
+  }, [showPredictions]);
 
   return (
     <div className="relative">
@@ -190,8 +215,11 @@ export default function GoogleMapsPlacesInput({
         name={name}
       />
       
-      {showPredictions && predictions.length > 0 && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+      {showPredictions && predictions.length > 0 && typeof window !== 'undefined' && portalRect && createPortal(
+        <div
+          style={{ position: 'absolute', top: portalRect.top, left: portalRect.left, width: portalRect.width, zIndex: 10000 }}
+          className="mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
+        >
           {predictions.map((prediction, index) => (
             <div
               key={index}
@@ -201,7 +229,8 @@ export default function GoogleMapsPlacesInput({
               {prediction.description}
             </div>
           ))}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
