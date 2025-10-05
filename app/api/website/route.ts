@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       tenant: {
         id: tenant.id,
-        name: tenant.name,
+        name: tenant.companyName,
         domain: tenant.domain
       },
       settings: website.settings,

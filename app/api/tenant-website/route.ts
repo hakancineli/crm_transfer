@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const tenants = await prisma.tenant.findMany({
       select: {
         id: true,
-        name: true,
+        companyName: true,
         domain: true,
         websites: {
           include: {
