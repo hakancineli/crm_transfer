@@ -10,34 +10,36 @@ interface WebsiteData {
     domain: string;
   };
   settings: {
+    companyName: string;
     logo: string;
-    primaryColor: string;
-    secondaryColor: string;
-    phone: string;
-    whatsapp: string;
-    email: string;
-    facebook: string;
-    instagram: string;
-    twitter: string;
-    heroTitle: {
-      tr: string;
-      en: string;
-      ar: string;
+    heroTitle: string;
+    heroSubtitle: string;
+    heroImage: string;
+    contactInfo: {
+      phone: string;
+      whatsapp: string;
+      email: string;
     };
-    heroSubtitle: {
-      tr: string;
-      en: string;
-      ar: string;
+    socialMedia: {
+      facebook: string;
+      instagram: string;
+      twitter: string;
     };
-    metaTitle: {
-      tr: string;
-      en: string;
-      ar: string;
+    seoSettings: {
+      metaTitle: {
+        tr: string;
+        en: string;
+        ar: string;
+      };
+      metaDescription: {
+        tr: string;
+        en: string;
+        ar: string;
+      };
     };
-    metaDescription: {
-      tr: string;
-      en: string;
-      ar: string;
+    colorScheme: {
+      primary: string;
+      secondary: string;
     };
   };
   pages: Array<{
@@ -137,11 +139,11 @@ export default function WebsitePage() {
             <div className="flex items-center">
               <img 
                 src={settings.logo} 
-                alt={tenant.name}
+                alt={settings.companyName}
                 className="h-8 w-auto"
               />
               <span className="ml-3 text-xl font-bold text-gray-900">
-                {tenant.name}
+                {settings.companyName}
               </span>
             </div>
             
@@ -186,10 +188,10 @@ export default function WebsitePage() {
       <section className="bg-gradient-to-r from-green-600 to-green-700 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            {settings.heroTitle[language]}
+            {settings.heroTitle}
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-green-100">
-            {settings.heroSubtitle[language]}
+            {settings.heroSubtitle}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
@@ -200,7 +202,7 @@ export default function WebsitePage() {
                language === 'en' ? 'Make Reservation' : 'احجز الآن'}
             </a>
             <a
-              href={`tel:${settings.phone}`}
+              href={`tel:${settings.contactInfo.phone}`}
               className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-green-600 transition-colors"
             >
               {language === 'tr' ? 'Hemen Ara' : 
@@ -331,7 +333,7 @@ export default function WebsitePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4">{tenant.name}</h3>
+              <h3 className="text-lg font-semibold mb-4">{settings.companyName}</h3>
               <p className="text-gray-400">
                 {language === 'tr' ? 'İstanbul\'un en güvenilir transfer hizmeti' : 
                  language === 'en' ? 'Istanbul\'s most reliable transfer service' : 
@@ -345,9 +347,9 @@ export default function WebsitePage() {
                  language === 'en' ? 'Contact' : 'اتصل بنا'}
               </h4>
               <div className="space-y-2 text-gray-400">
-                <p>📞 {settings.phone}</p>
-                <p>📧 {settings.email}</p>
-                <p>💬 WhatsApp: {settings.whatsapp}</p>
+                <p>📞 {settings.contactInfo.phone}</p>
+                <p>📧 {settings.contactInfo.email}</p>
+                <p>💬 WhatsApp: {settings.contactInfo.whatsapp}</p>
               </div>
             </div>
             
@@ -357,13 +359,13 @@ export default function WebsitePage() {
                  language === 'en' ? 'Social Media' : 'وسائل التواصل الاجتماعي'}
               </h4>
               <div className="flex space-x-4">
-                <a href={settings.facebook} className="text-gray-400 hover:text-white">
+                <a href={settings.socialMedia.facebook} className="text-gray-400 hover:text-white">
                   Facebook
                 </a>
-                <a href={settings.instagram} className="text-gray-400 hover:text-white">
+                <a href={settings.socialMedia.instagram} className="text-gray-400 hover:text-white">
                   Instagram
                 </a>
-                <a href={settings.twitter} className="text-gray-400 hover:text-white">
+                <a href={settings.socialMedia.twitter} className="text-gray-400 hover:text-white">
                   Twitter
                 </a>
               </div>
@@ -371,7 +373,7 @@ export default function WebsitePage() {
           </div>
           
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 {tenant.name}. {language === 'tr' ? 'Tüm hakları saklıdır.' : 
+            <p>&copy; 2024 {settings.companyName}. {language === 'tr' ? 'Tüm hakları saklıdır.' : 
                language === 'en' ? 'All rights reserved.' : 'جميع الحقوق محفوظة.'}</p>
           </div>
         </div>

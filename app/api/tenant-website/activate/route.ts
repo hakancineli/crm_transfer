@@ -64,33 +64,34 @@ export async function POST(request: NextRequest) {
     const defaultSettings = {
       companyName: 'Şeref Vural Turizm',
       logo: '/seref-vural-images/logo.svg',
-      primaryColor: '#16a34a',
-      secondaryColor: '#059669',
-      phone: '+90 212 555 0123',
-      whatsapp: '+90 212 555 0123',
-      email: 'info@serefvural.com',
-      facebook: 'https://facebook.com/serefvural',
-      instagram: 'https://instagram.com/serefvural',
-      twitter: 'https://twitter.com/serefvural',
-      heroTitle: {
-        tr: 'Şeref Vural Turizm',
-        en: 'Seref Vural Tourism',
-        ar: 'شرف فورال للسياحة'
+      heroTitle: 'Şeref Vural Turizm',
+      heroSubtitle: 'İstanbul\'un en güvenilir transfer hizmeti',
+      heroImage: '/seref-vural-images/hero.jpg',
+      contactInfo: {
+        phone: '+90 212 555 0123',
+        whatsapp: '+90 212 555 0123',
+        email: 'info@serefvural.com'
       },
-      heroSubtitle: {
-        tr: 'İstanbul\'un en güvenilir transfer hizmeti',
-        en: 'Istanbul\'s most reliable transfer service',
-        ar: 'خدمة النقل الأكثر موثوقية في اسطنبول'
+      socialMedia: {
+        facebook: 'https://facebook.com/serefvural',
+        instagram: 'https://instagram.com/serefvural',
+        twitter: 'https://twitter.com/serefvural'
       },
-      metaTitle: {
-        tr: 'Şeref Vural Turizm - İstanbul Transfer',
-        en: 'Seref Vural Tourism - Istanbul Transfer',
-        ar: 'شرف فورال للسياحة - نقل اسطنبول'
+      seoSettings: {
+        metaTitle: {
+          tr: 'Şeref Vural Turizm - İstanbul Transfer',
+          en: 'Seref Vural Tourism - Istanbul Transfer',
+          ar: 'شرف فورال للسياحة - نقل اسطنبول'
+        },
+        metaDescription: {
+          tr: 'İstanbul Havalimanı ve Sabiha Gökçen transfer hizmeti. VIP araçlar, profesyonel şoförler.',
+          en: 'Istanbul Airport and Sabiha Gokcen transfer service. VIP vehicles, professional drivers.',
+          ar: 'خدمة نقل مطار اسطنبول وصابحة جوكجن. مركبات VIP، سائقون محترفون.'
+        }
       },
-      metaDescription: {
-        tr: 'İstanbul Havalimanı ve Sabiha Gökçen transfer hizmeti. VIP araçlar, profesyonel şoförler.',
-        en: 'Istanbul Airport and Sabiha Gokcen transfer service. VIP vehicles, professional drivers.',
-        ar: 'خدمة نقل مطار اسطنبول وصابحة جوكجن. مركبات VIP، سائقون محترفون.'
+      colorScheme: {
+        primary: '#16a34a',
+        secondary: '#059669'
       }
     };
 
