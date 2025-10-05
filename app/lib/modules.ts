@@ -40,6 +40,20 @@ export const MODULES = {
       'ucus-raporlari'
     ]
   },
+  TOUR: {
+    id: 'tour',
+    name: 'Tur Yönetimi',
+    description: 'Tur paketleri, rota yönetimi ve tur rezervasyonları',
+    priceMonthly: 100,
+    priceYearly: 1000,
+    features: [
+      'tur-paketleri',
+      'rota-yonetimi',
+      'tur-rezervasyon',
+      'rehber-yonetimi',
+      'tur-raporlari'
+    ]
+  },
   WEBSITE: {
     id: 'website',
     name: 'Website Modülü',
@@ -74,7 +88,12 @@ export const MODULE_FEATURES = {
   'domain-yonetimi': 'Domain Yönetimi',
   'seo-optimizasyonu': 'SEO Optimizasyonu',
   'analytics-entegrasyonu': 'Analytics Entegrasyonu',
-  'custom-tasarim': 'Custom Tasarım'
+  'custom-tasarim': 'Custom Tasarım',
+  'tur-paketleri': 'Tur Paketleri',
+  'rota-yonetimi': 'Rota Yönetimi',
+  'tur-rezervasyon': 'Tur Rezervasyonu',
+  'rehber-yonetimi': 'Rehber Yönetimi',
+  'tur-raporlari': 'Tur Raporları'
 } as const;
 
 export const SUBSCRIPTION_PLANS = {
@@ -95,6 +114,12 @@ export const SUBSCRIPTION_PLANS = {
     name: 'Kurumsal', 
     price: 200,
     modules: ['transfer', 'accommodation', 'flight']
+  },
+  PREMIUM: {
+    id: 'premium',
+    name: 'Premium',
+    price: 300,
+    modules: ['transfer', 'accommodation', 'flight', 'tour', 'website']
   }
 } as const;
 

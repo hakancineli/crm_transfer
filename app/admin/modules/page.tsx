@@ -276,9 +276,23 @@ export default function ModuleManagement() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {modules.map((module) => {
                   const moduleInfo = getModuleInfo(module.id);
-                  const isEnabled = tenant.modules.some(tm => 
+                  
+                  // Check if module is enabled based on plan or database
+                  const isEnabledInDB = tenant.modules.some(tm => 
                     tm.moduleId === module.id && tm.isEnabled
                   );
+                  
+                  // Plan-based module activation
+                  const planModules: Record<string, string[]> = {
+                    'basic': ['transfer'],
+                    'STANDARD': ['transfer'],
+                    'professional': ['transfer', 'accommodation'],
+                    'enterprise': ['transfer', 'accommodation', 'flight'],
+                    'premium': ['transfer', 'accommodation', 'flight', 'tour', 'website']
+                  };
+                  
+                  const isEnabledByPlan = planModules[tenant.subscriptionPlan]?.includes(module.id) || false;
+                  const isEnabled = isEnabledInDB || isEnabledByPlan;
                   
                   return (
                     <div key={module.id} className="border border-gray-200 rounded-lg p-4">
@@ -290,12 +304,19 @@ export default function ModuleManagement() {
                           <p className="text-sm text-gray-500">
                             {moduleInfo?.description || module.description}
                           </p>
+                          {isEnabledByPlan && (
+                            <span className="inline-block px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full mt-1">
+                              Plan Dahili
+                            </span>
+                          )}
                         </div>
                         <button
-                          onClick={() => toggleModule(tenant.id, module.id)}
+                          onClick={() => !isEnabledByPlan && toggleModule(tenant.id, module.id)}
+                          disabled={isEnabledByPlan}
                           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                             isEnabled ? 'bg-blue-600' : 'bg-gray-200'
-                          }`}
+                          } ${isEnabledByPlan ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                          title={isEnabledByPlan ? 'Plan dahilinde aktif' : 'Toggle modül'}
                         >
                           <span
                             className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${

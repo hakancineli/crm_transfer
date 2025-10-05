@@ -276,6 +276,42 @@ export class TenantService {
     }
   }
 
+  static async ensureModulesForPlan(tenantId: string, plan: string): Promise<void> {
+    try {
+      // Map plan names to module arrays
+      const planModules: Record<string, string[]> = {
+        'basic': ['transfer'],
+        'STANDARD': ['transfer'],
+        'professional': ['transfer', 'accommodation'],
+        'enterprise': ['transfer', 'accommodation', 'flight'],
+        'premium': ['transfer', 'accommodation', 'flight', 'tour', 'website']
+      };
+
+      const modulesToActivate = planModules[plan] || ['transfer'];
+
+      for (const moduleId of modulesToActivate) {
+        await prisma.tenantModule.upsert({
+          where: {
+            tenantId_moduleId: {
+              tenantId: tenantId,
+              moduleId: moduleId // Keep original case
+            }
+          },
+          update: {
+            isEnabled: true
+          },
+          create: {
+            tenantId: tenantId,
+            moduleId: moduleId, // Keep original case
+            isEnabled: true
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error ensuring modules for plan:', error);
+    }
+  }
+
   static async getAllModules(): Promise<Module[]> {
     try {
       const modules = await prisma.module.findMany({

@@ -4,10 +4,10 @@ import { MODULES } from '@/app/lib/modules';
 
 export async function GET() {
   try {
-    const [tenants, modules] = await Promise.all([
-      TenantService.getAllTenants(),
-      TenantService.getAllModules()
-    ]);
+    const tenants = await TenantService.getAllTenants();
+    
+    // Use MODULES constant instead of database
+    const modules = Object.values(MODULES);
 
     return NextResponse.json({
       success: true,
