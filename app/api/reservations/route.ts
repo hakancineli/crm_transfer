@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
     const pageSize = parseInt(searchParams.get('pageSize') || '50');
     const offset = (page - 1) * pageSize;
     let tenantId = searchParams.get('tenantId');
+    let userIdScope: string | null = null;
 
     // If caller is an agency user and didn't pass tenantId, scope by token
     try {
@@ -29,6 +30,11 @@ export async function GET(request: NextRequest) {
           });
           if (link?.tenantId) {
             tenantId = link.tenantId;
+            // Non-privileged roles only see their own sales
+            const privileged = ['SUPERUSER', 'AGENCY_ADMIN', 'OPERATION', 'ACCOUNTANT'];
+            if (!privileged.includes(role)) {
+              userIdScope = decoded.userId || null;
+            }
           } else {
             // Non-superuser without tenant link should see nothing
             return NextResponse.json([]);
@@ -39,7 +45,8 @@ export async function GET(request: NextRequest) {
       // ignore scoping errors and continue unscoped only for superuser or public
     }
 
-    const whereClause: any = tenantId ? { tenantId } : undefined;
+    const whereClauseBase: any = tenantId ? { tenantId } : {};
+    const whereClause: any = userIdScope ? { ...whereClauseBase, userId: userIdScope } : whereClauseBase;
     
     console.log(`API: Sayfa ${page}, Boyut ${pageSize}, Offset ${offset}`);
     
