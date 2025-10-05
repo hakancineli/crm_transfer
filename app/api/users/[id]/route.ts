@@ -106,10 +106,12 @@ export async function PUT(
     };
 
     // Şifre verilmişse hash'le
+    let passwordChanged = false;
     if (password && password.trim() !== '') {
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(password, saltRounds);
       updateData.password = hashedPassword;
+      passwordChanged = true;
     }
 
     // Kullanıcıyı güncelle
@@ -131,7 +133,8 @@ export async function PUT(
     return NextResponse.json({
       success: true,
       message: 'Kullanıcı başarıyla güncellendi',
-      user: updatedUser
+      user: updatedUser,
+      passwordChanged
     });
 
   } catch (error) {

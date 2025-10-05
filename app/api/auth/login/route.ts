@@ -42,9 +42,9 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        // Check password for superuser
+        // Check password for any user
         const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (user.role === 'SUPERUSER' && isPasswordValid) {
+        if (isPasswordValid) {
           if (!process.env.JWT_SECRET) {
             return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
           }
