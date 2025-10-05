@@ -89,7 +89,43 @@ export default function GoogleMapsPlacesInput({
     'Laleli Meydanı'
   ];
 
-  // Google Places API ile öneri iste (yeni API -> eski API -> fallback)
+  // v1 HTTP Autocomplete (Places API New) – JS API yoksa gerçek öneriler için
+  const requestPredictionsViaHttp = async (inputValue: string) => {
+    try {
+      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+      if (!apiKey) throw new Error('No API key');
+      const resp = await fetch(`https://places.googleapis.com/v1/places:autocomplete?key=${apiKey}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          input: inputValue,
+          languageCode: 'tr',
+          regionCode: 'TR',
+          includedRegionCodes: ['TR'],
+        }),
+      });
+      if (!resp.ok) throw new Error('HTTP autocomplete failed');
+      const data = await resp.json();
+      const list = Array.isArray(data?.suggestions) ? data.suggestions : [];
+      const mapped = list
+        .map((s: any) => s?.placePrediction?.text?.text || s?.queryPrediction?.text?.text)
+        .filter(Boolean)
+        .slice(0, 5)
+        .map((description: string) => ({ description }));
+      if (mapped.length > 0) {
+        setPredictions(mapped);
+        setShowPredictions(true);
+        return true;
+      }
+    } catch (e) {
+      // ignore and fallback further
+    }
+    return false;
+  };
+
+  // Google Places API ile öneri iste (yeni API -> eski API -> HTTP v1 -> fallback)
   const requestPredictions = (inputValue: string) => {
     console.log('🔍 Requesting predictions for:', inputValue, 'Google ready:', googleReady);
     
@@ -176,12 +212,15 @@ export default function GoogleMapsPlacesInput({
       return;
     }
 
-    // 3) Fallback öneriler
-    console.log('❌ No Places API available, using fallback');
-    const filtered = fallbackAddresses.filter(addr => addr.toLowerCase().includes(inputValue.toLowerCase()));
-    const suggestions = filtered.map(addr => ({ description: addr })).slice(0, 5);
-    setPredictions(suggestions);
-    setShowPredictions(true);
+    // 3) HTTP v1 Autocomplete (Places API New)
+    requestPredictionsViaHttp(inputValue).then((ok) => {
+      if (ok) return;
+      // 4) Fallback öneriler
+      const filtered = fallbackAddresses.filter(addr => addr.toLowerCase().includes(inputValue.toLowerCase()));
+      const suggestions = filtered.map(addr => ({ description: addr })).slice(0, 5);
+      setPredictions(suggestions);
+      setShowPredictions(true);
+    });
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
