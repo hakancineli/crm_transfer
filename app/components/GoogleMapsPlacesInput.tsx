@@ -89,7 +89,7 @@ export default function GoogleMapsPlacesInput({
     'Laleli Meydanı'
   ];
 
-  // Google Places API ile öneri iste
+  // Google Places API ile öneri iste (yeni API -> eski API -> fallback)
   const requestPredictions = (inputValue: string) => {
     console.log('🔍 Requesting predictions for:', inputValue, 'Google ready:', googleReady);
     
@@ -113,51 +113,75 @@ export default function GoogleMapsPlacesInput({
     }
 
     const g = (window as any).google;
-    if (!g?.maps?.places?.AutocompleteService) {
-      console.log('❌ Google Maps AutocompleteService not available, using fallback');
-      const filtered = fallbackAddresses.filter(addr =>
-        addr.toLowerCase().includes(inputValue.toLowerCase())
+
+    // 1) Yeni API: AutocompleteSuggestion (mevcutsa tercih et)
+    try {
+      const SuggestionCtor = g?.maps?.places?.AutocompleteSuggestion;
+      if (SuggestionCtor) {
+        console.log('🌍 Using Places AutocompleteSuggestion API');
+        const svc = new SuggestionCtor();
+        if (typeof svc.getSuggestions === 'function') {
+          const sessionToken = g.maps.places.AutocompleteSessionToken ? new g.maps.places.AutocompleteSessionToken() : undefined;
+          svc.getSuggestions(
+            {
+              input: inputValue,
+              componentRestrictions: { country: ['tr'] },
+              sessionToken,
+              language: 'tr',
+              region: 'TR'
+            },
+            (preds: Array<{ description: string }> | null, status: string) => {
+              console.log('🌍 AutocompleteSuggestion response:', { preds, status });
+              if (status && status !== 'OK') throw new Error(status);
+              const list = preds || [];
+              setPredictions(list.slice(0, 5));
+              setShowPredictions(true);
+            }
+          );
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('⚠️ AutocompleteSuggestion failed, will try legacy service', e);
+    }
+
+    // 2) Eski API: AutocompleteService (bazı projelerde hâlâ aktif)
+    if (g?.maps?.places?.AutocompleteService) {
+      console.log('🌍 Using legacy AutocompleteService API');
+      const service = new g.maps.places.AutocompleteService();
+      const sessionToken = g.maps.places.AutocompleteSessionToken ? new g.maps.places.AutocompleteSessionToken() : undefined;
+      service.getPlacePredictions(
+        {
+          input: inputValue,
+          componentRestrictions: { country: ['tr'] },
+          sessionToken,
+          language: 'tr',
+          region: 'TR'
+        },
+        (preds: Array<{ description: string }> | null, status: string) => {
+          console.log('🌍 AutocompleteService response:', { preds, status });
+          if (status && status !== 'OK') {
+            console.warn('❌ Legacy Places API error:', status, 'Using fallback');
+            const filtered = fallbackAddresses.filter(addr => addr.toLowerCase().includes(inputValue.toLowerCase()));
+            const suggestions = filtered.map(addr => ({ description: addr })).slice(0, 5);
+            setPredictions(suggestions);
+            setShowPredictions(true);
+            return;
+          }
+          const list = preds || [];
+          setPredictions(list.slice(0, 5));
+          setShowPredictions(true);
+        }
       );
-      const suggestions = filtered.map(addr => ({ description: addr })).slice(0, 5);
-      setPredictions(suggestions);
-      setShowPredictions(true);
       return;
     }
 
-    console.log('🌍 Using Google Places API');
-    const service = new g.maps.places.AutocompleteService();
-    const sessionToken = g.maps.places.AutocompleteSessionToken ? new g.maps.places.AutocompleteSessionToken() : undefined;
-    
-    service.getPlacePredictions(
-      { 
-        input: inputValue, 
-        componentRestrictions: { country: ['tr'] }, 
-        sessionToken, 
-        language: 'tr', 
-        region: 'TR' 
-      },
-      (preds: Array<{ description: string }> | null, status: string) => {
-        console.log('🌍 Google Places response:', { preds, status });
-        
-        // Eğer API hatası varsa fallback kullan
-        if (status && status !== 'OK') {
-          console.warn('❌ Places API error:', status, 'Using fallback');
-          const filtered = fallbackAddresses.filter(addr =>
-            addr.toLowerCase().includes(inputValue.toLowerCase())
-          );
-          const suggestions = filtered.map(addr => ({ description: addr })).slice(0, 5);
-          console.log('📝 Fallback suggestions:', suggestions);
-          setPredictions(suggestions);
-          setShowPredictions(true);
-          return;
-        }
-        
-        const list = preds || [];
-        console.log('✅ Google suggestions:', list.slice(0, 5));
-        setPredictions(list.slice(0, 5));
-        setShowPredictions(true);
-      }
-    );
+    // 3) Fallback öneriler
+    console.log('❌ No Places API available, using fallback');
+    const filtered = fallbackAddresses.filter(addr => addr.toLowerCase().includes(inputValue.toLowerCase()));
+    const suggestions = filtered.map(addr => ({ description: addr })).slice(0, 5);
+    setPredictions(suggestions);
+    setShowPredictions(true);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
