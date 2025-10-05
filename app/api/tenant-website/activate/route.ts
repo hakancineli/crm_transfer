@@ -39,18 +39,27 @@ export async function POST(request: NextRequest) {
     });
 
     // Create default website settings
-    const website = await prisma.tenantWebsite.upsert({
-      where: { tenantId },
-      update: {
-        isActive: true,
-        theme: 'seref-vural'
-      },
-      create: {
-        tenantId,
-        isActive: true,
-        theme: 'seref-vural'
-      }
+    let website = await prisma.tenantWebsite.findFirst({
+      where: { tenantId }
     });
+
+    if (!website) {
+      website = await prisma.tenantWebsite.create({
+        data: {
+          tenantId,
+          isActive: true,
+          theme: 'seref-vural'
+        }
+      });
+    } else {
+      website = await prisma.tenantWebsite.update({
+        where: { id: website.id },
+        data: {
+          isActive: true,
+          theme: 'seref-vural'
+        }
+      });
+    }
 
     const defaultSettings = {
       companyName: 'Şeref Vural Turizm',

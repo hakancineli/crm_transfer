@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
 
 export async function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
@@ -37,28 +34,8 @@ export async function middleware(request: NextRequest) {
 		return NextResponse.next();
 	}
 	
-	// Custom domain handling - check if hostname belongs to a tenant
-	let tenantId = null;
-	try {
-		const tenant = await prisma.tenant.findFirst({
-			where: {
-				OR: [
-					{ domain: hostname },
-					{ domain: `www.${hostname}` }
-				]
-			},
-			select: { id: true }
-		});
-		
-		if (tenant) {
-			tenantId = tenant.id;
-		}
-	} catch (error) {
-		console.error('Tenant lookup error:', error);
-	}
-	
-	// If custom domain found, redirect to website
-	if (tenantId && pathname === '/') {
+	// Custom domain handling - redirect to website for non-proacente domains
+	if (!hostname.includes('proacente.com') && !hostname.includes('vercel.app') && pathname === '/') {
 		const url = request.nextUrl.clone();
 		url.pathname = '/website';
 		return NextResponse.redirect(url);
@@ -72,9 +49,6 @@ export async function middleware(request: NextRequest) {
 	// Add tenant context to request headers
 	const response = NextResponse.next();
 	response.headers.set('x-subdomain', subdomain);
-	if (tenantId) {
-		response.headers.set('x-tenant-id', tenantId);
-	}
 	
 	// For now, allow all routes - authentication will be handled client-side
 	return response;
