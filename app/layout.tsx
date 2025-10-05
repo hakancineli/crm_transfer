@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import Header from "./components/ui/Header";
 import { LanguageProvider } from "./contexts/LanguageContext";
@@ -153,6 +154,11 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
+        <Script
+          id="google-maps-script"
+          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&language=tr&v=weekly&loading=async`}
+          strategy="afterInteractive"
+        />
         <AuthProvider>
           <LanguageProvider>
             <EmojiProvider>
