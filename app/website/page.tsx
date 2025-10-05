@@ -45,16 +45,14 @@ interface WebsiteData {
   pages: Array<{
     id: string;
     slug: string;
-    title: {
-      tr: string;
-      en: string;
-      ar: string;
-    };
+    title: string;
     content: {
       tr: string;
       en: string;
       ar: string;
     };
+    isPublished: boolean;
+    isHomepage: boolean;
   }>;
 }
 

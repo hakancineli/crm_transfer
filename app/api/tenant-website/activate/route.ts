@@ -108,23 +108,28 @@ export async function POST(request: NextRequest) {
     const pages = [
       {
         slug: 'home',
-        title: { tr: 'Ana Sayfa', en: 'Home', ar: 'الرئيسية' },
-        content: { tr: 'Ana sayfa içeriği', en: 'Home page content', ar: 'محتوى الصفحة الرئيسية' }
+        title: 'Ana Sayfa',
+        content: { tr: 'Ana sayfa içeriği', en: 'Home page content', ar: 'محتوى الصفحة الرئيسية' },
+        isPublished: true,
+        isHomepage: true
       },
       {
         slug: 'about',
-        title: { tr: 'Hakkımızda', en: 'About Us', ar: 'من نحن' },
-        content: { tr: 'Hakkımızda içeriği', en: 'About us content', ar: 'محتوى من نحن' }
+        title: 'Hakkımızda',
+        content: { tr: 'Hakkımızda içeriği', en: 'About us content', ar: 'محتوى من نحن' },
+        isPublished: true
       },
       {
         slug: 'services',
-        title: { tr: 'Hizmetler', en: 'Services', ar: 'الخدمات' },
-        content: { tr: 'Hizmetler içeriği', en: 'Services content', ar: 'محتوى الخدمات' }
+        title: 'Hizmetler',
+        content: { tr: 'Hizmetler içeriği', en: 'Services content', ar: 'محتوى الخدمات' },
+        isPublished: true
       },
       {
         slug: 'contact',
-        title: { tr: 'İletişim', en: 'Contact', ar: 'اتصل بنا' },
-        content: { tr: 'İletişim bilgileri', en: 'Contact information', ar: 'معلومات الاتصال' }
+        title: 'İletişim',
+        content: { tr: 'İletişim bilgileri', en: 'Contact information', ar: 'معلومات الاتصال' },
+        isPublished: true
       }
     ];
 
