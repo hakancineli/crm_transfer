@@ -215,7 +215,6 @@ export default function CustomerReservationPage() {
                   onChange={setFrom}
                   placeholder={t('customerForm.fromPlaceholder') || 'Adres yazın (örn. Şirinevler)'}
                   required
-                  forceFallback
                 />
               </div>
               <div>
@@ -225,7 +224,6 @@ export default function CustomerReservationPage() {
                   onChange={setTo}
                   placeholder={t('customerForm.toPlaceholder') || 'Adres yazın (örn. Havalimanı)'}
                   required
-                  forceFallback
                 />
               </div>
             </div>
