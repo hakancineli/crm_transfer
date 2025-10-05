@@ -73,7 +73,12 @@ export default function ModuleManagement() {
     try {
       setLoading(true);
       console.log('Fetching module data...');
-      const response = await fetch('/api/admin/modules');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const response = await fetch('/api/admin/modules', {
+        headers: {
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
+      });
       console.log('Response status:', response.status);
       if (response.ok) {
         const data = await response.json();
@@ -93,10 +98,12 @@ export default function ModuleManagement() {
 
   const toggleModule = async (tenantId: string, moduleId: string) => {
     try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const response = await fetch('/api/admin/modules', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
         body: JSON.stringify({ tenantId, moduleId }),
       });
