@@ -45,6 +45,7 @@ import { formatLocation, formatPassengerName, formatHotelName, toTitleCase } fro
 import ReturnTransferModal from '@/app/components/ReturnTransferModal';
 import FlightStatus from '@/app/components/FlightStatus';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useTenant } from '@/app/contexts/TenantContext';
 import { canViewAllReservations, canViewOwnSales } from '@/app/lib/permissions';
 import { useModule } from '@/app/hooks/useModule';
 
@@ -54,13 +55,13 @@ interface ReservationListProps {
 
 export default function ReservationList({ onFilterChange }: ReservationListProps) {
     const { user } = useAuth();
+    const { selectedTenantId, tenants } = useTenant();
     const flightEnabled = useModule('flight');
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [filteredReservations, setFilteredReservations] = useState<Reservation[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [updateLoading, setUpdateLoading] = useState<string | null>(null);
     const [selectedTenant, setSelectedTenant] = useState<string>('all');
-    const [tenants, setTenants] = useState<Array<{id: string, companyName: string, subdomain: string}>>([]);
     const [returnTransferModal, setReturnTransferModal] = useState<{
         isOpen: boolean;
         reservation: any;
@@ -159,7 +160,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             const data = await response.json();
             
             if (Array.isArray(data)) {
-                setTenants(data);
+                // Tenants are now managed by TenantContext
             }
         } catch (error) {
             console.error('Tenant\'ları getirme hatası:', error);
@@ -710,10 +711,12 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             {user?.role === 'SUPERUSER' && (
                                                 <td className="px-6 py-4 text-sm text-gray-900 align-middle">
                                                     <div className="font-medium text-blue-600">
-                                                        {reservation.tenant?.companyName || 'Bilinmiyor'}
+                                                        {reservation.tenant?.companyName || 
+                                                         (selectedTenantId ? tenants.find(t => t.id === selectedTenantId)?.companyName : 'Bilinmiyor')}
                                                     </div>
                                                     <div className="text-xs text-gray-500">
-                                                        {reservation.tenant?.subdomain || 'N/A'}
+                                                        {reservation.tenant?.subdomain || 
+                                                         (selectedTenantId ? tenants.find(t => t.id === selectedTenantId)?.subdomain : 'N/A')}
                                                     </div>
                                                 </td>
                                             )}
@@ -1017,6 +1020,21 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                         </div>
                                     )}
                                 </div>
+
+                                {/* Acente (SUPERUSER için) */}
+                                {user?.role === 'SUPERUSER' && (
+                                    <div className="mb-3">
+                                        <div className="text-sm text-gray-600 mb-1">Acente:</div>
+                                        <div className="text-sm font-medium text-blue-600">
+                                            {reservation.tenant?.companyName || 
+                                             (selectedTenantId ? tenants.find(t => t.id === selectedTenantId)?.companyName : 'Bilinmiyor')}
+                                        </div>
+                                        <div className="text-xs text-gray-500">
+                                            {reservation.tenant?.subdomain || 
+                                             (selectedTenantId ? tenants.find(t => t.id === selectedTenantId)?.subdomain : 'N/A')}
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Şoför ve Durum */}
                                 <div className="flex justify-between items-center mb-3">
