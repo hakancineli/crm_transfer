@@ -34,10 +34,10 @@ export default function ProtransferWebsitePage() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentVehicleIndex((prev) => prev === serefVuralData.vehicleImages.length - 1 ? 0 : prev + 1);
+      setCurrentVehicleIndex((prev) => prev === (websiteContent?.vehicleImages?.length || defaultContent.vehicleImages.length) - 1 ? 0 : prev + 1);
     }, 7000);
     return () => clearInterval(interval);
-  }, []);
+  }, [websiteContent]);
 
   // Panel içeriğini domaine göre çek
   useEffect(() => {
