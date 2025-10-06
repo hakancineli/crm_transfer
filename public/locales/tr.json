@@ -7,7 +7,189 @@
     "save": "Kaydet",
     "edit": "Düzenle",
     "delete": "Sil",
-    "confirm": "Onayla"
+    "confirm": "Onayla",
+    "submit": "Gönder",
+    "back": "Geri",
+    "next": "İleri",
+    "previous": "Önceki",
+    "close": "Kapat",
+    "yes": "Evet",
+    "no": "Hayır",
+    "required": "Gerekli",
+    "optional": "İsteğe Bağlı"
+  },
+  "header": {
+    "title": "ProTransfer",
+    "newReservation": "Yeni Rezervasyon",
+    "customerPanel": "Rezervasyonlarım",
+    "allReservations": "Tüm Rezervasyonlar",
+    "reports": "Raporlar"
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Admin Paneli",
+      "welcome": "Hoş Geldiniz",
+      "stats": {
+        "totalReservations": "Toplam Rezervasyon",
+        "todayReservations": "Bugünkü Rezervasyonlar",
+        "totalRevenue": "Toplam Gelir",
+        "todayRevenue": "Bugünkü Gelir",
+        "totalDrivers": "Toplam Şoför",
+        "activeDrivers": "Aktif Şoförler",
+        "pendingPayments": "Bekleyen Ödemeler",
+        "completedTransfers": "Tamamlanan Transferler"
+      },
+      "quickActions": {
+        "transferOperations": "Transfer İşlemleri",
+        "accommodationOperations": "Konaklama İşlemleri",
+        "newReservation": "Yeni Rezervasyon",
+        "reservations": "Rezervasyonlar",
+        "reports": "Raporlar",
+        "flightStatus": "Uçuş Durumu",
+        "pricePool": "Fiyat Havuzu",
+        "hotelReservation": "Otel Rezervasyonu",
+        "accommodationReports": "Konaklama Raporları",
+        "hotelReservations": "Otel Rezervasyonları"
+      },
+      "recentActivities": "Son Aktiviteler",
+      "refresh": "Yenile"
+    },
+    "navigation": {
+      "dashboard": "Dashboard",
+      "allReservations": "Tüm Rezervasyonlar",
+      "reservations": "Rezervasyonlar",
+      "newReservation": "Yeni Rezervasyon",
+      "drivers": "Şoförler",
+      "reports": "Raporlar",
+      "accounting": "Muhasebe",
+      "customers": "Müşteriler",
+      "activities": "Son Aktiviteler",
+      "users": "Kullanıcılar",
+      "settings": "Ayarlar",
+      "logout": "Çıkış"
+    },
+    "accounting": {
+      "title": "Muhasebe ve Ödeme Yönetimi",
+      "description": "Rezervasyon ödemelerini ve komisyonları yönetin",
+      "filters": {
+        "all": "Tümü",
+        "paid": "Ödenmiş",
+        "pending": "Beklemede",
+        "unpaid": "Ödenmemiş"
+      },
+      "dateRange": {
+        "startDate": "Başlangıç Tarihi",
+        "endDate": "Bitiş Tarihi",
+        "apply": "Uygula"
+      },
+      "stats": {
+        "usdSalesTotal": "USD Satış Toplamı",
+        "usdTlRate": "USD/TL Kuru",
+        "tlEquivalent": "TL Karşılığı",
+        "driverCommission": "Şoför Komisyonu",
+        "companyProfit": "Şirket Karı",
+        "profitMargin": "Kar Marjı",
+        "pendingCommission": "Bekleyen Komisyon",
+        "approvedCommission": "Onaylanan Komisyon",
+        "unpaid": "Ödenmemiş"
+      },
+      "table": {
+        "voucher": "Voucher",
+        "date": "Tarih",
+        "route": "Rota",
+        "passengers": "Yolcular",
+        "salesAmount": "Satış Tutarı",
+        "driverCommission": "Şoför Komisyonu (TL)",
+        "companyProfit": "Şirket Karı (TL)",
+        "paymentStatus": "Ödeme Durumu",
+        "commissionApproval": "Komisyon Onayı",
+        "salesPerson": "Satış Personeli"
+      },
+      "actions": {
+        "approve": "Onayla",
+        "reject": "Reddet",
+        "refresh": "Yenile"
+      }
+    },
+    "settings": {
+      "title": "Sistem Ayarları",
+      "description": "Sistem geneli ayarları yönetin",
+      "emojiSettings": "Emoji Ayarları",
+      "emojiToggle": "Emojileri Aç/Kapat",
+      "emojiDescription": "Arayüzde emoji kullanımını açın veya kapatın",
+      "moduleSettings": "Modül Ayarları",
+      "modules": {
+        "transfer": {
+          "name": "Transfer Modülü",
+          "description": "Temel transfer işlemleri (her zaman aktif)",
+          "status": "Aktif"
+        },
+        "accommodation": {
+          "name": "Konaklama Modülü",
+          "description": "Otel rezervasyonları ve fiyat havuzu",
+          "status": "Devre Dışı"
+        },
+        "flight": {
+          "name": "Uçuş Modülü",
+          "description": "Uçuş rezervasyonları ve takibi",
+          "status": "Devre Dışı"
+        }
+      },
+      "toggleModule": "Modülü Aç/Kapat",
+      "saveSettings": "Ayarları Kaydet"
+    },
+    "users": {
+      "title": "Kullanıcı Yönetimi",
+      "description": "Sistem kullanıcılarını yönetin",
+      "addUser": "Kullanıcı Ekle",
+      "table": {
+        "name": "Ad Soyad",
+        "username": "Kullanıcı Adı",
+        "email": "E-posta",
+        "role": "Rol",
+        "permissions": "İzinler",
+        "reservations": "Rezervasyonlar",
+        "actions": "İşlemler"
+      },
+      "roles": {
+        "admin": "Admin",
+        "operasyon": "Operasyon",
+        "muhasebe": "Muhasebe",
+        "satisci": "Satış"
+      }
+    },
+    "activities": {
+      "title": "Sistem Aktiviteleri",
+      "description": "Sistem loglarını ve aktivitelerini görüntüleyin",
+      "table": {
+        "timestamp": "Zaman Damgası",
+        "user": "Kullanıcı",
+        "action": "İşlem",
+        "details": "Detaylar",
+        "ipAddress": "IP Adresi"
+      },
+      "actions": {
+        "login": "Giriş",
+        "logout": "Çıkış",
+        "create": "Oluştur",
+        "update": "Güncelle",
+        "delete": "Sil"
+      }
+    },
+    "reservations": {
+      "allReservations": "Tüm Rezervasyonlar",
+      "allReservationsDescription": "Sistemdeki tüm rezervasyonları görüntüleyin ve yönetin.",
+      "todayTransfers": "Bugünkü Transferler",
+      "todayTransfersDescription": "Bugün için planlanan transferleri görüntüleyin.",
+      "tomorrowTransfers": "Yarınki Transferler",
+      "tomorrowTransfersDescription": "Yarın için planlanan transferleri görüntüleyin.",
+      "thisWeekTransfers": "Bu Haftaki Transferler",
+      "thisWeekTransfersDescription": "Bu hafta için planlanan transferleri görüntüleyin.",
+      "assignedTransfers": "Atanmış Transferler",
+      "assignedTransfersDescription": "Şoför atanmış transferleri görüntüleyin.",
+      "unassignedTransfers": "Atanmamış Transferler",
+      "unassignedTransfersDescription": "Şoför ataması bekleyen transferleri görüntüleyin."
+    }
   },
   "website": {
     "title": "Şeref Vural Travel",
