@@ -5,8 +5,8 @@ import { MessageCircle, Calendar, MapPin, Clock, Users, Star, Phone, Mail, Check
 import Image from 'next/image';
 import ReservationForm from '../components/ReservationForm';
 
-// Şeref Vural Travel verileri (protransfer.com.tr için kök site)
-const serefVuralData = {
+// Varsayılan içerik (panel verisi yoksa fallback)
+const defaultContent = {
   companyName: "Şeref Vural Travel",
   tagline: "İstanbul Havalimanı Transfer Hizmeti",
   description: "İstanbul Havalimanı'ndan şehir merkezine konforlu ve güvenli transfer hizmeti. Profesyonel şoförlerimiz ve Mercedes Vito araçlarımızla 7/24 hizmetinizdeyiz. Ayrıca İstanbul, Sapanca, Bursa, Abant turları ve kaliteli otel konaklama seçenekleri sunuyoruz.",
@@ -30,6 +30,7 @@ const serefVuralData = {
 export default function ProtransferWebsitePage() {
   const [currentVehicleIndex, setCurrentVehicleIndex] = useState(0);
   const [isReservationFormOpen, setIsReservationFormOpen] = useState(false);
+  const [websiteContent, setWebsiteContent] = useState<any>(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -38,12 +39,39 @@ export default function ProtransferWebsitePage() {
     return () => clearInterval(interval);
   }, []);
 
+  // Panel içeriğini domaine göre çek
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const host = window.location.hostname;
+        const res = await fetch(`/api/website/content/${host}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.content) {
+            setWebsiteContent(JSON.parse(data.content));
+          }
+        }
+      } catch (_) {}
+    };
+    load();
+  }, []);
+
   const handleWhatsApp = (message: string) => {
     const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/${serefVuralData.whatsapp.replace(/\D/g, '')}?text=${encodedMessage}`, '_blank');
+    const phone = (websiteContent?.contact?.whatsapp || defaultContent.whatsapp).replace(/\D/g, '');
+    window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
   };
 
   const tenantId = 'protransfer';
+
+  // İçerik kaynakları (panel > varsayılan)
+  const companyName = websiteContent?.companyName || websiteContent?.settings?.companyName || defaultContent.companyName;
+  const tagline = websiteContent?.tagline || websiteContent?.settings?.heroTitle || defaultContent.tagline;
+  const description = websiteContent?.description || websiteContent?.settings?.heroSubtitle || defaultContent.description;
+  const phone = websiteContent?.contact?.phone || websiteContent?.settings?.contactInfo?.phone || defaultContent.phone;
+  const whatsapp = websiteContent?.contact?.whatsapp || websiteContent?.settings?.contactInfo?.whatsapp || defaultContent.whatsapp;
+  const email = websiteContent?.contact?.email || websiteContent?.settings?.contactInfo?.email || defaultContent.email;
+  const vehicleImages: string[] = websiteContent?.vehicleImages || defaultContent.vehicleImages;
 
   return (
     <div className="min-h-screen bg-white">
@@ -51,7 +79,7 @@ export default function ProtransferWebsitePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900">{serefVuralData.companyName}</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{companyName}</h1>
             </div>
             <nav className="hidden md:flex space-x-8">
               <a href="#tours" className="text-gray-600 hover:text-green-600">Turlar</a>
@@ -71,9 +99,9 @@ export default function ProtransferWebsitePage() {
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div>
               <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900 mb-6">
-                {serefVuralData.companyName} - {serefVuralData.tagline}
+                {companyName} - {tagline}
               </h1>
-              <p className="text-lg text-gray-600 mb-8">{serefVuralData.description}</p>
+              <p className="text-lg text-gray-600 mb-8">{description}</p>
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
                 <button onClick={() => setIsReservationFormOpen(true)} className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200 flex items-center justify-center">
                   <Calendar className="mr-2" size={20} />
@@ -102,7 +130,7 @@ export default function ProtransferWebsitePage() {
               <div className="relative w-full max-w-4xl mx-auto">
                 <div className="relative overflow-hidden rounded-xl shadow-lg">
                   <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${currentVehicleIndex * 100}%)` }}>
-                    {serefVuralData.vehicleImages.map((image, index) => (
+                    {vehicleImages.map((image, index) => (
                       <div key={index} className="w-full flex-shrink-0">
                         <div className="relative h-64 sm:h-80 md:h-96">
                           <Image src={image} alt={`Mercedes Vito ${index + 1}`} fill className="object-cover" priority={index === 0} />
@@ -113,7 +141,7 @@ export default function ProtransferWebsitePage() {
                   </div>
                 </div>
                 <div className="flex justify-center mt-4 space-x-2">
-                  {serefVuralData.vehicleImages.map((_, index) => (
+                  {vehicleImages.map((_, index) => (
                     <button key={index} onClick={() => setCurrentVehicleIndex(index)} className={`w-3 h-3 rounded-full transition-all duration-200 ${index === currentVehicleIndex ? 'bg-green-600 scale-110' : 'bg-gray-300 hover:bg-gray-400'}`} />
                   ))}
                 </div>
@@ -138,15 +166,15 @@ export default function ProtransferWebsitePage() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"><MessageCircle className="w-8 h-8 text-green-600" /></div>
-              <a href={`https://wa.me/${serefVuralData.whatsapp.replace(/\D/g, '')}`} className="text-green-600 font-semibold" target="_blank" rel="noopener noreferrer">{serefVuralData.whatsapp}</a>
+              <a href={`https://wa.me/${whatsapp.replace(/\D/g, '')}`} className="text-green-600 font-semibold" target="_blank" rel="noopener noreferrer">{whatsapp}</a>
             </div>
             <div className="text-center">
               <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"><Phone className="w-8 h-8 text-green-600" /></div>
-              <a href={`tel:${serefVuralData.phone}`} className="text-green-600 font-semibold">{serefVuralData.phone}</a>
+              <a href={`tel:${phone}`} className="text-green-600 font-semibold">{phone}</a>
             </div>
             <div className="text-center">
               <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"><Mail className="w-8 h-8 text-green-600" /></div>
-              <a href={`mailto:${serefVuralData.email}`} className="text-green-600 font-semibold">{serefVuralData.email}</a>
+              <a href={`mailto:${email}`} className="text-green-600 font-semibold">{email}</a>
             </div>
           </div>
         </div>
@@ -155,11 +183,11 @@ export default function ProtransferWebsitePage() {
       <footer className="bg-gray-900 text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h3 className="text-xl font-bold mb-2">{serefVuralData.companyName}</h3>
+            <h3 className="text-xl font-bold mb-2">{companyName}</h3>
             <p className="text-gray-400 mb-4">İstanbul'un en güvenilir transfer, tur ve konaklama hizmeti</p>
             <div className="flex justify-center space-x-6">
-              <a href={`tel:${serefVuralData.phone}`} className="text-gray-400 hover:text-white">{serefVuralData.phone}</a>
-              <a href={`mailto:${serefVuralData.email}`} className="text-gray-400 hover:text-white">{serefVuralData.email}</a>
+              <a href={`tel:${phone}`} className="text-gray-400 hover:text-white">{phone}</a>
+              <a href={`mailto:${email}`} className="text-gray-400 hover:text-white">{email}</a>
             </div>
           </div>
         </div>
