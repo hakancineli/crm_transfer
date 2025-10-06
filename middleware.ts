@@ -33,12 +33,47 @@ export async function middleware(request: NextRequest) {
 		}
 		return NextResponse.next();
 	}
+
+    // protransfer.com.tr -> Only customer website (Şeref Vural theme)
+    if (hostname.includes('protransfer.com.tr')) {
+        // Root should serve dedicated protransfer page (keep URL as '/')
+        if (pathname === '/') {
+            const url = request.nextUrl.clone();
+            url.pathname = '/protransfer';
+            return NextResponse.rewrite(url);
+        }
+        // Explicitly block CRM/auth paths on this domain and serve website content
+        if (
+            pathname === '/admin-login' ||
+            pathname === '/login' ||
+            pathname.startsWith('/admin')
+        ) {
+            const url = request.nextUrl.clone();
+            url.pathname = '/protransfer';
+            return NextResponse.rewrite(url);
+        }
+        // Allow only website and website API on this domain
+        const isAllowed =
+            pathname.startsWith('/website') ||
+            pathname.startsWith('/api/website');
+        if (!isAllowed) {
+            const url = request.nextUrl.clone();
+            url.pathname = '/protransfer';
+            return NextResponse.rewrite(url);
+        }
+        return NextResponse.next();
+    }
 	
-	// Custom domain handling - redirect to website for non-proacente domains
-	if (!hostname.includes('proacente.com') && !hostname.includes('vercel.app') && pathname === '/') {
-		const url = request.nextUrl.clone();
-		url.pathname = '/website';
-		return NextResponse.redirect(url);
+	// Custom domain handling - for other non-proacente domains, force website module
+	if (!hostname.includes('proacente.com') && !hostname.includes('vercel.app')) {
+		// Allow only website assets and API; redirect everything else to /website
+		const isWebsitePath = pathname === '/' || pathname.startsWith('/website');
+		const isWebsiteApi = pathname.startsWith('/api/website');
+		if (!isWebsitePath && !isWebsiteApi) {
+			const url = request.nextUrl.clone();
+			url.pathname = '/website';
+			return NextResponse.redirect(url);
+		}
 	}
 	
 	// Check if it's a public route

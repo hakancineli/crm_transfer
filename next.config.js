@@ -19,13 +19,63 @@ const nextConfig = {
     return config
   },
   
-  // Domain configuration
+  // Domain-based redirects are handled in `middleware.ts`.
+  // Keep Next.js redirects empty to avoid conflicts across domains.
   async redirects() {
     return [
+      // Block CRM paths on protransfer.com.tr at the edge
       {
-        source: '/',
-        destination: '/admin-login',
+        source: '/admin-login',
+        has: [ { type: 'host', value: 'protransfer.com.tr' } ],
+        destination: '/protransfer',
         permanent: false,
+      },
+      {
+        source: '/admin/:path*',
+        has: [ { type: 'host', value: 'protransfer.com.tr' } ],
+        destination: '/protransfer',
+        permanent: false,
+      },
+      // Also block on www subdomain just in case
+      {
+        source: '/admin-login',
+        has: [ { type: 'host', value: 'www.protransfer.com.tr' } ],
+        destination: '/protransfer',
+        permanent: false,
+      },
+      {
+        source: '/admin/:path*',
+        has: [ { type: 'host', value: 'www.protransfer.com.tr' } ],
+        destination: '/protransfer',
+        permanent: false,
+      },
+    ]
+  },
+
+  async rewrites() {
+    return [
+      // Allow website and website API to pass through on protransfer.com.tr
+      {
+        source: '/website/:path*',
+        has: [ { type: 'host', value: 'protransfer.com.tr' } ],
+        destination: '/website/:path*',
+      },
+      {
+        source: '/api/website/:path*',
+        has: [ { type: 'host', value: 'protransfer.com.tr' } ],
+        destination: '/api/website/:path*',
+      },
+      // Serve dedicated protransfer page at root for any other path on protransfer.com.tr
+      {
+        source: '/:path*',
+        has: [ { type: 'host', value: 'protransfer.com.tr' } ],
+        destination: '/protransfer',
+      },
+      // And for www subdomain
+      {
+        source: '/:path*',
+        has: [ { type: 'host', value: 'www.protransfer.com.tr' } ],
+        destination: '/protransfer',
       },
     ]
   },

@@ -13,11 +13,14 @@ export default function HomePage() {
     // Domain'e göre farklı yönlendirme
     const hostname = window.location.hostname;
     
-    let redirectPath = '/admin-login'; // Default
-    
+    let redirectPath = '/admin-login'; // Varsayılan: CRM girişi
+
     if (hostname.includes('proacente.com')) {
-      // ProAcente domain - CRM sistemi
+      // ProAcente domain - CRM
       redirectPath = '/admin-login';
+    } else if (hostname.includes('protransfer.com.tr')) {
+      // ProTransfer domain - müşteri web sitesi (Şeref Vural teması)
+      redirectPath = '/website/demo';
     }
     
     const timer = setTimeout(() => {
