@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from './contexts/LanguageContext';
 
 export default function HomePage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     // Domain'e göre farklı yönlendirme
@@ -30,19 +32,19 @@ export default function HomePage() {
       <div className="text-center text-white">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-4">ProAcente</h1>
-          <p className="text-xl opacity-90">Acente Yönetim Sistemi</p>
+          <p className="text-xl opacity-90">{t('header.title') || 'Acente Yönetim Sistemi'}</p>
           <p className="text-sm opacity-75 mt-2">proacente.com</p>
         </div>
         
         {isLoading && (
           <div className="flex items-center justify-center space-x-2">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-            <span>Yönlendiriliyor...</span>
+            <span>{t('common.loading') || 'Yönlendiriliyor...'}</span>
           </div>
         )}
         
         <div className="mt-8 text-sm opacity-75">
-          <p>Admin giriş sayfasına yönlendiriliyorsunuz...</p>
+          <p>{language === 'tr' ? 'Admin giriş sayfasına yönlendiriliyorsunuz...' : t('admin.navigation.allReservations') || 'Redirecting to admin login...'}</p>
         </div>
         
         <div className="mt-6 text-xs opacity-60">

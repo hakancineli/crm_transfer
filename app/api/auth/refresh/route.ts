@@ -21,10 +21,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Geçersiz refresh token' }, { status: 401 });
     }
 
-    // Get user from database
+    // Get user from database (select explicit fields to avoid stale columns)
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
-      include: {
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        name: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
         permissions: true,
       },
     });

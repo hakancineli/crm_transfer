@@ -15,23 +15,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Try database login first
+    // Try database login first (use raw SQL to avoid potential stale client issues)
     try {
-      const user = await prisma.user.findFirst({
-        where: {
-          OR: [
-            { username: username },
-            { email: username }
-          ]
-        },
-        include: {
-          tenantUsers: {
-            include: {
-              tenant: true
-            }
-          }
-        }
-      });
+      const rows: any[] = await prisma.$queryRaw`
+        SELECT id, username, email, password, name, role, "isActive"
+        FROM "User"
+        WHERE username = ${username} OR email = ${username}
+        LIMIT 1
+      `;
+      const user = rows && rows.length > 0 ? rows[0] : null;
 
       if (user) {
         // Check if user is active
