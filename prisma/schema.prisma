@@ -170,6 +170,7 @@ model Reservation {
   email                   String?
   notes                   String?
   type                    String         @default("transfer")
+  source                  String         @default("website")
   driver                  Driver?        @relation(fields: [driverId], references: [id])
   returnTransfer          Reservation?   @relation("ReturnTransfer", fields: [returnTransferId], references: [id])
   originalTransfer        Reservation?   @relation("ReturnTransfer")
@@ -324,6 +325,7 @@ model TourBooking {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   tourDuration   Int      @default(1)
+  source         String   @default("admin")
   driver         Driver?  @relation(fields: [driverId], references: [id])
   tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   User           User?    @relation(fields: [userId], references: [id])

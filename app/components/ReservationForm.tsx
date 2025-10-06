@@ -398,7 +398,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
                             >
                 + Yolcu Ekle
                             </button>
-              <p className="text-xs text-gray-600">Lütfen tüm yolcuların pasaporttaki tam isimlerini giriniz.</p>
+              <p className="text-xs text-gray-600">Yolcu bilgilerini eksiksiz giriniz.</p>
             </div>
                         </div>
 

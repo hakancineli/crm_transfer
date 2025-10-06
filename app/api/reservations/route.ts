@@ -143,7 +143,8 @@ export async function GET(request: NextRequest) {
       user: r.user,
       driver: r.driver,
       tenant: r.tenant,
-      type: 'transfer'
+      type: 'transfer',
+      source: (r as any).source || 'website'
     }));
 
     // Tur rezervasyonlarını formatla
@@ -164,7 +165,8 @@ export async function GET(request: NextRequest) {
       user: t.User,
       driver: t.driver,
       tenant: t.tenant,
-      type: 'tur'
+      type: 'tur',
+      source: (t as any).source || 'admin'
     }));
 
     // Tüm rezervasyonları birleştir ve tarihe göre sırala
@@ -225,6 +227,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Rezervasyon kaynağını belirle
+    const source = body.source || (userIdFromToken ? 'admin' : 'website');
+    
     // Basit rezervasyon oluşturma
     const reservation = await prisma.reservation.create({
       data: {
@@ -246,7 +251,8 @@ export async function POST(request: NextRequest) {
         tenantId: targetTenantId,
         notes: body.notes || '',
         email: body.email || '',
-        type: body.type || 'transfer'
+        type: body.type || 'transfer',
+        source: source
       }
     });
     

@@ -24,6 +24,7 @@ interface Reservation {
     phoneNumber?: string;
     paymentStatus: string;
     type?: string;
+    source?: string;
     driver?: {
         id: string;
         name: string;
@@ -641,10 +642,15 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                                             : 'Ara Transfer'
                                                             }
                                                         </span>
-                                                        {/* Website rezervasyonu badge'i */}
-                                                        {!reservation.user && (
+                                                        {/* Rezervasyon kaynağı badge'i */}
+                                                        {reservation.source === 'website' && (
                                                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800 border border-cyan-200">
                                                                 🌐 Website
+                                                            </span>
+                                                        )}
+                                                        {reservation.source === 'admin' && (
+                                                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                                                👤 Admin
                                                             </span>
                                                         )}
                                                     </div>
