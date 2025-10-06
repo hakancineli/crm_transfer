@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Calendar, MapPin, Users, Clock, X } from 'lucide-react';
 import GoogleMapsPlacesInput from '@/app/components/GoogleMapsPlacesInput';
+import { useGoogleMaps } from '@/app/hooks/useGoogleMaps';
 
 type Currency = 'TRY' | 'USD' | 'EUR';
 
@@ -13,7 +14,8 @@ interface ReservationFormProps {
 }
 
 export default function ReservationForm({ isOpen, onClose, tenantId }: ReservationFormProps) {
-    const [formData, setFormData] = useState({
+  const { isLoaded: googleMapsLoaded, isLoading: googleMapsLoading, error: googleMapsError } = useGoogleMaps();
+  const [formData, setFormData] = useState({
     type: 'transfer',
     from: '',
     to: '',
@@ -77,7 +79,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
   // Mesafe hesaplama
   useEffect(() => {
     const g = (window as any).google;
-    if (!formData.from || !formData.to || !g?.maps?.DistanceMatrixService) return;
+    if (!formData.from || !formData.to || !googleMapsLoaded || !g?.maps?.DistanceMatrixService) return;
     let cancelled = false;
     setEstimating(true);
     const svc = new g.maps.DistanceMatrixService();
@@ -105,7 +107,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
       }
     });
     return () => { cancelled = true; };
-  }, [formData.from, formData.to]);
+  }, [formData.from, formData.to, googleMapsLoaded]);
 
   // Google Places API handled by GoogleMapsPlacesInput component
 
@@ -282,7 +284,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
           {(formData.from && formData.to) && (
             <div className="text-sm text-gray-700 flex items-center gap-3">
               <span className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-2 py-1">
-                {estimating || distanceKm === null ? 'Hesaplanıyor…' : `${distanceKm.toFixed(1)} km`}
+                {googleMapsError ? 'Hesaplama hatası' : !googleMapsLoaded ? 'Google Maps yükleniyor…' : estimating || distanceKm === null ? 'Hesaplanıyor…' : `${distanceKm.toFixed(1)} km`}
               </span>
               {estimatedPriceTRY !== null && (
                 <>
@@ -299,8 +301,8 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
                   )}
                 </>
               )}
-                        </div>
-                    )}
+            </div>
+          )}
 
           {/* Date and Time */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
