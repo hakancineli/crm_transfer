@@ -2,6 +2,7 @@
 
 import AdminNavigation from '@/app/components/AdminNavigation';
 import Header from '@/app/components/ui/Header';
+import { TenantProvider } from '@/app/contexts/TenantContext';
 import { useEffect, useState } from 'react';
 
 export default function AdminLayout({
@@ -19,6 +20,7 @@ export default function AdminLayout({
   }, []);
 
   return (
+    <TenantProvider>
     <div className="min-h-screen bg-gray-50">
       {/* Global Header with sidebar toggle */}
       <Header 
@@ -46,5 +48,6 @@ export default function AdminLayout({
         {children}
       </main>
     </div>
+    </TenantProvider>
   );
 }

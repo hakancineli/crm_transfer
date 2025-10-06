@@ -7,6 +7,7 @@ import { useEmoji } from '@/app/contexts/EmojiContext';
 import { useModule } from '@/app/hooks/useModule';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import ReservationTypeSelector from './ReservationTypeSelector';
+import { useTenant } from '@/app/contexts/TenantContext';
 
 interface AdminNavigationProps {
   onClose?: () => void;
@@ -22,12 +23,17 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
   const flightEnabled = useModule('flight');
   const tourEnabled = useModule('tour');
   const websiteEnabled = useModule('website');
+  const { selectedTenantId, setSelectedTenantId, tenants, refreshTenants } = useTenant();
 
 
   // Client-side rendering kontrolü
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    if (user?.role === 'SUPERUSER') refreshTenants();
+  }, [user?.role, refreshTenants]);
 
 
   // Rol bazlı menü sıralaması
@@ -273,6 +279,23 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
 
       {/* Navigation */}
       <nav className="p-4 space-y-2 pt-6 flex-1 overflow-y-auto pb-4">
+        {user?.role === 'SUPERUSER' && (
+          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+            <div className="text-xs text-amber-700 mb-2">Tenant Seçimi (Sadece SUPERUSER)</div>
+            <select
+              className="w-full border border-amber-300 rounded-md text-sm px-2 py-1 bg-white"
+              value={selectedTenantId || ''}
+              onChange={(e) => setSelectedTenantId(e.target.value || null)}
+            >
+              <option value="">— Tenant seçiniz —</option>
+              {tenants.map(t => (
+                <option key={t.id} value={t.id}>
+                  {t.companyName}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         {menuItems.map((item) => {
           // Check if item should be shown based on user permissions
           let shouldShow = true;
