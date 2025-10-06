@@ -6,14 +6,31 @@ export async function GET(
   { params }: { params: { domain: string } }
 ) {
   try {
-    const domain = params.domain;
+    const rawDomain = params.domain || '';
+    const normalized = rawDomain.replace(/^www\./i, '').toLowerCase();
 
-    // Find tenant by subdomain
-    const tenant = await prisma.tenant.findFirst({
+    // Resolve tenant by TenantWebsite domain mapping first (authoritative)
+    const tenantWebsite = await prisma.tenantWebsite.findFirst({
+      where: {
+        isActive: true,
+        OR: [
+          { domain: normalized },
+          { domain: `www.${normalized}` }
+        ]
+      },
+      include: {
+        tenant: true,
+        pages: true,
+        sections: true
+      }
+    });
+
+    // Fallback: try to find by tenant subdomain/company name if no TenantWebsite found
+    const tenant = tenantWebsite?.tenant || await prisma.tenant.findFirst({
       where: {
         OR: [
-          { subdomain: domain },
-          { companyName: { contains: domain, mode: 'insensitive' } }
+          { subdomain: normalized },
+          { companyName: { contains: normalized, mode: 'insensitive' } }
         ]
       }
     });
@@ -23,7 +40,7 @@ export async function GET(
     }
 
     // Get website content for this specific tenant
-    const websiteContent = await prisma.tenantWebsite.findFirst({
+    const websiteContent = tenantWebsite || await prisma.tenantWebsite.findFirst({
       where: { 
         tenantId: tenant.id,
         isActive: true
