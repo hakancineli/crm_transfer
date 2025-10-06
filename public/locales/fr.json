@@ -14,7 +14,182 @@
     "yes": "Oui",
     "no": "Non",
     "required": "Obligatoire",
-    "optional": "Optionnel"
+    "optional": "Optionnel",
+    "error": "Erreur",
+    "success": "Succès"
+  },
+  "header": {
+    "title": "ProTransfer",
+    "newReservation": "Nouvelle Réservation",
+    "customerPanel": "Mes Réservations",
+    "allReservations": "Toutes les Réservations",
+    "reports": "Rapports"
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Panneau d'Administration",
+      "welcome": "Bienvenue",
+      "stats": {
+        "totalReservations": "Total des Réservations",
+        "todayReservations": "Réservations d'Aujourd'hui",
+        "totalRevenue": "Revenus Totaux",
+        "todayRevenue": "Revenus d'Aujourd'hui",
+        "totalDrivers": "Total des Chauffeurs",
+        "activeDrivers": "Chauffeurs Actifs",
+        "pendingPayments": "Paiements en Attente",
+        "completedTransfers": "Transferts Terminés"
+      },
+      "quickActions": {
+        "transferOperations": "Opérations de Transfert",
+        "accommodationOperations": "Opérations d'Hébergement",
+        "newReservation": "Nouvelle Réservation",
+        "reservations": "Réservations",
+        "reports": "Rapports",
+        "flightStatus": "Statut du Vol",
+        "pricePool": "Pool de Prix",
+        "hotelReservation": "Réservation d'Hôtel",
+        "accommodationReports": "Rapports d'Hébergement",
+        "hotelReservations": "Réservations d'Hôtel"
+      },
+      "recentActivities": "Activités Récentes",
+      "refresh": "Actualiser"
+    },
+    "navigation": {
+      "dashboard": "Tableau de Bord",
+      "allReservations": "Toutes les Réservations",
+      "reservations": "Réservations",
+      "newReservation": "Nouvelle Réservation",
+      "drivers": "Chauffeurs",
+      "reports": "Rapports",
+      "accounting": "Comptabilité",
+      "customers": "Clients",
+      "activities": "Activités Récentes",
+      "users": "Utilisateurs",
+      "settings": "Paramètres",
+      "logout": "Déconnexion"
+    },
+    "accounting": {
+      "title": "Gestion de la Comptabilité et des Paiements",
+      "description": "Gérer les paiements de réservation et les commissions",
+      "filters": {
+        "all": "Tous",
+        "paid": "Payé",
+        "pending": "En Attente",
+        "unpaid": "Non Payé"
+      },
+      "dateRange": {
+        "startDate": "Date de Début",
+        "endDate": "Date de Fin",
+        "apply": "Appliquer"
+      },
+      "stats": {
+        "usdSalesTotal": "Total des Ventes USD",
+        "usdTlRate": "Taux USD/TL",
+        "tlEquivalent": "Équivalent TL",
+        "driverCommission": "Commission du Chauffeur",
+        "companyProfit": "Profit de l'Entreprise",
+        "profitMargin": "Marge de Profit",
+        "pendingCommission": "Commission en Attente",
+        "approvedCommission": "Commission Approuvée",
+        "unpaid": "Non Payé"
+      },
+      "table": {
+        "voucher": "Bon",
+        "date": "Date",
+        "route": "Route",
+        "passengers": "Passagers",
+        "salesAmount": "Montant des Ventes",
+        "driverCommission": "Commission du Chauffeur (TL)",
+        "companyProfit": "Profit de l'Entreprise (TL)",
+        "paymentStatus": "Statut du Paiement",
+        "commissionApproval": "Approbation de la Commission",
+        "salesPerson": "Personne de Vente"
+      },
+      "actions": {
+        "approve": "Approuver",
+        "reject": "Rejeter",
+        "refresh": "Actualiser"
+      }
+    },
+    "settings": {
+      "title": "Paramètres du Système",
+      "description": "Gérer les paramètres généraux du système",
+      "emojiSettings": "Paramètres d'Emoji",
+      "emojiToggle": "Activer/Désactiver les Emojis",
+      "emojiDescription": "Activer ou désactiver l'utilisation des emojis dans l'interface",
+      "moduleSettings": "Paramètres des Modules",
+      "modules": {
+        "transfer": {
+          "name": "Module de Transfert",
+          "description": "Opérations de transfert de base (toujours actif)",
+          "status": "Actif"
+        },
+        "accommodation": {
+          "name": "Module d'Hébergement",
+          "description": "Réservations d'hôtel et pool de prix",
+          "status": "Désactivé"
+        },
+        "flight": {
+          "name": "Module de Vol",
+          "description": "Réservations de vol et suivi",
+          "status": "Désactivé"
+        }
+      },
+      "toggleModule": "Basculer le Module",
+      "saveSettings": "Enregistrer les Paramètres"
+    },
+    "users": {
+      "title": "Gestion des Utilisateurs",
+      "description": "Gérer les utilisateurs du système",
+      "addUser": "Ajouter un Utilisateur",
+      "table": {
+        "name": "Nom Complet",
+        "username": "Nom d'Utilisateur",
+        "email": "E-mail",
+        "role": "Rôle",
+        "permissions": "Permissions",
+        "reservations": "Réservations",
+        "actions": "Actions"
+      },
+      "roles": {
+        "admin": "Admin",
+        "operasyon": "Opérations",
+        "muhasebe": "Comptabilité",
+        "satisci": "Ventes"
+      }
+    },
+    "activities": {
+      "title": "Activités du Système",
+      "description": "Voir les logs et activités du système",
+      "table": {
+        "timestamp": "Horodatage",
+        "user": "Utilisateur",
+        "action": "Action",
+        "details": "Détails",
+        "ipAddress": "Adresse IP"
+      },
+      "actions": {
+        "login": "Connexion",
+        "logout": "Déconnexion",
+        "create": "Créer",
+        "update": "Mettre à jour",
+        "delete": "Supprimer"
+      }
+    },
+    "reservations": {
+      "allReservations": "Toutes les Réservations",
+      "allReservationsDescription": "Voir et gérer toutes les réservations du système.",
+      "todayTransfers": "Transferts d'Aujourd'hui",
+      "todayTransfersDescription": "Voir les transferts programmés pour aujourd'hui.",
+      "tomorrowTransfers": "Transferts de Demain",
+      "tomorrowTransfersDescription": "Voir les transferts programmés pour demain.",
+      "thisWeekTransfers": "Transferts de Cette Semaine",
+      "thisWeekTransfersDescription": "Voir les transferts programmés pour cette semaine.",
+      "assignedTransfers": "Transferts Assignés",
+      "assignedTransfersDescription": "Voir les transferts avec chauffeurs assignés.",
+      "unassignedTransfers": "Transferts Non Assignés",
+      "unassignedTransfersDescription": "Voir les transferts en attente d'assignation de chauffeur."
+    }
   }
 }
 

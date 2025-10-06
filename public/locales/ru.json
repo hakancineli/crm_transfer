@@ -14,7 +14,182 @@
     "yes": "Да",
     "no": "Нет",
     "required": "Обязательно",
-    "optional": "Необязательно"
+    "optional": "Необязательно",
+    "error": "Ошибка",
+    "success": "Успешно"
+  },
+  "header": {
+    "title": "ProTransfer",
+    "newReservation": "Новое Бронирование",
+    "customerPanel": "Мои Бронирования",
+    "allReservations": "Все Бронирования",
+    "reports": "Отчеты"
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Панель Администратора",
+      "welcome": "Добро пожаловать",
+      "stats": {
+        "totalReservations": "Всего Бронирований",
+        "todayReservations": "Бронирования Сегодня",
+        "totalRevenue": "Общий Доход",
+        "todayRevenue": "Доход Сегодня",
+        "totalDrivers": "Всего Водителей",
+        "activeDrivers": "Активные Водители",
+        "pendingPayments": "Ожидающие Платежи",
+        "completedTransfers": "Завершенные Трансферы"
+      },
+      "quickActions": {
+        "transferOperations": "Операции Трансфера",
+        "accommodationOperations": "Операции Размещения",
+        "newReservation": "Новое Бронирование",
+        "reservations": "Бронирования",
+        "reports": "Отчеты",
+        "flightStatus": "Статус Рейса",
+        "pricePool": "Пул Цен",
+        "hotelReservation": "Бронирование Отеля",
+        "accommodationReports": "Отчеты Размещения",
+        "hotelReservations": "Бронирования Отелей"
+      },
+      "recentActivities": "Последние Активности",
+      "refresh": "Обновить"
+    },
+    "navigation": {
+      "dashboard": "Панель Управления",
+      "allReservations": "Все Бронирования",
+      "reservations": "Бронирования",
+      "newReservation": "Новое Бронирование",
+      "drivers": "Водители",
+      "reports": "Отчеты",
+      "accounting": "Бухгалтерия",
+      "customers": "Клиенты",
+      "activities": "Последние Активности",
+      "users": "Пользователи",
+      "settings": "Настройки",
+      "logout": "Выход"
+    },
+    "accounting": {
+      "title": "Управление Бухгалтерией и Платежами",
+      "description": "Управление платежами бронирований и комиссиями",
+      "filters": {
+        "all": "Все",
+        "paid": "Оплачено",
+        "pending": "Ожидает",
+        "unpaid": "Не Оплачено"
+      },
+      "dateRange": {
+        "startDate": "Дата Начала",
+        "endDate": "Дата Окончания",
+        "apply": "Применить"
+      },
+      "stats": {
+        "usdSalesTotal": "Общий Объем Продаж USD",
+        "usdTlRate": "Курс USD/TL",
+        "tlEquivalent": "Эквивалент в TL",
+        "driverCommission": "Комиссия Водителя",
+        "companyProfit": "Прибыль Компании",
+        "profitMargin": "Маржа Прибыли",
+        "pendingCommission": "Ожидающая Комиссия",
+        "approvedCommission": "Одобренная Комиссия",
+        "unpaid": "Не Оплачено"
+      },
+      "table": {
+        "voucher": "Ваучер",
+        "date": "Дата",
+        "route": "Маршрут",
+        "passengers": "Пассажиры",
+        "salesAmount": "Сумма Продажи",
+        "driverCommission": "Комиссия Водителя (TL)",
+        "companyProfit": "Прибыль Компании (TL)",
+        "paymentStatus": "Статус Платежа",
+        "commissionApproval": "Одобрение Комиссии",
+        "salesPerson": "Продавец"
+      },
+      "actions": {
+        "approve": "Одобрить",
+        "reject": "Отклонить",
+        "refresh": "Обновить"
+      }
+    },
+    "settings": {
+      "title": "Настройки Системы",
+      "description": "Управление общими настройками системы",
+      "emojiSettings": "Настройки Эмодзи",
+      "emojiToggle": "Включить/Выключить Эмодзи",
+      "emojiDescription": "Включить или выключить использование эмодзи в интерфейсе",
+      "moduleSettings": "Настройки Модулей",
+      "modules": {
+        "transfer": {
+          "name": "Модуль Трансфера",
+          "description": "Базовые операции трансфера (всегда активен)",
+          "status": "Активен"
+        },
+        "accommodation": {
+          "name": "Модуль Размещения",
+          "description": "Бронирования отелей и пул цен",
+          "status": "Отключен"
+        },
+        "flight": {
+          "name": "Модуль Рейсов",
+          "description": "Бронирования рейсов и отслеживание",
+          "status": "Отключен"
+        }
+      },
+      "toggleModule": "Переключить Модуль",
+      "saveSettings": "Сохранить Настройки"
+    },
+    "users": {
+      "title": "Управление Пользователями",
+      "description": "Управление пользователями системы",
+      "addUser": "Добавить Пользователя",
+      "table": {
+        "name": "Полное Имя",
+        "username": "Имя Пользователя",
+        "email": "Электронная Почта",
+        "role": "Роль",
+        "permissions": "Разрешения",
+        "reservations": "Бронирования",
+        "actions": "Действия"
+      },
+      "roles": {
+        "admin": "Админ",
+        "operasyon": "Операции",
+        "muhasebe": "Бухгалтерия",
+        "satisci": "Продажи"
+      }
+    },
+    "activities": {
+      "title": "Активности Системы",
+      "description": "Просмотр логов и активностей системы",
+      "table": {
+        "timestamp": "Временная Метка",
+        "user": "Пользователь",
+        "action": "Действие",
+        "details": "Детали",
+        "ipAddress": "IP Адрес"
+      },
+      "actions": {
+        "login": "Вход",
+        "logout": "Выход",
+        "create": "Создать",
+        "update": "Обновить",
+        "delete": "Удалить"
+      }
+    },
+    "reservations": {
+      "allReservations": "Все Бронирования",
+      "allReservationsDescription": "Просмотр и управление всеми бронированиями в системе.",
+      "todayTransfers": "Трансферы Сегодня",
+      "todayTransfersDescription": "Просмотр трансферов, запланированных на сегодня.",
+      "tomorrowTransfers": "Трансферы Завтра",
+      "tomorrowTransfersDescription": "Просмотр трансферов, запланированных на завтра.",
+      "thisWeekTransfers": "Трансферы На Этой Неделе",
+      "thisWeekTransfersDescription": "Просмотр трансферов, запланированных на эту неделю.",
+      "assignedTransfers": "Назначенные Трансферы",
+      "assignedTransfersDescription": "Просмотр трансферов с назначенными водителями.",
+      "unassignedTransfers": "Неназначенные Трансферы",
+      "unassignedTransfersDescription": "Просмотр трансферов, ожидающих назначения водителя."
+    }
   }
 }
 
