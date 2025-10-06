@@ -5,6 +5,8 @@ import { useState, useRef, useEffect } from 'react';
 
 const languages = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'ru', name: 'Русский', flag: '🇷🇺' },
   { code: 'ar', name: 'العربية', flag: '🇸🇦' },
   { code: 'tr', name: 'Türkçe', flag: '🇹🇷' }
 ];
@@ -28,7 +30,7 @@ export default function LanguageSelector() {
   }, []);
 
   const handleLanguageChange = (langCode: string) => {
-    setLanguage(langCode as 'en' | 'ar' | 'tr');
+    setLanguage(langCode as 'en' | 'ar' | 'tr' | 'fr' | 'ru');
     setIsOpen(false);
   };
 
