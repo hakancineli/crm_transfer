@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { MessageCircle, Calendar, MapPin, Clock, Users, Star, Phone, Mail, CheckCircle } from 'lucide-react';
 import Image from 'next/image';
-import ReservationForm from '../website/components/ReservationForm';
+import ReservationForm from '../components/ReservationForm';
 
 // Şeref Vural Travel verileri (protransfer.com.tr için kök site)
 const serefVuralData = {
