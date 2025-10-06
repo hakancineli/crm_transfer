@@ -11,9 +11,10 @@ interface ReservationFormProps {
   isOpen: boolean;
   onClose: () => void;
   tenantId?: string;
+  isAdminForm?: boolean; // Admin panelinde kullanıldığında fiyat hesaplama kapatılır
 }
 
-export default function ReservationForm({ isOpen, onClose, tenantId }: ReservationFormProps) {
+export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm = false }: ReservationFormProps) {
   const { isLoaded: googleMapsLoaded, isLoading: googleMapsLoading, error: googleMapsError } = useGoogleMaps();
   const [formData, setFormData] = useState({
     type: 'transfer',
@@ -76,8 +77,11 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
     return 2500 + extraBlocks * 300;
   }
 
-  // Mesafe hesaplama - Directions API ile fallback
+  // Mesafe hesaplama - Directions API ile fallback (sadece müşteri formunda)
   useEffect(() => {
+    // Admin formunda fiyat hesaplama yapma
+    if (isAdminForm) return;
+    
     const g = (window as any).google;
     if (!formData.from || !formData.to || !googleMapsLoaded) return;
     
@@ -127,7 +131,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
     }
     
     return () => { cancelled = true; };
-  }, [formData.from, formData.to, googleMapsLoaded]);
+  }, [formData.from, formData.to, googleMapsLoaded, isAdminForm]);
 
   // Google Places API handled by GoogleMapsPlacesInput component
 
@@ -151,10 +155,16 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
 
     try {
       const priceToSubmit = (() => {
-        if (estimatedPriceTRY == null) return 0;
-        if (currency === 'TRY') return estimatedPriceTRY;
-        const rate = fxRates[currency];
-        return rate ? estimatedPriceTRY * rate : estimatedPriceTRY;
+        if (isAdminForm) {
+          // Admin formunda manuel girilen fiyat kullanılır
+          return estimatedPriceTRY || 0;
+        } else {
+          // Müşteri formunda hesaplanan fiyat kullanılır
+          if (estimatedPriceTRY == null) return 0;
+          if (currency === 'TRY') return estimatedPriceTRY;
+          const rate = fxRates[currency];
+          return rate ? estimatedPriceTRY * rate : estimatedPriceTRY;
+        }
       })();
 
             const response = await fetch('/api/reservations', {
@@ -178,12 +188,16 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
                     flightCode: formData.flightCode,
           distanceKm: distanceKm || null,
           tenantId,
-          source: 'website'
+          source: isAdminForm ? 'admin' : 'website'
                 }),
             });
 
       if (response.ok) {
-        alert('Rezervasyon talebiniz başarıyla gönderildi! En kısa sürede sizinle iletişime geçeceğiz.');
+        if (isAdminForm) {
+          alert('Rezervasyon başarıyla oluşturuldu!');
+        } else {
+          alert('Rezervasyon talebiniz başarıyla gönderildi! En kısa sürede sizinle iletişime geçeceğiz.');
+        }
         onClose();
         // Reset form
         setFormData({
@@ -300,8 +314,8 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
             </div>
                             </div>
 
-          {/* Distance and Price Display */}
-          {(formData.from && formData.to) && (
+          {/* Distance and Price Display - Sadece müşteri formunda göster */}
+          {!isAdminForm && (formData.from && formData.to) && (
             <div className="text-sm text-gray-700 flex items-center gap-3">
               <span className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-2 py-1">
                 {googleMapsError ? 'Hesaplama hatası' : !googleMapsLoaded ? 'Google Maps yükleniyor…' : estimating || distanceKm === null ? 'Hesaplanıyor…' : `${distanceKm.toFixed(1)} km`}
@@ -361,14 +375,14 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Uçuş Kodu (Opsiyonel)
               </label>
-                                <input
-                                    type="text"
-                                    value={formData.flightCode}
+              <input
+                type="text"
+                value={formData.flightCode}
                 onChange={(e) => handleInputChange('flightCode', e.target.value)}
-                                    placeholder="TK1234"
+                placeholder="TK1234"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                                />
-                            </div>
+              />
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Para Birimi
@@ -382,8 +396,34 @@ export default function ReservationForm({ isOpen, onClose, tenantId }: Reservati
                 <option value="USD">USD</option>
                 <option value="EUR">EUR</option>
               </select>
-                        </div>
-                    </div>
+            </div>
+          </div>
+
+          {/* Admin Form - Manuel Fiyat Girişi */}
+          {isAdminForm && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Fiyat (Manuel Giriş)
+              </label>
+              <div className="flex">
+                <input
+                  type="number"
+                  value={estimatedPriceTRY || ''}
+                  onChange={(e) => setEstimatedPriceTRY(e.target.value ? parseFloat(e.target.value) : null)}
+                  placeholder="Fiyat girin"
+                  min="0"
+                  step="0.01"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+                <span className="px-3 py-2 border border-l-0 border-gray-300 rounded-r-md bg-gray-50 text-gray-700">
+                  TRY
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Admin panelinde fiyat manuel olarak girilir
+              </p>
+            </div>
+          )}
 
           {/* Multi-Passenger Management */}
           <div>

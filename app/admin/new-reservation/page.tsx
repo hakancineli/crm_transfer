@@ -33,6 +33,7 @@ export default function AdminNewReservationPage() {
             isOpen={true} 
             onClose={() => { window.location.href = '/admin/reservations'; }} 
             tenantId={undefined}
+            isAdminForm={true}
           />
         </div>
       </div>
