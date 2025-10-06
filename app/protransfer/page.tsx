@@ -33,11 +33,13 @@ export default function ProtransferWebsitePage() {
   const [websiteContent, setWebsiteContent] = useState<any>(null);
 
   useEffect(() => {
+    if (!websiteContent) return;
+    
     const interval = setInterval(() => {
       setCurrentVehicleIndex((prev) => prev === (websiteContent?.vehicleImages?.length || defaultContent.vehicleImages.length) - 1 ? 0 : prev + 1);
     }, 7000);
     return () => clearInterval(interval);
-  }, [websiteContent]);
+  }, [websiteContent?.vehicleImages?.length]);
 
   // Panel içeriğini domaine göre çek (default içerik ile)
   useEffect(() => {

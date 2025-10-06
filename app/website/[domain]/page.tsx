@@ -42,14 +42,16 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const vehicleImages = websiteContent?.vehicleImages || serefVuralData.vehicleImages;
+    
     const interval = setInterval(() => {
       setCurrentVehicleIndex((prev) => 
-        prev === serefVuralData.vehicleImages.length - 1 ? 0 : prev + 1
+        prev === vehicleImages.length - 1 ? 0 : prev + 1
       );
     }, 7000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [websiteContent?.vehicleImages]);
 
   // Fetch website content based on domain
   useEffect(() => {

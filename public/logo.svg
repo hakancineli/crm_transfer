@@ -1,14 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Yeşil Altıgen Arka Plan -->
-    <path d="M256 64L384 149.3V320L256 405.3L128 320V149.3L256 64Z" fill="#22C55E" fill-opacity="0.1"/>
-    
-    <!-- P Harfi -->
-    <path d="M160 140V372" stroke="#000000" stroke-width="40" stroke-linecap="round"/>
-    <path d="M160 140H240C280 140 310 170 310 210C310 250 280 280 240 280H160" 
-          stroke="#000000" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
-    
-    <!-- T Harfi -->
-    <path d="M270 200H400" stroke="#22C55E" stroke-width="40" stroke-linecap="round"/>
-    <path d="M335 200V372" stroke="#22C55E" stroke-width="40" stroke-linecap="round"/>
-</svg> 
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="8" fill="#3B82F6"/>
+  <path d="M8 12h16v2H8v-2zm0 4h16v2H8v-2zm0 4h12v2H8v-2z" fill="white"/>
+  <circle cx="24" cy="8" r="4" fill="#EF4444"/>
+  <text x="24" y="12" text-anchor="middle" fill="white" font-size="6" font-weight="bold">T</text>
+</svg>
