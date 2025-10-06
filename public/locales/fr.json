@@ -1,0 +1,21 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "submit": "Envoyer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "yes": "Oui",
+    "no": "Non",
+    "required": "Obligatoire",
+    "optional": "Optionnel"
+  }
+}
+
+

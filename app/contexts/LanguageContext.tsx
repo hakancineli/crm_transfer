@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-export type Language = 'en' | 'ar' | 'tr' | 'de' | 'fr';
+export type Language = 'en' | 'ar' | 'tr' | 'de' | 'fr' | 'ru';
 
 interface LanguageContextType {
   language: Language;
@@ -32,7 +32,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
   useEffect(() => {
     // Local storage'dan dil tercihini al
     const savedLanguage = localStorage.getItem('language') as Language;
-    if (savedLanguage && ['en', 'ar', 'tr', 'de', 'fr'].includes(savedLanguage)) {
+    if (savedLanguage && ['en', 'ar', 'tr', 'de', 'fr', 'ru'].includes(savedLanguage)) {
       setLanguageState(savedLanguage);
     }
   }, []);

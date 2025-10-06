@@ -169,6 +169,72 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
             arrival: 'Arrival Transfer',
             departure: 'Departure Transfer'
         },
+        fr: {
+            title: 'Bon de Chauffeur',
+            transferInfo: 'Informations de Transfert',
+            date: 'Date',
+            time: 'Heure',
+            from: 'De',
+            to: 'À',
+            flightInfo: 'Informations de Vol',
+            flightCode: 'Code de Vol',
+            luggage: 'Bagage',
+            passengers: 'Passagers',
+            passengerInfo: 'Informations Passager',
+            passengerCount: 'Nombre de Passagers',
+            luggageCount: 'Bagage',
+            contact: 'Contact',
+            person: 'Personne',
+            piece: 'Pièce',
+            paymentInfo: 'Informations de Paiement',
+            driverFee: 'Frais Chauffeur',
+            customerPayment: 'Paiement Client',
+            bankInfo: 'Informations Bancaires',
+            iban: 'IBAN',
+            accountHolder: 'Titulaire du Compte',
+            bank: 'Banque',
+            print: 'Imprimer',
+            returnTransfer: 'Transfert Retour',
+            originalTransfer: 'Transfert Aller',
+            transferType: 'Type de Transfert',
+            outbound: 'Transfert Intermédiaire',
+            inbound: 'Transfert Retour',
+            arrival: 'Transfert Arrivée',
+            departure: 'Transfert Départ'
+        },
+        ru: {
+            title: 'Ваучер водителя',
+            transferInfo: 'Информация о трансфере',
+            date: 'Дата',
+            time: 'Время',
+            from: 'Откуда',
+            to: 'Куда',
+            flightInfo: 'Информация о рейсе',
+            flightCode: 'Код рейса',
+            luggage: 'Багаж',
+            passengers: 'Пассажиры',
+            passengerInfo: 'Информация о пассажирах',
+            passengerCount: 'Количество пассажиров',
+            luggageCount: 'Багаж',
+            contact: 'Контакт',
+            person: 'Человек',
+            piece: 'Шт.',
+            paymentInfo: 'Платёжная информация',
+            driverFee: 'Оплата водителю',
+            customerPayment: 'Платёж клиента',
+            bankInfo: 'Банковская информация',
+            iban: 'IBAN',
+            accountHolder: 'Владелец счёта',
+            bank: 'Банк',
+            print: 'Печать',
+            returnTransfer: 'Обратный трансфер',
+            originalTransfer: 'Трансфер туда',
+            transferType: 'Тип трансфера',
+            outbound: 'Промежуточный трансфер',
+            inbound: 'Обратный трансфер',
+            arrival: 'Трансфер прибытия',
+            departure: 'Трансфер отправления'
+        },
         ar: {
             title: 'قسيمة السائق',
             transferInfo: 'معلومات النقل',
@@ -239,6 +305,8 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                 >
                     <option value="tr">Türkçe</option>
                     <option value="en">English</option>
+                    <option value="fr">Français</option>
+                    <option value="ru">Русский</option>
                     <option value="ar">العربية</option>
                 </select>
             </div>
@@ -246,24 +314,10 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
             {/* Header */}
             <div className="text-center mb-8 print:mb-4 border-b-2 border-gradient-to-r from-blue-500 to-green-500 pb-6 print:pb-3">
                 <div className="flex justify-center items-center mb-6 print:mb-3">
-                    {/* ProTransfer şirketi için logo göster */}
-                    {reservation.tenant?.companyName?.toLowerCase().includes('protransfer') ? (
-                        <>
-                            <img 
-                                src="/logo.svg" 
-                                alt="ProTransfer" 
-                                className="h-16 w-16 print:h-12 print:w-12 mr-4 drop-shadow-sm"
-                            />
-                            <span className="text-4xl print:text-2xl font-bold tracking-tight bg-gradient-to-r from-gray-800 to-green-600 bg-clip-text text-transparent">
-                                ProTransfer
-                            </span>
-                        </>
-                    ) : (
-                        /* Diğer şirketler için sadece şirket adı */
-                        <span className="text-4xl print:text-2xl font-bold tracking-tight bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">
-                            {reservation.tenant?.companyName || 'Şirket Adı'}
-                        </span>
-                    )}
+                    {/* Şirket Adı */}
+                    <span className="text-4xl print:text-2xl font-bold tracking-tight bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">
+                        {reservation.tenant?.companyName || (reservation as any).companyName || 'Şirket Adı'}
+                    </span>
                 </div>
                 <h1 className="text-2xl print:text-xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2">
                     {isDriverVoucher ? t.title : 'Müşteri Voucherı'}
@@ -529,10 +583,8 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                     </svg>
                     {t.print}
                 </button>
-                <a
-                    href={buildPdfUrl()}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                <button
+                    onClick={() => window.print()}
                     className="bg-gradient-to-r from-sky-600 to-blue-600 text-white px-6 py-3 rounded-2xl hover:from-sky-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 font-semibold text-lg"
                     title="PDF indir"
                 >
@@ -541,7 +593,7 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                         <path d="M12 17l5-5h-3V4h-4v8H7l5 5z"/>
                     </svg>
                     PDF indir
-                </a>
+                </button>
                 <button
                     onClick={handleSendWhatsApp}
                     className="bg-gradient-to-r from-emerald-600 to-green-600 text-white px-6 py-3 rounded-2xl hover:from-emerald-700 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 font-semibold text-lg"
