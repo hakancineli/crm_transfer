@@ -1,53 +1,305 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CRM Transfer - Multi-Tenant Travel Management System
 
-## Getting Started
+Bu proje, çok kiracılı (multi-tenant) seyahat yönetim sistemi ve müşteri web siteleri için geliştirilmiş bir Next.js uygulamasıdır.
 
-First, run the development server:
+## 🏗️ Mimari
 
+### Domain Yapısı
+- **proacente.com** → CRM Admin Paneli (Acente yönetimi)
+- **protransfer.com.tr** → Müşteri Web Sitesi (Şeref Vural teması)
+- **Diğer tenant domainleri** → Her tenant'ın kendi müşteri web sitesi
+
+### Ana Bileşenler
+- **CRM Admin Paneli**: Rezervasyon, müşteri, araç, tur yönetimi
+- **Müşteri Web Siteleri**: Dinamik içerik yönetimi ile tenant bazlı siteler
+- **Multi-Tenant Yapı**: SUPERUSER tenant seçimi ve izolasyonu
+- **API Entegrasyonları**: Google Maps, WhatsApp, Email
+
+## 🚀 Kurulum
+
+### Geliştirme Ortamı
 ```bash
 npm run dev
-# or
+# veya
 yarn dev
-# or
+# veya
 pnpm dev
-# or
+# veya
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Tarayıcıda [http://localhost:3000](http://localhost:3000) adresini açın.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Veritabanı
+```bash
+# Prisma migration
+npx prisma migrate dev
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Veritabanı seed
+npm run seed
+```
 
-## Learn More
+## 🌐 Domain ve Website Yönetimi
 
-To learn more about Next.js, take a look at the following resources:
+### Yeni Tenant Website Ekleme
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+#### 1. DNS Ayarları
+```
+# Apex domain için
+mytenant.com → ALIAS/A → Vercel IP
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# WWW subdomain için  
+www.mytenant.com → CNAME → cname.vercel-dns.com
+```
 
-## Deploy on Vercel
+#### 2. Vercel Domain Ekleme
+- Vercel Dashboard → Project → Domains
+- `mytenant.com` ve `www.mytenant.com` ekle
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+#### 3. Veritabanı Konfigürasyonu
+```sql
+-- TenantWebsite kaydı oluştur
+INSERT INTO "TenantWebsite" (
+  "id",
+  "tenantId", 
+  "domain",
+  "isActive",
+  "createdAt",
+  "updatedAt"
+) VALUES (
+  'website_' || generate_random_uuid(),
+  'tenant_id_here',
+  'mytenant.com',
+  true,
+  NOW(),
+  NOW()
+);
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+#### 4. Uygulama Yönlendirmesi
 
-Deploy trigger at Thu Aug 21 14:21:47 +03 2025
+**Seçenek A: Dedicated Sayfa (Önerilen)**
+```typescript
+// middleware.ts - Domain bazlı yönlendirme
+if (hostname.includes('mytenant.com')) {
+    if (pathname === '/') {
+        const url = request.nextUrl.clone();
+        url.pathname = '/mytenant'; // Dedicated sayfa
+        return NextResponse.rewrite(url);
+    }
+    // CRM yollarını engelle
+    if (pathname.startsWith('/admin') || pathname === '/login') {
+        const url = request.nextUrl.clone();
+        url.pathname = '/mytenant';
+        return NextResponse.rewrite(url);
+    }
+}
+```
 
-Redeploy trigger at Thu Aug 21 15:04:32 +03 2025
+```typescript
+// next.config.js - Edge-level rewrite
+async rewrites() {
+  return [
+    {
+      source: '/:path*',
+      has: [{ type: 'host', value: 'mytenant.com' }],
+      destination: '/mytenant',
+    },
+  ]
+}
+```
 
-Redeploy trigger at Thu Aug 21 15:15:48 +03 2025
+**Seçenek B: Generic Website Route**
+```typescript
+// middleware.ts - Generic website routing
+if (hostname.includes('mytenant.com')) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/website/${hostname}`;
+    return NextResponse.rewrite(url);
+}
+```
 
-Redeploy trigger at Thu Aug 21 15:26:56 +03 2025
+#### 5. İçerik Yönetimi
+- Admin Panel → Website Modülü → Settings
+- Logo, Hero Section, Hizmetler, İletişim bilgileri
+- Sayfa içerikleri ve bölümler
 
-Redeploy trigger at Thu Aug 21 15:54:23 +03 2025
+### Website API Entegrasyonu
 
-Redeploy trigger at Thu Aug 21 18:56:05 +03 2025
+```typescript
+// Domain → Tenant çözümleme
+const tenantWebsite = await prisma.tenantWebsite.findFirst({
+  where: {
+    isActive: true,
+    OR: [
+      { domain: 'mytenant.com' },
+      { domain: 'www.mytenant.com' }
+    ]
+  },
+  include: {
+    tenant: true,
+    pages: true,
+    sections: true
+  }
+});
 
-Redeploy trigger at Fri Aug 22 13:06:12 +03 2025
+// Fallback: Subdomain/Company name ile arama
+const tenant = await prisma.tenant.findFirst({
+  where: {
+    OR: [
+      { subdomain: 'mytenant' },
+      { companyName: { contains: 'My Tenant', mode: 'insensitive' } }
+    ]
+  }
+});
+```
 
-Redeploy trigger at Fri Aug 22 14:29:21 +03 2025
-# Google Maps API Test
+## 👥 Kullanıcı Rolleri ve Yetkilendirme
+
+### SUPERUSER Özellikleri
+- Tüm tenant'ları görüntüleme ve yönetme
+- Tenant seçimi ile o tenant adına işlem yapma
+- Global sistem ayarları
+- Tenant bazlı modül kontrolü
+
+### Tenant Seçimi (SUPERUSER)
+```typescript
+// TenantContext ile tenant seçimi
+const { selectedTenantId, setSelectedTenantId, fetchWithTenant } = useTenant();
+
+// API çağrılarında otomatik tenant header
+const response = await fetchWithTenant('/api/reservations', {
+  method: 'POST',
+  body: JSON.stringify(reservationData)
+});
+```
+
+### Agency Admin
+- Sadece kendi tenant'ına erişim
+- Rezervasyon, müşteri, araç yönetimi
+- Website içerik yönetimi
+
+## 🔧 Teknik Detaylar
+
+### Middleware Routing
+```typescript
+// middleware.ts - Domain bazlı yönlendirme
+export function middleware(request: NextRequest) {
+  const hostname = request.headers.get('host') || '';
+  const pathname = request.nextUrl.pathname;
+
+  // proacente.com → CRM
+  if (hostname.includes('proacente.com')) {
+    if (pathname === '/') {
+      return NextResponse.redirect(new URL('/admin-login', request.url));
+    }
+  }
+
+  // protransfer.com.tr → Website
+  if (hostname.includes('protransfer.com.tr')) {
+    if (pathname === '/') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/protransfer';
+      return NextResponse.rewrite(url);
+    }
+    // CRM yollarını engelle
+    if (pathname.startsWith('/admin') || pathname === '/login') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/protransfer';
+      return NextResponse.rewrite(url);
+    }
+  }
+}
+```
+
+### Cache Yönetimi
+```bash
+# Vercel cache temizleme
+curl -X POST "https://api.vercel.com/v1/integrations/deploy/your-project-id/purge" \
+  -H "Authorization: Bearer YOUR_VERCEL_TOKEN"
+```
+
+### Build ve Deploy
+```bash
+# Production build
+npm run build
+
+# Vercel deploy
+vercel --prod
+
+# Cache temizleme ile redeploy
+vercel --prod --force
+```
+
+## 📁 Proje Yapısı
+
+```
+app/
+├── admin/                 # CRM Admin Paneli
+├── api/                   # API Routes
+├── components/            # Paylaşılan bileşenler
+├── contexts/             # React Context'ler
+├── protransfer/          # Dedicated website sayfası
+├── website/              # Generic website routes
+└── middleware.ts         # Domain routing
+
+prisma/
+├── schema.prisma         # Veritabanı şeması
+└── migrations/           # Migration dosyaları
+```
+
+## 🔍 Troubleshooting
+
+### Domain Yönlendirme Sorunları
+1. **Cache Temizleme**: Vercel dashboard → Deployments → Redeploy with "Clear build cache"
+2. **Middleware Kontrol**: `middleware.ts` domain kurallarını kontrol et
+3. **Next.config.js**: Edge-level rewrite kurallarını kontrol et
+4. **Browser Cache**: Gizli pencerede test et
+
+### Tenant Website Sorunları
+1. **Veritabanı Kontrol**: `TenantWebsite` tablosunda domain kaydı var mı?
+2. **DNS Kontrol**: Domain Vercel'e doğru yönlendiriliyor mu?
+3. **API Test**: `/api/website/content/domain` endpoint'i çalışıyor mu?
+
+## 📚 API Dokümantasyonu
+
+### Website Content API
+```
+GET /api/website/content/{domain}
+Response: {
+  tenant: Tenant,
+  pages: Page[],
+  sections: Section[],
+  content: string (JSON)
+}
+```
+
+### Reservation API
+```
+POST /api/reservations
+Headers: {
+  x-tenant-id: string (SUPERUSER için)
+}
+Body: ReservationData
+```
+
+## 🚀 Deployment
+
+### Vercel Deployment
+1. GitHub repository'yi Vercel'e bağla
+2. Environment variables ayarla
+3. Domain'leri ekle
+4. Deploy
+
+### Environment Variables
+```
+DATABASE_URL=postgresql://...
+NEXTAUTH_SECRET=...
+NEXTAUTH_URL=...
+GOOGLE_MAPS_API_KEY=...
+```
+
+---
+
+**Son Güncelleme**: 2025-01-30
+**Versiyon**: 2.0.0
