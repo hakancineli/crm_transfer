@@ -14,6 +14,11 @@ interface User {
   createdAt: string;
   creator?: { name: string };
   _count: { reservations: number };
+  tenant?: {
+    id: string;
+    companyName: string;
+    subdomain: string;
+  };
 }
 
 export default function UsersPage() {
@@ -22,11 +27,13 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [groupedUsers, setGroupedUsers] = useState<Record<string, User[]>>({});
 
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
+    currentPassword: '',
     name: '',
     role: 'SELLER' as 'SUPERUSER' | 'AGENCY_ADMIN' | 'AGENCY_USER' | 'OPERATION' | 'SELLER' | 'ACCOUNTANT',
     isActive: true
@@ -76,10 +83,24 @@ export default function UsersPage() {
         return;
       }
 
-      setUsers(Array.isArray(data) ? data : []);
+      const usersData = Array.isArray(data) ? data : [];
+      setUsers(usersData);
+      
+      // Group users by tenant
+      const grouped = usersData.reduce((acc: Record<string, User[]>, user: User) => {
+        const tenantKey = user.tenant?.companyName || 'Sistem Kullanıcıları';
+        if (!acc[tenantKey]) {
+          acc[tenantKey] = [];
+        }
+        acc[tenantKey].push(user);
+        return acc;
+      }, {});
+      
+      setGroupedUsers(grouped);
     } catch (error) {
       console.error('Error fetching users:', error);
       setUsers([]);
+      setGroupedUsers({});
     } finally {
       setLoading(false);
     }
@@ -97,7 +118,7 @@ export default function UsersPage() {
 
       if (response.ok) {
         setShowCreateForm(false);
-        setFormData({ username: '', email: '', password: '', name: '', role: 'SELLER', isActive: true });
+        setFormData({ username: '', email: '', password: '', currentPassword: '', name: '', role: 'SELLER', isActive: true });
         fetchUsers();
       } else {
         const error = await response.json();
@@ -126,7 +147,7 @@ export default function UsersPage() {
 
       if (response.ok) {
         setEditingUser(null);
-        setFormData({ username: '', email: '', password: '', name: '', role: 'SELLER', isActive: true });
+        setFormData({ username: '', email: '', password: '', currentPassword: '', name: '', role: 'SELLER', isActive: true });
         fetchUsers();
       } else {
         const error = await response.json();
@@ -241,33 +262,39 @@ export default function UsersPage() {
         </button>
       </div>
 
-      {/* Kullanıcı Listesi - Desktop */}
-      <div className="hidden lg:block bg-white shadow rounded-lg overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Kullanıcı
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Rol
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Durum
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Rezervasyonlar
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Oluşturulma
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                İşlemler
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {users.map((user) => (
+      {/* Kullanıcı Listesi - Desktop - Acente Bazlı Gruplandırma */}
+      <div className="hidden lg:block space-y-6">
+        {Object.entries(groupedUsers).map(([tenantName, tenantUsers]) => (
+          <div key={tenantName} className="bg-white shadow rounded-lg overflow-hidden">
+            <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">{tenantName}</h3>
+              <p className="text-sm text-gray-500">{tenantUsers.length} kullanıcı</p>
+            </div>
+            <table className="min-w-full divide-y divide-gray-200 table-fixed">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Kullanıcı
+                  </th>
+                  <th className="w-20 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Rol
+                  </th>
+                  <th className="w-20 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Durum
+                  </th>
+                  <th className="w-24 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Rezervasyonlar
+                  </th>
+                  <th className="w-28 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Oluşturulma
+                  </th>
+                  <th className="w-32 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    İşlemler
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {tenantUsers.map((user) => (
               <tr key={user.id}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div>
@@ -302,6 +329,7 @@ export default function UsersPage() {
                         username: user.username,
                         email: user.email,
                         password: '',
+                        currentPassword: '',
                         name: user.name,
                         role: user.role,
                         isActive: user.isActive
@@ -311,13 +339,15 @@ export default function UsersPage() {
                   >
                     Düzenle
                   </button>
-                  <button
-                    onClick={() => window.location.href = `/admin/users/${user.id}/permissions`}
-                    className="text-blue-600 hover:text-blue-900 mr-2"
-                    title="Yetkileri Yönet"
-                  >
-                    🔐 Yetkiler
-                  </button>
+                  {user.role !== 'SUPERUSER' && (
+                    <button
+                      onClick={() => window.location.href = `/admin/users/${user.id}/permissions`}
+                      className="text-blue-600 hover:text-blue-900 mr-2"
+                      title="Yetkileri Yönet"
+                    >
+                      🔐 Yetkiler
+                    </button>
+                  )}
                   {user.role !== 'SUPERUSER' && user.id !== currentUser?.id && (
                     <button
                       onClick={() => handleDeleteUser(user.id)}
@@ -328,9 +358,11 @@ export default function UsersPage() {
                   )}
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))}
       </div>
 
       {/* Kullanıcı Listesi - Mobile */}
@@ -368,6 +400,7 @@ export default function UsersPage() {
                     username: user.username,
                     email: user.email,
                     password: '',
+                    currentPassword: '',
                     name: user.name,
                     role: user.role,
                     isActive: user.isActive

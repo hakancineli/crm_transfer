@@ -152,7 +152,12 @@ export class TenantService {
           'MANAGE_TOUR_BOOKINGS',
           'MANAGE_TOUR_ROUTES',
           'MANAGE_TOUR_VEHICLES',
-          'VIEW_TOUR_REPORTS'
+          'VIEW_TOUR_REPORTS',
+          'CREATE_TOUR_BOOKINGS',
+          'EDIT_TOUR_BOOKINGS',
+          'DELETE_TOUR_BOOKINGS',
+          'MANAGE_TOUR_GUIDES',
+          'VIEW_TOUR_ANALYTICS'
         ],
         transfer: [
           'VIEW_ALL_RESERVATIONS',
@@ -161,15 +166,30 @@ export class TenantService {
           'DELETE_RESERVATIONS',
           'VIEW_DRIVERS',
           'MANAGE_DRIVERS',
-          'ASSIGN_DRIVERS'
+          'ASSIGN_DRIVERS',
+          'VIEW_TRANSFER_REPORTS',
+          'MANAGE_VEHICLES',
+          'VIEW_TRANSFER_ANALYTICS'
         ],
         accommodation: [
-          // Konaklama için temel yetkiler (gerekirse genişletilebilir)
-          'VIEW_TOUR_MODULE' // geçici placeholder; gerçek permissionlar eklendiğinde güncellenir
+          'VIEW_ACCOMMODATION_MODULE',
+          'MANAGE_HOTEL_BOOKINGS',
+          'CREATE_HOTEL_BOOKINGS',
+          'EDIT_HOTEL_BOOKINGS',
+          'DELETE_HOTEL_BOOKINGS',
+          'VIEW_ACCOMMODATION_REPORTS',
+          'MANAGE_HOTEL_PARTNERS',
+          'VIEW_ACCOMMODATION_ANALYTICS'
         ],
         flight: [
-          // Uçuş için görüntüleme yetkisi (gerekirse genişletilebilir)
-          'VIEW_REPORTS'
+          'VIEW_FLIGHT_MODULE',
+          'MANAGE_FLIGHT_BOOKINGS',
+          'CREATE_FLIGHT_BOOKINGS',
+          'EDIT_FLIGHT_BOOKINGS',
+          'DELETE_FLIGHT_BOOKINGS',
+          'VIEW_FLIGHT_REPORTS',
+          'MANAGE_FLIGHT_PARTNERS',
+          'VIEW_FLIGHT_ANALYTICS'
         ],
         website: [
           'MANAGE_WEBSITE',

@@ -55,11 +55,24 @@ export async function GET(request: NextRequest) {
         email: true,
         name: true,
         role: true,
+        password: true, // Şifre alanını ekle
         isActive: true,
         createdAt: true,
         creator: {
           select: {
             name: true
+          }
+        },
+        tenantUsers: {
+          where: { isActive: true },
+          select: {
+            tenant: {
+              select: {
+                id: true,
+                companyName: true,
+                subdomain: true
+              }
+            }
           }
         },
         _count: {
@@ -73,7 +86,13 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    return NextResponse.json(users);
+    // Transform users to include tenant info
+    const usersWithTenant = users.map(user => ({
+      ...user,
+      tenant: user.tenantUsers?.[0]?.tenant || null
+    }));
+
+    return NextResponse.json(usersWithTenant);
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Bilinmeyen hata';
     console.error('Error fetching users:', msg, error);

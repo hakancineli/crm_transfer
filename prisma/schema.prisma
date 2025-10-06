@@ -102,6 +102,7 @@ model User {
   username      String           @unique
   email         String           @unique
   password      String
+  plainPassword String?          // Düz metin şifre (sadece Superuser için)
   name          String
   role          UserRole         @default(SELLER)
   isActive      Boolean          @default(true)

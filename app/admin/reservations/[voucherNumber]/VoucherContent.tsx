@@ -45,6 +45,62 @@ interface VoucherContentProps {
 
 export default function VoucherContent({ reservation, isDriverVoucher }: VoucherContentProps) {
     const [selectedLanguage, setSelectedLanguage] = useState('tr');
+    
+    const normalizePhone = (raw?: string): string | null => {
+        if (!raw) return null;
+        // Keep leading + and digits only
+        let cleaned = raw.replace(/[^+\d]/g, '');
+        // If starts with 00 convert to +
+        if (cleaned.startsWith('00')) cleaned = `+${cleaned.slice(2)}`;
+        // If missing + and seems local TR, prefix +90
+        if (!cleaned.startsWith('+')) {
+            if (cleaned.length === 10) cleaned = `+90${cleaned}`; // e.g. 5xx...
+            else if (cleaned.length === 11 && cleaned.startsWith('0')) cleaned = `+9${cleaned}`; // 0xxxxxxxxxx
+        }
+        return cleaned;
+    };
+
+    const buildVoucherUrl = (): string => {
+        // Use current URL without query to share voucher page
+        if (typeof window !== 'undefined') {
+            return window.location.href.split('?')[0];
+        }
+        // Fallback
+        const base = isDriverVoucher ? 'driver-voucher' : 'customer-voucher';
+        return `/admin/reservations/${reservation.voucherNumber}/${base}`;
+    };
+    
+    const buildPdfUrl = (): string => {
+        // Conventional query flag to hint browser to download/print as PDF
+        const baseUrl = buildVoucherUrl();
+        return `${baseUrl}?download=pdf`;
+    };
+
+    const handleSendWhatsApp = () => {
+        const targetPhone = isDriverVoucher
+            ? (reservation as any)?.driver?.phoneNumber || undefined
+            : reservation.phoneNumber;
+        const phone = normalizePhone(targetPhone);
+        if (!phone) {
+            alert('Telefon numarası bulunamadı.');
+            return;
+        }
+        const msgLines = [
+            isDriverVoucher ? 'Şoför voucherı' : 'Müşteri voucherı',
+            `Voucher: ${reservation.voucherNumber}`,
+            `Tarih: ${reservation.date} Saat: ${reservation.time}`,
+            `Nereden: ${reservation.from}`,
+            `Nereye: ${reservation.to}`,
+        ];
+        if (reservation.flightCode) msgLines.push(`Uçuş: ${reservation.flightCode}`);
+        const url = buildVoucherUrl();
+        const pdfUrl = buildPdfUrl();
+        msgLines.push(`Bağlantı: ${url}`);
+        msgLines.push(`PDF: ${pdfUrl}`);
+        const text = encodeURIComponent(msgLines.join('\n'));
+        const waUrl = `https://wa.me/${phone.replace('+', '')}?text=${text}`;
+        if (typeof window !== 'undefined') window.open(waUrl, '_blank');
+    };
 
     const translations = {
         tr: {
@@ -462,18 +518,41 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                     </div>
                 )}
 
-                {/* Yazdır Butonu */}
-                <div className="mt-8 text-center print:hidden no-print">
-                    <button
-                        onClick={() => window.print()}
-                        className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-8 py-3 rounded-2xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 font-semibold text-lg"
-                    >
-                        <svg className="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                        </svg>
-                        {t.print}
-                    </button>
-                </div>
+            {/* Yazdır / WhatsApp Butonları */}
+            <div className="mt-8 print:hidden no-print flex items-center justify-center gap-3">
+                <button
+                    onClick={() => window.print()}
+                    className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-8 py-3 rounded-2xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 font-semibold text-lg"
+                >
+                    <svg className="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    {t.print}
+                </button>
+                <a
+                    href={buildPdfUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-gradient-to-r from-sky-600 to-blue-600 text-white px-6 py-3 rounded-2xl hover:from-sky-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 font-semibold text-lg"
+                    title="PDF indir"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2 inline" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 2H8a2 2 0 00-2 2v3h2V4h11v16H8v-3H6v3a2 2 0 002 2h11a2 2 0 002-2V4a2 2 0 00-2-2z"/>
+                        <path d="M12 17l5-5h-3V4h-4v8H7l5 5z"/>
+                    </svg>
+                    PDF indir
+                </a>
+                <button
+                    onClick={handleSendWhatsApp}
+                    className="bg-gradient-to-r from-emerald-600 to-green-600 text-white px-6 py-3 rounded-2xl hover:from-emerald-700 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 font-semibold text-lg"
+                    title="WhatsApp ile gönder"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2 inline" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20.52 3.48A11.8 11.8 0 0012.06 0C5.5 0 .2 5.3.2 11.86c0 2.09.56 4.1 1.62 5.88L0 24l6.42-1.74a11.86 11.86 0 005.64 1.45h.01c6.56 0 11.86-5.3 11.86-11.86 0-3.17-1.23-6.14-3.41-8.32zM12.06 21.3h-.01a9.42 9.42 0 01-4.8-1.31l-.34-.2-3.8 1.03 1.02-3.7-.22-.38a9.45 9.45 0 01-1.46-5.08c0-5.22 4.25-9.47 9.48-9.47 2.53 0 4.91.98 6.7 2.76a9.45 9.45 0 012.78 6.7c0 5.22-4.25 9.45-9.45 9.45zm5.48-7.09c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.64.07-.3-.15-1.26-.46-2.4-1.47-.89-.79-1.49-1.76-1.66-2.06-.17-.3-.02-.46.13-.61.14-.14.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.48-.5-.67-.5-.17 0-.37-.03-.57-.03-.2 0-.52.08-.8.37-.27.3-1.05 1.03-1.05 2.52s1.08 2.93 1.23 3.13c.15.2 2.12 3.24 5.15 4.55.72.31 1.28.5 1.72.64.72.23 1.37.2 1.88.12.57-.08 1.76-.72 2-1.42.25-.7.25-1.3.17-1.42-.08-.12-.28-.2-.58-.35z" />
+                    </svg>
+                    WhatsApp ile gönder
+                </button>
+            </div>
             </div>
         </div>
     );
