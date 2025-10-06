@@ -15,17 +15,10 @@ type TenantContextValue = {
 const TenantContext = createContext<TenantContextValue | undefined>(undefined);
 
 export function TenantProvider({ children }: { children: React.ReactNode }) {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [selectedTenantId, setSelectedTenantIdState] = useState<string | null>(null);
   const [tenants, setTenants] = useState<TenantSummary[]>([]);
   const originalFetchRef = useRef<typeof fetch | null>(null);
-
-  // Load saved selection
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const saved = window.localStorage.getItem('selectedTenantId');
-    if (saved) setSelectedTenantIdState(saved);
-  }, []);
 
   const setSelectedTenantId = useCallback((tenantId: string | null) => {
     setSelectedTenantIdState(tenantId);
@@ -37,6 +30,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
 
   const refreshTenants = useCallback(async () => {
     try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const res = await fetch('/api/tenants', {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
@@ -50,7 +44,21 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
         setTenants(items);
       }
     } catch {}
-  }, [token]);
+  }, []);
+
+  // Load saved selection
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const saved = window.localStorage.getItem('selectedTenantId');
+    if (saved) setSelectedTenantIdState(saved);
+  }, []);
+
+  // Load tenants when user is available
+  useEffect(() => {
+    if (user?.role === 'SUPERUSER') {
+      refreshTenants();
+    }
+  }, [user?.role, refreshTenants]);
 
   // Install global fetch wrapper for SUPERUSER to inject x-tenant-id
   useEffect(() => {
@@ -64,6 +72,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
       const sel = selectedTenantId;
       if (!sel) return baseFetch(input, init);
 
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const headers = new Headers((init && init.headers) || undefined);
       headers.set('x-tenant-id', sel);
       if (token) headers.set('authorization', `Bearer ${token}`);
@@ -90,7 +99,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
         window.fetch = originalFetchRef.current;
       }
     };
-  }, [selectedTenantId, token, user?.role]);
+  }, [selectedTenantId, user?.role]);
 
   const value = useMemo(() => ({ selectedTenantId, setSelectedTenantId, tenants, refreshTenants }), [selectedTenantId, setSelectedTenantId, tenants, refreshTenants]);
 
