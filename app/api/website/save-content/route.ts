@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '../../../../lib/prisma';
-
+import { prisma } from '../../../lib/prisma';
 // Default website content
 const DEFAULT_WEBSITE_CONTENT = {
   companyName: "Şeref Vural Travel",
@@ -81,76 +80,104 @@ const DEFAULT_WEBSITE_CONTENT = {
   ]
 };
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { domain: string } }
-) {
+export async function POST(request: NextRequest) {
   try {
-    const rawDomain = params.domain || '';
-    const normalized = rawDomain.replace(/^www\./i, '').toLowerCase();
+    const body = await request.json();
+    const { tenantId, content, domain } = body;
 
-    // Resolve tenant by TenantWebsite domain mapping first (authoritative)
-    const tenantWebsite = await prisma.tenantWebsite.findFirst({
-      where: {
-        isActive: true,
-        OR: [
-          { domain: normalized },
-          { domain: `www.${normalized}` }
-        ]
-      },
-      include: {
-        tenant: true,
-        pages: true,
-        sections: true
-      }
-    });
+    if (!tenantId || !content) {
+      return NextResponse.json(
+        { error: 'Tenant ID and content are required' },
+        { status: 400 }
+      );
+    }
 
-    // Fallback: try to find by tenant subdomain/company name if no TenantWebsite found
-    const tenant = tenantWebsite?.tenant || await prisma.tenant.findFirst({
-      where: {
-        OR: [
-          { subdomain: normalized },
-          { companyName: { contains: normalized, mode: 'insensitive' } }
-        ]
-      }
+    // Check if tenant exists
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: tenantId }
     });
 
     if (!tenant) {
-      // Tenant bulunamazsa default içerik döndür
-      return NextResponse.json({
-        content: JSON.stringify(DEFAULT_WEBSITE_CONTENT),
-        isDefault: true
-      });
+      return NextResponse.json(
+        { error: 'Tenant not found' },
+        { status: 404 }
+      );
     }
 
-    // Get website content for this specific tenant
-    const websiteContent = tenantWebsite || await prisma.tenantWebsite.findFirst({
-      where: { 
-        tenantId: tenant.id,
-        isActive: true
-      },
-      include: {
-        pages: true,
-        sections: true
-      }
+    // Check if TenantWebsite already exists
+    let tenantWebsite = await prisma.tenantWebsite.findFirst({
+      where: { tenantId }
     });
 
-    // Eğer tenant'ın özel içeriği yoksa default içerik döndür
-    if (!websiteContent || !(websiteContent as any).content) {
-      return NextResponse.json({
-        content: JSON.stringify(DEFAULT_WEBSITE_CONTENT),
-        isDefault: true,
-        tenant: {
-          id: tenant.id,
-          companyName: tenant.companyName,
-          subdomain: tenant.subdomain
+    if (tenantWebsite) {
+      // Update existing content
+      tenantWebsite = await prisma.tenantWebsite.update({
+        where: { id: tenantWebsite.id },
+        data: {
+          content: JSON.stringify(content),
+          domain: domain || null,
+          updatedAt: new Date()
+        }
+      });
+    } else {
+      // Create new TenantWebsite
+      tenantWebsite = await prisma.tenantWebsite.create({
+        data: {
+          tenantId,
+          content: JSON.stringify(content),
+          domain: domain || null,
+          isActive: true
         }
       });
     }
 
-    return NextResponse.json(websiteContent);
+    return NextResponse.json({
+      success: true,
+      tenantWebsite
+    });
   } catch (error) {
-    console.error('Error fetching website content by domain:', error);
+    console.error('Error saving website content:', error);
+    return NextResponse.json(
+      { error: 'Failed to save website content' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const tenantId = searchParams.get('tenantId');
+
+    if (!tenantId) {
+      return NextResponse.json(
+        { error: 'Tenant ID is required' },
+        { status: 400 }
+      );
+    }
+
+    // Get tenant's website content
+    const tenantWebsite = await prisma.tenantWebsite.findFirst({
+      where: { 
+        tenantId,
+        isActive: true
+      }
+    });
+
+    if (!tenantWebsite || !tenantWebsite.content) {
+      // Return default content if no custom content exists
+      return NextResponse.json({
+        content: DEFAULT_WEBSITE_CONTENT,
+        isDefault: true
+      });
+    }
+
+    return NextResponse.json({
+      content: JSON.parse(tenantWebsite.content as string),
+      isDefault: false
+    });
+  } catch (error) {
+    console.error('Error fetching website content:', error);
     return NextResponse.json(
       { error: 'Failed to fetch website content' },
       { status: 500 }

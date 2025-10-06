@@ -39,7 +39,7 @@ export default function ProtransferWebsitePage() {
     return () => clearInterval(interval);
   }, [websiteContent]);
 
-  // Panel içeriğini domaine göre çek
+  // Panel içeriğini domaine göre çek (default içerik ile)
   useEffect(() => {
     const load = async () => {
       try {
@@ -49,9 +49,18 @@ export default function ProtransferWebsitePage() {
           const data = await res.json();
           if (data?.content) {
             setWebsiteContent(JSON.parse(data.content));
+          } else {
+            // API'den içerik gelmezse default içerik kullan
+            setWebsiteContent(defaultContent);
           }
+        } else {
+          // API hatası durumunda default içerik kullan
+          setWebsiteContent(defaultContent);
         }
-      } catch (_) {}
+      } catch (_) {
+        // Hata durumunda default içerik kullan
+        setWebsiteContent(defaultContent);
+      }
     };
     load();
   }, []);

@@ -62,12 +62,18 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
           const data = await response.json();
           if (data.content) {
             setWebsiteContent(JSON.parse(data.content));
+          } else {
+            // API'den içerik gelmezse default içerik kullan
+            setWebsiteContent(serefVuralData);
           }
         } else {
-          console.log('No content found for domain, using default content');
+          // API hatası durumunda default içerik kullan
+          setWebsiteContent(serefVuralData);
         }
       } catch (error) {
         console.error('Error fetching website content:', error);
+        // Hata durumunda default içerik kullan
+        setWebsiteContent(serefVuralData);
       } finally {
         setIsLoading(false);
       }

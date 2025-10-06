@@ -342,6 +342,7 @@ model TenantWebsite {
   theme     String           @default("default")
   customCSS String?
   favicon   String?
+  content   Json?            // Website content as JSON
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
   tenant    Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
