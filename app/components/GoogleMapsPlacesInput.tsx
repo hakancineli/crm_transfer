@@ -30,6 +30,7 @@ export default function GoogleMapsPlacesInput({
   const [showPredictions, setShowPredictions] = useState(false);
   const { isLoaded: googleReady, isLoading, error } = useGoogleMaps();
   const [portalRect, setPortalRect] = useState<{ top: number; left: number; width: number } | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number>(-1);
 
   const updatePortalRect = () => {
     if (typeof window === 'undefined') return;
@@ -223,6 +224,7 @@ export default function GoogleMapsPlacesInput({
     onChange(prediction.description);
     setShowPredictions(false);
     setPredictions([]);
+    setActiveIndex(-1);
   };
 
   const handleBlur = () => {
@@ -237,6 +239,31 @@ export default function GoogleMapsPlacesInput({
       setShowPredictions(true);
     }
     updatePortalRect();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showPredictions || predictions.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex((prev) => {
+        const next = prev < predictions.length - 1 ? prev + 1 : 0;
+        return next;
+      });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex((prev) => {
+        const next = prev > 0 ? prev - 1 : predictions.length - 1;
+        return next;
+      });
+    } else if (e.key === 'Enter') {
+      if (activeIndex >= 0 && activeIndex < predictions.length) {
+        e.preventDefault();
+        handleSuggestionClick(predictions[activeIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      setShowPredictions(false);
+      setActiveIndex(-1);
+    }
   };
 
   // Reposition on scroll/resize while dropdown is visible
@@ -259,6 +286,7 @@ export default function GoogleMapsPlacesInput({
         type="text"
         value={value}
         onChange={handleInputChange}
+        onKeyDown={handleKeyDown}
         onBlur={handleBlur}
         onFocus={handleFocus}
         placeholder={placeholder}
@@ -277,7 +305,9 @@ export default function GoogleMapsPlacesInput({
           {predictions.map((prediction, index) => (
             <div
               key={index}
-              className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+              className={`px-3 py-2 cursor-pointer text-sm ${index === activeIndex ? 'bg-gray-100' : 'hover:bg-gray-100'}`}
+              onMouseEnter={() => setActiveIndex(index)}
+              onMouseLeave={() => setActiveIndex((prev) => (prev === index ? -1 : prev))}
               onClick={() => handleSuggestionClick(prediction)}
             >
               {prediction.description}
