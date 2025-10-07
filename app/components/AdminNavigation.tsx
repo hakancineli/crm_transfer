@@ -239,6 +239,14 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         description: 'Sistem ayarları',
         module: 'transfer',
         order: role === 'SUPERUSER' ? 14 : 999
+      },
+      {
+        name: 'Acente Ayarları',
+        href: '/admin/tenant-settings',
+        icon: '🏢',
+        description: 'Acente bilgileri ve sistem ayarları',
+        module: 'transfer',
+        order: role === 'SUPERUSER' ? 15 : (role === 'AGENCY_ADMIN' ? 11 : 999)
       }
     ];
 
@@ -366,6 +374,8 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               shouldShow = false; // Only SUPERUSER can see this
             } else if (item.name === 'Ayarlar') {
               shouldShow = false; // Only SUPERUSER can see this
+            } else if (item.name === 'Acente Ayarları') {
+              shouldShow = user?.role === 'AGENCY_ADMIN' || user?.role === 'SUPERUSER';
             } else if (item.name === 'Modül Yönetimi') {
               shouldShow = user?.role === 'SUPERUSER';
             } else if (item.module === 'tour') {

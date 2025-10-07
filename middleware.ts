@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
 	const subdomain = hostname.split('.')[0];
 	
 	// Public routes that don't need authentication
-	const publicRoutes = ['/login', '/admin-login', '/', '/customer-reservation', '/customer-panel', '/reservation-lookup'];
+	const publicRoutes = ['/login', '/admin-login', '/', '/customer-reservation', '/customer-panel', '/reservation-lookup', '/marketing'];
 
 	// Always allow public assets and manifest
 	if (
@@ -23,6 +23,16 @@ export async function middleware(request: NextRequest) {
 		return NextResponse.next();
 	}
 	
+	// Local development: show marketing page at root
+	if (hostname.includes('localhost') || hostname.startsWith('127.')) {
+		if (pathname === '/') {
+			const url = request.nextUrl.clone();
+			url.pathname = '/marketing';
+			return NextResponse.rewrite(url);
+		}
+		return NextResponse.next();
+	}
+
 	// Domain-specific routing
 	if (hostname.includes('proacente.com')) {
 		// ProAcente CRM - redirect to admin login

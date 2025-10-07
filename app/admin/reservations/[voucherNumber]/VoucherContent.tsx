@@ -444,7 +444,23 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                         <div className="space-y-2 text-sm">
                             <div className="flex justify-between items-center py-1 border-b border-gray-100">
                                 <span className="text-gray-600">{t.flightCode}:</span>
-                                <span className="font-medium">{reservation.flightCode}</span>
+                                <div className="flex items-center gap-2">
+                                    <span className="font-medium">{reservation.flightCode || '—'}</span>
+                                    {reservation.flightCode && (
+                                        <a
+                                            href={`https://www.google.com/search?q=${encodeURIComponent(reservation.flightCode + ' uçuş durumu')}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
+                                            title="Google'da uçuş durumunu ara"
+                                        >
+                                            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                            </svg>
+                                            Ara
+                                        </a>
+                                    )}
+                                </div>
                             </div>
                             <div className="flex justify-between items-center py-1">
                                 <span className="text-gray-600">{t.luggage}:</span>
@@ -599,7 +615,23 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                                         </div>
                                         <div className="flex justify-between items-center">
                                             <span className="text-gray-600">{t.flightCode}:</span>
-                                            <span className="font-medium">{reservation.originalTransfer.flightCode}</span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-medium">{reservation.originalTransfer.flightCode || '—'}</span>
+                                                {reservation.originalTransfer.flightCode && (
+                                                    <a
+                                                        href={`https://www.google.com/search?q=${encodeURIComponent(reservation.originalTransfer.flightCode + ' uçuş durumu')}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
+                                                        title="Google'da uçuş durumunu ara"
+                                                    >
+                                                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                        </svg>
+                                                        Ara
+                                                    </a>
+                                                )}
+                                            </div>
                                         </div>
                                         <Link 
                                             href={`/admin/reservations/${reservation.originalTransfer.voucherNumber}${isDriverVoucher ? '?view=driver' : ''}`}
@@ -623,7 +655,23 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                                         </div>
                                         <div className="flex justify-between items-center">
                                             <span className="text-gray-600">{t.flightCode}:</span>
-                                            <span className="font-medium">{reservation.returnTransfer.flightCode}</span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-medium">{reservation.returnTransfer.flightCode || '—'}</span>
+                                                {reservation.returnTransfer.flightCode && (
+                                                    <a
+                                                        href={`https://www.google.com/search?q=${encodeURIComponent(reservation.returnTransfer.flightCode + ' uçuş durumu')}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
+                                                        title="Google'da uçuş durumunu ara"
+                                                    >
+                                                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                        </svg>
+                                                        Ara
+                                                    </a>
+                                                )}
+                                            </div>
                                         </div>
                                         <Link 
                                             href={`/admin/reservations/${reservation.returnTransfer.voucherNumber}${isDriverVoucher ? '?view=driver' : ''}`}

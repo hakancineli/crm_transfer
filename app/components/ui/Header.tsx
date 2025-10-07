@@ -33,9 +33,7 @@ export default function Header({ onSidebarToggle, showSidebarToggle = false }: H
         { name: 'Admin Panel', href: '/admin' },
     ];
 
-    const customerNavigation: { name: string; href: string }[] = [
-        { name: t('header.customerPanel'), href: '/customer-panel' },
-    ];
+    const customerNavigation: { name: string; href: string }[] = [];
 
     const navigation = isCustomerContext ? customerNavigation : adminNavigation;
 
@@ -63,9 +61,7 @@ export default function Header({ onSidebarToggle, showSidebarToggle = false }: H
                                 <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
                                     <span className="text-white font-bold text-lg">P</span>
                                 </div>
-                                <span className="text-xl font-bold text-green-600">
-                                    {t('header.title')}
-                                </span>
+                                <span className="text-xl font-bold text-green-600">Pro Acente</span>
                             </Link>
                         </div>
                         <div className="hidden md:ml-6 md:flex md:space-x-8">

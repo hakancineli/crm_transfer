@@ -21,6 +21,50 @@ model Tenant {
   paymentBank          String?
   paymentIban          String?
   websiteModuleEnabled Boolean          @default(false)
+  
+  // Genel Bilgiler
+  taxNumber            String?
+  address              String?
+  phone                String?
+  email                String?
+  website              String?
+  logoUrl              String?
+  workingHours         String?
+  holidayDays          String?
+  
+  // Marka & Tasarım
+  primaryColor         String?          @default("#3B82F6")
+  secondaryColor       String?          @default("#10B981")
+  fontFamily           String?          @default("Inter")
+  voucherBackgroundUrl String?
+  
+  // Sistem Ayarları
+  defaultLanguage      String?          @default("tr")
+  defaultCurrency      String?          @default("TRY")
+  timezone             String?          @default("Europe/Istanbul")
+  dateFormat           String?          @default("DD/MM/YYYY")
+  temperatureUnit      String?          @default("celsius")
+  
+  // Entegrasyonlar
+  whatsappApiKey       String?
+  googleMapsApiKey     String?
+  yandexMapsEnabled    Boolean          @default(false)
+  
+  // Kullanıcı Yönetimi
+  maxUsers             Int?             @default(10)
+  maxConcurrentSessions Int?            @default(5)
+  passwordMinLength    Int?             @default(8)
+  passwordExpiryDays   Int?             @default(90)
+  
+  // Raporlama & Analitik
+  dataRetentionDays    Int?             @default(365)
+  autoArchiveEnabled   Boolean          @default(false)
+  reportLogoEnabled    Boolean          @default(true)
+  
+  // Güvenlik
+  apiKeyExpiryDays     Int?             @default(30)
+  auditLogRetentionDays Int?            @default(180)
+  dataEncryptionLevel  String?          @default("standard")
   activities           Activity[]
   reservations         Reservation[]
   drivers              Driver[]
