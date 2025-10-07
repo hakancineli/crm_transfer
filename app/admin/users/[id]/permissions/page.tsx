@@ -370,7 +370,7 @@ export default function UserPermissionsPage() {
                           <label className="relative inline-flex items-center cursor-pointer">
                             <input
                               type="checkbox"
-                              checked={permissions[permission] || false}
+                              checked={permissions[permission] || isPermissionInRole(permission)}
                               onChange={(e) => handlePermissionChange(permission, e.target.checked)}
                               className="sr-only peer"
                             />
