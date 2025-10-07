@@ -46,39 +46,44 @@ interface VoucherContentProps {
 export default function VoucherContent({ reservation, isDriverVoucher }: VoucherContentProps) {
     const [selectedLanguage, setSelectedLanguage] = useState('tr');
     
-    // Open address in navigation app (Yandex preferred, fallback to Google/Apple)
+    // Open address in navigation app (Yandex preferred), robust for mobile browsers
     const openInNavigation = (rawAddress: string) => {
         if (!rawAddress) return;
         const address = (AIRPORTS[rawAddress as keyof typeof AIRPORTS] || rawAddress).toString();
         const encoded = encodeURIComponent(address);
 
-        // Try Yandex Maps app first
-        const yandexDeepLink = `yandexmaps://maps.yandex.com/?text=${encoded}`;
+        const ua = typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
+        const isIOS = /iPad|iPhone|iPod/.test(ua);
+        const isAndroid = /Android/.test(ua);
+
+        // Preferred app deep links
+        const yandexApp = isIOS ? `yandexmaps://?text=${encoded}` : `yandexmaps://maps.yandex.com/?text=${encoded}`;
+        const appleMaps = `maps://?q=${encoded}`; // iOS Apple Maps
         const yandexWeb = `https://yandex.com.tr/maps/?text=${encoded}`;
-        // Universal Google Maps web link (opens app on mobile if installed)
-        const googleUniversal = `https://www.google.com/maps/search/?api=1&query=${encoded}`;
+        const googleWeb = `https://www.google.com/maps/search/?api=1&query=${encoded}`;
 
-        let opened = false;
-        try {
-            const win = window.open(yandexDeepLink, '_self');
-            opened = !!win;
-        } catch {}
+        // Use location.href (more reliable than window.open for deep links)
+        const start = Date.now();
+        try { window.location.href = yandexApp; } catch {}
 
-        // Fallback chain via small timeout
+        // Fallback after 1.2s if app didn't take over
         setTimeout(() => {
-            if (opened) return;
-            try {
-                const win2 = window.open(yandexWeb, '_blank');
-                opened = !!win2;
-            } catch {}
-        }, 100);
+            const elapsed = Date.now() - start;
+            if (elapsed < 1300) {
+                if (isIOS) {
+                    // Try Apple Maps on iOS as secondary fallback
+                    try { window.location.href = appleMaps; } catch {}
+                } else {
+                    // Android/browser fallback to Yandex web first
+                    try { window.location.href = yandexWeb; } catch {}
+                }
 
-        setTimeout(() => {
-            if (opened) return;
-            try {
-                window.open(googleUniversal, '_blank');
-            } catch {}
-        }, 300);
+                // Final fallback to Google Maps web
+                setTimeout(() => {
+                    try { window.open(googleWeb, '_blank'); } catch {}
+                }, 900);
+            }
+        }, 1200);
     };
     
     const normalizePhone = (raw?: string): string | null => {
