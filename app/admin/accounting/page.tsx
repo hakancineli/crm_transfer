@@ -59,6 +59,7 @@ export default function AccountingPage() {
     
     // Check if user has permission to view accounting
     const hasViewAccountingPermission = user?.role === 'SUPERUSER' || 
+      user?.role === 'AGENCY_ADMIN' ||
       user?.permissions?.some(p => p.permission === 'VIEW_ACCOUNTING' && p.isActive);
     
     if (user && !hasViewAccountingPermission) {
@@ -289,6 +290,7 @@ export default function AccountingPage() {
 
   // Check permissions before rendering
   const hasViewAccountingPermission = user?.role === 'SUPERUSER' || 
+    user?.role === 'AGENCY_ADMIN' ||
     user?.permissions?.some(p => p.permission === 'VIEW_ACCOUNTING' && p.isActive);
   
   // Check if user has VIEW_ACCOUNTING permission
