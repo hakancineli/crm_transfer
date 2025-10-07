@@ -46,6 +46,41 @@ interface VoucherContentProps {
 export default function VoucherContent({ reservation, isDriverVoucher }: VoucherContentProps) {
     const [selectedLanguage, setSelectedLanguage] = useState('tr');
     
+    // Open address in navigation app (Yandex preferred, fallback to Google/Apple)
+    const openInNavigation = (rawAddress: string) => {
+        if (!rawAddress) return;
+        const address = (AIRPORTS[rawAddress as keyof typeof AIRPORTS] || rawAddress).toString();
+        const encoded = encodeURIComponent(address);
+
+        // Try Yandex Maps app first
+        const yandexDeepLink = `yandexmaps://maps.yandex.com/?text=${encoded}`;
+        const yandexWeb = `https://yandex.com.tr/maps/?text=${encoded}`;
+        // Universal Google Maps web link (opens app on mobile if installed)
+        const googleUniversal = `https://www.google.com/maps/search/?api=1&query=${encoded}`;
+
+        let opened = false;
+        try {
+            const win = window.open(yandexDeepLink, '_self');
+            opened = !!win;
+        } catch {}
+
+        // Fallback chain via small timeout
+        setTimeout(() => {
+            if (opened) return;
+            try {
+                const win2 = window.open(yandexWeb, '_blank');
+                opened = !!win2;
+            } catch {}
+        }, 100);
+
+        setTimeout(() => {
+            if (opened) return;
+            try {
+                window.open(googleUniversal, '_blank');
+            } catch {}
+        }, 300);
+    };
+    
     const normalizePhone = (raw?: string): string | null => {
         if (!raw) return null;
         // Keep leading + and digits only
@@ -353,15 +388,41 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                                 <span className="font-medium">{reservation.time}</span>
                             </div>
                             <div className="py-1 border-b border-gray-100">
-                                <div className="text-gray-600">{t.from}:</div>
-                                <div className="font-medium">
-                                    {AIRPORTS[reservation.from as keyof typeof AIRPORTS] || reservation.from}
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <div className="text-gray-600">{t.from}:</div>
+                                        <div className="font-medium">
+                                            {AIRPORTS[reservation.from as keyof typeof AIRPORTS] || reservation.from}
+                                        </div>
+                                    </div>
+                                    {isDriverVoucher && (
+                                        <button
+                                            onClick={() => openInNavigation(reservation.from)}
+                                            className="ml-4 inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md bg-green-600 text-white hover:bg-green-700"
+                                            title="Navigasyonda aç"
+                                        >
+                                            🚘 Git
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                             <div className="py-1">
-                                <div className="text-gray-600">{t.to}:</div>
-                                <div className="font-medium">
-                                    {AIRPORTS[reservation.to as keyof typeof AIRPORTS] || reservation.to}
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <div className="text-gray-600">{t.to}:</div>
+                                        <div className="font-medium">
+                                            {AIRPORTS[reservation.to as keyof typeof AIRPORTS] || reservation.to}
+                                        </div>
+                                    </div>
+                                    {isDriverVoucher && (
+                                        <button
+                                            onClick={() => openInNavigation(reservation.to)}
+                                            className="ml-4 inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700"
+                                            title="Navigasyonda aç"
+                                        >
+                                            🧭 Git
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </div>
