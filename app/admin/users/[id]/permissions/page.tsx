@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { PERMISSIONS, PERMISSION_LABELS } from '@/app/lib/permissions';
+import { PERMISSIONS, PERMISSION_LABELS, ROLE_PERMISSIONS } from '@/app/lib/permissions';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { canManageUsers } from '@/app/lib/permissions';
 
@@ -33,6 +33,12 @@ export default function UserPermissionsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [permissions, setPermissions] = useState<Record<string, boolean>>({});
+
+  const isPermissionInRole = (permission: string): boolean => {
+    const role = (user?.role || '').toString();
+    const rolePerms = (ROLE_PERMISSIONS as any)[role] || [];
+    return (rolePerms as readonly string[]).includes(permission);
+  };
 
   useEffect(() => {
     // SUPERUSER or AGENCY_ADMIN can access user permissions
