@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useModule } from '@/app/hooks/useModule';
 
 interface AuditLog {
   id: string;
@@ -21,6 +23,8 @@ interface AuditLog {
 
 export default function AuditLogsPage() {
   const { user } = useAuth();
+  const { isEnabled: isAuditLogsEnabled, isLoading: moduleLoading } = useModule('transfer');
+  const router = useRouter();
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -32,10 +36,29 @@ export default function AuditLogsPage() {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [isClient, setIsClient] = useState(false);
+
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
+    if (moduleLoading) return;
+    
+    if (!isAuditLogsEnabled) {
+      router.push('/admin');
+      return;
+    }
+
+    // Only SUPERUSER can access audit logs
+    if (user && user.role !== 'SUPERUSER') {
+      router.push('/admin');
+      return;
+    }
+
     fetchLogs();
-  }, [currentPage, filters]);
+  }, [currentPage, filters, moduleLoading, isAuditLogsEnabled, user, router]);
 
   const fetchLogs = async () => {
     try {
@@ -85,6 +108,33 @@ export default function AuditLogsPage() {
     }
   };
 
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (moduleLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuditLogsEnabled) {
+    return null;
+  }
+
   // Check if user has permission to view audit logs
   const hasAuditLogsPermission = user?.permissions?.some(p => 
     p.permission === 'AUDIT_LOGS' && p.isActive
@@ -102,7 +152,7 @@ export default function AuditLogsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-8" id="audit-logs-page">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">

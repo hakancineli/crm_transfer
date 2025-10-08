@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useModule } from '@/app/hooks/useModule';
 
 interface Tenant {
   id: string;
@@ -47,6 +49,8 @@ interface Reservation {
 
 export default function CompaniesPage() {
   const { user, loading: authLoading } = useAuth();
+  const { isEnabled: isCompaniesEnabled, isLoading: moduleLoading } = useModule('transfer');
+  const router = useRouter();
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
   const [tenantUsers, setTenantUsers] = useState<TenantUser[]>([]);
@@ -55,11 +59,22 @@ export default function CompaniesPage() {
   const [activeTab, setActiveTab] = useState<'users' | 'reservations'>('users');
   const [creating, setCreating] = useState(false);
   const [newCompany, setNewCompany] = useState({ companyName: '', subdomain: '', adminUsername: '', adminPassword: '', adminEmail: '' });
+  const [isClient, setIsClient] = useState(false);
   const [adminUsernameTouched, setAdminUsernameTouched] = useState(false);
+
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     // Wait for auth to load
-    if (authLoading) {
+    if (authLoading || moduleLoading) {
+      return;
+    }
+    
+    if (!isCompaniesEnabled) {
+      router.push('/admin');
       return;
     }
     
@@ -69,7 +84,7 @@ export default function CompaniesPage() {
     }
     
     fetchTenants();
-  }, [user, authLoading]);
+  }, [user, authLoading, moduleLoading, isCompaniesEnabled, router]);
 
   const fetchTenants = async () => {
     try {
@@ -268,6 +283,33 @@ export default function CompaniesPage() {
     );
   }
 
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (moduleLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isCompaniesEnabled) {
+    return null;
+  }
+
   if (user?.role !== 'SUPERUSER') {
     return (
       <div className="p-6">
@@ -293,7 +335,7 @@ export default function CompaniesPage() {
   }
 
   return (
-    <div className="p-4 lg:p-6">
+    <div className="p-4 lg:p-6" id="companies-page">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Şirket Yönetimi</h1>
       </div>
