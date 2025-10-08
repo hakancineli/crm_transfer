@@ -59,8 +59,14 @@ export default function TenantSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [isClient, setIsClient] = useState(false);
 
   const [formData, setFormData] = useState<Partial<TenantSettings>>({});
+
+  // Client-side rendering kontrolü
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const tabs = [
     { id: 'general', name: 'Genel Bilgiler', icon: '🏢' },
@@ -199,6 +205,18 @@ export default function TenantSettingsPage() {
     }
   };
 
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -210,7 +228,7 @@ export default function TenantSettingsPage() {
   const selectedTenant = tenants.find(t => t.id === selectedTenantId);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50" id="tenant-settings-page">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white shadow rounded-lg">
           {/* Header */}
