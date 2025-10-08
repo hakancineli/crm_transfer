@@ -63,6 +63,44 @@ export function useModule(moduleName: keyof ModuleSettings) {
         return;
       }
 
+      // AGENCY_ADMIN için modül kontrolü
+      if (user?.role === 'AGENCY_ADMIN') {
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) {
+            setIsEnabled(false);
+            setIsLoading(false);
+            return;
+          }
+
+          const response = await fetch('/api/tenant-modules', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            const tenantModules = data.tenantModules || [];
+            // Modül adından kontrol et
+            const hasModuleAccess = tenantModules.some((tm: any) => 
+              (tm.module?.name || '').toLowerCase().includes(moduleName)
+            );
+            setIsEnabled(hasModuleAccess);
+          } else {
+            console.error('useModule: API response not ok for AGENCY_ADMIN:', response.status);
+            setIsEnabled(false);
+          }
+        } catch (error) {
+          console.error('useModule: AGENCY_ADMIN tenant modül kontrolü hatası:', error);
+          setIsEnabled(false);
+        } finally {
+          setIsLoading(false);
+        }
+        return;
+      }
+
       // SELLER için modül kontrolü - promise ve yetkilere göre
       if (user?.role === 'SELLER') {
         

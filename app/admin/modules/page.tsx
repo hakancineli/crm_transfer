@@ -62,7 +62,7 @@ export default function ModuleManagement() {
     setIsClient(true);
   }, []);
 
-  // Superuser kontrolü
+  // Yetki kontrolü
   useEffect(() => {
     if (moduleLoading) return;
     
@@ -71,15 +71,16 @@ export default function ModuleManagement() {
       return;
     }
 
-    if (user && user.role !== 'SUPERUSER') {
+    // SUPERUSER veya AGENCY_ADMIN erişebilir
+    if (user && !['SUPERUSER', 'AGENCY_ADMIN'].includes(user.role)) {
       router.push('/admin');
       return;
     }
   }, [user, moduleLoading, isModulesEnabled, router]);
 
-  // Superuser değilse veri çekme
+  // Veri çekme
   useEffect(() => {
-    if (user?.role === 'SUPERUSER' && isModulesEnabled) {
+    if (user && ['SUPERUSER', 'AGENCY_ADMIN'].includes(user.role) && isModulesEnabled) {
       fetchData();
     }
   }, [user, isModulesEnabled]);
@@ -259,7 +260,12 @@ export default function ModuleManagement() {
     <div className="p-6" id="modules-page">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Modül Yönetimi</h1>
-        <p className="mt-2 text-gray-600">Firmaların modül erişimlerini yönetin</p>
+        <p className="mt-2 text-gray-600">
+          {user?.role === 'SUPERUSER' 
+            ? 'Firmaların modül erişimlerini yönetin' 
+            : 'Firmanızın modül erişimlerini yönetin'
+          }
+        </p>
       </div>
 
       <div className="space-y-6">

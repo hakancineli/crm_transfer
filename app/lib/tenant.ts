@@ -345,6 +345,36 @@ export class TenantService {
       return [];
     }
   }
+
+  static async getTenantsByUserId(userId: string): Promise<Tenant[]> {
+    try {
+      const tenantUsers = await prisma.tenantUser.findMany({
+        where: {
+          userId: userId,
+          isActive: true
+        },
+        include: {
+          tenant: {
+            include: {
+              modules: {
+                include: {
+                  module: true
+                }
+              },
+              users: {
+                where: { isActive: true }
+              }
+            }
+          }
+        }
+      });
+
+      return tenantUsers.map(tu => tu.tenant as unknown as Tenant);
+    } catch (error) {
+      console.error('Error getting tenants by user ID:', error);
+      return [];
+    }
+  }
 }
 
 export default TenantService;
