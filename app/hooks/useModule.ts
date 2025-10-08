@@ -20,9 +20,7 @@ const defaultModules: ModuleSettings = {
 };
 
 export function useModule(moduleName: keyof ModuleSettings) {
-  console.log('useModule called with:', moduleName);
   const { user } = useAuth();
-  console.log('useModule user:', user);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isEnabled, setIsEnabled] = useState<boolean>(() => {
     // Giriş yapılmadıysa hiçbir modül varsayılan olarak görünmesin
@@ -49,12 +47,10 @@ export function useModule(moduleName: keyof ModuleSettings) {
   // Tenant bazlı modül kontrolü için API çağrısı
   useEffect(() => {
     const checkTenantModule = async () => {
-      console.log('useModule checkTenantModule:', { moduleName, user: user?.role });
       setIsLoading(true);
       
       // User null ise, modülleri gizle
       if (!user) {
-        console.log('useModule: User is null, hiding all modules');
         setIsEnabled(false);
         setIsLoading(false);
         return;
@@ -62,7 +58,6 @@ export function useModule(moduleName: keyof ModuleSettings) {
       
       // SUPERUSER için tüm modüllere erişim var
       if (user?.role === 'SUPERUSER') {
-        console.log('useModule: SUPERUSER, enabling module');
         setIsEnabled(true);
         setIsLoading(false);
         return;
@@ -70,7 +65,6 @@ export function useModule(moduleName: keyof ModuleSettings) {
 
       // SELLER için modül kontrolü - promise ve yetkilere göre
       if (user?.role === 'SELLER') {
-        console.log('useModule: SELLER role detected, checking permissions');
         
         // SELLER için tenant modül kontrolü yap
         try {
@@ -92,13 +86,10 @@ export function useModule(moduleName: keyof ModuleSettings) {
           if (response.ok) {
             const data = await response.json();
             const tenantModules = data.tenantModules || [];
-            console.log('useModule: API response for SELLER:', { tenantModules, moduleName });
-            
             // Modül adından kontrol et
             const hasModuleAccess = tenantModules.some((tm: any) => 
               (tm.module?.name || '').toLowerCase().includes(moduleName)
             );
-            console.log('useModule: SELLER hasModuleAccess:', hasModuleAccess);
             setIsEnabled(hasModuleAccess);
           } else {
             console.error('useModule: API response not ok for SELLER:', response.status);
@@ -108,7 +99,6 @@ export function useModule(moduleName: keyof ModuleSettings) {
           console.error('useModule: SELLER tenant modül kontrolü hatası:', error);
           setIsEnabled(false);
         } finally {
-          console.log('useModule: SELLER setting loading to false');
           setIsLoading(false);
         }
         return;
@@ -116,11 +106,9 @@ export function useModule(moduleName: keyof ModuleSettings) {
 
       // AGENCY_ADMIN ve diğer roller için tenant modül kontrolü
       if (user && (user.role === 'AGENCY_ADMIN' || user.role === 'AGENCY_USER')) {
-        console.log('useModule: Checking tenant modules for role:', user.role);
         try {
           const token = localStorage.getItem('token');
           if (!token) {
-            console.error('useModule: Token bulunamadı');
             setIsEnabled(false);
             setIsLoading(false);
             return;
@@ -135,24 +123,18 @@ export function useModule(moduleName: keyof ModuleSettings) {
           if (response.ok) {
             const data = await response.json();
             const tenantModules = data.tenantModules || [];
-            console.log('useModule: API response:', { tenantModules, moduleName });
             const hasModuleAccess = tenantModules.some((tm: any) => 
               (tm.module?.name || '').toLowerCase().includes(moduleName)
             );
-            console.log('useModule: hasModuleAccess:', hasModuleAccess);
             setIsEnabled(hasModuleAccess);
-          } else {
-            console.error('useModule: API response not ok:', response.status);
           }
         } catch (error) {
           console.error('useModule: Tenant modül kontrolü hatası:', error);
           setIsEnabled(false);
         } finally {
-          console.log('useModule: Setting loading to false');
           setIsLoading(false);
         }
       } else {
-        console.log('useModule: User role not supported, setting loading to false');
         setIsLoading(false);
       }
     };

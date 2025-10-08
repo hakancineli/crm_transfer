@@ -21,8 +21,6 @@ export default function Header({ onSidebarToggle, showSidebarToggle = false }: H
     const { t } = useLanguage();
     const { user, logout, isAuthenticated } = useAuth();
     const { emojisEnabled } = useEmoji();
-    
-    console.log('Header - isAuthenticated:', isAuthenticated, 'user:', user, 'isCustomerContext:', pathname === '/' || pathname.startsWith('/customer-reservation') || pathname.startsWith('/customer-panel'));
 
     // Müşteri ekranlarında yönetim linklerini gizle (ana sayfa dahil)
     const isCustomerContext = pathname === '/' || pathname.startsWith('/customer-reservation') || pathname.startsWith('/customer-panel');
