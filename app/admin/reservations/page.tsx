@@ -1,21 +1,50 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import ReservationList from './ReservationList';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useModule } from '@/app/hooks/useModule';
 import { PERMISSIONS, ROLE_PERMISSIONS } from '@/app/lib/permissions';
 
 export default function ReservationsPage() {
     const { t, dir } = useLanguage();
     const { user } = useAuth();
+    const { isEnabled: isReservationsEnabled, isLoading: moduleLoading } = useModule('transfer');
+    const router = useRouter();
     const [title, setTitle] = useState(t('admin.reservations.allReservations'));
     const [description, setDescription] = useState(t('admin.reservations.allReservationsDescription'));
+
+    useEffect(() => {
+        if (moduleLoading) return;
+        
+        if (!isReservationsEnabled) {
+            router.push('/admin');
+            return;
+        }
+    }, [moduleLoading, isReservationsEnabled, router]);
 
     const rolePerms = user?.role ? (ROLE_PERMISSIONS as any)[user.role] || [] : [];
     const has = (perm: string) => rolePerms.includes(perm) || user?.permissions?.some(p => p.permission === perm && p.isActive);
     const canViewAll = user?.role === 'SUPERUSER' || has(PERMISSIONS.VIEW_ALL_RESERVATIONS);
     const canViewOwn = has(PERMISSIONS.VIEW_OWN_SALES) || has(PERMISSIONS.CREATE_RESERVATIONS);
+
+    if (moduleLoading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Yükleniyor...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!isReservationsEnabled) {
+        return null;
+    }
+
     if (!canViewAll && !canViewOwn) {
         return (
             <div className="min-h-screen bg-gray-50 py-8">
