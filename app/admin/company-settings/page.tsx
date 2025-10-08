@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useModule } from '@/app/hooks/useModule';
 
 interface TenantInfo {
   id: string;
@@ -13,6 +15,8 @@ interface TenantInfo {
 
 export default function CompanySettingsPage() {
   const { user } = useAuth();
+  const { isEnabled: isCompanySettingsEnabled, isLoading: moduleLoading } = useModule('transfer');
+  const router = useRouter();
   const [allTenants, setAllTenants] = useState<TenantInfo[]>([]);
   const [selectedTenantId, setSelectedTenantId] = useState<string>('');
   const [form, setForm] = useState({ paymentIban: '', paymentAccountHolder: '', paymentBank: '' });
@@ -20,6 +24,7 @@ export default function CompanySettingsPage() {
   const [saving, setSaving] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [message, setMessage] = useState<string>('');
+  const [isClient, setIsClient] = useState(false);
 
   const fetchTenants = async (tenantId?: string) => {
     setLoading(true);
@@ -59,12 +64,24 @@ export default function CompanySettingsPage() {
     }
   };
 
+  // Chrome eklentisi için DOM hazır olana kadar bekle
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (moduleLoading) return;
+    
+    if (!isCompanySettingsEnabled) {
+      router.push('/admin');
+      return;
+    }
+
     if (!user) return;
     // API kullanıcı token'ına göre izinli tenantları döner.
     // SUPERUSER için tümü, diğer roller için kendi tenant(lar)ı.
     fetchTenants();
-  }, [user]);
+  }, [user, moduleLoading, isCompanySettingsEnabled, router]);
 
   const handleTenantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const id = e.target.value;
@@ -110,8 +127,35 @@ export default function CompanySettingsPage() {
 
   const title = user?.role === 'SUPERUSER' ? 'Şirket Ayarları' : 'Şirket Ödeme Bilgileri';
 
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (moduleLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isCompanySettingsEnabled) {
+    return null;
+  }
+
   return (
-    <div className="max-w-3xl mx-auto p-6">
+    <div className="max-w-3xl mx-auto p-6" id="company-settings-page">
       <h1 className="text-xl font-semibold mb-4">{title}</h1>
       {loading && <div>Yükleniyor...</div>}
       {error && <div className="text-red-600 mb-3">{error}</div>}

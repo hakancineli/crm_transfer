@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useModule } from '@/app/hooks/useModule';
 
 interface CustomerSetupData {
   companyName: string;
@@ -20,8 +22,11 @@ interface CustomerSetupData {
 
 export default function CustomerSetupPage() {
   const { user } = useAuth();
+  const { isEnabled: isCustomerSetupEnabled, isLoading: moduleLoading } = useModule('transfer');
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
+  const [isClient, setIsClient] = useState(false);
   
   const [formData, setFormData] = useState<CustomerSetupData>({
     companyName: '',
@@ -34,6 +39,47 @@ export default function CustomerSetupPage() {
       { username: '', name: '', email: '', role: 'SELLER', password: '' }
     ]
   });
+
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (moduleLoading) return;
+    
+    if (!isCustomerSetupEnabled) {
+      router.push('/admin');
+      return;
+    }
+  }, [moduleLoading, isCustomerSetupEnabled, router]);
+
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (moduleLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isCustomerSetupEnabled) {
+    return null;
+  }
 
   // Only SUPERUSER can access this page
   if (user?.role !== 'SUPERUSER') {
@@ -123,7 +169,7 @@ export default function CustomerSetupPage() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6" id="customer-setup-page">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Müşteri Kurulumu</h1>
         
