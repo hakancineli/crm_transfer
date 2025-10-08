@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useModule } from '@/app/hooks/useModule';
 import { MODULES, MODULE_FEATURES } from '@/app/lib/modules';
 import { useRouter } from 'next/navigation';
 
@@ -48,26 +49,40 @@ interface TenantUser {
 
 export default function ModuleManagement() {
   const { user } = useAuth();
+  const { isEnabled: isModulesEnabled, isLoading: moduleLoading } = useModule('transfer');
   const router = useRouter();
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Superuser kontrolü
   useEffect(() => {
+    if (moduleLoading) return;
+    
+    if (!isModulesEnabled) {
+      router.push('/admin');
+      return;
+    }
+
     if (user && user.role !== 'SUPERUSER') {
       router.push('/admin');
       return;
     }
-  }, [user, router]);
+  }, [user, moduleLoading, isModulesEnabled, router]);
 
   // Superuser değilse veri çekme
   useEffect(() => {
-    if (user?.role === 'SUPERUSER') {
+    if (user?.role === 'SUPERUSER' && isModulesEnabled) {
       fetchData();
     }
-  }, [user]);
+  }, [user, isModulesEnabled]);
 
   const fetchData = async () => {
     try {
@@ -187,6 +202,33 @@ export default function ModuleManagement() {
     );
   }
 
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (moduleLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isModulesEnabled) {
+    return null;
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -214,7 +256,7 @@ export default function ModuleManagement() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-6" id="modules-page">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Modül Yönetimi</h1>
         <p className="mt-2 text-gray-600">Firmaların modül erişimlerini yönetin</p>

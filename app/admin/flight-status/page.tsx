@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { FlightInfo, FlightTracker } from '@/app/lib/flightTracker';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useModule } from '@/app/hooks/useModule';
@@ -17,12 +18,14 @@ interface FlightStatusData {
 
 export default function FlightStatusPage() {
   const { user, loading: authLoading } = useAuth();
-  const flightEnabled = useModule('flight');
+  const { isEnabled: flightEnabled, isLoading: moduleLoading } = useModule('flight');
+  const router = useRouter();
   const [flights, setFlights] = useState<FlightStatusData[]>([]);
   const [filteredFlights, setFilteredFlights] = useState<FlightStatusData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isClient, setIsClient] = useState(false);
   
   // Uçuş çağırma için state'ler
   const [lookupFlightCode, setLookupFlightCode] = useState('');
@@ -30,16 +33,19 @@ export default function FlightStatusPage() {
   const [lookupResult, setLookupResult] = useState<FlightInfo | null>(null);
   const [lookupError, setLookupError] = useState<string | null>(null);
 
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   useEffect(() => {
     // Wait for auth to load
-    if (authLoading) {
+    if (authLoading || moduleLoading) {
       return;
     }
     
-    // Modül kontrolü: SUPERUSER veya modül açık olmalı
-    if (user?.role !== 'SUPERUSER' && !flightEnabled) {
-      setLoading(false);
-      setError('MODULE_DISABLED');
+    if (!flightEnabled) {
+      router.push('/admin');
       return;
     }
     
@@ -51,7 +57,7 @@ export default function FlightStatusPage() {
       return;
     }
     fetchFlightStatus();
-  }, [user, authLoading, flightEnabled]);
+  }, [user, authLoading, moduleLoading, flightEnabled, router]);
 
   const fetchFlightStatus = async () => {
     try {
@@ -140,6 +146,33 @@ export default function FlightStatusPage() {
     }
   };
 
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (moduleLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!flightEnabled) {
+    return null;
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -179,7 +212,7 @@ export default function FlightStatusPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-8" id="flight-status-page">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
