@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useModule } from '@/app/hooks/useModule';
 import { PERMISSIONS, ROLE_PERMISSIONS } from '@/app/lib/permissions';
 
 interface Driver {
@@ -19,6 +21,8 @@ interface Driver {
 
 export default function DriversPage() {
   const { user } = useAuth();
+  const { isEnabled: isDriversEnabled, isLoading: moduleLoading } = useModule('transfer');
+  const router = useRouter();
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -34,9 +38,16 @@ export default function DriversPage() {
     user?.permissions?.some(p => p.permission === PERMISSIONS.MANAGE_DRIVERS && p.isActive);
 
   useEffect(() => {
+    if (moduleLoading) return;
+    
+    if (!isDriversEnabled) {
+      router.push('/admin');
+      return;
+    }
+    
     if (!canViewDrivers) return;
     fetchDrivers();
-  }, [canViewDrivers]);
+  }, [canViewDrivers, moduleLoading, isDriversEnabled, router]);
 
   const fetchDrivers = async () => {
     try {
@@ -86,6 +97,21 @@ export default function DriversPage() {
         </div>
       </div>
     );
+  }
+
+  if (moduleLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isDriversEnabled) {
+    return null;
   }
 
   if (loading) {
