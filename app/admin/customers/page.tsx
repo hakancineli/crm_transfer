@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useModule } from '@/app/hooks/useModule';
 import { PERMISSIONS, ROLE_PERMISSIONS } from '@/app/lib/permissions';
 
 interface Customer {
@@ -15,6 +17,8 @@ interface Customer {
 
 export default function CustomersPage() {
   const { user } = useAuth();
+  const { isEnabled: isCustomersEnabled, isLoading: moduleLoading } = useModule('transfer');
+  const router = useRouter();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -90,9 +94,16 @@ export default function CustomersPage() {
     user?.permissions?.some(p => (p.permission === PERMISSIONS.VIEW_CUSTOMER_DATA || p.permission === PERMISSIONS.MANAGE_CUSTOMERS) && p.isActive);
 
   useEffect(() => {
+    if (moduleLoading) return;
+    
+    if (!isCustomersEnabled) {
+      router.push('/admin');
+      return;
+    }
+    
     if (!canViewCustomers) return;
     fetchCustomers();
-  }, [canViewCustomers, selectedTenant]);
+  }, [canViewCustomers, selectedTenant, moduleLoading, isCustomersEnabled, router]);
 
   const fetchCustomers = async () => {
     try {
@@ -169,6 +180,21 @@ export default function CustomersPage() {
     // Basit telefon formatı
     return phone.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
   };
+
+  if (moduleLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isCustomersEnabled) {
+    return null;
+  }
 
   if (!canViewCustomers) {
     return (

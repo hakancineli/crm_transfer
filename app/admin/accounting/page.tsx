@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useModule } from '@/app/hooks/useModule';
 import { canViewAccounting } from '@/app/lib/permissions';
 import { calculateCommissions, CommissionCalculation } from '@/app/lib/commissionCalculator';
 import { useLanguage } from '@/app/contexts/LanguageContext';
@@ -41,6 +43,8 @@ interface Reservation {
 
 export default function AccountingPage() {
   const { user, loading: authLoading } = useAuth();
+  const { isEnabled: isAccountingEnabled, isLoading: moduleLoading } = useModule('transfer');
+  const router = useRouter();
   const { t, dir } = useLanguage();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +57,7 @@ export default function AccountingPage() {
 
   useEffect(() => {
     // Wait for auth to load
-    if (authLoading) {
+    if (authLoading || moduleLoading) {
       return;
     }
     
@@ -66,11 +70,17 @@ export default function AccountingPage() {
       window.location.href = '/admin';
       return;
     }
+
+    // Check module access
+    if (!isAccountingEnabled) {
+      router.push('/admin');
+      return;
+    }
     
     // USD kuru al
     getUSDRate().then(rate => setUsdRate(rate));
     fetchReservations();
-  }, [filter, dateRange, user, authLoading]);
+  }, [filter, dateRange, user, authLoading, moduleLoading, isAccountingEnabled, router]);
 
   const fetchReservations = async () => {
     try {
@@ -277,7 +287,7 @@ export default function AccountingPage() {
     }, 0);
 
   // Loading state - authentication henüz tamamlanmadıysa loading göster
-  if (authLoading) {
+  if (authLoading || moduleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -286,6 +296,11 @@ export default function AccountingPage() {
         </div>
       </div>
     );
+  }
+
+  // Check module access
+  if (!isAccountingEnabled) {
+    return null;
   }
 
   // Check permissions before rendering
