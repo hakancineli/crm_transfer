@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useModule } from '@/app/hooks/useModule';
 import { canManageUsers } from '@/app/lib/permissions';
 
 interface User {
@@ -23,11 +25,14 @@ interface User {
 
 export default function UsersPage() {
   const { user: currentUser, isAdmin, loading: authLoading } = useAuth();
+  const { isEnabled: isUsersEnabled, isLoading: moduleLoading } = useModule('transfer');
+  const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [groupedUsers, setGroupedUsers] = useState<Record<string, User[]>>({});
+  const [isClient, setIsClient] = useState(false);
 
   const [formData, setFormData] = useState({
     username: '',
@@ -39,14 +44,25 @@ export default function UsersPage() {
     isActive: true
   });
 
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   useEffect(() => {
     // Wait for auth to load
-    if (authLoading) {
+    if (authLoading || moduleLoading) {
       return;
     }
     
     if (!currentUser) {
       window.location.href = '/admin';
+      return;
+    }
+
+    // Check module access
+    if (!isUsersEnabled) {
+      router.push('/admin');
       return;
     }
     
@@ -63,7 +79,7 @@ export default function UsersPage() {
     }
     
     fetchUsers();
-  }, [currentUser, authLoading]);
+  }, [currentUser, authLoading, moduleLoading, isUsersEnabled, router]);
 
   const fetchUsers = async () => {
     try {
@@ -211,6 +227,33 @@ export default function UsersPage() {
   );
   
   // Check if user can manage users (SUPERUSER or AGENCY_ADMIN or has MANAGE_USERS)
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (moduleLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isUsersEnabled) {
+    return null;
+  }
+
   if (currentUser && !canManageUsers(currentUser.role) && !hasManageUsersPermission) {
     return (
       <div className="p-6">
@@ -251,7 +294,7 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="p-4 lg:p-6">
+    <div className="p-4 lg:p-6" id="users-page">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Kullanıcı Yönetimi</h1>
         <button
