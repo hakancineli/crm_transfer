@@ -14,8 +14,25 @@ export default function ReportsPage() {
     useEffect(() => {
         if (!isLoading && !isReportsEnabled) {
             router.push('/admin');
+            return;
         }
-    }, [isLoading, isReportsEnabled, router]);
+
+        // Check if user has permission to view reports
+        if (user && !isLoading) {
+            const hasViewReportsPermission = user?.permissions?.some(p => 
+                p.permission === 'VIEW_REPORTS' && p.isActive
+            );
+            
+            // Allow SUPERUSER, AGENCY_ADMIN, OPERATION, ACCOUNTANT to access reports
+            const allowedRoles = ['SUPERUSER', 'AGENCY_ADMIN', 'OPERATION', 'ACCOUNTANT'];
+            const hasRoleAccess = allowedRoles.includes(user.role);
+            
+            if (!hasRoleAccess && !hasViewReportsPermission) {
+                router.push('/admin');
+                return;
+            }
+        }
+    }, [isLoading, isReportsEnabled, user, router]);
 
     if (isLoading) {
         return (
@@ -30,6 +47,27 @@ export default function ReportsPage() {
 
     if (!isReportsEnabled) {
         return null;
+    }
+
+    // Check permissions before rendering
+    if (user) {
+        const hasViewReportsPermission = user?.permissions?.some(p => 
+            p.permission === 'VIEW_REPORTS' && p.isActive
+        );
+        
+        const allowedRoles = ['SUPERUSER', 'AGENCY_ADMIN', 'OPERATION', 'ACCOUNTANT'];
+        const hasRoleAccess = allowedRoles.includes(user.role);
+        
+        if (!hasRoleAccess && !hasViewReportsPermission) {
+            return (
+                <div className="min-h-screen bg-gray-50 py-8">
+                    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
+                        <h1 className="text-2xl font-bold text-gray-800 mb-4">Yetkisiz Erişim</h1>
+                        <p className="text-gray-600">Bu sayfaya erişim yetkiniz bulunmamaktadır.</p>
+                    </div>
+                </div>
+            );
+        }
     }
 
     return (

@@ -45,18 +45,10 @@ export default function ReportsDashboard() {
     const debouncedEndDate = useDebounce(endDate, 500);
 
     useEffect(() => {
-        // Check if user has permission to view reports
-        const hasViewReportsPermission = user?.permissions?.some(p => 
-            p.permission === 'VIEW_REPORTS' && p.isActive
-        );
-        
-        // Allow SUPERUSER to access reports
-        if (user && user.role !== 'SUPERUSER' && !hasViewReportsPermission) {
-            window.location.href = '/admin';
-            return;
-        }
         // İlk yüklemede raporu getir
-        fetchReportData();
+        if (user) {
+            fetchReportData();
+        }
     }, [user]); // Sadece user değiştiğinde çalışsın
 
     // Debounced tarihler değiştiğinde otomatik güncelle
