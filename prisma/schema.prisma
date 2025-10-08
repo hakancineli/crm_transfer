@@ -50,6 +50,13 @@ model Tenant {
   googleMapsApiKey     String?
   yandexMapsEnabled    Boolean          @default(false)
   
+  // U-ETDS Entegrasyonu
+  uetdsEnabled         Boolean          @default(false)
+  uetdsUsername        String?
+  uetdsPassword        String?
+  uetdsUnetNo          String?
+  uetdsTestMode        Boolean          @default(true)
+  
   // Kullanıcı Yönetimi
   maxUsers             Int?             @default(10)
   maxConcurrentSessions Int?            @default(5)
@@ -70,6 +77,11 @@ model Tenant {
   drivers              Driver[]
   hotelBookings        HotelBooking[]
   hotelPricePool       HotelPricePool[]
+  uetdsSeferler        UetdsSefer[]
+  uetdsYolcular        UetdsYolcu[]
+  uetdsPersoneller     UetdsPersonel[]
+  uetdsGruplar         UetdsGrup[]
+  uetdsLogs            UetdsLog[]
   hotelRequests        HotelRequest[]
   modules              TenantModule[]
   users                TenantUser[]
@@ -221,6 +233,7 @@ model Reservation {
   tenant                  Tenant?        @relation(fields: [tenantId], references: [id])
   user                    User?          @relation(fields: [userId], references: [id])
   hotelBookings           HotelBooking[]
+  uetdsSeferler           UetdsSefer[]
 }
 
 model HotelRequest {
@@ -460,4 +473,141 @@ enum UserRole {
   ACCOUNTANT
   AGENCY_ADMIN
   AGENCY_USER
+}
+
+// U-ETDS Modelleri
+model UetdsSefer {
+  id                    String           @id @default(uuid())
+  tenantId              String
+  reservationId         String?          // Rezervasyon ile bağlantı
+  uetdsSeferReferansNo  String?          // U-ETDS'den dönen referans numarası
+  aracPlaka             String
+  hareketTarihi         DateTime
+  hareketSaati          String
+  seferAciklama         String?
+  aracTelefonu          String?
+  firmaSeferNo          String?
+  seferBitisTarihi      DateTime
+  seferBitisSaati       String
+  seferDurum            String           @default("AKTIF") // AKTIF, IPTAL
+  bildirimZamani        DateTime?        // U-ETDS'ye bildirim zamanı
+  sonucKodu             Int?             // U-ETDS'den dönen sonuç kodu
+  sonucMesaji           String?          // U-ETDS'den dönen sonuç mesajı
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+  
+  tenant                Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  reservation           Reservation?     @relation(fields: [reservationId], references: [id])
+  yolcular              UetdsYolcu[]
+  personeller           UetdsPersonel[]
+  gruplar               UetdsGrup[]
+  logs                  UetdsLog[]
+  
+  @@map("uetds_seferler")
+}
+
+model UetdsYolcu {
+  id                    String           @id @default(uuid())
+  tenantId              String
+  seferId               String
+  grupId                String?          // Grup ID'si
+  uetdsYolcuRefNo       String?          // U-ETDS'den dönen yolcu referans numarası
+  uyrukUlke             String           // Ülke kodu
+  cinsiyet              String           // E - K
+  tcKimlikPasaportNo    String
+  adi                   String
+  soyadi                String
+  koltukNo              String?
+  telefonNo             String?
+  hesKodu               String?
+  durum                 String           @default("AKTIF") // AKTIF, IPTAL, GELMEDI
+  iptalAciklama         String?
+  bildirimZamani        DateTime?        // U-ETDS'ye bildirim zamanı
+  sonucKodu             Int?             // U-ETDS'den dönen sonuç kodu
+  sonucMesaji           String?          // U-ETDS'den dönen sonuç mesajı
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+  
+  tenant                Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  sefer                 UetdsSefer       @relation(fields: [seferId], references: [id], onDelete: Cascade)
+  grup                  UetdsGrup?       @relation(fields: [grupId], references: [id])
+  
+  @@map("uetds_yolcular")
+}
+
+model UetdsPersonel {
+  id                    String           @id @default(uuid())
+  tenantId              String
+  seferId               String
+  uetdsPersonelId       String?          // U-ETDS'den dönen personel ID'si
+  turKodu               Int              // 0-Şoför, 1-Şoför Yrd., 2-Host, 3-Hostes, 4-Diğer, 5-Rehber
+  uyrukUlke             String           // Ülke kodu
+  tcKimlikPasaportNo    String
+  cinsiyet              String           // E - K
+  adi                   String
+  soyadi                String
+  telefon               String?
+  adres                 String?
+  hesKodu               String?
+  durum                 String           @default("AKTIF") // AKTIF, IPTAL
+  iptalAciklama         String?
+  bildirimZamani        DateTime?        // U-ETDS'ye bildirim zamanı
+  sonucKodu             Int?             // U-ETDS'den dönen sonuç kodu
+  sonucMesaji           String?          // U-ETDS'den dönen sonuç mesajı
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+  
+  tenant                Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  sefer                 UetdsSefer       @relation(fields: [seferId], references: [id], onDelete: Cascade)
+  
+  @@map("uetds_personeller")
+}
+
+model UetdsGrup {
+  id                    String           @id @default(uuid())
+  tenantId              String
+  seferId               String
+  uetdsGrupRefNo        String?          // U-ETDS'den dönen grup referans numarası
+  grupAdi               String
+  grupAciklama          String
+  baslangicUlke         String           // Ülke kodu
+  baslangicIl           Int?             // Mernis il kodu
+  baslangicIlce         Int?             // Mernis ilçe kodu
+  baslangicYer          String?          // Başlangıç yer bilgisi
+  bitisUlke             String           // Ülke kodu
+  bitisIl               Int?             // Mernis il kodu
+  bitisIlce             Int?             // Mernis ilçe kodu
+  bitisYer              String?          // Bitiş yer bilgisi
+  grupUcret             String?          // Grup taşıma ücreti
+  durum                 String           @default("AKTIF") // AKTIF, IPTAL
+  iptalAciklama         String?
+  bildirimZamani        DateTime?        // U-ETDS'ye bildirim zamanı
+  sonucKodu             Int?             // U-ETDS'den dönen sonuç kodu
+  sonucMesaji           String?          // U-ETDS'den dönen sonuç mesajı
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+  
+  tenant                Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  sefer                 UetdsSefer       @relation(fields: [seferId], references: [id], onDelete: Cascade)
+  yolcular              UetdsYolcu[]
+  
+  @@map("uetds_gruplar")
+}
+
+model UetdsLog {
+  id                    String           @id @default(uuid())
+  tenantId              String
+  seferId               String?
+  islemTuru             String           // seferEkle, yolcuEkle, personelEkle, etc.
+  islemParametreleri    Json             // Gönderilen parametreler
+  sonucKodu             Int?             // U-ETDS'den dönen sonuç kodu
+  sonucMesaji           String?          // U-ETDS'den dönen sonuç mesajı
+  sonucVerisi           Json?            // U-ETDS'den dönen tüm veri
+  hataDetayi            String?          // Hata detayı
+  islemZamani           DateTime         @default(now())
+  
+  tenant                Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  sefer                 UetdsSefer?      @relation(fields: [seferId], references: [id])
+  
+  @@map("uetds_logs")
 }

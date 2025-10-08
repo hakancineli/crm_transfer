@@ -67,6 +67,21 @@ export const MODULES = {
       'analytics-entegrasyonu',
       'custom-tasarim'
     ]
+  },
+  UETDS: {
+    id: 'uetds',
+    name: 'U-ETDS Entegrasyonu',
+    description: 'Ulaştırma Elektronik Takip Denetim Sistemi entegrasyonu',
+    priceMonthly: 40,
+    priceYearly: 400,
+    features: [
+      'uetds-sefer-bildirimi',
+      'uetds-yolcu-yonetimi',
+      'uetds-personel-yonetimi',
+      'uetds-grup-yonetimi',
+      'uetds-raporlama',
+      'uetds-otomatik-bildirim'
+    ]
   }
 } as const;
 
@@ -93,7 +108,13 @@ export const MODULE_FEATURES = {
   'rota-yonetimi': 'Rota Yönetimi',
   'tur-rezervasyon': 'Tur Rezervasyonu',
   'rehber-yonetimi': 'Rehber Yönetimi',
-  'tur-raporlari': 'Tur Raporları'
+  'tur-raporlari': 'Tur Raporları',
+  'uetds-sefer-bildirimi': 'U-ETDS Sefer Bildirimi',
+  'uetds-yolcu-yonetimi': 'U-ETDS Yolcu Yönetimi',
+  'uetds-personel-yonetimi': 'U-ETDS Personel Yönetimi',
+  'uetds-grup-yonetimi': 'U-ETDS Grup Yönetimi',
+  'uetds-raporlama': 'U-ETDS Raporlama',
+  'uetds-otomatik-bildirim': 'U-ETDS Otomatik Bildirim'
 } as const;
 
 export const SUBSCRIPTION_PLANS = {
@@ -120,6 +141,12 @@ export const SUBSCRIPTION_PLANS = {
     name: 'Premium',
     price: 300,
     modules: ['transfer', 'accommodation', 'flight', 'tour', 'website']
+  },
+  UETDS_PLAN: {
+    id: 'uetds_plan',
+    name: 'U-ETDS Planı',
+    price: 150,
+    modules: ['transfer', 'uetds']
   }
 } as const;
 

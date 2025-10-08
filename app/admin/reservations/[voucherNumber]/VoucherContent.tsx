@@ -370,6 +370,33 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                 </div>
             </div>
 
+            {/* U-ETDS Butonu (Sadece Şoför Voucher'ında) */}
+            {isDriverVoucher && (
+                <div className="mb-6 print:hidden">
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                                <span className="text-2xl mr-3">🚌</span>
+                                <div>
+                                    <h3 className="font-semibold text-gray-900">U-ETDS Bildirimi</h3>
+                                    <p className="text-sm text-gray-600">Transfer bilgilerini U-ETDS sistemine bildirin</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    // U-ETDS oluştur sayfasına yönlendir
+                                    window.open(`/admin/uetds/create?reservation=${reservation.voucherNumber}`, '_blank');
+                                }}
+                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center"
+                            >
+                                <span className="mr-2">🚌</span>
+                                U-ETDS Oluştur
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Main Content */}
             <div className="space-y-6 print:space-y-3">
                 {/* Transfer ve Uçuş Bilgileri Grid */}

@@ -71,8 +71,8 @@ export default function ModuleManagement() {
       return;
     }
 
-    // SUPERUSER veya AGENCY_ADMIN erişebilir
-    if (user && !['SUPERUSER', 'AGENCY_ADMIN'].includes(user.role)) {
+    // Sadece SUPERUSER erişebilir
+    if (user && user.role !== 'SUPERUSER') {
       router.push('/admin');
       return;
     }
@@ -80,7 +80,7 @@ export default function ModuleManagement() {
 
   // Veri çekme
   useEffect(() => {
-    if (user && ['SUPERUSER', 'AGENCY_ADMIN'].includes(user.role) && isModulesEnabled) {
+    if (user && user.role === 'SUPERUSER' && isModulesEnabled) {
       fetchData();
     }
   }, [user, isModulesEnabled]);
@@ -256,6 +256,17 @@ export default function ModuleManagement() {
     );
   }
 
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6" id="modules-page">
       <div className="mb-8">
@@ -294,6 +305,32 @@ export default function ModuleManagement() {
                   </span>
                 </div>
               </div>
+
+              {/* U-ETDS Status (if U-ETDS module is enabled) */}
+              {tenant.modules.some(m => m.moduleId === 'uetds' && m.isEnabled) && (
+                <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <span className="text-2xl mr-3">🚌</span>
+                      <div>
+                        <h4 className="font-semibold text-green-900">U-ETDS Entegrasyonu</h4>
+                        <p className="text-sm text-green-700">U-ETDS modülü aktif - Sefer bildirimleri yapılabilir</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                        U-ETDS Aktif
+                      </span>
+                      <button
+                        onClick={() => window.open(`/admin/uetds`, '_blank')}
+                        className="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
+                      >
+                        U-ETDS Yönet
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Domain Management */}
               <div className="mb-6 p-4 bg-gray-50 rounded-lg">
@@ -336,25 +373,40 @@ export default function ModuleManagement() {
                     'STANDARD': ['transfer'],
                     'professional': ['transfer', 'accommodation'],
                     'enterprise': ['transfer', 'accommodation', 'flight'],
-                    'premium': ['transfer', 'accommodation', 'flight', 'tour', 'website']
+                    'premium': ['transfer', 'accommodation', 'flight', 'tour', 'website'],
+                    'uetds_plan': ['transfer', 'uetds']
                   };
                   
                   const isEnabledByPlan = planModules[tenant.subscriptionPlan]?.includes(module.id) || false;
                   const isEnabled = isEnabledInDB || isEnabledByPlan;
                   
                   return (
-                    <div key={module.id} className="border border-gray-200 rounded-lg p-4">
+                    <div key={module.id} className={`border rounded-lg p-4 ${
+                      module.id === 'uetds' 
+                        ? 'border-green-200 bg-green-50' 
+                        : 'border-gray-200'
+                    }`}>
                       <div className="flex items-center justify-between mb-3">
                         <div>
-                          <h4 className="font-medium text-gray-900">
-                            {moduleInfo?.name || module.name}
-                          </h4>
+                          <div className="flex items-center">
+                            {module.id === 'uetds' && (
+                              <span className="text-xl mr-2">🚌</span>
+                            )}
+                            <h4 className="font-medium text-gray-900">
+                              {moduleInfo?.name || module.name}
+                            </h4>
+                          </div>
                           <p className="text-sm text-gray-500">
                             {moduleInfo?.description || module.description}
                           </p>
                           {isEnabledByPlan && (
                             <span className="inline-block px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full mt-1">
                               Plan Dahili
+                            </span>
+                          )}
+                          {module.id === 'uetds' && isEnabled && (
+                            <span className="inline-block px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full mt-1 ml-2">
+                              U-ETDS Aktif
                             </span>
                           )}
                         </div>
@@ -402,6 +454,19 @@ export default function ModuleManagement() {
                               </div>
                             ))}
                           </div>
+                          
+                          {/* U-ETDS için özel buton */}
+                          {module.id === 'uetds' && (
+                            <div className="mt-3 pt-3 border-t border-green-200">
+                              <button
+                                onClick={() => window.open(`/admin/uetds`, '_blank')}
+                                className="w-full px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium flex items-center justify-center"
+                              >
+                                <span className="mr-2">🚌</span>
+                                U-ETDS Yönet
+                              </button>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>

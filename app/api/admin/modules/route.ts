@@ -29,20 +29,15 @@ export async function GET(request: NextRequest) {
     const userRole = decoded.role;
     const userId = decoded.userId;
 
-    // SUPERUSER tüm tenant'ları görebilir, AGENCY_ADMIN sadece kendi tenant'ını
-    let tenants;
-    if (userRole === 'SUPERUSER') {
-      tenants = await TenantService.getAllTenants();
-    } else if (userRole === 'AGENCY_ADMIN') {
-      // AGENCY_ADMIN sadece kendi tenant'ını görebilir
-      const userTenants = await TenantService.getTenantsByUserId(userId);
-      tenants = userTenants;
-    } else {
+    // Sadece SUPERUSER erişebilir
+    if (userRole !== 'SUPERUSER') {
       return NextResponse.json(
-        { success: false, error: 'Yetkisiz erişim' },
+        { success: false, error: 'Yetkisiz erişim - Sadece SUPERUSER modül yönetimi yapabilir' },
         { status: 403 }
       );
     }
+
+    const tenants = await TenantService.getAllTenants();
     
     // Use MODULES constant instead of database
     const modules = Object.values(MODULES);
@@ -97,20 +92,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // AGENCY_ADMIN sadece kendi tenant'ının modüllerini değiştirebilir
-    if (userRole === 'AGENCY_ADMIN') {
-      const userTenants = await TenantService.getTenantsByUserId(userId);
-      const hasAccess = userTenants.some(tenant => tenant.id === tenantId);
-      
-      if (!hasAccess) {
-        return NextResponse.json(
-          { success: false, error: 'Bu tenant\'a erişim yetkiniz yok' },
-          { status: 403 }
-        );
-      }
-    } else if (userRole !== 'SUPERUSER') {
+    // Sadece SUPERUSER modül değiştirebilir
+    if (userRole !== 'SUPERUSER') {
       return NextResponse.json(
-        { success: false, error: 'Yetkisiz erişim' },
+        { success: false, error: 'Yetkisiz erişim - Sadece SUPERUSER modül yönetimi yapabilir' },
         { status: 403 }
       );
     }

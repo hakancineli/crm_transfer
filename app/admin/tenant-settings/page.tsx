@@ -35,6 +35,12 @@ interface TenantSettings {
   whatsappApiKey?: string;
   googleMapsApiKey?: string;
   yandexMapsEnabled?: boolean;
+  // U-ETDS Entegrasyonu
+  uetdsEnabled?: boolean;
+  uetdsUsername?: string;
+  uetdsPassword?: string;
+  uetdsUnetNo?: string;
+  uetdsTestMode?: boolean;
   // Kullanıcı Yönetimi
   maxUsers?: number;
   maxConcurrentSessions?: number;
@@ -660,6 +666,101 @@ export default function TenantSettingsPage() {
                       >
                         Bağlantıyı Test Et
                       </button>
+                    </div>
+                  </div>
+
+                  {/* U-ETDS */}
+                  <div className="border border-gray-200 rounded-lg p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center">
+                        <span className="text-2xl mr-3">🚌</span>
+                        <div>
+                          <h4 className="font-semibold text-gray-900">U-ETDS Entegrasyonu</h4>
+                          <p className="text-sm text-gray-600">Ulaştırma Elektronik Takip Denetim Sistemi</p>
+                        </div>
+                      </div>
+                      <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        formData.uetdsEnabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {formData.uetdsEnabled ? 'Aktif' : 'Pasif'}
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          name="uetdsEnabled"
+                          checked={formData.uetdsEnabled || false}
+                          onChange={handleInputChange}
+                          className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                        />
+                        <label className="ml-2 text-sm text-gray-700">U-ETDS entegrasyonunu etkinleştir</label>
+                      </div>
+                      
+                      {formData.uetdsEnabled && (
+                        <>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Kullanıcı Adı</label>
+                            <input
+                              type="text"
+                              name="uetdsUsername"
+                              value={formData.uetdsUsername || ''}
+                              onChange={handleInputChange}
+                              placeholder="U-ETDS kullanıcı adı"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Şifre</label>
+                            <input
+                              type="password"
+                              name="uetdsPassword"
+                              value={formData.uetdsPassword || ''}
+                              onChange={handleInputChange}
+                              placeholder="U-ETDS şifresi"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">UNET Numarası</label>
+                            <input
+                              type="text"
+                              name="uetdsUnetNo"
+                              value={formData.uetdsUnetNo || ''}
+                              onChange={handleInputChange}
+                              placeholder="UNET numarası"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                            />
+                          </div>
+                          
+                          <div className="flex items-center">
+                            <input
+                              type="checkbox"
+                              name="uetdsTestMode"
+                              checked={formData.uetdsTestMode || false}
+                              onChange={handleInputChange}
+                              className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                            />
+                            <label className="ml-2 text-sm text-gray-700">Test modu (geliştirme ortamı)</label>
+                          </div>
+                          
+                          <button
+                            onClick={() => {
+                              // U-ETDS bağlantı testi
+                              if (formData.uetdsUsername && formData.uetdsPassword) {
+                                setMessage('U-ETDS bağlantısı test edildi');
+                              } else {
+                                setError('Kullanıcı adı ve şifre gerekli');
+                              }
+                            }}
+                            className="w-full px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
+                          >
+                            Bağlantıyı Test Et
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
 

@@ -247,6 +247,14 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         description: 'Acente bilgileri ve sistem ayarları',
         module: 'transfer',
         order: role === 'SUPERUSER' ? 15 : (role === 'AGENCY_ADMIN' ? 11 : 999)
+      },
+      {
+        name: 'U-ETDS',
+        href: '/admin/uetds',
+        icon: '🚌',
+        description: 'U-ETDS sefer yönetimi',
+        module: 'transfer',
+        order: role === 'SUPERUSER' ? 16 : (role === 'AGENCY_ADMIN' ? 12 : 999)
       }
     ];
 
@@ -375,6 +383,8 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
             } else if (item.name === 'Ayarlar') {
               shouldShow = false; // Only SUPERUSER can see this
             } else if (item.name === 'Acente Ayarları') {
+              shouldShow = user?.role === 'AGENCY_ADMIN' || user?.role === 'SUPERUSER';
+            } else if (item.name === 'U-ETDS') {
               shouldShow = user?.role === 'AGENCY_ADMIN' || user?.role === 'SUPERUSER';
             } else if (item.name === 'Modül Yönetimi') {
               shouldShow = user?.role === 'SUPERUSER';
