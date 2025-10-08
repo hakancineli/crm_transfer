@@ -2,7 +2,6 @@
 const nextConfig = {
   // Build optimizations for Vercel
   experimental: {
-    optimizeCss: true,
     optimizePackageImports: ['lucide-react']
   },
   
