@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useModule } from '@/app/hooks/useModule';
 import { PERMISSIONS, PERMISSION_LABELS, ROLE_PERMISSIONS } from '@/app/lib/permissions';
 
 interface User {
@@ -23,15 +25,29 @@ interface UserPermission {
 
 export default function PermissionsPage() {
   const { user, loading: authLoading } = useAuth();
+  const { isEnabled: isPermissionsEnabled, isLoading: moduleLoading } = useModule('transfer');
+  const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [userPermissions, setUserPermissions] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     // Wait for auth to load
-    if (authLoading) {
+    if (authLoading || moduleLoading) {
+      return;
+    }
+    
+    // Check module access
+    if (!isPermissionsEnabled) {
+      router.push('/admin');
       return;
     }
     
@@ -48,7 +64,7 @@ export default function PermissionsPage() {
     }
 
     fetchUsers();
-  }, [user, authLoading]);
+  }, [user, authLoading, moduleLoading, isPermissionsEnabled, router]);
 
   const fetchUsers = async () => {
     try {
@@ -183,6 +199,33 @@ export default function PermissionsPage() {
     return descriptions[permission] || 'Bu izin için açıklama bulunmuyor';
   };
 
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (moduleLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isPermissionsEnabled) {
+    return null;
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
@@ -213,7 +256,7 @@ export default function PermissionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-8" id="permissions-page">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">

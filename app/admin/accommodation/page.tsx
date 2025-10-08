@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useModule } from '@/app/hooks/useModule';
 import { useEmoji } from '@/app/contexts/EmojiContext';
 import { TenantService } from '@/app/lib/tenant';
 import { BookingApiService, Hotel } from '@/app/lib/bookingApi';
@@ -14,6 +16,8 @@ import HotelBookingConfirmation from '@/app/components/HotelBookingConfirmation'
 
 export default function AccommodationPage() {
   const { user } = useAuth();
+  const { isEnabled: isAccommodationEnabled, isLoading: moduleLoading } = useModule('accommodation');
+  const router = useRouter();
   const { emojisEnabled } = useEmoji();
   const [currentStep, setCurrentStep] = useState<'form' | 'search' | 'booking'>('form');
   const [requestData, setRequestData] = useState<any>(null);
@@ -23,8 +27,21 @@ export default function AccommodationPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tenant, setTenant] = useState<any>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
+    if (moduleLoading) return;
+    
+    if (!isAccommodationEnabled) {
+      router.push('/admin');
+      return;
+    }
+
     // Tenant bilgilerini al
     const fetchTenant = async () => {
       try {
@@ -40,7 +57,7 @@ export default function AccommodationPage() {
     };
 
     fetchTenant();
-  }, []);
+  }, [moduleLoading, isAccommodationEnabled, router]);
 
   // Debug log
   console.log('Tenant state:', tenant);
@@ -181,11 +198,38 @@ export default function AccommodationPage() {
     }
   };
 
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (moduleLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAccommodationEnabled) {
+    return null;
+  }
+
   // Geçici olarak tüm kontrolleri devre dışı bırak - sadece test için
   console.log('Rendering accommodation page...');
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-8" id="accommodation-page">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">

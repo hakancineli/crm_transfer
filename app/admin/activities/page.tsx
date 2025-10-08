@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useModule } from '@/app/hooks/useModule';
 import { ROLE_PERMISSIONS, PERMISSIONS } from '@/app/lib/permissions';
 
 interface Activity {
@@ -24,11 +26,26 @@ interface Activity {
 
 export default function ActivitiesPage() {
   const { user } = useAuth();
+  const { isEnabled: isActivitiesEnabled, isLoading: moduleLoading } = useModule('transfer');
+  const router = useRouter();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [isClient, setIsClient] = useState(false);
+
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
+    if (moduleLoading) return;
+    
+    if (!isActivitiesEnabled) {
+      router.push('/admin');
+      return;
+    }
+
     const roleAllows = user?.role === 'SUPERUSER' || (user?.role && (ROLE_PERMISSIONS as any)[user.role]?.includes(PERMISSIONS.MANAGE_ACTIVITIES));
     const hasManageActivitiesPermission = user?.permissions?.some(p => p.permission === PERMISSIONS.MANAGE_ACTIVITIES && p.isActive);
     if (user && !(roleAllows || hasManageActivitiesPermission)) {
@@ -36,7 +53,7 @@ export default function ActivitiesPage() {
       return;
     }
     fetchActivities();
-  }, [filter, user]);
+  }, [filter, user, moduleLoading, isActivitiesEnabled, router]);
 
   const fetchActivities = async () => {
     try {
@@ -106,6 +123,33 @@ export default function ActivitiesPage() {
     return activity.action === filter;
   });
 
+  // Chrome eklentisi için DOM hazır olana kadar bekle
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (moduleLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isActivitiesEnabled) {
+    return null;
+  }
+
   // Check permissions before rendering
   const hasManageActivitiesPermission = user?.role === 'SUPERUSER' ||
     (user?.role && (ROLE_PERMISSIONS as any)[user.role]?.includes(PERMISSIONS.MANAGE_ACTIVITIES)) ||
@@ -151,7 +195,7 @@ export default function ActivitiesPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-6" id="activities-page">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center space-x-4">
           <select
