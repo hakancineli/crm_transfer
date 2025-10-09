@@ -82,30 +82,34 @@ export async function POST(request: NextRequest) {
 
       // Şoför ekle (varsa)
       if (body.personel) {
-        await uetdsService.personelEkle({
-          seferReferansNo: result.seferReferansNo,
-          turKodu: body.personel.turKodu,
-          uyrukUlke: body.personel.uyrukUlke,
-          tcKimlikPasaportNo: body.personel.tcKimlikPasaportNo,
-          cinsiyet: body.personel.cinsiyet,
-          adi: body.personel.adi,
-          soyadi: body.personel.soyadi,
-          telefon: body.personel.telefon,
-          adres: body.personel.adres
-        });
+        await uetdsService.personelEkle(
+          result.seferReferansNo as string,
+          {
+            turKodu: body.personel.turKodu,
+            uyrukUlke: body.personel.uyrukUlke,
+            tcKimlikPasaportNo: body.personel.tcKimlikPasaportNo,
+            cinsiyet: body.personel.cinsiyet,
+            adi: body.personel.adi,
+            soyadi: body.personel.soyadi,
+            telefon: body.personel.telefon,
+            adres: body.personel.adres
+          }
+        );
       }
 
       // Yolcuları ekle (varsa)
       if (body.yolcular && Array.isArray(body.yolcular)) {
         for (const yolcu of body.yolcular) {
-          await uetdsService.yolcuEkle({
-            seferReferansNo: result.seferReferansNo,
-            uyrukUlke: yolcu.uyrukUlke,
-            cinsiyet: yolcu.cinsiyet,
-            tcKimlikPasaportNo: yolcu.tcKimlikPasaportNo,
-            adi: yolcu.adi,
-            soyadi: yolcu.soyadi
-          });
+          await uetdsService.yolcuEkle(
+            result.seferReferansNo as string,
+            {
+              uyrukUlke: yolcu.uyrukUlke,
+              cinsiyet: yolcu.cinsiyet,
+              tcKimlikPasaportNo: yolcu.tcKimlikPasaportNo,
+              adi: yolcu.adi,
+              soyadi: yolcu.soyadi
+            }
+          );
         }
       }
 
