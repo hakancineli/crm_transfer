@@ -9,6 +9,7 @@ function NewInvoiceInner() {
   const [draft, setDraft] = useState<any>(null);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string>('');
+  const [tenantCurrency, setTenantCurrency] = useState<string>('');
 
   useEffect(() => {
     const load = async () => {
@@ -37,6 +38,32 @@ function NewInvoiceInner() {
     };
     load();
   }, [reservationId]);
+
+  // Tenant varsayılan para birimini yükle ve taslağa uygula
+  useEffect(() => {
+    const loadTenant = async () => {
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        const res = await fetch('/api/tenant/settings', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const curr = data?.defaultCurrency || data?.tenant?.defaultCurrency;
+          if (curr) setTenantCurrency(curr);
+          // Taslak varsa ve currency seçilmemişse tenant currency uygula
+          setDraft((d: any) => {
+            if (!d) return d;
+            if (!d.currency || d.currency === 'TRY') {
+              return { ...d, currency: curr || d.currency };
+            }
+            return d;
+          });
+        }
+      } catch {}
+    };
+    loadTenant();
+  }, []);
 
   const addItem = () => {
     setDraft((d: any) => ({
