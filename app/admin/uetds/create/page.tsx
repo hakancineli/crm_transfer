@@ -38,7 +38,7 @@ export default function UetdsCreatePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user } = useAuth();
-  const { hasAccess, loading: moduleLoading } = useModule('transfer');
+  const { isEnabled, isLoading: moduleLoading } = useModule('transfer');
   
   const [reservation, setReservation] = useState<Reservation | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,8 +50,8 @@ export default function UetdsCreatePage() {
 
   useEffect(() => {
     if (!user || moduleLoading) return;
-    
-    if (!hasAccess) {
+
+    if (!isEnabled) {
       router.push('/admin');
       return;
     }
@@ -59,7 +59,7 @@ export default function UetdsCreatePage() {
     if (voucherNumber) {
       fetchReservation();
     }
-  }, [user, moduleLoading, hasAccess, voucherNumber, router]);
+  }, [user, moduleLoading, isEnabled, voucherNumber, router]);
 
   const fetchReservation = async () => {
     try {
