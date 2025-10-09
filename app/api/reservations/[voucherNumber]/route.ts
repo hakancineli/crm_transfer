@@ -306,17 +306,19 @@ export async function PATCH(request: NextRequest, { params }: { params: { vouche
             });
 
             // Şoför ekle
-            await uetdsService.personelEkle({
-              seferReferansNo: seferResult.seferReferansNo as string,
-              turKodu: 0, // Şoför
-              uyrukUlke: 'TR',
-              tcKimlikPasaportNo: driverInfo.tcNo || '12345678901',
-              cinsiyet: driverInfo.gender || 'E',
-              adi: (driverInfo.name || '').split(' ')[0] || 'Şoför',
-              soyadi: (driverInfo.name || '').split(' ').slice(1).join(' ') || 'Adı',
-              telefon: driverInfo.phone || driverInfo.phoneNumber || '',
-              adres: driverInfo.address || ''
-            });
+            await uetdsService.personelEkle(
+              seferResult.seferReferansNo as string,
+              {
+                turKodu: 0, // Şoför
+                uyrukUlke: 'TR',
+                tcKimlikPasaportNo: driverInfo.tcNo || '12345678901',
+                cinsiyet: driverInfo.gender || 'E',
+                adi: (driverInfo.name || '').split(' ')[0] || 'Şoför',
+                soyadi: (driverInfo.name || '').split(' ').slice(1).join(' ') || 'Adı',
+                telefon: driverInfo.phone || driverInfo.phoneNumber || '',
+                adres: driverInfo.address || ''
+              }
+            );
 
             // Yolcuları ekle
             const passengerNames = Array.isArray(updatedReservation.passengerNames) 
@@ -325,14 +327,16 @@ export async function PATCH(request: NextRequest, { params }: { params: { vouche
 
             for (const passengerName of passengerNames) {
               if (passengerName && passengerName.trim()) {
-                await uetdsService.yolcuEkle({
-                  seferReferansNo: seferResult.seferReferansNo as string,
-                  uyrukUlke: 'TR',
-                  cinsiyet: 'E', // Varsayılan
-                  tcKimlikPasaportNo: '12345678901', // Varsayılan - gerçek uygulamada yolcu bilgileri gerekli
-                  adi: passengerName.split(' ')[0] || 'Yolcu',
-                  soyadi: passengerName.split(' ').slice(1).join(' ') || 'Adı'
-                });
+                await uetdsService.yolcuEkle(
+                  seferResult.seferReferansNo as string,
+                  {
+                    uyrukUlke: 'TR',
+                    cinsiyet: 'E', // Varsayılan
+                    tcKimlikPasaportNo: '12345678901', // Varsayılan - gerçek uygulamada yolcu bilgileri gerekli
+                    adi: passengerName.split(' ')[0] || 'Yolcu',
+                    soyadi: passengerName.split(' ').slice(1).join(' ') || 'Adı'
+                  }
+                );
               }
             }
           }
