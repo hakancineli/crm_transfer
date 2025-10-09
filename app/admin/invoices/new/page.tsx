@@ -72,6 +72,18 @@ function NewInvoiceInner() {
             <input className="border p-2 rounded" placeholder="Vergi No" value={draft.customerTaxId || ''} onChange={e => setDraft({ ...draft, customerTaxId: e.target.value })} />
             <input className="border p-2 rounded" placeholder="E-posta" value={draft.customerEmail || ''} onChange={e => setDraft({ ...draft, customerEmail: e.target.value })} />
             <input className="border p-2 rounded" placeholder="Adres" value={draft.customerAddress || ''} onChange={e => setDraft({ ...draft, customerAddress: e.target.value })} />
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Para Birimi</label>
+              <select
+                className="border p-2 rounded w-full"
+                value={draft.currency || 'TRY'}
+                onChange={e => setDraft({ ...draft, currency: e.target.value })}
+              >
+                <option value="TRY">TRY</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+              </select>
+            </div>
           </div>
 
           <div>
