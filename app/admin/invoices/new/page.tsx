@@ -12,10 +12,28 @@ function NewInvoiceInner() {
 
   useEffect(() => {
     const load = async () => {
-      if (!reservationId) return;
-      const res = await fetch(`/api/invoices/prefill/${reservationId}`);
-      const data = await res.json();
-      if (data.success) setDraft({ ...data.draft, tenantId: '', reservationId });
+      if (!reservationId) {
+        // Manuel fatura girişi için boş taslak hazırla
+        setDraft({
+          tenantId: '',
+          customerName: '',
+          customerTaxId: '',
+          customerEmail: '',
+          customerAddress: '',
+          currency: 'TRY',
+          vatRate: 20,
+          items: []
+        });
+        return;
+      }
+      try {
+        const res = await fetch(`/api/invoices/prefill/${reservationId}`);
+        const data = await res.json();
+        if (data.success) setDraft({ ...data.draft, tenantId: '', reservationId });
+        else setDraft({ tenantId: '', currency: 'TRY', vatRate: 20, items: [] });
+      } catch {
+        setDraft({ tenantId: '', currency: 'TRY', vatRate: 20, items: [] });
+      }
     };
     load();
   }, [reservationId]);
