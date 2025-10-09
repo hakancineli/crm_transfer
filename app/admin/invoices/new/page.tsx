@@ -30,7 +30,7 @@ function NewInvoiceInner() {
       try {
         const res = await fetch(`/api/invoices/prefill/${reservationId}`);
         const data = await res.json();
-        if (data.success) setDraft({ ...data.draft, tenantId: '', reservationId });
+        if (data.success) setDraft({ ...data.draft, tenantId: '', reservationId, __meta: data.meta });
         else setDraft({ tenantId: '', currency: 'TRY', vatRate: 20, items: [] });
       } catch {
         setDraft({ tenantId: '', currency: 'TRY', vatRate: 20, items: [] });
@@ -137,7 +137,10 @@ function NewInvoiceInner() {
           {/* Özet */}
           <div className="border-t pt-4">
             <h3 className="font-medium mb-2">Özet</h3>
-            <div className="text-sm text-gray-700">
+            <div className="text-sm text-gray-700 space-y-1">
+              <div>Voucher: <span className="font-semibold">{draft.__meta?.voucherNumber || '-'}</span></div>
+              <div>Tarih: <span className="font-semibold">{draft.__meta ? `${draft.__meta.date} ${draft.__meta.time}` : '-'}</span></div>
+              <div>Rota: <span className="font-semibold">{draft.__meta?.route || '-'}</span></div>
               <div>Para Birimi: <span className="font-semibold">{draft.currency || 'TRY'}</span></div>
             </div>
           </div>
