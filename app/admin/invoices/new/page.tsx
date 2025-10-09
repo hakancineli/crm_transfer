@@ -10,6 +10,7 @@ function NewInvoiceInner() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string>('');
   const [tenantCurrency, setTenantCurrency] = useState<string>('');
+  const [rates, setRates] = useState<{ USD: number; EUR: number; TRY: number }>({ USD: 1, EUR: 0.85, TRY: 31.5 });
 
   useEffect(() => {
     const load = async () => {
@@ -38,6 +39,30 @@ function NewInvoiceInner() {
     };
     load();
   }, [reservationId]);
+
+  // Kur bilgilerini al (USD bazlı)
+  useEffect(() => {
+    const loadRates = async () => {
+      try {
+        const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        const data = await res.json();
+        if (data?.rates) {
+          setRates({ USD: 1, EUR: data.rates.EUR || 0.9, TRY: data.rates.TRY || 30 });
+        }
+      } catch {}
+    };
+    loadRates();
+  }, []);
+
+  const convert = (amount: number, from: string, to: string) => {
+    const f = from as keyof typeof rates;
+    const t = to as keyof typeof rates;
+    const fromRate = rates[f] ?? 1;
+    const toRate = rates[t] ?? 1;
+    // USD tabanlı dönüşüm: amount_in_usd = amount / fromRate; target = amount_in_usd * toRate
+    const usd = amount / fromRate;
+    return usd * toRate;
+  };
 
   // Tenant varsayılan para birimini yükle ve taslağa uygula
   useEffect(() => {
@@ -102,7 +127,16 @@ function NewInvoiceInner() {
               <select
                 className="border p-2 rounded w-full"
                 value={draft.currency || 'TRY'}
-                onChange={e => setDraft({ ...draft, currency: e.target.value })}
+                onChange={e => {
+                  const newCurr = e.target.value;
+                  // mevcut kalemleri seçilen para birimine çevir
+                  const items = (draft.items || []).map((it: any) => {
+                    const from = draft.currency || 'TRY';
+                    const converted = convert(it.unitPrice, from, newCurr);
+                    return { ...it, unitPrice: Number(converted.toFixed(2)) };
+                  });
+                  setDraft({ ...draft, currency: newCurr, items });
+                }}
               >
                 <option value="TRY">TRY</option>
                 <option value="USD">USD</option>
