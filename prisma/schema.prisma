@@ -49,6 +49,14 @@ model Tenant {
   whatsappApiKey       String?
   googleMapsApiKey     String?
   yandexMapsEnabled    Boolean          @default(false)
+  // E-Fatura / E-Arşiv Ayarları
+  eInvoiceEnabled      Boolean          @default(false)
+  eIntegrator          String?          // Örn: Parasut, Foriba, Kolaybi vs. (adapter ile)
+  eInvoiceSenderVKN    String?          // Gönderici VKN/TCKN
+  eInvoiceAlias        String?          // Gönderici posta kutusu/alias
+  eInvoiceSerie        String?          // Fatura seri
+  eInvoiceNextNumber   Int?             // Sıradaki numara (uygulanırsa)
+  eInvoiceDefaultVAT   Float?           @default(20)
   
   // U-ETDS Entegrasyonu
   uetdsEnabled         Boolean          @default(false)
@@ -88,6 +96,7 @@ model Tenant {
   websites             TenantWebsite[]
   tourBookings         TourBooking[]
   vehicles             Vehicle[]
+  invoices             Invoice[]
 
   @@map("tenants")
 }
@@ -234,6 +243,7 @@ model Reservation {
   user                    User?          @relation(fields: [userId], references: [id])
   hotelBookings           HotelBooking[]
   uetdsSeferler           UetdsSefer[]
+  invoices                Invoice[]
 }
 
 model HotelRequest {
@@ -473,6 +483,50 @@ enum UserRole {
   ACCOUNTANT
   AGENCY_ADMIN
   AGENCY_USER
+}
+
+// U-ETDS Modelleri
+// Fatura Modelleri
+model Invoice {
+  id              String        @id @default(uuid())
+  tenantId        String
+  reservationId   String?
+  number          String        @unique
+  type            String        @default("EARSIV") // EARSIV | EINVOICE
+  issueDate       DateTime      @default(now())
+  currency        String        @default("TRY")
+  customerName    String
+  customerTaxId   String?
+  customerEmail   String?
+  customerAddress String?
+  subtotal        Float         @default(0)
+  vatRate         Float         @default(20)
+  vatAmount       Float         @default(0)
+  total           Float         @default(0)
+  notes           String?
+  status          String        @default("DRAFT") // DRAFT | SENT | CANCELLED
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  tenant          Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  reservation     Reservation?  @relation(fields: [reservationId], references: [id])
+  items           InvoiceItem[]
+
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id          String   @id @default(uuid())
+  invoiceId   String
+  description String
+  quantity    Float    @default(1)
+  unitPrice   Float    @default(0)
+  vatRate     Float    @default(20)
+  total       Float    @default(0)
+
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@map("invoice_items")
 }
 
 // U-ETDS Modelleri

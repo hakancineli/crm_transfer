@@ -368,6 +368,13 @@ export default function AccountingPage() {
           >
             🔄 Yenile
           </button>
+          <button
+            onClick={() => window.open('/admin/invoices/new', '_blank')}
+            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+            title="Yeni Fatura"
+          >
+            🧾 Fatura Kes
+          </button>
         </div>
       </div>
 
