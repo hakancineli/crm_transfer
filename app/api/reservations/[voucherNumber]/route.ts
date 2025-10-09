@@ -271,13 +271,14 @@ export async function PATCH(request: NextRequest, { params }: { params: { vouche
       try {
         const uetdsService = await createUetdsServiceForTenant(updatedReservation.tenantId as string);
         if (uetdsService) {
+          const driverInfo: any = updatedReservation.driver || {};
           // Sefer ekle
           const seferResult = await uetdsService.seferEkle({
-            aracPlaka: updatedReservation.driver.vehiclePlate || '34ABC123',
+            aracPlaka: driverInfo.vehiclePlate || driverInfo.plate || '34ABC123',
             hareketTarihi: new Date(updatedReservation.date),
             hareketSaati: updatedReservation.time,
             seferAciklama: `${updatedReservation.from} - ${updatedReservation.to} Transfer`,
-            aracTelefonu: updatedReservation.driver.phone || '',
+            aracTelefonu: driverInfo.phone || driverInfo.phoneNumber || '',
             firmaSeferNo: updatedReservation.voucherNumber,
             seferBitisTarihi: new Date(updatedReservation.date),
             seferBitisSaati: updatedReservation.time
@@ -290,11 +291,11 @@ export async function PATCH(request: NextRequest, { params }: { params: { vouche
                 tenantId: updatedReservation.tenantId,
                 reservationId: updatedReservation.id,
                 uetdsSeferReferansNo: seferResult.data.uetdsSeferReferansNo,
-                aracPlaka: updatedReservation.driver.vehiclePlate || '34ABC123',
+                aracPlaka: driverInfo.vehiclePlate || driverInfo.plate || '34ABC123',
                 hareketTarihi: new Date(updatedReservation.date),
                 hareketSaati: updatedReservation.time,
                 seferAciklama: `${updatedReservation.from} - ${updatedReservation.to} Transfer`,
-                aracTelefonu: updatedReservation.driver.phone || '',
+                aracTelefonu: driverInfo.phone || driverInfo.phoneNumber || '',
                 firmaSeferNo: updatedReservation.voucherNumber,
                 seferBitisTarihi: new Date(updatedReservation.date),
                 seferBitisSaati: updatedReservation.time,
@@ -309,12 +310,12 @@ export async function PATCH(request: NextRequest, { params }: { params: { vouche
               seferReferansNo: seferResult.data.uetdsSeferReferansNo,
               turKodu: 0, // Şoför
               uyrukUlke: 'TR',
-              tcKimlikPasaportNo: updatedReservation.driver.tcNo || '12345678901',
-              cinsiyet: updatedReservation.driver.gender || 'E',
-              adi: updatedReservation.driver.name.split(' ')[0] || 'Şoför',
-              soyadi: updatedReservation.driver.name.split(' ').slice(1).join(' ') || 'Adı',
-              telefon: updatedReservation.driver.phone || '',
-              adres: updatedReservation.driver.address || ''
+              tcKimlikPasaportNo: driverInfo.tcNo || '12345678901',
+              cinsiyet: driverInfo.gender || 'E',
+              adi: (driverInfo.name || '').split(' ')[0] || 'Şoför',
+              soyadi: (driverInfo.name || '').split(' ').slice(1).join(' ') || 'Adı',
+              telefon: driverInfo.phone || driverInfo.phoneNumber || '',
+              adres: driverInfo.address || ''
             });
 
             // Yolcuları ekle
