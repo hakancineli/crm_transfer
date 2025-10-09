@@ -51,13 +51,11 @@ function NewInvoiceInner() {
           const data = await res.json();
           const curr = data?.defaultCurrency || data?.tenant?.defaultCurrency;
           if (curr) setTenantCurrency(curr);
-          // Taslak varsa ve currency seçilmemişse tenant currency uygula
+          // Taslak varsa ve currency HENÜZ belirlenmemişse tenant currency uygula
           setDraft((d: any) => {
             if (!d) return d;
-            if (!d.currency || d.currency === 'TRY') {
-              return { ...d, currency: curr || d.currency };
-            }
-            return d;
+            if (!d.currency) return { ...d, currency: curr || 'TRY' };
+            return d; // rezervasyon taslağı para birimi belirlediyse dokunma
           });
         }
       } catch {}
@@ -132,6 +130,15 @@ function NewInvoiceInner() {
                     onChange={e => { const items = [...draft.items]; items[idx].vatRate = Number(e.target.value); setDraft({ ...draft, items }); }} />
                 </div>
               ))}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">Not: Para birimi, faturanın resmi para birimidir. Rezervasyon dövizi ne olursa olsun burada seçtiğiniz birim faturaya yazılır.</p>
+          </div>
+
+          {/* Özet */}
+          <div className="border-t pt-4">
+            <h3 className="font-medium mb-2">Özet</h3>
+            <div className="text-sm text-gray-700">
+              <div>Para Birimi: <span className="font-semibold">{draft.currency || 'TRY'}</span></div>
             </div>
           </div>
 
