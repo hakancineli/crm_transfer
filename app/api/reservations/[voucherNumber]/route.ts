@@ -284,13 +284,13 @@ export async function PATCH(request: NextRequest, { params }: { params: { vouche
             seferBitisSaati: updatedReservation.time
           });
 
-          if (seferResult.success && seferResult.data?.uetdsSeferReferansNo) {
+          if (seferResult.success && seferResult.seferReferansNo) {
             // U-ETDS sefer kaydı oluştur
             await prisma.uetdsSefer.create({
               data: {
                 tenantId: updatedReservation.tenantId,
                 reservationId: updatedReservation.id,
-                uetdsSeferReferansNo: seferResult.data.uetdsSeferReferansNo,
+                uetdsSeferReferansNo: seferResult.seferReferansNo,
                 aracPlaka: driverInfo.vehiclePlate || driverInfo.plate || '34ABC123',
                 hareketTarihi: new Date(updatedReservation.date),
                 hareketSaati: updatedReservation.time,
@@ -300,14 +300,14 @@ export async function PATCH(request: NextRequest, { params }: { params: { vouche
                 seferBitisTarihi: new Date(updatedReservation.date),
                 seferBitisSaati: updatedReservation.time,
                 bildirimZamani: new Date(),
-                sonucKodu: seferResult.data.sonucKodu,
-                sonucMesaji: seferResult.data.sonucMesaji
+                sonucKodu: 0,
+                sonucMesaji: seferResult.message
               }
             });
 
             // Şoför ekle
             await uetdsService.personelEkle({
-              seferReferansNo: seferResult.data.uetdsSeferReferansNo,
+              seferReferansNo: seferResult.seferReferansNo as string,
               turKodu: 0, // Şoför
               uyrukUlke: 'TR',
               tcKimlikPasaportNo: driverInfo.tcNo || '12345678901',
@@ -326,7 +326,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { vouche
             for (const passengerName of passengerNames) {
               if (passengerName && passengerName.trim()) {
                 await uetdsService.yolcuEkle({
-                  seferReferansNo: seferResult.data.uetdsSeferReferansNo,
+                  seferReferansNo: seferResult.seferReferansNo as string,
                   uyrukUlke: 'TR',
                   cinsiyet: 'E', // Varsayılan
                   tcKimlikPasaportNo: '12345678901', // Varsayılan - gerçek uygulamada yolcu bilgileri gerekli
