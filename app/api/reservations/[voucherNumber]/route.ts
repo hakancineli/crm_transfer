@@ -267,9 +267,9 @@ export async function PATCH(request: NextRequest, { params }: { params: { vouche
     });
 
     // U-ETDS otomatik bildirimi (kendi araç ile transfer)
-    if (updatedReservation.tenant?.uetdsEnabled && updatedReservation.driver) {
+    if (updatedReservation.tenant?.uetdsEnabled && updatedReservation.driver && updatedReservation.tenantId) {
       try {
-        const uetdsService = await createUetdsServiceForTenant(updatedReservation.tenantId);
+        const uetdsService = await createUetdsServiceForTenant(updatedReservation.tenantId as string);
         if (uetdsService) {
           // Sefer ekle
           const seferResult = await uetdsService.seferEkle({
