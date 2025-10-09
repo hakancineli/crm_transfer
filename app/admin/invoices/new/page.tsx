@@ -10,6 +10,10 @@ function NewInvoiceInner() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string>('');
   const [tenantCurrency, setTenantCurrency] = useState<string>('');
+  const [tenantInfo, setTenantInfo] = useState<any>(null);
+  const [issueDate, setIssueDate] = useState<string>('');
+  const [invoiceNumber, setInvoiceNumber] = useState<string>('');
+  const [notes, setNotes] = useState<string>('');
   const [rates, setRates] = useState<{ USD: number; EUR: number; TRY: number }>({ USD: 1, EUR: 0.85, TRY: 31.5 });
 
   useEffect(() => {
@@ -76,6 +80,7 @@ function NewInvoiceInner() {
           const data = await res.json();
           const curr = data?.defaultCurrency || data?.tenant?.defaultCurrency;
           if (curr) setTenantCurrency(curr);
+          setTenantInfo(data?.tenant || data);
           // Taslak varsa ve currency HENÜZ belirlenmemişse tenant currency uygula
           setDraft((d: any) => {
             if (!d) return d;
@@ -86,6 +91,13 @@ function NewInvoiceInner() {
       } catch {}
     };
     loadTenant();
+  }, []);
+
+  // Varsayılan düzenleme tarihi ve fatura numarası
+  useEffect(() => {
+    const now = new Date();
+    setIssueDate(now.toISOString().slice(0, 16)); // yyyy-MM-ddTHH:mm
+    setInvoiceNumber(`INV-${now.getTime()}`);
   }, []);
 
   const addItem = () => {
@@ -117,6 +129,14 @@ function NewInvoiceInner() {
       ) : (
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Fatura No</label>
+              <input className="border p-2 rounded w-full" value={invoiceNumber} onChange={e => setInvoiceNumber(e.target.value)} />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Düzenleme Tarihi</label>
+              <input type="datetime-local" className="border p-2 rounded w-full" value={issueDate} onChange={e => setIssueDate(e.target.value)} />
+            </div>
             <input className="border p-2 rounded" placeholder="Tenant ID" value={draft.tenantId || ''} onChange={e => setDraft({ ...draft, tenantId: e.target.value })} />
             <input className="border p-2 rounded" placeholder="Müşteri Adı" value={draft.customerName || ''} onChange={e => setDraft({ ...draft, customerName: e.target.value })} />
             <input className="border p-2 rounded" placeholder="Vergi No" value={draft.customerTaxId || ''} onChange={e => setDraft({ ...draft, customerTaxId: e.target.value })} />
@@ -176,7 +196,50 @@ function NewInvoiceInner() {
               <div>Tarih: <span className="font-semibold">{draft.__meta ? `${draft.__meta.date} ${draft.__meta.time}` : '-'}</span></div>
               <div>Rota: <span className="font-semibold">{draft.__meta?.route || '-'}</span></div>
               <div>Para Birimi: <span className="font-semibold">{draft.currency || 'TRY'}</span></div>
+              {/* Dinamik toplamlar */}
+              <div className="mt-2 pt-2 border-t">
+                {(() => {
+                  const items = draft.items || [];
+                  const subtotal = items.reduce((s: number, it: any) => s + (Number(it.quantity || 0) * Number(it.unitPrice || 0)), 0);
+                  const vat = items.reduce((s: number, it: any) => s + ((Number(it.quantity || 0) * Number(it.unitPrice || 0)) * (Number(it.vatRate || 0) / 100)), 0);
+                  const total = subtotal + vat;
+                  return (
+                    <div className="space-y-1">
+                      <div>Ara Toplam: <span className="font-semibold">{subtotal.toFixed(2)} {draft.currency}</span></div>
+                      <div>KDV: <span className="font-semibold">{vat.toFixed(2)} {draft.currency}</span></div>
+                      <div>Genel Toplam: <span className="font-semibold">{total.toFixed(2)} {draft.currency}</span></div>
+                    </div>
+                  );
+                })()}
+              </div>
             </div>
+          </div>
+
+          {/* Satıcı / Alıcı Bilgileri */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div className="bg-gray-50 p-4 rounded">
+              <h4 className="font-medium mb-2">Satıcı (Acente)</h4>
+              <div className="text-sm text-gray-700 space-y-1">
+                <div>{tenantInfo?.companyName || 'Acente'}</div>
+                <div>VKN/TCKN: {tenantInfo?.taxNumber || '-'}</div>
+                <div>Adres: {tenantInfo?.address || '-'}</div>
+              </div>
+            </div>
+            <div className="bg-gray-50 p-4 rounded">
+              <h4 className="font-medium mb-2">Alıcı (Müşteri)</h4>
+              <div className="text-sm text-gray-700 space-y-1">
+                <div>{draft.customerName || '-'}</div>
+                <div>Vergi No: {draft.customerTaxId || '-'}</div>
+                <div>E‑posta: {draft.customerEmail || '-'}</div>
+                <div>Adres: {draft.customerAddress || '-'}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Notlar */}
+          <div className="mt-4">
+            <label className="block text-xs text-gray-500 mb-1">Notlar</label>
+            <textarea className="border p-2 rounded w-full" rows={3} value={notes} onChange={e => setNotes(e.target.value)} />
           </div>
 
           <div className="flex justify-end space-x-2">
