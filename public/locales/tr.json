@@ -93,7 +93,8 @@
       "uetds": "U-ETDS",
       "uetdsDesc": "U-ETDS sefer yönetimi",
       "flightStatus": "Uçuş Durumu",
-      "flightStatusDesc": "Uçuş takibi ve durumu"
+      "flightStatusDesc": "Uçuş takibi ve durumu",
+      "users": "Kullanıcılar"
     },
     "accounting": {
       "title": "Muhasebe ve Ödeme Yönetimi",

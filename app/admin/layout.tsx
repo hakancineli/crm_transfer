@@ -45,9 +45,7 @@ export default function AdminLayout({
 
       {/* Main Content */}
       <main className={`${sidebarOpen ? 'lg:ml-64 ml-0' : 'ml-0'} min-h-screen overflow-x-hidden pt-16 transition-all duration-700 ease-out`}>
-        <div className={`${sidebarOpen ? 'lg:px-6 px-4' : 'px-6'} max-w-7xl mx-auto`}>
-          {children}
-        </div>
+        {children}
       </main>
     </div>
     </TenantProvider>
