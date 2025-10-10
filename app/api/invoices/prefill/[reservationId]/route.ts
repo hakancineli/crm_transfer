@@ -15,14 +15,26 @@ export async function GET(_req: NextRequest, { params }: { params: { reservation
     const price = reservation.price ?? 0;
     const subtotal = price / (1 + vatRate / 100);
     const vatAmount = price - subtotal;
-    // Yolcu adı
+    // Müşteri adı: voucher'daki ilk yolcunun virgülden önceki adı-soyadı; virgül yoksa tam ad
     let customerName = reservation.email || 'Müşteri';
     try {
       const names = JSON.parse((reservation as any).passengerNames || '[]');
       if (Array.isArray(names) && names.length > 0) {
-        customerName = String(names[0]).split(' ')[0] || customerName;
+        const raw = String(names[0] ?? '').trim();
+        const beforeComma = raw.includes(',') ? raw.split(',')[0] : raw;
+        customerName = beforeComma || customerName;
       }
     } catch {}
+
+    // Hizmet türünü belirle (sadece: Transfer, Tur, Konaklama)
+    let serviceType = 'Transfer';
+    if (reservation.voucherNumber?.startsWith('TUR-')) {
+      serviceType = 'Tur';
+    } else if (reservation.voucherNumber?.includes('HOTEL') || reservation.voucherNumber?.includes('OTEL')) {
+      serviceType = 'Konaklama';
+    } else {
+      serviceType = 'Transfer';
+    }
 
     const draft = {
       type: 'EARSIV',
@@ -34,10 +46,11 @@ export async function GET(_req: NextRequest, { params }: { params: { reservation
       total: Number(price.toFixed(2)),
       items: [
         {
-          description: `Voucher: ${reservation.voucherNumber} | Tarih: ${reservation.date} ${reservation.time} | Rota: ${reservation.from} → ${reservation.to}`,
+          description: `${serviceType} Hizmeti`,
           quantity: 1,
           unitPrice: Number(subtotal.toFixed(2)),
-          vatRate
+          vatRate,
+          unit: 'ADET'
         }
       ]
     };

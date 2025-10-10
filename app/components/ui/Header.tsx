@@ -33,7 +33,8 @@ export default function Header({ onSidebarToggle, showSidebarToggle = false }: H
 
     const customerNavigation: { name: string; href: string }[] = [];
 
-    const navigation = isCustomerContext ? customerNavigation : adminNavigation;
+    // Giriş yapılmamışsa üst çubukta admin linklerini gösterme
+    const navigation = isCustomerContext ? customerNavigation : (isAuthenticated ? adminNavigation : customerNavigation);
 
     // Logo link'i - müşteri ekranlarında müşteri paneline/landing'e, admin ekranlarında ana sayfaya
     const logoHref = isCustomerContext ? '/' : '/';

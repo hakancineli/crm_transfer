@@ -5,14 +5,14 @@ import { MessageCircle, Calendar, MapPin, Clock, Users, Star, Phone, Mail, Check
 import Image from 'next/image';
 import ReservationForm from '../../components/ReservationForm';
 
-// Şeref Vural Travel verileri
-const serefVuralData = {
-  companyName: "Şeref Vural Travel",
+// Pro Transfer verileri
+const proTransferData = {
+  companyName: "Pro Transfer",
   tagline: "İstanbul Havalimanı Transfer Hizmeti",
   description: "İstanbul Havalimanı'ndan şehir merkezine konforlu ve güvenli transfer hizmeti. Profesyonel şoförlerimiz ve Mercedes Vito araçlarımızla 7/24 hizmetinizdeyiz. Ayrıca İstanbul, Sapanca, Bursa, Abant turları ve kaliteli otel konaklama seçenekleri sunuyoruz.",
   phone: "+90 531 945 89 31",
   whatsapp: "+90 531 945 89 31",
-  email: "info@serefvural.com",
+  email: "info@protransfer.com",
   
   features: [
     { title: "7/24 Hizmet", description: "Her zaman yanınızdayız", icon: "🕐" },
@@ -42,7 +42,7 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const vehicleImages = websiteContent?.vehicleImages || serefVuralData.vehicleImages;
+    const vehicleImages = websiteContent?.vehicleImages || proTransferData.vehicleImages;
     
     const interval = setInterval(() => {
       setCurrentVehicleIndex((prev) => 
@@ -66,16 +66,16 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
             setWebsiteContent(JSON.parse(data.content));
           } else {
             // API'den içerik gelmezse default içerik kullan
-            setWebsiteContent(serefVuralData);
+            setWebsiteContent(proTransferData);
           }
         } else {
           // API hatası durumunda default içerik kullan
-          setWebsiteContent(serefVuralData);
+          setWebsiteContent(proTransferData);
         }
       } catch (error) {
         console.error('Error fetching website content:', error);
         // Hata durumunda default içerik kullan
-        setWebsiteContent(serefVuralData);
+        setWebsiteContent(proTransferData);
       } finally {
         setIsLoading(false);
       }
@@ -86,7 +86,7 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
 
   const handleWhatsApp = (message: string) => {
     const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/${serefVuralData.whatsapp.replace(/\D/g, '')}?text=${encodedMessage}`, '_blank');
+    window.open(`https://wa.me/${proTransferData.whatsapp.replace(/\D/g, '')}?text=${encodedMessage}`, '_blank');
   };
 
   const handleReservation = () => {
@@ -100,7 +100,10 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900">{serefVuralData.companyName}</h1>
+              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center mr-3">
+                <span className="text-white font-bold text-lg">P</span>
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900">{websiteContent?.companyName || proTransferData.companyName}</h1>
             </div>
             <nav className="hidden md:flex space-x-8">
               <a href="#tours" className="text-gray-600 hover:text-green-600">Turlar</a>
@@ -121,11 +124,11 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div>
               <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900 mb-6">
-                {serefVuralData.companyName} - {serefVuralData.tagline}
+                {websiteContent?.companyName || proTransferData.companyName} - {websiteContent?.tagline || proTransferData.tagline}
               </h1>
               
               <p className="text-lg text-gray-600 mb-8">
-                {serefVuralData.description}
+                {websiteContent?.description || proTransferData.description}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
@@ -147,7 +150,7 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                {serefVuralData.features.map((feature, index) => (
+                {(websiteContent?.features || proTransferData.features).map((feature, index) => (
                   <div key={index} className="bg-white p-4 rounded-lg shadow-sm border">
                     <div className="text-green-600 font-semibold mb-1">{feature.title}</div>
                     <div className="text-sm text-gray-600">{feature.description}</div>
@@ -163,7 +166,7 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
                     className="flex transition-transform duration-500 ease-in-out"
                     style={{ transform: `translateX(-${currentVehicleIndex * 100}%)` }}
                   >
-                    {serefVuralData.vehicleImages.map((image, index) => (
+                    {(websiteContent?.vehicleImages || proTransferData.vehicleImages).map((image, index) => (
                       <div key={index} className="w-full flex-shrink-0">
                         <div className="relative h-64 sm:h-80 md:h-96">
                           <Image
@@ -181,7 +184,7 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
                 </div>
 
                 <div className="flex justify-center mt-4 space-x-2">
-                  {serefVuralData.vehicleImages.map((_, index) => (
+                  {(websiteContent?.vehicleImages || proTransferData.vehicleImages).map((_, index) => (
                     <button
                       key={index}
                       onClick={() => setCurrentVehicleIndex(index)}
@@ -653,12 +656,12 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
               <h3 className="text-lg font-semibold mb-2">WhatsApp</h3>
               <p className="text-gray-600 mb-2">Hızlı cevap için WhatsApp'tan yazın</p>
               <a 
-                href={`https://wa.me/${serefVuralData.whatsapp.replace(/\D/g, '')}`}
+                href={`https://wa.me/${(websiteContent?.whatsapp || proTransferData.whatsapp).replace(/\D/g, '')}`}
                 className="text-green-600 font-semibold"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {serefVuralData.whatsapp}
+                {websiteContent?.whatsapp || proTransferData.whatsapp}
               </a>
             </div>
             
@@ -668,8 +671,8 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
               </div>
               <h3 className="text-lg font-semibold mb-2">Telefon</h3>
               <p className="text-gray-600 mb-2">7/24 telefon desteği</p>
-              <a href={`tel:${serefVuralData.phone}`} className="text-green-600 font-semibold">
-                {serefVuralData.phone}
+              <a href={`tel:${websiteContent?.phone || proTransferData.phone}`} className="text-green-600 font-semibold">
+                {websiteContent?.phone || proTransferData.phone}
               </a>
             </div>
             
@@ -679,8 +682,8 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
               </div>
               <h3 className="text-lg font-semibold mb-2">Email</h3>
               <p className="text-gray-600 mb-2">Genel bilgi ve sorularınız için</p>
-              <a href={`mailto:${serefVuralData.email}`} className="text-green-600 font-semibold">
-                {serefVuralData.email}
+              <a href={`mailto:${websiteContent?.email || proTransferData.email}`} className="text-green-600 font-semibold">
+                {websiteContent?.email || proTransferData.email}
               </a>
             </div>
           </div>
@@ -691,14 +694,14 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
       <footer className="bg-gray-900 text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h3 className="text-xl font-bold mb-2">{serefVuralData.companyName}</h3>
+            <h3 className="text-xl font-bold mb-2">{websiteContent?.companyName || proTransferData.companyName}</h3>
             <p className="text-gray-400 mb-4">İstanbul'un en güvenilir transfer, tur ve konaklama hizmeti</p>
             <div className="flex justify-center space-x-6">
-              <a href={`tel:${serefVuralData.phone}`} className="text-gray-400 hover:text-white">
-                {serefVuralData.phone}
+              <a href={`tel:${websiteContent?.phone || proTransferData.phone}`} className="text-gray-400 hover:text-white">
+                {websiteContent?.phone || proTransferData.phone}
               </a>
-              <a href={`mailto:${serefVuralData.email}`} className="text-gray-400 hover:text-white">
-                {serefVuralData.email}
+              <a href={`mailto:${websiteContent?.email || proTransferData.email}`} className="text-gray-400 hover:text-white">
+                {websiteContent?.email || proTransferData.email}
               </a>
             </div>
           </div>

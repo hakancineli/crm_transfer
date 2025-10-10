@@ -62,26 +62,26 @@ export async function POST(request: NextRequest) {
     }
 
     const defaultSettings = {
-      companyName: 'Şeref Vural Turizm',
-      logo: '/seref-vural-images/logo.svg',
-      heroTitle: 'Şeref Vural Turizm',
+      companyName: 'Pro Transfer',
+      logo: '/logo.svg',
+      heroTitle: 'Pro Transfer',
       heroSubtitle: 'İstanbul\'un en güvenilir transfer hizmeti',
-      heroImage: '/seref-vural-images/hero.jpg',
+      heroImage: '/seref-vural-images/mercedes-vito-1.jpg',
       contactInfo: {
         phone: '+90 212 555 0123',
         whatsapp: '+90 212 555 0123',
-        email: 'info@serefvural.com'
+        email: 'info@protransfer.com'
       },
       socialMedia: {
-        facebook: 'https://facebook.com/serefvural',
-        instagram: 'https://instagram.com/serefvural',
-        twitter: 'https://twitter.com/serefvural'
+        facebook: 'https://facebook.com/protransfer',
+        instagram: 'https://instagram.com/protransfer',
+        twitter: 'https://twitter.com/protransfer'
       },
       seoSettings: {
         metaTitle: {
-          tr: 'Şeref Vural Turizm - İstanbul Transfer',
-          en: 'Seref Vural Tourism - Istanbul Transfer',
-          ar: 'شرف فورال للسياحة - نقل اسطنبول'
+          tr: 'Pro Transfer - İstanbul Transfer',
+          en: 'Pro Transfer - Istanbul Transfer',
+          ar: 'برو ترانسفير - نقل اسطنبول'
         },
         metaDescription: {
           tr: 'İstanbul Havalimanı ve Sabiha Gökçen transfer hizmeti. VIP araçlar, profesyonel şoförler.',

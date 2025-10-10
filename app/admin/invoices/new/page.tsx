@@ -167,23 +167,38 @@ function NewInvoiceInner() {
 
           <div>
             <div className="flex justify-between items-center mb-2">
-              <h2 className="font-medium">Kalemler</h2>
-              <button onClick={addItem} className="px-3 py-1 bg-gray-800 text-white rounded">Kalem Ekle</button>
+              <h2 className="font-medium">HİZMET</h2>
+              <button onClick={addItem} className="px-3 py-1 bg-gray-800 text-white rounded">Hizmet Ekle</button>
+            </div>
+            <div className="grid grid-cols-8 gap-2 text-xs font-semibold text-gray-600 mb-1">
+              <div className="col-span-3">HİZMET AÇIKLAMA</div>
+              <div>MİKTAR</div>
+              <div>BİRİM</div>
+              <div>BR. FİYAT</div>
+              <div>VERGİ (%)</div>
+              <div>TOPLAM</div>
             </div>
             <div className="space-y-2">
-              {(draft.items || []).map((it: any, idx: number) => (
-                <div key={idx} className="grid grid-cols-6 gap-2">
-                  <input className="border p-2 rounded col-span-3" placeholder="Açıklama" value={it.description} onChange={e => {
-                    const items = [...draft.items]; items[idx].description = e.target.value; setDraft({ ...draft, items });
-                  }} />
-                  <input type="number" className="border p-2 rounded" placeholder="Adet" value={it.quantity}
-                    onChange={e => { const items = [...draft.items]; items[idx].quantity = Number(e.target.value); setDraft({ ...draft, items }); }} />
-                  <input type="number" className="border p-2 rounded" placeholder="Birim Fiyat" value={it.unitPrice}
-                    onChange={e => { const items = [...draft.items]; items[idx].unitPrice = Number(e.target.value); setDraft({ ...draft, items }); }} />
-                  <input type="number" className="border p-2 rounded" placeholder="KDV %" value={it.vatRate}
-                    onChange={e => { const items = [...draft.items]; items[idx].vatRate = Number(e.target.value); setDraft({ ...draft, items }); }} />
-                </div>
-              ))}
+              {(draft.items || []).map((it: any, idx: number) => {
+                const lineSubtotal = Number(it.quantity || 0) * Number(it.unitPrice || 0);
+                const lineVat = lineSubtotal * (Number(it.vatRate || 0) / 100);
+                const lineTotal = lineSubtotal + lineVat;
+                return (
+                  <div key={idx} className="grid grid-cols-8 gap-2 items-center">
+                    <input className="border p-2 rounded col-span-3" placeholder="Hizmet açıklaması" value={it.description}
+                      onChange={e => { const items = [...draft.items]; items[idx].description = e.target.value; setDraft({ ...draft, items }); }} />
+                    <input type="number" className="border p-2 rounded" placeholder="Miktar" value={it.quantity}
+                      onChange={e => { const items = [...draft.items]; items[idx].quantity = Number(e.target.value); setDraft({ ...draft, items }); }} />
+                    <input className="border p-2 rounded" placeholder="Birim" value={it.unit || 'ADET'}
+                      onChange={e => { const items = [...draft.items]; items[idx].unit = e.target.value; setDraft({ ...draft, items }); }} />
+                    <input type="number" className="border p-2 rounded" placeholder="Br. Fiyat" value={it.unitPrice}
+                      onChange={e => { const items = [...draft.items]; items[idx].unitPrice = Number(e.target.value); setDraft({ ...draft, items }); }} />
+                    <input type="number" className="border p-2 rounded" placeholder="Vergi %" value={it.vatRate}
+                      onChange={e => { const items = [...draft.items]; items[idx].vatRate = Number(e.target.value); setDraft({ ...draft, items }); }} />
+                    <div className="text-right pr-2 font-medium">{lineTotal.toFixed(2)} {draft.currency}</div>
+                  </div>
+                );
+              })}
             </div>
             <p className="text-xs text-gray-500 mt-2">Not: Para birimi, faturanın resmi para birimidir. Rezervasyon dövizi ne olursa olsun burada seçtiğiniz birim faturaya yazılır.</p>
           </div>
