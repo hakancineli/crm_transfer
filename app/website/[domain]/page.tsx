@@ -150,7 +150,7 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                {(websiteContent?.features || proTransferData.features).map((feature, index) => (
+                {(websiteContent?.features || proTransferData.features).map((feature: { title: string; description: string; icon: string }, index: number) => (
                   <div key={index} className="bg-white p-4 rounded-lg shadow-sm border">
                     <div className="text-green-600 font-semibold mb-1">{feature.title}</div>
                     <div className="text-sm text-gray-600">{feature.description}</div>
@@ -166,7 +166,7 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
                     className="flex transition-transform duration-500 ease-in-out"
                     style={{ transform: `translateX(-${currentVehicleIndex * 100}%)` }}
                   >
-                    {(websiteContent?.vehicleImages || proTransferData.vehicleImages).map((image, index) => (
+                    {(websiteContent?.vehicleImages || proTransferData.vehicleImages).map((image: string, index: number) => (
                       <div key={index} className="w-full flex-shrink-0">
                         <div className="relative h-64 sm:h-80 md:h-96">
                           <Image
@@ -184,7 +184,7 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
                 </div>
 
                 <div className="flex justify-center mt-4 space-x-2">
-                  {(websiteContent?.vehicleImages || proTransferData.vehicleImages).map((_, index) => (
+                  {(websiteContent?.vehicleImages || proTransferData.vehicleImages).map((_: string, index: number) => (
                     <button
                       key={index}
                       onClick={() => setCurrentVehicleIndex(index)}
@@ -522,7 +522,7 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
               <div key={review.id} className="bg-white p-6 rounded-lg shadow-sm border">
                 <div className="flex items-center mb-4">
                   <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
+                    {[...Array(5)].map((_: any, i: number) => (
                       <Star key={i} className="w-4 h-4 fill-current" />
                     ))}
                   </div>
@@ -581,7 +581,7 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
                 question: "Bebek koltuğu mevcut mu?",
                 answer: "Evet, bebek koltuğu hizmetimiz mevcuttur. Rezervasyon yaparken bu talebinizi belirtmeniz yeterlidir."
               }
-            ].map((faq, index) => (
+            ].map((faq: { question: string; answer: string }, index: number) => (
               <div key={index} className="bg-gray-50 p-6 rounded-lg">
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{faq.question}</h3>
                 <p className="text-gray-600">{faq.answer}</p>
