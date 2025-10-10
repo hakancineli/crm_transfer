@@ -166,13 +166,11 @@ export default function AccommodationPage() {
           console.error('❌ E-posta hatası:', emailError);
         }
 
-        // Başarı mesajı göster ve voucher sayfasına yönlendir
-        const confirmMessage = `🎉 Rezervasyon başarıyla oluşturuldu!\n\nVoucher Numarası: ${voucherNumber}\n\nE-posta adresinize onay e-postası gönderildi.\n\nVoucher'ı görüntülemek ister misiniz?`;
+        // Başarı mesajı göster ve customer voucher sayfasına yönlendir
+        alert(`🎉 Rezervasyon başarıyla oluşturuldu!\n\nVoucher Numarası: ${voucherNumber}\n\nE-posta adresinize onay e-postası gönderildi.`);
         
-        if (confirm(confirmMessage)) {
-          // Voucher sayfasına yönlendir
-          window.open(`/accommodation/voucher/${voucherNumber}`, '_blank');
-        }
+        // Customer voucher sayfasına yönlendir
+        window.location.href = `/admin/accommodation/voucher/${voucherNumber}`;
         
         setCurrentStep('form');
         setRequestData(null);

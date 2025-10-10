@@ -155,7 +155,8 @@ export default function NewTourReservationPage() {
 
       if (response.ok) {
         const result = await response.json();
-        router.push('/admin/tour/reservations');
+        // Tour rezervasyonu için customer voucher sayfasına yönlendir
+        router.push(`/admin/tour/reservations/${result.id}/customer-voucher`);
       } else {
         const error = await response.json();
         alert('Hata: ' + (error.message || 'Rezervasyon oluşturulamadı'));

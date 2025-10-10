@@ -193,12 +193,16 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
             });
 
       if (response.ok) {
+        const result = await response.json();
+        
         if (isAdminForm) {
-          alert('Rezervasyon başarıyla oluşturuldu!');
+          // Admin form için voucher sayfasına yönlendir
+          window.location.href = `/admin/reservations/${result.voucherNumber}/customer-voucher`;
         } else {
           alert('Rezervasyon talebiniz başarıyla gönderildi! En kısa sürede sizinle iletişime geçeceğiz.');
+          onClose();
         }
-        onClose();
+        
         // Reset form
         setFormData({
           type: 'transfer',

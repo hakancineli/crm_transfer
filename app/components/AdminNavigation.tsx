@@ -36,9 +36,10 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
   }, [user?.role, refreshTenants]);
 
 
-  // Rol bazlı menü sıralaması
+  // Rol bazlı menü sıralaması - Yeniden düzenlenmiş
   const getMenuItemsByRole = (role: string) => {
     const baseMenuItems = [
+      // 1. Dashboard - Her zaman en üstte
       {
         name: t('admin.navigation.dashboard'),
         href: '/admin',
@@ -47,214 +48,231 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         module: 'transfer',
         order: 1
       },
-      {
-        name: role === 'SUPERUSER' ? t('admin.navigation.allReservations') : t('admin.navigation.reservations'),
-        href: '/admin/reservations',
-        icon: '📋',
-        description: t('admin.navigation.reservations'),
-        module: 'transfer',
-        order: role === 'SUPERUSER' ? 5 : 2
-      },
+      // 2. Yeni Rezervasyon - En sık kullanılan
       {
         name: t('admin.navigation.newReservation'),
         href: '/admin/new-reservation',
         icon: '➕',
         description: t('admin.navigation.newReservation'),
         module: 'transfer',
-        order: role === 'SUPERUSER' ? 6 : 3,
+        order: 2,
         isSpecial: true // Özel component kullanılacak
       },
+      // 3. Tüm Rezervasyonlar - Rezervasyon yönetimi
       {
-        name: t('admin.navigation.flightStatus'),
-        href: '/admin/flight-status',
-        icon: '✈️',
-        description: t('admin.navigation.flightStatusDesc'),
-        module: 'flight',
-        order: role === 'SUPERUSER' ? 12 : (role === 'ACCOUNTANT' ? 999 : 6)
-      },
-      {
-        name: t('admin.navigation.drivers'),
-        href: '/admin/drivers',
-        icon: '👨‍✈️',
-        description: t('admin.navigation.drivers'),
+        name: role === 'SUPERUSER' ? t('admin.navigation.allReservations') : t('admin.navigation.reservations'),
+        href: '/admin/reservations',
+        icon: '📋',
+        description: t('admin.navigation.reservations'),
         module: 'transfer',
-        order: role === 'SUPERUSER' ? 7 : (role === 'ACCOUNTANT' ? 999 : 4)
+        order: 3
       },
-      {
-        name: t('admin.navigation.reports'),
-        href: '/admin/reports',
-        icon: '📈',
-        description: t('admin.navigation.reports'),
-        module: 'transfer',
-        order: role === 'SUPERUSER' ? 9 : (role === 'ACCOUNTANT' ? 4 : 8)
-      },
-      {
-        name: t('admin.navigation.accounting'),
-        href: '/admin/accounting',
-        icon: '💰',
-        description: t('admin.navigation.accounting'),
-        module: 'transfer',
-        order: role === 'SUPERUSER' ? 10 : (role === 'ACCOUNTANT' ? 3 : 9)
-      },
+      // 4. Müşteriler - Müşteri yönetimi
       {
         name: t('admin.navigation.customers'),
         href: '/admin/customers',
         icon: '👥',
         description: t('admin.navigation.customers'),
         module: 'transfer',
-        order: role === 'SUPERUSER' ? 8 : (role === 'ACCOUNTANT' ? 999 : 5)
+        order: 4
       },
+      // 5. Şoförler - Şoför yönetimi
+      {
+        name: t('admin.navigation.drivers'),
+        href: '/admin/drivers',
+        icon: '👨‍✈️',
+        description: t('admin.navigation.drivers'),
+        module: 'transfer',
+        order: 5
+      },
+      // 6. Muhasebe - Finansal işlemler
+      {
+        name: t('admin.navigation.accounting'),
+        href: '/admin/accounting',
+        icon: '💰',
+        description: t('admin.navigation.accounting'),
+        module: 'transfer',
+        order: 6
+      },
+      // 7. Raporlar - Analiz ve raporlar
+      {
+        name: t('admin.navigation.reports'),
+        href: '/admin/reports',
+        icon: '📈',
+        description: t('admin.navigation.reports'),
+        module: 'transfer',
+        order: 7
+      },
+      // 8. Uçuş Durumu - Uçuş takibi
+      {
+        name: t('admin.navigation.flightStatus'),
+        href: '/admin/flight-status',
+        icon: '✈️',
+        description: t('admin.navigation.flightStatusDesc'),
+        module: 'flight',
+        order: 8
+      },
+      // 9. Son Aktiviteler - Sistem aktiviteleri
       {
         name: t('admin.navigation.activities'),
         href: '/admin/activities',
         icon: '📋',
         description: t('admin.navigation.activities'),
         module: 'transfer',
-        order: role === 'SUPERUSER' ? 4 : 999
+        order: role === 'SUPERUSER' ? 9 : 999
       },
+      // 10. Kullanıcılar - Kullanıcı yönetimi (sadece yetkili roller)
       {
         name: t('admin.navigation.users'),
         href: '/admin/users',
         icon: '👤',
         description: t('admin.navigation.users'),
         module: 'transfer',
-        order: role === 'SUPERUSER' ? 3 : (role === 'AGENCY_ADMIN' ? 10 : 999)
+        order: role === 'SUPERUSER' ? 10 : (role === 'AGENCY_ADMIN' ? 10 : 999)
       },
+      // 11. Şirketler - Şirket yönetimi (sadece SUPERUSER)
       {
         name: t('admin.navigation.companies'),
         href: '/admin/companies',
         icon: '🏢',
         description: t('admin.navigation.companiesDesc'),
         module: 'system',
-        order: role === 'SUPERUSER' ? 2 : 999
+        order: role === 'SUPERUSER' ? 11 : 999
       },
-      {
-        name: t('admin.navigation.customerSetup'),
-        href: '/admin/customer-setup',
-        icon: '🏢',
-        description: t('admin.navigation.customerSetupDesc'),
-        module: 'transfer',
-        order: role === 'SUPERUSER' ? 999 : 999
-      },
+      // 12. Denetim Logları - Sistem logları (sadece SUPERUSER)
       {
         name: t('admin.navigation.auditLogs'),
         href: '/admin/audit-logs',
         icon: '📋',
         description: t('admin.navigation.auditLogsDesc'),
         module: 'system',
-        order: role === 'SUPERUSER' ? 4 : 999
+        order: role === 'SUPERUSER' ? 12 : 999
       },
+      // 13. Personel Performansı - Performans analizi
       {
         name: t('admin.navigation.performance'),
         href: '/admin/performance',
         icon: '📊',
         description: t('admin.navigation.performanceDesc'),
         module: 'system',
-        order: role === 'SUPERUSER' ? 11 : (role === 'AGENCY_ADMIN' ? 7 : (role === 'ACCOUNTANT' ? 5 : 999))
+        order: role === 'SUPERUSER' ? 13 : (role === 'AGENCY_ADMIN' ? 13 : 999)
       },
+      // 14. Konaklama - Otel rezervasyon yönetimi
       {
         name: 'Konaklama',
         href: '/admin/accommodation',
         icon: '🏨',
         description: 'Otel rezervasyon yönetimi',
         module: 'accommodation',
-        order: 999
+        order: 14
       },
+      // 15. Konaklama Rezervasyonları
       {
         name: 'Konaklama Rezervasyonları',
         href: '/admin/accommodation/reservations',
         icon: '📋',
         description: 'Tüm otel rezervasyonlarını görüntüle',
         module: 'accommodation',
-        order: 999
+        order: 15
       },
+      // 16. Konaklama Raporları
       {
         name: 'Konaklama Raporları',
         href: '/admin/accommodation/reports',
         icon: '📊',
         description: 'Detaylı analiz ve raporlar',
         module: 'accommodation',
-        order: 999
+        order: 16
       },
+      // 17. Otel Fiyat Havuzu
       {
         name: 'Otel Fiyat Havuzu',
         href: '/admin/accommodation/price-pool',
         icon: '🏨',
         description: 'Tüm satış personelinin görebileceği fiyatlar',
         module: 'accommodation',
-        order: 999
+        order: 17
       },
+      // 18. Website - Website yönetimi
       {
         name: t('admin.navigation.website'),
         href: '/admin/website',
         icon: '🌐',
         description: t('admin.navigation.websiteDesc'),
         module: 'website',
-        order: role === 'SUPERUSER' ? 15 : (role === 'AGENCY_ADMIN' ? 6 : 999)
+        order: 18
       },
+      // 19. Tur - Tur yönetimi
       {
         name: t('admin.navigation.tour'),
         href: '/admin/tour',
         icon: '🚌',
         description: t('admin.navigation.tourDesc'),
         module: 'tour',
-        order: role === 'SUPERUSER' ? 16 : (role === 'AGENCY_ADMIN' ? 7 : 999)
+        order: 19
       },
+      // 20. Tur Rezervasyonları
       {
         name: t('admin.navigation.tourReservations'),
         href: '/admin/tour/reservations',
         icon: '📋',
         description: t('admin.navigation.tourReservationsDesc'),
         module: 'tour',
-        order: role === 'SUPERUSER' ? 17 : (role === 'AGENCY_ADMIN' ? 8 : 999)
+        order: 20
       },
+      // 21. Tur Rotaları
       {
         name: t('admin.navigation.tourRoutes'),
         href: '/admin/tour/routes',
         icon: '🗺️',
         description: t('admin.navigation.tourRoutesDesc'),
         module: 'tour',
-        order: role === 'SUPERUSER' ? 18 : (role === 'AGENCY_ADMIN' ? 9 : 999)
+        order: 21
       },
+      // 22. Tur Araçları
       {
         name: t('admin.navigation.tourVehicles'),
         href: '/admin/tour/vehicles',
         icon: '🚐',
         description: t('admin.navigation.tourVehiclesDesc'),
         module: 'tour',
-        order: role === 'SUPERUSER' ? 19 : (role === 'AGENCY_ADMIN' ? 10 : 999)
+        order: 22
       },
-      {
-        name: t('admin.navigation.modules'),
-        href: '/admin/modules',
-        icon: '🔧',
-        description: t('admin.navigation.modulesDesc'),
-        module: 'system',
-        order: role === 'SUPERUSER' ? 13 : 999
-      },
-      {
-        name: t('admin.navigation.settings'),
-        href: '/admin/settings',
-        icon: '⚙️',
-        description: t('admin.navigation.settingsDesc'),
-        module: 'transfer',
-        order: role === 'SUPERUSER' ? 14 : 999
-      },
-      {
-        name: t('admin.navigation.tenantSettings'),
-        href: '/admin/tenant-settings',
-        icon: '🏢',
-        description: t('admin.navigation.tenantSettingsDesc'),
-        module: 'transfer',
-        order: role === 'SUPERUSER' ? 15 : (role === 'AGENCY_ADMIN' ? 11 : 999)
-      },
+      // 23. U-ETDS - Ulaştırma sistemi
       {
         name: t('admin.navigation.uetds'),
         href: '/admin/uetds',
         icon: '🚌',
         description: t('admin.navigation.uetdsDesc'),
         module: 'transfer',
-        order: role === 'SUPERUSER' ? 16 : (role === 'AGENCY_ADMIN' ? 12 : 999)
+        order: 23
+      },
+      // 24. Modül Yönetimi - Sistem modülleri (sadece SUPERUSER)
+      {
+        name: t('admin.navigation.modules'),
+        href: '/admin/modules',
+        icon: '🔧',
+        description: t('admin.navigation.modulesDesc'),
+        module: 'system',
+        order: role === 'SUPERUSER' ? 24 : 999
+      },
+      // 25. Ayarlar - Sistem ayarları (sadece SUPERUSER)
+      {
+        name: t('admin.navigation.settings'),
+        href: '/admin/settings',
+        icon: '⚙️',
+        description: t('admin.navigation.settingsDesc'),
+        module: 'transfer',
+        order: role === 'SUPERUSER' ? 25 : 999
+      },
+      // 26. Acente Ayarları - Acente özel ayarları
+      {
+        name: t('admin.navigation.tenantSettings'),
+        href: '/admin/tenant-settings',
+        icon: '🏢',
+        description: t('admin.navigation.tenantSettingsDesc'),
+        module: 'transfer',
+        order: role === 'SUPERUSER' ? 26 : (role === 'AGENCY_ADMIN' ? 26 : 999)
       }
     ];
 
