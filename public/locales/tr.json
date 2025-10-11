@@ -64,7 +64,7 @@
       "accounting": "Muhasebe",
       "customers": "Müşteriler",
       "activities": "Son Aktiviteler",
-      "users": "Kullanıcılar",
+      
       "settings": "Ayarlar",
       "logout": "Çıkış",
       "companies": "Şirketler",
@@ -94,7 +94,15 @@
       "uetdsDesc": "U-ETDS sefer yönetimi",
       "flightStatus": "Uçuş Durumu",
       "flightStatusDesc": "Uçuş takibi ve durumu",
-      "users": "Kullanıcılar"
+      "users": "Kullanıcılar",
+      "accommodation": "Konaklama",
+      "accommodationDesc": "Otel rezervasyon yönetimi",
+      "accommodationReservations": "Konaklama Rezervasyonları",
+      "accommodationReservationsDesc": "Tüm otel rezervasyonlarını görüntüle",
+      "accommodationReports": "Konaklama Raporları",
+      "accommodationReportsDesc": "Detaylı analiz ve raporlar",
+      "accommodationPricePool": "Otel Fiyat Havuzu",
+      "accommodationPricePoolDesc": "Tüm satış personelinin görebileceği fiyatlar"
     },
     "accounting": {
       "title": "Muhasebe ve Ödeme Yönetimi",

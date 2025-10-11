@@ -159,37 +159,37 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
       },
       // 14. Konaklama - Otel rezervasyon yönetimi
       {
-        name: 'Konaklama',
+        name: t('admin.navigation.accommodation'),
         href: '/admin/accommodation',
         icon: '🏨',
-        description: 'Otel rezervasyon yönetimi',
+        description: t('admin.navigation.accommodationDesc'),
         module: 'accommodation',
         order: 14
       },
       // 15. Konaklama Rezervasyonları
       {
-        name: 'Konaklama Rezervasyonları',
+        name: t('admin.navigation.accommodationReservations'),
         href: '/admin/accommodation/reservations',
         icon: '📋',
-        description: 'Tüm otel rezervasyonlarını görüntüle',
+        description: t('admin.navigation.accommodationReservationsDesc'),
         module: 'accommodation',
         order: 15
       },
       // 16. Konaklama Raporları
       {
-        name: 'Konaklama Raporları',
+        name: t('admin.navigation.accommodationReports'),
         href: '/admin/accommodation/reports',
         icon: '📊',
-        description: 'Detaylı analiz ve raporlar',
+        description: t('admin.navigation.accommodationReportsDesc'),
         module: 'accommodation',
         order: 16
       },
       // 17. Otel Fiyat Havuzu
       {
-        name: 'Otel Fiyat Havuzu',
+        name: t('admin.navigation.accommodationPricePool'),
         href: '/admin/accommodation/price-pool',
         icon: '🏨',
-        description: 'Tüm satış personelinin görebileceği fiyatlar',
+        description: t('admin.navigation.accommodationPricePoolDesc'),
         module: 'accommodation',
         order: 17
       },
@@ -303,6 +303,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         <span className="text-lg font-semibold text-gray-900">ProTransfer</span>
         <button
           onClick={onClose}
+          title="Menüyü kapat"
           className="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
         >
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -320,6 +321,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               className="w-full border border-amber-300 rounded-md text-sm px-2 py-1 bg-white"
               value={selectedTenantId || ''}
               onChange={(e) => setSelectedTenantId(e.target.value || null)}
+              title="Tenant seçimi"
             >
               <option value="">— Tenant seçiniz —</option>
               {tenants.map(t => (

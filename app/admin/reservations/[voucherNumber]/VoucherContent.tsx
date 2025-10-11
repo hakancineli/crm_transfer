@@ -341,6 +341,7 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                 <select
                     value={selectedLanguage}
                     onChange={(e) => setSelectedLanguage(e.target.value)}
+                    title="Dil seçimi"
                     className="block w-24 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
                 >
                     <option value="tr">Türkçe</option>
@@ -613,8 +614,8 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                             {reservation.isReturn ? (
                                 t.inbound
                             ) : (
-                                Object.keys(AIRPORTS).includes(reservation.from) ? t.arrival : 
-                                Object.keys(AIRPORTS).includes(reservation.to) ? t.departure : 
+                                (reservation.from?.includes('IST') || reservation.from?.includes('SAW')) ? t.arrival :
+                                (reservation.to?.includes('IST') || reservation.to?.includes('SAW')) ? t.departure :
                                 t.outbound
                             )}
                         </span>

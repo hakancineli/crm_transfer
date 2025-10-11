@@ -43,7 +43,6 @@ interface Reservation {
 }
 import { formatLocation, formatPassengerName, formatHotelName, toTitleCase } from '@/app/utils/textFormatters';
 import ReturnTransferModal from '@/app/components/ReturnTransferModal';
-import FlightStatus from '@/app/components/FlightStatus';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useTenant } from '@/app/contexts/TenantContext';
 import { canViewAllReservations, canViewOwnSales } from '@/app/lib/permissions';
@@ -56,7 +55,7 @@ interface ReservationListProps {
 export default function ReservationList({ onFilterChange }: ReservationListProps) {
     const { user } = useAuth();
     const { selectedTenantId, tenants } = useTenant();
-    const flightEnabled = useModule('flight');
+    // const flightEnabled = useModule('flight');
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [filteredReservations, setFilteredReservations] = useState<Reservation[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -119,10 +118,18 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                         ? JSON.parse(reservation.passengerNames || '[]')
                         : reservation.passengerNames || []
                 })).sort((a: Reservation, b: Reservation) => {
-                    const timeA = new Date(`${a.date} ${a.time}`).getTime();
-                    const timeB = new Date(`${b.date} ${b.time}`).getTime();
-                    // Yeni → Eski
-                    return timeB - timeA;
+                    // Önce kırmızı alarm (son 1 saat) olanlar üste
+                    const now = new Date();
+                    const aTime = new Date(`${a.date}T${a.time}`);
+                    const bTime = new Date(`${b.date}T${b.time}`);
+                    const aDiffHours = (aTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+                    const bDiffHours = (bTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+                    const aUrgent = aDiffHours >= 0 && aDiffHours <= 1;
+                    const bUrgent = bDiffHours >= 0 && bDiffHours <= 1;
+                    if (aUrgent !== bUrgent) return aUrgent ? -1 : 1;
+
+                    // Sonra yeni → eski (varsayılan)
+                    return bTime.getTime() - aTime.getTime();
                 })
                 : [];
 
@@ -458,6 +465,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                             <select
                                 value={selectedTenant}
                                 onChange={(e) => setSelectedTenant(e.target.value)}
+                                title="Acente filtresi"
                                 className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             >
                                 <option value="all">Tüm Acenteler</option>
@@ -489,7 +497,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                         <div className="flex items-end gap-2">
                             <div>
                                 <label className="block text-xs text-gray-500 mb-1">Sayfa Boyutu</label>
-                                <select value={pageSize} onChange={(e)=>setPageSize(parseInt(e.target.value))} className="px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                <select value={pageSize} onChange={(e)=>setPageSize(parseInt(e.target.value))} title="Sayfa boyutu" className="px-3 py-2 border border-gray-300 rounded-md text-sm">
                                     <option value={10}>10</option>
                                     <option value={20}>20</option>
                                     <option value={50}>50</option>
@@ -538,14 +546,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-36">
                                     Şoför
                                 </th>
-                                {(user?.role === 'SUPERUSER' || flightEnabled) && (
-                                    <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-32">
-                                        Uçuş Durumu
-                                    </th>
-                                )}
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-28">
-                                    Durum
-                                </th>
+                                {/* Uçuş Durumu sütunu kaldırıldı */}
+                                {/* Durum sütunu kaldırıldı */}
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-32">
                                     Ödeme
                                 </th>
@@ -562,9 +564,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                         (user?.role === 'SUPERUSER' || user?.role === 'AGENCY_ADMIN' ? 1 : 0) + // Kullanıcı sütunu
                                         6 + // VOUCHER, TİP, TARİH, GÜZERGAH, MÜŞTERİ, FİYAT
                                         1 + // Şoför
-                                        ((user?.role === 'SUPERUSER' || flightEnabled) ? 1 : 0) + // Uçuş Durumu
-                                        3 + // Durum, Ödeme, İşlem
-                                        0
+                                        0 + // Uçuş Durumu kaldırıldı
+                                        2 // Ödeme, İşlem (Durum kaldırıldı)
                                     } className="px-3 py-4 text-center text-gray-500">
                                         Rezervasyon bulunamadı
                                     </td>
@@ -572,6 +573,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                             ) : (
                                 filteredReservations.map((reservation) => {
                                     const isUrgent = isWithinTwoHours(reservation.date, reservation.time);
+                                    const isPast = new Date(`${reservation.date}T${reservation.time}`) < new Date();
                                     // Kısa güzergah gösterimi: Havalimanı adı + ilçe
                                     const isFromAirport = reservation.from.includes('IST') || reservation.from.includes('SAW');
                                     const isToAirport = reservation.to.includes('IST') || reservation.to.includes('SAW');
@@ -608,7 +610,11 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                 }
                                             }}
                                             className={`transition-all duration-200 cursor-pointer ${
-                                                isUrgent ? 'bg-red-50 hover:bg-red-100 border-l-4 border-red-500' : 'hover:bg-gray-50 hover:shadow-sm'
+                                                isUrgent
+                                                    ? 'bg-red-50 hover:bg-red-100 border-l-4 border-red-500'
+                                                    : isPast
+                                                        ? 'bg-gray-100 hover:bg-gray-200'
+                                                        : 'hover:bg-gray-50 hover:shadow-sm'
                                             }`}>
                                             <td className="px-6 py-4 text-sm font-bold align-middle">
                                                 <div className="font-mono text-xs px-2 py-1 rounded border inline-block whitespace-nowrap text-gray-700 bg-gray-100 border-gray-200">
@@ -649,11 +655,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                                 🌐 Website
                                                             </span>
                                                         )}
-                                                        {reservation.source === 'admin' && (
-                                                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
-                                                                👤 Admin
-                                                            </span>
-                                                        )}
+                                                        {/* Admin etiketi istenmiyor */}
                                                     </div>
                                                 </div>
                                             </td>
@@ -747,27 +749,6 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                 ) : (
                                                     <span className="text-gray-400">-</span>
                                                 )}
-                                            </td>
-                                            {(user?.role === 'SUPERUSER' || flightEnabled) && (
-                                                <td className="px-6 py-4 text-sm align-middle">
-                                                    {reservation.flightCode ? (
-                                                        <FlightStatus 
-                                                            flightCode={reservation.flightCode}
-                                                            reservationDate={reservation.date}
-                                                            reservationTime={reservation.time}
-                                                            isArrival={reservation.from.includes('IST') || reservation.from.includes('SAW')}
-                                                        />
-                                                    ) : (
-                                                        <span className="text-gray-400 text-xs">-</span>
-                                                    )}
-                                                </td>
-                                            )}
-                                            <td className="px-6 py-4 text-sm align-middle">
-                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                                                    reservation.driver ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-yellow-100 text-yellow-800 border border-yellow-200'
-                                                }`}>
-                                                    {reservation.driver ? 'Atandı' : 'Bekliyor'}
-                                                </span>
                                             </td>
                                             <td className="px-6 py-4 text-sm align-middle">
                                                 <div className="flex items-center gap-2">
@@ -995,16 +976,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             <span className="flex-1">{formattedTo}</span>
                                         </div>
                                         {reservation.flightCode && (
-                                            <div className="mt-1">
-                                                <div className="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-1 rounded border border-blue-200 mb-1">
-                                                    ✈️ {reservation.flightCode.toUpperCase()}
-                                                </div>
-                                                <FlightStatus 
-                                                    flightCode={reservation.flightCode}
-                                                    reservationDate={reservation.date}
-                                                    reservationTime={reservation.time}
-                                                    isArrival={reservation.from.includes('IST') || reservation.from.includes('SAW')}
-                                                />
+                                            <div className="mt-1 text-xs text-blue-600 font-medium bg-blue-50 px-2 py-1 rounded border border-blue-200">
+                                                ✈️ {reservation.flightCode.toUpperCase()}
                                             </div>
                                         )}
                                     </div>

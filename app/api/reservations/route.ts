@@ -144,7 +144,8 @@ export async function GET(request: NextRequest) {
       driver: r.driver,
       tenant: r.tenant,
       type: 'transfer',
-      source: (r as any).source || 'website'
+      // Default source: if explicit set use it; else if has userId treat as admin; else website
+      source: (r as any).source ?? ((r as any).userId ? 'admin' : 'website')
     }));
 
     // Tur rezervasyonlarını formatla
