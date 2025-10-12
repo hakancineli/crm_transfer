@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Head from 'next/head';
 
 interface WebsiteData {
   tenant: {
@@ -128,8 +129,15 @@ export default function WebsitePage() {
 
   const { tenant, settings, pages } = websiteData;
 
+  const dir = language === 'ar' ? 'rtl' : 'ltr';
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white" dir={dir}>
+      <Head>
+        <title>{settings.seoSettings?.metaTitle?.[language] || settings.companyName}</title>
+        <meta name="description" content={settings.seoSettings?.metaDescription?.[language] || settings.heroSubtitle} />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -154,6 +162,7 @@ export default function WebsitePage() {
                     ? 'bg-blue-600 text-white' 
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
+                title="Türkçe"
               >
                 🇹🇷 TR
               </button>
@@ -164,6 +173,7 @@ export default function WebsitePage() {
                     ? 'bg-blue-600 text-white' 
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
+                title="English"
               >
                 🇬🇧 EN
               </button>
@@ -174,6 +184,7 @@ export default function WebsitePage() {
                     ? 'bg-blue-600 text-white' 
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
+                title="العربية"
               >
                 🇸🇦 AR
               </button>
@@ -210,6 +221,27 @@ export default function WebsitePage() {
         </div>
       </section>
 
+      {/* Features */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1,2,3].map((i) => (
+              <div key={i} className="p-6 rounded-xl border border-gray-200 shadow-sm bg-white">
+                <div className="text-3xl mb-3">{i===1?'🛬':i===2?'🕒':'👨‍✈️'}</div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  {language==='tr' ? (i===1?'Uçuş Takibi':'Zamanında Hizmet') : language==='en' ? (i===1?'Flight Tracking':'On-time Service') : (i===1?'تتبع الرحلات':'الخدمة في الوقت')}
+                </h3>
+                <p className="text-gray-600">
+                  {language==='tr' ? (i===1?'Uçuş kodunuzu izleyip gecikmelere göre planlarız.':i===2?'Tüm planlamayı dakik yaparız.':'Profesyonel şoför kadrosu, konforlu yolculuk.')
+                  : language==='en' ? (i===1?'We track your flight and adapt to delays.':i===2?'Punctual planning for every ride.':'Professional drivers for a comfortable ride.')
+                  : (i===1?'نقوم بتتبع رحلتك ونكيف الخطة مع التأخير.':i===2?'تخطيط دقيق وفي الوقت.':'سائقون محترفون ورحلة مريحة.')}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Reservation Form */}
       <section id="reservation" className="py-16 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -230,6 +262,8 @@ export default function WebsitePage() {
                     type="text"
                     name="customerName"
                     required
+                    title={language==='tr'?'Ad Soyad':language==='en'?'Full Name':'الاسم الكامل'}
+                    placeholder={language==='tr'?'Ad Soyad':language==='en'?'Full Name':'الاسم الكامل'}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
@@ -243,6 +277,8 @@ export default function WebsitePage() {
                     type="tel"
                     name="customerPhone"
                     required
+                    title={language==='tr'?'Telefon':'Phone'}
+                    placeholder={language==='tr'?'+90 5XX XXX XX XX':language==='en'?'+90 5XX XXX XX XX':'‏+90 5XX XXX XX XX'}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
@@ -255,6 +291,8 @@ export default function WebsitePage() {
                   <input
                     type="email"
                     name="customerEmail"
+                    title={language==='tr'?'E-posta':'Email'}
+                    placeholder={language==='tr'?'ornek@email.com':language==='en'?'example@email.com':'example@email.com'}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
@@ -268,6 +306,8 @@ export default function WebsitePage() {
                     type="date"
                     name="pickupDate"
                     required
+                    title={language==='tr'?'Tarih':'Date'}
+                    placeholder="gg.aa.yyyy"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
@@ -281,6 +321,8 @@ export default function WebsitePage() {
                     type="time"
                     name="pickupTime"
                     required
+                    title={language==='tr'?'Saat':'Time'}
+                    placeholder="ss:dd"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
@@ -295,6 +337,19 @@ export default function WebsitePage() {
                     name="passengerCount"
                     min="1"
                     required
+                    title={language==='tr'?'Yolcu Sayısı':'Passenger Count'}
+                    placeholder={language==='tr'?'Örn: 2':language==='en'?'e.g., 2':'مثال: 2'}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {language==='tr'?'Uçuş Kodu':language==='en'?'Flight Code':'رمز الرحلة'}
+                  </label>
+                  <input
+                    type="text"
+                    name="flightCode"
+                    placeholder="TK1234"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
@@ -308,6 +363,8 @@ export default function WebsitePage() {
                 <textarea
                   name="notes"
                   rows={4}
+                  title={language==='tr'?'Notlar':'Notes'}
+                  placeholder={language==='tr'?'Özel taleplerinizi yazın...':language==='en'?'Write your special requests...':'اكتب طلباتك الخاصة...'}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
@@ -322,6 +379,54 @@ export default function WebsitePage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-10">
+            {language==='tr'?'Müşteri Yorumları':language==='en'?'Customer Reviews':'تقييمات العملاء'}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1,2,3].map((i)=> (
+              <div key={i} className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <p className="text-gray-700">
+                  {language==='tr'? 'Uçuş gecikmesine rağmen bizi beklediler, çok konforlu yolculuk.'
+                    : language==='en' ? 'They waited despite flight delay, very comfortable ride.'
+                    : 'انتظرونا رغم تأخر الرحلة، كانت رحلة مريحة جداً.'}
+                </p>
+                <div className="mt-4 text-sm text-gray-500">★★★★★</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-10">FAQ</h2>
+          <div className="space-y-4">
+            {[
+              {
+                q: language==='tr'?'Uçuşum gecikirse ne olur?':language==='en'?'What if my flight is delayed?':'ماذا لو تأخرت رحلتي؟',
+                a: language==='tr'?'Uçuş numaranızı izliyoruz, sürücünüz bekler. Ek ücret yok.':language==='en'?'We track your flight number; your driver will wait. No extra fee.':'نتتبع رقم رحلتك؛ سائقك سيَنتظر. بدون رسوم إضافية.'
+              },
+              {
+                q: language==='tr'?'Kaç kişi alabiliyorsunuz?':language==='en'?'How many passengers can you take?':'كم عدد الركاب؟',
+                a: language==='tr'?'VIP Vito ile 6 yolcu + 6 bavul kapasitesi.':language==='en'?'Up to 6 passengers + 6 suitcases with Vito VIP.':'حتى 6 ركاب + 6 حقائب مع فيتو VIP.'
+              }
+            ].map((item, idx) => (
+              <details key={idx} className="group border border-gray-200 rounded-lg p-4 bg-white">
+                <summary className="cursor-pointer font-medium text-gray-900 flex items-center justify-between">
+                  {item.q}
+                  <span className="text-gray-400 group-open:rotate-180 transition-transform">⌃</span>
+                </summary>
+                <p className="mt-2 text-gray-600">{item.a}</p>
+              </details>
+            ))}
           </div>
         </div>
       </section>
@@ -376,6 +481,20 @@ export default function WebsitePage() {
           </div>
         </div>
       </footer>
+
+      {/* Sticky WhatsApp CTA */}
+      {settings.contactInfo?.whatsapp && (
+        <a
+          href={`https://wa.me/${settings.contactInfo.whatsapp.replace(/\D/g,'')}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-full shadow-lg flex items-center gap-2"
+          title="WhatsApp"
+        >
+          <span>💬</span>
+          <span className="font-semibold">WhatsApp</span>
+        </a>
+      )}
     </div>
   );
 }
