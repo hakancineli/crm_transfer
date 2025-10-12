@@ -35,11 +35,9 @@ export async function middleware(request: NextRequest) {
 
 	// Domain-specific routing
 	if (hostname.includes('proacente.com')) {
-		// ProAcente CRM - redirect to admin login
+		// Root should serve marketing page (app/page.tsx re-exports marketing)
 		if (pathname === '/') {
-			const url = request.nextUrl.clone();
-			url.pathname = '/admin-login';
-			return NextResponse.redirect(url);
+			return NextResponse.next();
 		}
 		return NextResponse.next();
 	}
