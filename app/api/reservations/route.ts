@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 import { prisma } from '@/lib/prisma';
+import { sendTelegramNotification } from '@/app/lib/telegram';
 import jwt from 'jsonwebtoken';
 
 export async function GET(request: NextRequest) {
@@ -258,6 +259,25 @@ export async function POST(request: NextRequest) {
     });
     
     console.log('API: Rezervasyon oluşturuldu:', reservation.id);
+    // Telegram bildirimi gönder
+    try {
+      await sendTelegramNotification({
+        type: 'new_reservation',
+        reservation: {
+          voucherNumber: reservation.voucherNumber,
+          date: reservation.date,
+          time: reservation.time,
+          from: reservation.from,
+          to: reservation.to,
+          passengerNames: (() => { try { const arr = JSON.parse((reservation as any).passengerNames || '[]'); return Array.isArray(arr) ? arr : []; } catch { return []; } })(),
+          price: reservation.price,
+          currency: reservation.currency
+        }
+      });
+    } catch (e) {
+      console.warn('Telegram bildirimi gönderilemedi:', e);
+    }
+
     return NextResponse.json(reservation);
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Bilinmeyen hata';

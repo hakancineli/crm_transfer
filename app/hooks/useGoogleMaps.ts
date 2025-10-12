@@ -29,13 +29,29 @@ export function useGoogleMaps(): GoogleMapsHook {
     }
 
     // Script zaten yüklenmiş mi kontrol et
-    const existingScript = document.getElementById('google-maps-script');
+    const existingScript = document.getElementById('google-maps-script') as HTMLScriptElement | null;
     if (existingScript) {
-      // Script var ama Google Maps henüz hazır değilse bekle
+      // Script Next.js tarafından ekli, hazırsa set et; değilse load event'ine bağlan
       if ((window as any).google?.maps?.places) {
         setIsLoaded(true);
         setError(null);
+        return;
       }
+      setIsLoading(true);
+      existingScript.addEventListener('load', () => {
+        if ((window as any).google?.maps?.places) {
+          setIsLoaded(true);
+          setError(null);
+        } else {
+          // Yüklendi ama places yok; yine de hata vermeyelim
+          setIsLoaded(true);
+        }
+        setIsLoading(false);
+      }, { once: true });
+      existingScript.addEventListener('error', () => {
+        setError('Failed to load Google Maps API - Check billing settings');
+        setIsLoading(false);
+      }, { once: true });
       return;
     }
 

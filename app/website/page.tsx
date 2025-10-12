@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Head from 'next/head';
+import Image from 'next/image';
 
 interface WebsiteData {
   tenant: {
@@ -195,28 +196,42 @@ export default function WebsitePage() {
 
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-green-600 to-green-700 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            {settings.heroTitle}
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 text-green-100">
-            {settings.heroSubtitle}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="#reservation"
-              className="bg-white text-green-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-            >
-              {language === 'tr' ? 'Rezervasyon Yap' : 
-               language === 'en' ? 'Make Reservation' : 'احجز الآن'}
-            </a>
-            <a
-              href={`tel:${settings.contactInfo.phone}`}
-              className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-green-600 transition-colors"
-            >
-              {language === 'tr' ? 'Hemen Ara' : 
-               language === 'en' ? 'Call Now' : 'اتصل الآن'}
-            </a>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div className="text-center md:text-left">
+              <h1 className="text-4xl md:text-6xl font-bold mb-6">
+                {settings.heroTitle}
+              </h1>
+              <p className="text-xl md:text-2xl mb-8 text-green-100">
+                {settings.heroSubtitle}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <a
+                  href="#reservation"
+                  className="bg-white text-green-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                >
+                  {language === 'tr' ? 'Rezervasyon Yap' : 
+                   language === 'en' ? 'Make Reservation' : 'احجز الآن'}
+                </a>
+                <a
+                  href={`tel:${settings.contactInfo.phone}`}
+                  className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-green-600 transition-colors"
+                >
+                  {language === 'tr' ? 'Hemen Ara' : 
+                   language === 'en' ? 'Call Now' : 'اتصل الآن'}
+                </a>
+              </div>
+            </div>
+            <div className="relative h-64 sm:h-80 md:h-96 rounded-xl overflow-hidden shadow-lg">
+              <Image
+                src={settings.heroImage || '/seref-vural-images/mercedes-vito-1.jpg'}
+                alt={settings.companyName}
+                fill
+                className="object-cover"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+            </div>
           </div>
         </div>
       </section>
