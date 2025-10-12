@@ -7,11 +7,11 @@ import ReservationForm from '../components/ReservationForm';
 
 // Varsayılan içerik (panel verisi yoksa fallback) - Full demo content
 const defaultContent = {
-  companyName: "Şeref Vural Travel",
+  companyName: "Pro Transfer",
   tagline: "İstanbul Havalimanı Transfer Hizmeti",
   description: "İstanbul Havalimanı'ndan şehir merkezine konforlu ve güvenli transfer hizmeti. Profesyonel şoförlerimiz ve Mercedes Vito araçlarımızla 7/24 hizmetinizdeyiz. Ayrıca İstanbul, Sapanca, Bursa, Abant turları ve kaliteli otel konaklama seçenekleri sunuyoruz.",
-  phone: "+90 531 945 89 31",
-  whatsapp: "+90 531 945 89 31",
+  phone: "+905545812034",
+  whatsapp: "+905545812034",
   email: "info@serefvural.com",
   vehicleImages: [
     '/seref-vural-images/mercedes-vito-1.jpg',
@@ -232,7 +232,7 @@ const defaultContent = {
     },
     {
       name: "Mehmet S.",
-      text: "İstanbul Havalimanı'ndan şehir merkezine çok rahat bir yolculuk yaptık. Teşekkürler Şeref Vural Travel.",
+      text: "İstanbul Havalimanı'ndan şehir merkezine çok rahat bir yolculuk yaptık. Teşekkürler Pro Transfer.",
       rating: 5,
       type: "Transfer"
     }
@@ -490,11 +490,11 @@ export default function ProtransferWebsitePage() {
         </div>
       </section>
 
-      {/* Neden Şeref Vural Travel? */}
+      {/* Neden Pro Transfer? */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-extrabold text-gray-900">Neden Şeref Vural Travel?</h2>
+            <h2 className="text-3xl font-extrabold text-gray-900">Neden Pro Transfer?</h2>
             <p className="text-lg text-gray-600">Profesyonel hizmet anlayışımız ve müşteri memnuniyeti odaklı yaklaşımımızla İstanbul'un en güvenilir transfer, tur ve konaklama hizmeti sunuyoruz.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">

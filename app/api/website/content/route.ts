@@ -3,21 +3,21 @@ import { prisma } from '../../../lib/prisma';
 
 // Default website content - Full demo content
 const DEFAULT_WEBSITE_CONTENT = {
-  companyName: "Şeref Vural Travel",
+  companyName: "Pro Transfer",
   tagline: "İstanbul Havalimanı Transfer Hizmeti",
   description: "İstanbul Havalimanı'ndan şehir merkezine konforlu ve güvenli transfer hizmeti. Profesyonel şoförlerimiz ve Mercedes Vito araçlarımızla 7/24 hizmetinizdeyiz. Ayrıca İstanbul, Sapanca, Bursa, Abant turları ve kaliteli otel konaklama seçenekleri sunuyoruz.",
   contact: {
-    phone: "+90 531 945 89 31",
-    whatsapp: "+90 531 945 89 31",
-    email: "info@serefvural.com"
+    phone: "+905545812034",
+    whatsapp: "+905545812034",
+    email: "info@protransfer.com"
   },
   settings: {
-    heroTitle: "Şeref Vural Travel - İstanbul Havalimanı Transfer Hizmeti",
+    heroTitle: "Pro Transfer - İstanbul Havalimanı Transfer Hizmeti",
     heroSubtitle: "İstanbul Havalimanı'ndan şehir merkezine konforlu ve güvenli transfer hizmeti. Profesyonel şoförlerimiz ve Mercedes Vito araçlarımızla 7/24 hizmetinizdeyiz. Ayrıca İstanbul, Sapanca, Bursa, Abant turları ve kaliteli otel konaklama seçenekleri sunuyoruz.",
     contactInfo: {
-      phone: "+90 531 945 89 31",
-      whatsapp: "+90 531 945 89 31",
-      email: "info@serefvural.com"
+      phone: "+905545812034",
+      whatsapp: "+905545812034",
+      email: "info@protransfer.com"
     }
   },
   vehicleImages: [
@@ -261,7 +261,7 @@ const DEFAULT_WEBSITE_CONTENT = {
     },
     {
       name: "Mehmet S.",
-      text: "İstanbul Havalimanı'ndan şehir merkezine çok rahat bir yolculuk yaptık. Teşekkürler Şeref Vural Travel.",
+      text: "İstanbul Havalimanı'ndan şehir merkezine çok rahat bir yolculuk yaptık. Teşekkürler Pro Transfer.",
       rating: 5,
       type: "Transfer"
     }

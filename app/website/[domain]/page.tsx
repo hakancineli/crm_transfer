@@ -10,8 +10,8 @@ const proTransferData = {
   companyName: "Pro Transfer",
   tagline: "İstanbul Havalimanı Transfer Hizmeti",
   description: "İstanbul Havalimanı'ndan şehir merkezine konforlu ve güvenli transfer hizmeti. Profesyonel şoförlerimiz ve Mercedes Vito araçlarımızla 7/24 hizmetinizdeyiz. Ayrıca İstanbul, Sapanca, Bursa, Abant turları ve kaliteli otel konaklama seçenekleri sunuyoruz.",
-  phone: "+90 531 945 89 31",
-  whatsapp: "+90 531 945 89 31",
+  phone: "+905545812034",
+  whatsapp: "+905545812034",
   email: "info@protransfer.com",
   
   features: [
@@ -430,7 +430,7 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-extrabold text-gray-900 mb-4">
-              Neden Şeref Vural Travel?
+              Neden Pro Transfer?
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               Profesyonel hizmet anlayışımız ve müşteri memnuniyeti odaklı yaklaşımımızla İstanbul'un en güvenilir transfer, tur ve konaklama hizmeti sunuyoruz.
@@ -516,7 +516,7 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
                 service: "Transfer",
                 date: "2 hafta önce",
                 rating: 5,
-                comment: "İstanbul Havalimanı'ndan şehir merkezine çok rahat bir yolculuk yaptık. Teşekkürler Şeref Vural Travel."
+                comment: "İstanbul Havalimanı'ndan şehir merkezine çok rahat bir yolculuk yaptık. Teşekkürler Pro Transfer."
               }
             ].map((review) => (
               <div key={review.id} className="bg-white p-6 rounded-lg shadow-sm border">
