@@ -30,16 +30,18 @@ interface SerefVuralTemplateProps {
 }
 
 const vehicleImages = [
-  '/images/1.jpg',
-  '/images/2.jpg',
-  '/images/3-3.jpg',
-  '/images/4-4.jpg',
-  '/images/5-5.jpg',
-  '/images/6(-6.jpg',
-  '/images/7-7.jpg',
-  '/images/8-8.jpg',
-  '/images/9-9.jpg',
-  '/images/10-10.jpg',
+  '/vehicles/vito-1.jpg',
+  '/vehicles/vito-2.jpg',
+  '/vehicles/vito-3.jpg',
+  '/vehicles/vito-4.jpg',
+  '/vehicles/vito-5.jpg',
+  '/vehicles/vito-6.jpg',
+  '/vehicles/vito-7.jpg',
+  '/vehicles/vito-8.jpg',
+  '/vehicles/vito-9.jpg',
+  '/vehicles/vito-10.jpg',
+  '/vehicles/vito-11.jpg',
+  '/vehicles/vito-12.jpg',
 ];
 
 export default function SerefVuralTemplate({ settings }: SerefVuralTemplateProps) {

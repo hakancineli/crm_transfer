@@ -22,16 +22,16 @@ const proTransferData = {
   ],
 
   vehicleImages: [
-    '/seref-vural-images/mercedes-vito-1.jpg',
-    '/seref-vural-images/mercedes-vito-2.jpg',
-    '/seref-vural-images/mercedes-vito-3.jpg',
-    '/seref-vural-images/mercedes-vito-4.jpg',
-    '/seref-vural-images/mercedes-vito-5.jpg',
-    '/seref-vural-images/mercedes-vito-6.jpg',
-    '/seref-vural-images/mercedes-vito-7.jpg',
-    '/seref-vural-images/mercedes-vito-8.jpg',
-    '/seref-vural-images/mercedes-vito-9.jpg',
-    '/seref-vural-images/mercedes-vito-10.jpg'
+    '/vehicles/vito-1.jpg',
+    '/vehicles/vito-2.jpg',
+    '/vehicles/vito-3.jpg',
+    '/vehicles/vito-4.jpg',
+    '/vehicles/vito-5.jpg',
+    '/vehicles/vito-6.jpg',
+    '/vehicles/vito-7.jpg',
+    '/vehicles/vito-8.jpg',
+    '/vehicles/vito-9.jpg',
+    '/vehicles/vito-10.jpg'
   ]
 };
 
