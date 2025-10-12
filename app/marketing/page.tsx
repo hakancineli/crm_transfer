@@ -122,8 +122,8 @@ export default function MarketingPage() {
                   <div className="text-lg font-semibold text-gray-900">{s.title}</div>
                   <div className="text-gray-600 mt-1 text-sm">{s.desc}</div>
                 </div>
-                <div className="relative aspect-[4/3] bg-gray-100">
-                  <img src={s.src} alt={s.title} className="object-cover w-full h-full" />
+                <div className="h-40 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-400 text-sm select-none">
+                  Görsel Yer Tutucu
                 </div>
               </div>
             ))}
