@@ -1,8 +1,22 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function MarketingPage() {
+  const { language, setLanguage } = useLanguage();
+  const [open, setOpen] = useState(false);
+  const languages = [
+    { code: 'en', label: 'English' },
+    { code: 'fr', label: 'Français' },
+    { code: 'ru', label: 'Русский' },
+    { code: 'ar', label: 'العربية' },
+    { code: 'tr', label: 'Türkçe' },
+  ] as const;
+
+  const current = languages.find(l => l.code === language) || languages[0];
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -14,7 +28,43 @@ export default function MarketingPage() {
             </div>
             <span className="text-xl font-bold text-gray-900">Pro Acente</span>
           </Link>
-          <div className="space-x-4 text-sm">
+          <div className="space-x-4 text-sm flex items-center">
+            <div className="relative">
+              <button
+                type="button"
+                aria-haspopup="menu"
+                aria-expanded={open ? 'true' : 'false'}
+                aria-controls="language-menu"
+                onClick={() => setOpen((v) => !v)}
+                className="inline-flex items-center px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                title="Language"
+              >
+                <span className="hidden sm:block text-sm font-medium text-gray-700">{current.label}</span>
+                <span className="sm:ml-2">▾</span>
+              </button>
+              {open && (
+                <div id="language-menu" role="menu" aria-label="Language" className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <ul className="py-1">
+                    {languages.map((l) => (
+                      <li key={l.code}>
+                        <button
+                          type="button"
+                          role="menuitem"
+                          onClick={() => {
+                            setLanguage(l.code as any);
+                            setOpen(false);
+                          }}
+                          className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${language === l.code ? 'text-gray-900 font-medium' : 'text-gray-700'}`}
+                          title={l.label}
+                        >
+                          {l.label}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
             <Link href="/admin-login" className="text-gray-600 hover:text-gray-900">Admin</Link>
             <Link href="/" className="inline-flex items-center px-3 py-1.5 rounded-lg bg-green-600 text-white hover:bg-green-700">Demoyu İncele</Link>
           </div>
