@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     description:
       "Pro Transfer ile IST ve SAW VIP transfer. Sabit fiyat, uçuş takibi, karşılama.",
     images: [
-      { url: "/images/1-1.jpg", width: 1200, height: 630, alt: "Pro Transfer Vito" },
+      { url: "/seref-vural-images/mercedes-vito-1.jpg", width: 1200, height: 630, alt: "Pro Transfer Vito" },
     ],
   },
   twitter: {
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     title: "Pro Transfer - İstanbul Havalimanı Transfer",
     description:
       "Pro Transfer ile IST ve SAW VIP transfer. Sabit fiyat, uçuş takibi, karşılama.",
-    images: ["/images/1-1.jpg"],
+    images: ["/seref-vural-images/mercedes-vito-1.jpg"],
   },
   robots: { index: true, follow: true },
 };
