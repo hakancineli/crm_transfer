@@ -233,7 +233,7 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
                 rating: 4.8,
                 price: 150,
                 currency: "USD",
-                image: "/seref-vural-tours/istanbul/1-1.jpeg"
+                image: "/seref-vural-images/tours/istanbul.svg"
               },
               {
                 id: 2,
@@ -243,7 +243,7 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
                 rating: 4.6,
                 price: 120,
                 currency: "USD",
-                image: "/seref-vural-tours/sapanca/1-1.jpeg"
+                image: "/seref-vural-images/tours/sapanca.svg"
               },
               {
                 id: 3,
@@ -253,7 +253,7 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
                 rating: 4.7,
                 price: 180,
                 currency: "USD",
-                image: "/seref-vural-tours/bursa/1-1.jpeg"
+                image: "/seref-vural-images/tours/bursa.svg"
               },
               {
                 id: 4,
@@ -263,7 +263,7 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
                 rating: 4.5,
                 price: 140,
                 currency: "USD",
-                image: "/seref-vural-tours/abant/1-1.jpeg"
+                image: "/seref-vural-images/tours/abant.svg"
               }
             ]).map((tour: any) => (
               <div key={tour.id} className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col h-full">
