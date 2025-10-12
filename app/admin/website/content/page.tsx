@@ -78,70 +78,70 @@ export default function WebsiteContentPage() {
         name: "Mercedes Vito",
         capacity: "7 kişilik kapasite",
         features: "Klima • WiFi • Profesyonel şoför",
-        image: "/seref-vural-tours/vito-1.jpg"
+        image: "/vehicles/vito-1.jpg"
       },
       {
         id: 2,
         name: "Mercedes Vito",
         capacity: "7 kişilik kapasite",
         features: "Klima • WiFi • Profesyonel şoför",
-        image: "/seref-vural-tours/vito-2.jpg"
+        image: "/vehicles/vito-2.jpg"
       },
       {
         id: 3,
         name: "Mercedes Vito",
         capacity: "7 kişilik kapasite",
         features: "Klima • WiFi • Profesyonel şoför",
-        image: "/seref-vural-tours/vito-3.jpg"
+        image: "/vehicles/vito-3.jpg"
       },
       {
         id: 4,
         name: "Mercedes Vito",
         capacity: "7 kişilik kapasite",
         features: "Klima • WiFi • Profesyonel şoför",
-        image: "/seref-vural-tours/vito-4.jpg"
+        image: "/vehicles/vito-4.jpg"
       },
       {
         id: 5,
         name: "Mercedes Vito",
         capacity: "7 kişilik kapasite",
         features: "Klima • WiFi • Profesyonel şoför",
-        image: "/seref-vural-tours/vito-5.jpg"
+        image: "/vehicles/vito-5.jpg"
       },
       {
         id: 6,
         name: "Mercedes Vito",
         capacity: "7 kişilik kapasite",
         features: "Klima • WiFi • Profesyonel şoför",
-        image: "/seref-vural-tours/vito-6.jpg"
+        image: "/vehicles/vito-6.jpg"
       },
       {
         id: 7,
         name: "Mercedes Vito",
         capacity: "7 kişilik kapasite",
         features: "Klima • WiFi • Profesyonel şoför",
-        image: "/seref-vural-tours/vito-7.jpg"
+        image: "/vehicles/vito-7.jpg"
       },
       {
         id: 8,
         name: "Mercedes Vito",
         capacity: "7 kişilik kapasite",
         features: "Klima • WiFi • Profesyonel şoför",
-        image: "/seref-vural-tours/vito-8.jpg"
+        image: "/vehicles/vito-8.jpg"
       },
       {
         id: 9,
         name: "Mercedes Vito",
         capacity: "7 kişilik kapasite",
         features: "Klima • WiFi • Profesyonel şoför",
-        image: "/seref-vural-tours/vito-9.jpg"
+        image: "/vehicles/vito-9.jpg"
       },
       {
         id: 10,
         name: "Mercedes Vito",
         capacity: "7 kişilik kapasite",
         features: "Klima • WiFi • Profesyonel şoför",
-        image: "/seref-vural-tours/vito-10.jpg"
+        image: "/vehicles/vito-10.jpg"
       }
     ],
     tours: [
@@ -152,7 +152,7 @@ export default function WebsiteContentPage() {
         duration: "8 saat",
         capacity: "7 kişilik kapasite",
         rating: 4.8,
-        image: "/seref-vural-tours/istanbul/1-1.jpeg",
+        image: "/seref-vural-tours/istanbul/1.svg",
         prices: {
           TRY: 4500,
           USD: 150,
@@ -167,7 +167,7 @@ export default function WebsiteContentPage() {
         duration: "6 saat",
         capacity: "7 kişilik kapasite",
         rating: 4.6,
-        image: "/seref-vural-tours/sapanca/1-1.jpeg",
+        image: "/seref-vural-tours/sapanca/1.svg",
         prices: {
           TRY: 3600,
           USD: 120,
@@ -182,7 +182,7 @@ export default function WebsiteContentPage() {
         duration: "10 saat",
         capacity: "7 kişilik kapasite",
         rating: 4.7,
-        image: "/seref-vural-tours/bursa/1-1.jpeg",
+        image: "/seref-vural-tours/bursa/1.svg",
         prices: {
           TRY: 5400,
           USD: 180,
@@ -197,7 +197,7 @@ export default function WebsiteContentPage() {
         duration: "7 saat",
         capacity: "7 kişilik kapasite",
         rating: 4.5,
-        image: "/seref-vural-tours/abant/1-1.jpeg",
+        image: "/seref-vural-tours/abant/1.svg",
         prices: {
           TRY: 4200,
           USD: 140,
@@ -389,80 +389,91 @@ export default function WebsiteContentPage() {
               <h2 className="text-xl font-semibold mb-6">Ana Sayfa İçeriği</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="hero-title" className="block text-sm font-medium text-gray-700 mb-2">
                     Şirket Adı
                   </label>
                   <input
+                    id="hero-title"
                     type="text"
                     value={content.hero.title}
                     onChange={(e) => setContent(prev => ({
                       ...prev,
                       hero: { ...prev.hero, title: e.target.value }
                     }))}
+                    placeholder="Şirket adı"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="hero-subtitle" className="block text-sm font-medium text-gray-700 mb-2">
                     Alt Başlık
                   </label>
                   <input
+                    id="hero-subtitle"
                     type="text"
                     value={content.hero.subtitle}
                     onChange={(e) => setContent(prev => ({
                       ...prev,
                       hero: { ...prev.hero, subtitle: e.target.value }
                     }))}
+                    placeholder="Alt başlık"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="hero-description" className="block text-sm font-medium text-gray-700 mb-2">
                     Açıklama
                   </label>
                   <textarea
+                    id="hero-description"
                     rows={4}
                     value={content.hero.description}
                     onChange={(e) => setContent(prev => ({
                       ...prev,
                       hero: { ...prev.hero, description: e.target.value }
                     }))}
+                    placeholder="Kısa açıklama"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="hero-whatsapp" className="block text-sm font-medium text-gray-700 mb-2">
                     WhatsApp
                   </label>
                   <input
+                    id="hero-whatsapp"
                     type="text"
                     value={content.hero.whatsapp}
                     onChange={(e) => setContent(prev => ({
                       ...prev,
                       hero: { ...prev.hero, whatsapp: e.target.value }
                     }))}
+                    placeholder="+90..."
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="hero-phone" className="block text-sm font-medium text-gray-700 mb-2">
                     Telefon
                   </label>
                   <input
+                    id="hero-phone"
                     type="text"
                     value={content.hero.phone}
                     onChange={(e) => setContent(prev => ({
                       ...prev,
                       hero: { ...prev.hero, phone: e.target.value }
                     }))}
+                    placeholder="+90..."
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="hero-email" className="block text-sm font-medium text-gray-700 mb-2">
                     Email
                   </label>
                   <input
+                    id="hero-email"
                     type="email"
                     value={content.hero.email}
                     onChange={(e) => setContent(prev => ({
@@ -716,10 +727,11 @@ export default function WebsiteContentPage() {
                       {/* Sol Kolon - Temel Bilgiler */}
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor={`vehicle-name-${vehicle.id}`} className="block text-sm font-medium text-gray-700 mb-2">
                             Araç Adı
                           </label>
                           <input
+                            id={`vehicle-name-${vehicle.id}`}
                             type="text"
                             value={vehicle.name}
                             onChange={(e) => setContent(prev => ({
@@ -728,14 +740,16 @@ export default function WebsiteContentPage() {
                                 v.id === vehicle.id ? { ...v, name: e.target.value } : v
                               )
                             }))}
+                            placeholder="Araç adı"
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor={`vehicle-capacity-${vehicle.id}`} className="block text-sm font-medium text-gray-700 mb-2">
                             Kapasite
                           </label>
                           <input
+                            id={`vehicle-capacity-${vehicle.id}`}
                             type="text"
                             value={vehicle.capacity}
                             onChange={(e) => setContent(prev => ({
@@ -744,14 +758,16 @@ export default function WebsiteContentPage() {
                                 v.id === vehicle.id ? { ...v, capacity: e.target.value } : v
                               )
                             }))}
+                            placeholder="7 kişilik"
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor={`vehicle-features-${vehicle.id}`} className="block text-sm font-medium text-gray-700 mb-2">
                             Özellikler
                           </label>
                           <input
+                            id={`vehicle-features-${vehicle.id}`}
                             type="text"
                             value={vehicle.features}
                             onChange={(e) => setContent(prev => ({
@@ -760,6 +776,7 @@ export default function WebsiteContentPage() {
                                 v.id === vehicle.id ? { ...v, features: e.target.value } : v
                               )
                             }))}
+                            placeholder="Klima, WiFi, ..."
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                           />
                         </div>

@@ -268,11 +268,10 @@ export default function WebsitePage({ params }: { params: { domain: string } }) 
             ]).map((tour: any) => (
               <div key={tour.id} className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col h-full">
                 <div className="relative h-48 bg-gray-200">
-                  <Image
+                  <img
                     src={tour.image}
                     alt={tour.name}
-                    fill
-                    className="object-cover"
+                    className="object-cover w-full h-full"
                   />
                   <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center">
                     <Star className="w-4 h-4 text-yellow-400 fill-current mr-1" />

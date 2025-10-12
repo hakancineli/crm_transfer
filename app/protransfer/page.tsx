@@ -427,7 +427,7 @@ export default function ProtransferWebsitePage() {
             {tours.map((tour: any) => (
               <div key={tour.id} className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
                 <div className="relative h-48">
-                  <Image src={tour.image} alt={tour.name} fill className="object-cover" />
+                  <img src={tour.image} alt={tour.name} className="object-cover w-full h-full" />
                   <div className="absolute top-4 right-4 bg-white px-2 py-1 rounded-full text-sm font-semibold text-green-600">
                     ⭐ {tour.rating}
                   </div>
