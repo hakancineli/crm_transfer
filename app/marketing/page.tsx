@@ -395,11 +395,11 @@ export default function MarketingPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {[ 
+                {[
                   { k: 'Rezervasyon Yönetimi', cols: [true, true, true, true, false] },
                   { k: 'Şoför / Araç Yönetimi', cols: [true, true, false, false, false] },
                   { k: 'Raporlama & Analiz', cols: [true, true, true, true, false] },
-                  { k: 'Muhasebe / Komisyon', cols: [true, true, false, false, false] },
+                  { k: 'Muhasebe / Komisyon', cols: [true, true, true, true, false] },
                   { k: 'Rota / Rehber Yönetimi', cols: [false, true, false, false, false] },
                   { k: 'Otel / Oda Yönetimi', cols: [false, false, true, false, false] },
                   { k: 'Uçuş Takibi', cols: [true, false, false, true, false] },
@@ -414,6 +414,12 @@ export default function MarketingPage() {
                   { k: 'Ödeme Takibi', cols: [true, true, true, true, false] },
                   { k: 'Excel Export/Import', cols: [true, true, true, true, false] },
                   { k: 'API Entegrasyonu', cols: [true, true, true, true, true] },
+                  { k: 'UETDS Entegrasyonu', cols: [true, false, false, false, false] },
+                  { k: 'Fatura Ön-Dolum (Prefill)', cols: [true, true, true, true, false] },
+                  { k: 'Rezervasyon Lookup (Voucher)', cols: [true, true, true, true, false] },
+                  { k: 'Harici Rezervasyon Push (Webhook/API)', cols: [true, true, true, true, true] },
+                  { k: 'Kur Oranları Otomatik Güncelleme', cols: [true, true, true, true, true] },
+                  { k: 'Yedekleme ve Geri Yükleme', cols: [true, true, true, true, true] },
                   { k: 'Audit Log', cols: [true, true, true, true, true] },
                   { k: 'Otomatik Yedekleme', cols: [true, true, true, true, true] },
                   { k: 'Real-time Güncellemeler', cols: [true, true, true, true, true] },
@@ -670,30 +676,19 @@ export default function MarketingPage() {
                 'Sürücü için navigasyon'
               ] },
               { name: 'Professional', price: '₺1000/ay', features: [
-                'Rol bazlı erişim kontrolü', 'Transfer Modülü', 'Raporlama', 'Kullanıcı Yönetimi', 'Şoför Atama', 'İş saatine 1 saat kala kırmızı alarm', 'Voucher gönderimi (5 dil, WhatsApp müşteri + şoför)', 'Muhasebe', 'Sürücü için navigasyon',
-                'Transfer + Konaklama',
-                'Gelişmiş Raporlama',
-                'Öncelikli Destek',
-                'Çok dilli voucher şablonları',
-                'Toplu voucher gönderimi'
+                'Rol bazlı erişim kontrolü', 'Transfer Modülü', 'Tur Modülü', 'Konaklama Modülü', 'Raporlama', 'Kullanıcı Yönetimi', 'Şoför Atama', 'İş saatine 1 saat kala kırmızı alarm', 'Voucher gönderimi (5 dil, WhatsApp müşteri + şoför)', 'Muhasebe', 'Sürücü için navigasyon',
+                'Gelişmiş Raporlama', 'Öncelikli Destek', 'Çok dilli voucher şablonları', 'Toplu voucher gönderimi',
+                'Fatura ön‑dolum (prefill)', 'Rezervasyon lookup & push (API)'
               ] },
               { name: 'Enterprise', price: '₺2000/ay', features: [
-                'Rol bazlı erişim kontrolü', 'Transfer Modülü', 'Raporlama', 'Kullanıcı Yönetimi', 'Şoför Atama', 'İş saatine 1 saat kala kırmızı alarm', 'Voucher gönderimi (5 dil, WhatsApp müşteri + şoför)', 'Muhasebe', 'Sürücü için navigasyon',
-                'Transfer + Konaklama + Uçuş',
-                'API Erişimi',
-                'Tek Oturum Açma',
-                'Akıllı atama önerileri',
-                'Audit Log & Gelişmiş güvenlik',
-                'Yedekleme politikaları'
+                'Rol bazlı erişim kontrolü', 'Transfer Modülü', 'Tur Modülü', 'Konaklama Modülü', 'Uçuş Modülü', 'Raporlama', 'Kullanıcı Yönetimi', 'Şoför Atama', 'İş saatine 1 saat kala kırmızı alarm', 'Voucher gönderimi (5 dil, WhatsApp müşteri + şoför)', 'Muhasebe', 'Sürücü için navigasyon',
+                'API Erişimi', 'Tek Oturum Açma', 'Akıllı atama önerileri', 'Audit Log & Gelişmiş güvenlik',
+                'UETDS Entegrasyonu', 'Kur oranlarını otomatik güncelleme', 'Yedekleme & geri yükleme'
               ] },
               { name: 'Premium', price: '₺3000/ay', features: [
-                'Rol bazlı erişim kontrolü', 'Transfer Modülü', 'Raporlama', 'Kullanıcı Yönetimi', 'Şoför Atama', 'İş saatine 1 saat kala kırmızı alarm', 'Voucher gönderimi (5 dil, WhatsApp müşteri + şoför)', 'Muhasebe', 'Sürücü için navigasyon',
-                'Tüm Modüller + Website',
-                'Özel Domain & İçerik',
-                'Danışmanlık',
-                'Çoklu marka/tenant yönetimi',
-                'Özel SLA ve eğitim',
-                'Özelleştirilmiş raporlar'
+                'Rol bazlı erişim kontrolü', 'Transfer Modülü', 'Tur Modülü', 'Konaklama Modülü', 'Uçuş Modülü', 'Website', 'Raporlama', 'Kullanıcı Yönetimi', 'Şoför Atama', 'İş saatine 1 saat kala kırmızı alarm', 'Voucher gönderimi (5 dil, WhatsApp müşteri + şoför)', 'Muhasebe', 'Sürücü için navigasyon',
+                'Özel Domain & İçerik', 'Danışmanlık', 'Çoklu marka/tenant yönetimi', 'Özel SLA ve eğitim', 'Özelleştirilmiş raporlar',
+                'UETDS Entegrasyonu', 'Kur oranlarını otomatik güncelleme', 'Rezervasyon lookup & push (API)', 'Yedekleme & geri yükleme'
               ] },
             ].map((p) => (
               <div key={p.name} className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm flex flex-col">
