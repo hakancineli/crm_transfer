@@ -224,7 +224,7 @@ export default function WebsitePage() {
             </div>
             <div className="relative h-64 sm:h-80 md:h-96 rounded-xl overflow-hidden shadow-lg">
               <Image
-                src={settings.heroImage || '/seref-vural-images/mercedes-vito-1.jpg'}
+                src={settings.heroImage || '/seref-vural-tours/vito-1.jpg'}
                 alt={settings.companyName}
                 fill
                 className="object-cover"

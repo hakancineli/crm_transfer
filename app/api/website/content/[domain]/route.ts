@@ -21,16 +21,18 @@ const DEFAULT_WEBSITE_CONTENT = {
     }
   },
   vehicleImages: [
-    '/seref-vural-images/mercedes-vito-1.jpg',
-    '/seref-vural-images/mercedes-vito-2.jpg',
-    '/seref-vural-images/mercedes-vito-3.jpg',
-    '/seref-vural-images/mercedes-vito-4.jpg',
-    '/seref-vural-images/mercedes-vito-5.jpg',
-    '/seref-vural-images/mercedes-vito-6.jpg',
-    '/seref-vural-images/mercedes-vito-7.jpg',
-    '/seref-vural-images/mercedes-vito-8.jpg',
-    '/seref-vural-images/mercedes-vito-9.jpg',
-    '/seref-vural-images/mercedes-vito-10.jpg'
+    '/seref-vural-tours/vito-1.jpg',
+    '/seref-vural-tours/vito-2.jpg',
+    '/seref-vural-tours/vito-3.jpg',
+    '/seref-vural-tours/vito-4.jpg',
+    '/seref-vural-tours/vito-5.jpg',
+    '/seref-vural-tours/vito-6.jpg',
+    '/seref-vural-tours/vito-7.jpg',
+    '/seref-vural-tours/vito-8.jpg',
+    '/seref-vural-tours/vito-9.jpg',
+    '/seref-vural-tours/vito-10.jpg',
+    '/seref-vural-tours/vito-11.jpg',
+    '/seref-vural-tours/vito-12.jpg'
   ],
   vehicles: [
     {
@@ -38,70 +40,70 @@ const DEFAULT_WEBSITE_CONTENT = {
       name: "Mercedes Vito",
       capacity: "7 kişilik kapasite",
       features: "Klima • WiFi • Profesyonel şoför",
-      image: "/seref-vural-images/mercedes-vito-1.jpg"
+      image: "/seref-vural-tours/vito-1.jpg"
     },
     {
       id: 2,
       name: "Mercedes Vito",
       capacity: "7 kişilik kapasite",
       features: "Klima • WiFi • Profesyonel şoför",
-      image: "/seref-vural-images/mercedes-vito-2.jpg"
+      image: "/seref-vural-tours/vito-2.jpg"
     },
     {
       id: 3,
       name: "Mercedes Vito",
       capacity: "7 kişilik kapasite",
       features: "Klima • WiFi • Profesyonel şoför",
-      image: "/seref-vural-images/mercedes-vito-3.jpg"
+      image: "/seref-vural-tours/vito-3.jpg"
     },
     {
       id: 4,
       name: "Mercedes Vito",
       capacity: "7 kişilik kapasite",
       features: "Klima • WiFi • Profesyonel şoför",
-      image: "/seref-vural-images/mercedes-vito-4.jpg"
+      image: "/seref-vural-tours/vito-4.jpg"
     },
     {
       id: 5,
       name: "Mercedes Vito",
       capacity: "7 kişilik kapasite",
       features: "Klima • WiFi • Profesyonel şoför",
-      image: "/seref-vural-images/mercedes-vito-5.jpg"
+      image: "/seref-vural-tours/vito-5.jpg"
     },
     {
       id: 6,
       name: "Mercedes Vito",
       capacity: "7 kişilik kapasite",
       features: "Klima • WiFi • Profesyonel şoför",
-      image: "/seref-vural-images/mercedes-vito-6.jpg"
+      image: "/seref-vural-tours/vito-6.jpg"
     },
     {
       id: 7,
       name: "Mercedes Vito",
       capacity: "7 kişilik kapasite",
       features: "Klima • WiFi • Profesyonel şoför",
-      image: "/seref-vural-images/mercedes-vito-7.jpg"
+      image: "/seref-vural-tours/vito-7.jpg"
     },
     {
       id: 8,
       name: "Mercedes Vito",
       capacity: "7 kişilik kapasite",
       features: "Klima • WiFi • Profesyonel şoför",
-      image: "/seref-vural-images/mercedes-vito-8.jpg"
+      image: "/seref-vural-tours/vito-8.jpg"
     },
     {
       id: 9,
       name: "Mercedes Vito",
       capacity: "7 kişilik kapasite",
       features: "Klima • WiFi • Profesyonel şoför",
-      image: "/seref-vural-images/mercedes-vito-9.jpg"
+      image: "/seref-vural-tours/vito-9.jpg"
     },
     {
       id: 10,
       name: "Mercedes Vito",
       capacity: "7 kişilik kapasite",
       features: "Klima • WiFi • Profesyonel şoför",
-      image: "/seref-vural-images/mercedes-vito-10.jpg"
+      image: "/seref-vural-tours/vito-10.jpg"
     }
   ],
   tours: [
