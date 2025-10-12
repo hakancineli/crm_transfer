@@ -28,6 +28,7 @@ interface LanguageProviderProps {
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
   const [language, setLanguageState] = useState<Language>('tr');
   const [translations, setTranslations] = useState<any>({});
+  const [ready, setReady] = useState<boolean>(false);
 
   useEffect(() => {
     // Local storage'dan dil tercihini al
@@ -42,29 +43,35 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     const loadTranslations = async () => {
       try {
         const response = await fetch(`/locales/${language}.json`, { cache: 'no-store' });
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        // Bazı hostinglerde content-type hatalı gelebilir; yine de JSON parse dene
+        let data: any = {};
+        try {
+          data = await response.json();
+        } catch (e) {
+          throw new Error('Invalid JSON body for translations');
         }
-        const ct = response.headers.get('content-type') || '';
-        if (!ct.includes('application/json')) {
-          throw new Error('Invalid content-type for translations');
-        }
-        const data = await response.json();
         setTranslations(data || {});
+        setReady(true);
       } catch (error) {
         console.error(`Failed to load ${language} translations:`, error);
         // Fallback olarak İngilizce yükle
         try {
           const response = await fetch('/locales/en.json', { cache: 'no-store' });
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          const ct = response.headers.get('content-type') || '';
-          if (!ct.includes('application/json')) throw new Error('Invalid content-type for fallback');
-          const data = await response.json();
+          let data: any = {};
+          try {
+            data = await response.json();
+          } catch (e) {
+            throw new Error('Invalid JSON body for fallback');
+          }
           setTranslations(data || {});
+          setReady(true);
         } catch (fallbackError) {
           console.error('Failed to load fallback translations:', fallbackError);
           // En kötü senaryoda boş çeviri ile devam et
           setTranslations({});
+          setReady(true);
         }
       }
     };
@@ -108,9 +115,11 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
 
   return (
     <LanguageContext.Provider value={value}>
-      <div dir={dir} lang={language}>
-        {children}
-      </div>
+      {ready ? (
+        <div dir={dir} lang={language} suppressHydrationWarning>
+          {children}
+        </div>
+      ) : null}
     </LanguageContext.Provider>
   );
 };
