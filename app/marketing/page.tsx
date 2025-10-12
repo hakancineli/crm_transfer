@@ -107,6 +107,31 @@ export default function MarketingPage() {
         </div>
       </section>
 
+      {/* Ekran Görüntüleri */}
+      <section className="py-16 bg-gray-50" id="screenshots">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">Ekran Görüntüleri</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[ 
+              { title: 'Dashboard', desc: 'Anlık özet ve hızlı aksiyonlar', src: '/screenshots/dashboard.png' },
+              { title: 'Rezervasyon', desc: 'Yeni rezervasyon ve atama akışı', src: '/screenshots/reservation.png' },
+              { title: 'Raporlar', desc: 'Gelir, dağılım ve popüler rotalar', src: '/screenshots/reports.png' },
+            ].map((s) => (
+              <div key={s.title} className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+                <div className="p-4">
+                  <div className="text-lg font-semibold text-gray-900">{s.title}</div>
+                  <div className="text-gray-600 mt-1 text-sm">{s.desc}</div>
+                </div>
+                <div className="relative aspect-[4/3] bg-gray-100">
+                  <img src={s.src} alt={s.title} className="object-cover w-full h-full" />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-xs text-gray-500 mt-3">Görselleri <code>/public/screenshots/</code> altına <code>dashboard.png</code>, <code>reservation.png</code>, <code>reports.png</code> isimleriyle yükleyin.</div>
+        </div>
+      </section>
+
       {/* Değer Önerileri (3 ana başlık) */}
       <section className="py-16" id="value-props">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
