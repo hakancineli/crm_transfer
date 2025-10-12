@@ -10,13 +10,13 @@ import { EmojiProvider } from "./contexts/EmojiContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://proacente.com"),
+  metadataBase: new URL("https://protransfer.com"),
   title: {
-    default: "ProTransfer - İstanbul Havalimanı Transfer Hizmeti",
-    template: "%s | ProTransfer",
+    default: "Pro Transfer - İstanbul Havalimanı Transfer Hizmeti",
+    template: "%s | Pro Transfer",
   },
   description:
-    "İstanbul Havalimanı (IST) ve Sabiha Gökçen (SAW) VIP transfer. 7/24 Mercedes Vito, lüks sedan, şehirler arası transfer. Sabit fiyat, uçuş takibi, karşılama.",
+    "Pro Transfer ile İstanbul Havalimanı (IST) ve Sabiha Gökçen (SAW) VIP transfer. 7/24 Mercedes Vito, sabit fiyat, uçuş takibi ve karşılama hizmeti.",
   keywords: [
     "İstanbul transfer",
     "havalimanı transfer",
@@ -38,21 +38,21 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    url: "https://proacente.com/",
-    siteName: "ProAcente",
-    title: "ProAcente - CRM",
+    url: "https://protransfer.com/",
+    siteName: "Pro Transfer",
+    title: "Pro Transfer - İstanbul Havalimanı Transfer Hizmeti",
     description:
-      "IST ve SAW için VIP transfer. Sabit fiyat, uçuş takibi, karşılama hizmeti.",
+      "Pro Transfer ile IST ve SAW VIP transfer. Sabit fiyat, uçuş takibi, karşılama.",
     images: [
-      { url: "/logo.svg", width: 1200, height: 630, alt: "ProTransfer" },
+      { url: "/images/1-1.jpg", width: 1200, height: 630, alt: "Pro Transfer Vito" },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ProTransfer - İstanbul Havalimanı Transfer",
+    title: "Pro Transfer - İstanbul Havalimanı Transfer",
     description:
-      "IST ve SAW için VIP transfer. Sabit fiyat, uçuş takibi, karşılama hizmeti.",
-    images: ["/logo.svg"],
+      "Pro Transfer ile IST ve SAW VIP transfer. Sabit fiyat, uçuş takibi, karşılama.",
+    images: ["/images/1-1.jpg"],
   },
   robots: { index: true, follow: true },
 };
