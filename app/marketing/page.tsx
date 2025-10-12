@@ -662,33 +662,20 @@ export default function MarketingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-extrabold text-gray-900 mb-8">Fiyatlandırma</h2>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6">
             {[ 
-              { name: 'Basic', price: '₺0', features: [
-                'Rol bazlı erişim kontrolü',
-                'Transfer Modülü',
-                'Raporlama',
-                'Kullanıcı Yönetimi',
-                'Şoför Atama',
-                'İş saatine 1 saat kala kırmızı alarm',
-                'Voucher gönderimi (5 dil, WhatsApp müşteri + şoför)',
-                'Muhasebe',
-                'Sürücü için navigasyon'
+              { name: 'Professional', price: '₺50.000', features: [
+                'Rol bazlı erişim kontrolü', 'Transfer Modülü', 'Tur Yönetimi', 'Konaklama Yönetimi', 'Raporlama', 'Kullanıcı Yönetimi', 'Şoför Atama',
+                'İş saatine 1 saat kala kırmızı alarm', 'Voucher gönderimi (5 dil, WhatsApp müşteri + şoför)', 'Muhasebe', 'Sürücü için navigasyon'
               ] },
-              { name: 'Professional', price: '₺1000/ay', features: [
-                'Rol bazlı erişim kontrolü', 'Transfer Modülü', 'Tur Modülü', 'Konaklama Modülü', 'Raporlama', 'Kullanıcı Yönetimi', 'Şoför Atama', 'İş saatine 1 saat kala kırmızı alarm', 'Voucher gönderimi (5 dil, WhatsApp müşteri + şoför)', 'Muhasebe', 'Sürücü için navigasyon',
-                'Gelişmiş Raporlama', 'Öncelikli Destek', 'Çok dilli voucher şablonları', 'Toplu voucher gönderimi',
-                'Fatura ön‑dolum (prefill)', 'Rezervasyon lookup & push (API)'
+              { name: 'Enterprise', price: '₺60.000', features: [
+                'Profesyonel paketteki tüm özellikler', 'Uçuş Yönetimi', 'API Erişimi', 'Tek Oturum Açma',
+                'Fatura ön‑dolum (prefill)', 'Rezervasyon lookup & push (API)', 'Gelişmiş Raporlama', 'Öncelikli Destek'
               ] },
-              { name: 'Enterprise', price: '₺2000/ay', features: [
-                'Rol bazlı erişim kontrolü', 'Transfer Modülü', 'Tur Modülü', 'Konaklama Modülü', 'Uçuş Modülü', 'Raporlama', 'Kullanıcı Yönetimi', 'Şoför Atama', 'İş saatine 1 saat kala kırmızı alarm', 'Voucher gönderimi (5 dil, WhatsApp müşteri + şoför)', 'Muhasebe', 'Sürücü için navigasyon',
-                'API Erişimi', 'Tek Oturum Açma', 'Akıllı atama önerileri', 'Audit Log & Gelişmiş güvenlik',
-                'UETDS Entegrasyonu', 'Kur oranlarını otomatik güncelleme', 'Yedekleme & geri yükleme'
-              ] },
-              { name: 'Premium', price: '₺3000/ay', features: [
-                'Rol bazlı erişim kontrolü', 'Transfer Modülü', 'Tur Modülü', 'Konaklama Modülü', 'Uçuş Modülü', 'Website', 'Raporlama', 'Kullanıcı Yönetimi', 'Şoför Atama', 'İş saatine 1 saat kala kırmızı alarm', 'Voucher gönderimi (5 dil, WhatsApp müşteri + şoför)', 'Muhasebe', 'Sürücü için navigasyon',
-                'Özel Domain & İçerik', 'Danışmanlık', 'Çoklu marka/tenant yönetimi', 'Özel SLA ve eğitim', 'Özelleştirilmiş raporlar',
-                'UETDS Entegrasyonu', 'Kur oranlarını otomatik güncelleme', 'Rezervasyon lookup & push (API)', 'Yedekleme & geri yükleme'
+              { name: 'Premium', price: '₺70.000', features: [
+                'Enterprise paketteki tüm özellikler', 'Website (çoklu tenant)', 'UETDS Entegrasyonu',
+                'Kur oranlarını otomatik güncelleme', 'Yedekleme & geri yükleme', 'Özel Domain & İçerik',
+                'Çoklu marka/tenant yönetimi', 'Özel SLA ve eğitim', 'Özelleştirilmiş raporlar'
               ] },
             ].map((p) => (
               <div key={p.name} className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm flex flex-col">
