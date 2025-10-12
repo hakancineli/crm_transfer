@@ -41,18 +41,30 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     // Dil dosyasını yükle
     const loadTranslations = async () => {
       try {
-        const response = await fetch(`/locales/${language}.json`);
+        const response = await fetch(`/locales/${language}.json`, { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const ct = response.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) {
+          throw new Error('Invalid content-type for translations');
+        }
         const data = await response.json();
-        setTranslations(data);
+        setTranslations(data || {});
       } catch (error) {
         console.error(`Failed to load ${language} translations:`, error);
         // Fallback olarak İngilizce yükle
         try {
-          const response = await fetch('/locales/en.json');
+          const response = await fetch('/locales/en.json', { cache: 'no-store' });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const ct = response.headers.get('content-type') || '';
+          if (!ct.includes('application/json')) throw new Error('Invalid content-type for fallback');
           const data = await response.json();
-          setTranslations(data);
+          setTranslations(data || {});
         } catch (fallbackError) {
           console.error('Failed to load fallback translations:', fallbackError);
+          // En kötü senaryoda boş çeviri ile devam et
+          setTranslations({});
         }
       }
     };
