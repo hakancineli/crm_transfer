@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
 
 export default function AdminLoginClient() {
-  const [email, setEmail] = useState('superuser');
-  const [password, setPassword] = useState('Pamukkale34.');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -18,7 +18,17 @@ export default function AdminLoginClient() {
     }
   }, [isAuthenticated, router]);
 
-  // Demo auto-login removed intentionally
+  // Demo: URL param ?demo=1 gelirse demo bilgilerini formda doldur (auto-submit yok)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('demo') === '1') {
+        setEmail('demo');
+        setPassword('demo');
+      }
+    } catch {}
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

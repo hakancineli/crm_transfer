@@ -95,7 +95,7 @@ export default function MarketingPage() {
               )}
             </div>
             <Link href="/admin-login" className="text-gray-600 hover:text-gray-900">Admin</Link>
-            <Link href="/admin-login" className="inline-flex items-center px-3 py-1.5 rounded-lg bg-green-600 text-white hover:bg-green-700">Demoyu İncele</Link>
+            <Link href="/admin-login?demo=1" className="inline-flex items-center px-3 py-1.5 rounded-lg bg-green-600 text-white hover:bg-green-700">Demoyu İncele</Link>
           </div>
         </div>
       </header>
