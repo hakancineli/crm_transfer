@@ -39,6 +39,7 @@ interface VoucherContentProps {
             companyName: string;
             subdomain: string;
         };
+    };
     isDriverVoucher?: boolean;
 }
 
