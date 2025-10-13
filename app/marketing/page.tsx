@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export default function MarketingPage() {
@@ -16,6 +16,7 @@ export default function MarketingPage() {
   ] as const;
 
   const current = languages.find(l => l.code === language) || languages[0];
+  const scRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className="min-h-screen bg-white">
@@ -66,7 +67,7 @@ export default function MarketingPage() {
               )}
             </div>
             <Link href="/admin-login" className="text-gray-600 hover:text-gray-900">Admin</Link>
-            <Link href="/" className="inline-flex items-center px-3 py-1.5 rounded-lg bg-green-600 text-white hover:bg-green-700">Demoyu İncele</Link>
+            <Link href="/admin-login#demo" className="inline-flex items-center px-3 py-1.5 rounded-lg bg-green-600 text-white hover:bg-green-700">Demoyu İncele</Link>
           </div>
         </div>
       </header>
@@ -111,26 +112,53 @@ export default function MarketingPage() {
       <section className="py-16 bg-gray-50" id="screenshots">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-extrabold text-gray-900 mb-8">Ekran Görüntüleri</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[ 
-              { title: 'Dashboard', desc: 'Anlık özet ve hızlı aksiyonlar', src: '/screenshots/dashboard.png' },
-              { title: 'Rezervasyon', desc: 'Yeni rezervasyon ve atama akışı', src: '/screenshots/reservation.png' },
-              { title: 'Raporlar', desc: 'Gelir, dağılım ve popüler rotalar', src: '/screenshots/reports.png' },
-            ].map((s) => (
-              <div key={s.title} className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-                <div className="p-4">
-                  <div className="text-lg font-semibold text-gray-900">{s.title}</div>
-                  <div className="text-gray-600 mt-1 text-sm">{s.desc}</div>
-                </div>
-                <a href={s.src} target="_blank" rel="noopener noreferrer" title={`${s.title} - Tam boyut`}>
-                  <div className="relative aspect-[4/3] bg-gray-100">
-                    <img src={s.src} alt={s.title} className="object-cover w-full h-full" />
+          <div className="relative">
+            <div
+              ref={scRef}
+              className="flex gap-6 overflow-x-auto pb-2 snap-x snap-mandatory"
+              aria-label="Ekran görüntüleri kaydırma galerisi"
+            >
+              {[ 
+                { title: 'Dashboard', desc: 'Anlık özet ve hızlı aksiyonlar', src: '/screenshots/dashboard.png' },
+                { title: 'Rezervasyon', desc: 'Yeni rezervasyon ve atama akışı', src: '/screenshots/reservation.png' },
+                { title: 'Raporlar', desc: 'Gelir, dağılım ve popüler rotalar', src: '/screenshots/reports.png' },
+                { title: 'Müşteri Voucherı', desc: 'PDF/WhatsApp paylaşımı için voucher', src: '/screenshots/mvoucheri.png' },
+              ].map((s) => (
+                <div key={s.title} className="snap-start min-w-[280px] sm:min-w-[340px] lg:min-w-[420px] rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+                  <div className="p-4">
+                    <div className="text-lg font-semibold text-gray-900">{s.title}</div>
+                    <div className="text-gray-600 mt-1 text-sm">{s.desc}</div>
                   </div>
-                </a>
-              </div>
-            ))}
+                  <a href={s.src} target="_blank" rel="noopener noreferrer" title={`${s.title} - Tam boyut`}>
+                    <div className="relative aspect-[4/3] bg-gray-100">
+                      <img src={s.src} alt={s.title} className="object-cover w-full h-full" />
+                    </div>
+                  </a>
+                </div>
+              ))}
+            </div>
+            <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex items-center justify-between">
+              <button
+                type="button"
+                aria-label="Galeriyi sola kaydır"
+                onClick={() => scRef.current?.scrollBy({ left: -400, behavior: 'smooth' })}
+                className="pointer-events-auto hidden sm:flex items-center justify-center w-9 h-9 rounded-full bg-white/90 border border-gray-200 shadow hover:bg-white focus:outline-none"
+                title="Sola kaydır"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                aria-label="Galeriyi sağa kaydır"
+                onClick={() => scRef.current?.scrollBy({ left: 400, behavior: 'smooth' })}
+                className="pointer-events-auto hidden sm:flex items-center justify-center w-9 h-9 rounded-full bg-white/90 border border-gray-200 shadow hover:bg-white focus:outline-none"
+                title="Sağa kaydır"
+              >
+                ›
+              </button>
+            </div>
           </div>
-          <div className="text-xs text-gray-500 mt-3">Görseller <code>/public/screenshots/</code> altındaki <code>dashboard.png</code>, <code>reservation.png</code>, <code>reports.png</code> dosyalarından yüklenir.</div>
+          <div className="text-xs text-gray-500 mt-3">Görseller <code>/public/screenshots/</code> altındaki <code>dashboard.png</code>, <code>reservation.png</code>, <code>reports.png</code>, <code>mvoucheri.png</code> dosyalarından yüklenir. Liste sağa-sola kaydırılabilir.</div>
         </div>
       </section>
 
