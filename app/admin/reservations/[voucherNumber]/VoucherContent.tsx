@@ -45,6 +45,7 @@ interface VoucherContentProps {
 
 export default function VoucherContent({ reservation, isDriverVoucher }: VoucherContentProps) {
     const [selectedLanguage, setSelectedLanguage] = useState('tr');
+    const [hasAuth, setHasAuth] = useState(false);
     const [editingDriverPhone, setEditingDriverPhone] = useState(false);
     const [driverPhone, setDriverPhone] = useState<string>((reservation as any)?.driver?.phoneNumber || '');
     const [savingDriver, setSavingDriver] = useState(false);
@@ -57,6 +58,14 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
     const [drivers, setDrivers] = useState<Array<{id:string; name:string; phoneNumber?:string}>>([]);
     const [driversLoading, setDriversLoading] = useState(false);
     const [selectedDriverId, setSelectedDriverId] = useState<string>('');
+
+    // Check auth token to decide whether to show edit controls (shared links shouldn't show)
+    if (typeof window !== 'undefined' && !hasAuth) {
+        try {
+            const t = localStorage.getItem('token');
+            if (t) setHasAuth(true);
+        } catch {}
+    }
     const fetchDrivers = async () => {
         try {
             setDriversLoading(true);
@@ -393,7 +402,7 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                 <h1 className="text-2xl print:text-xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2">
                     {isDriverVoucher ? t.title : 'Müşteri Voucherı'}
                 </h1>
-                {isDriverVoucher && (
+                {isDriverVoucher && hasAuth && (
                     <div className="print:hidden mb-3">
                         <Link
                             href={`/admin/reservations/${reservation.voucherNumber}?edit=driver&view=driver`}
