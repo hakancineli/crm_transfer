@@ -168,11 +168,16 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
       })();
 
             const response = await fetch('/api/reservations', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
+        method: 'POST',
+        headers: (() => {
+          const base: Record<string, string> = { 'Content-Type': 'application/json' };
+          if (typeof window !== 'undefined') {
+            const token = localStorage.getItem('token');
+            if (token) base['Authorization'] = `Bearer ${token}`;
+          }
+          return base;
+        })(),
+        body: JSON.stringify({
           type: formData.type,
           from: formData.from,
           to: formData.to,

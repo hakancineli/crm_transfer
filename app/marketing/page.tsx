@@ -32,15 +32,11 @@ export default function MarketingPage() {
     const reduce = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) return;
 
-    let idx = 0;
     const container = scRef.current;
-
     const tick = () => {
       if (!container) return;
-      const slides = container.querySelectorAll<HTMLElement>('[data-slide="true"]');
-      if (slides.length === 0) return;
-      idx = (idx + 1) % slides.length;
-      slides[idx]?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+      // Horizontal kaydırma: dikey sayfa konumunu etkilemeden yalnızca x ekseninde kaydır
+      container.scrollBy({ left: 400, behavior: 'smooth' });
     };
 
     const interval = setInterval(() => {
