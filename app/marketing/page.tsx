@@ -122,13 +122,15 @@ export default function MarketingPage() {
                   <div className="text-lg font-semibold text-gray-900">{s.title}</div>
                   <div className="text-gray-600 mt-1 text-sm">{s.desc}</div>
                 </div>
-                <div className="h-40 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-400 text-sm select-none">
-                  Görsel Yer Tutucu
-                </div>
+                <a href={s.src} target="_blank" rel="noopener noreferrer" title={`${s.title} - Tam boyut`}>
+                  <div className="relative aspect-[4/3] bg-gray-100">
+                    <img src={s.src} alt={s.title} className="object-cover w-full h-full" />
+                  </div>
+                </a>
               </div>
             ))}
           </div>
-          <div className="text-xs text-gray-500 mt-3">Görselleri <code>/public/screenshots/</code> altına <code>dashboard.png</code>, <code>reservation.png</code>, <code>reports.png</code> isimleriyle yükleyin.</div>
+          <div className="text-xs text-gray-500 mt-3">Görseller <code>/public/screenshots/</code> altındaki <code>dashboard.png</code>, <code>reservation.png</code>, <code>reports.png</code> dosyalarından yüklenir.</div>
         </div>
       </section>
 
