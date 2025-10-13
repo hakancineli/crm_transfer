@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import jwt from 'jsonwebtoken';
 
 export async function GET(
   request: NextRequest,
@@ -74,5 +75,57 @@ export async function GET(
       { error: 'Şoför bilgileri alınamadı' },
       { status: 500 }
     );
+  }
+}
+
+// Şoför güncelleme (ad/telefon)
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const driverId = params.id;
+    const body = await request.json();
+    const { name, phoneNumber } = body || {};
+
+    if (!name && !phoneNumber) {
+      return NextResponse.json(
+        { error: 'Güncellenecek en az bir alan gerekli' },
+        { status: 400 }
+      );
+    }
+
+    // Basit yetkilendirme: Token zorunlu
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+    const token = authHeader.substring(7);
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    const role = decoded?.role;
+    const userId = decoded?.userId;
+
+    // SUPERUSER serbest; diğer roller için tenant eşleşmesi kontrolü
+    if (role !== 'SUPERUSER' && userId) {
+      const link = await prisma.tenantUser.findFirst({ where: { userId, isActive: true }, select: { tenantId: true } });
+      const driver = await prisma.driver.findUnique({ where: { id: driverId }, select: { tenantId: true } });
+      if (!link?.tenantId || !driver?.tenantId || link.tenantId !== driver.tenantId) {
+        return NextResponse.json({ error: 'Bu sürücüyü güncelleme yetkiniz yok' }, { status: 403 });
+      }
+    }
+
+    const updated = await prisma.driver.update({
+      where: { id: driverId },
+      data: {
+        ...(name ? { name } : {}),
+        ...(phoneNumber ? { phoneNumber } : {}),
+      },
+    });
+
+    return NextResponse.json(updated);
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Bilinmeyen hata';
+    console.error('Şoför güncelleme hatası:', msg, error);
+    return NextResponse.json({ error: 'Şoför güncellenemedi', details: msg }, { status: 500 });
   }
 }
