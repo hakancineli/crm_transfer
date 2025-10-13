@@ -393,6 +393,16 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                 <h1 className="text-2xl print:text-xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2">
                     {isDriverVoucher ? t.title : 'Müşteri Voucherı'}
                 </h1>
+                {isDriverVoucher && (
+                    <div className="print:hidden mb-3">
+                        <Link
+                            href={`/admin/reservations/${reservation.voucherNumber}?edit=driver&view=driver`}
+                            className="inline-flex items-center px-3 py-1.5 rounded-md bg-purple-600 text-white hover:bg-purple-700 text-sm"
+                        >
+                            Düzenle (Şoför/Hakediş)
+                        </Link>
+                    </div>
+                )}
                 <div className="inline-flex items-center px-4 py-2 bg-gray-100 rounded-full text-gray-700 text-sm print:text-xs font-medium">
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -570,6 +580,118 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                         )}
                     </div>
                 </div>
+
+                {/* Şoför İletişimi (Driver Voucher görünümünde de göster) */}
+                {isDriverVoucher && (reservation as any)?.driver && (
+                    <div className="bg-white border border-gray-200 p-4 rounded-xl print:hidden">
+                        <h2 className="text-sm font-semibold text-gray-800 mb-3">Şoför İletişimi</h2>
+                        <div className="flex items-center justify-between gap-3">
+                            <div className="text-sm">
+                                <div className="text-gray-600">Ad Soyad</div>
+                                {!editingDriverName ? (
+                                    <div className="flex items-center gap-2 font-medium">
+                                        <span>{driverName || (reservation as any).driver?.name || '-'}</span>
+                                        <button
+                                            onClick={()=> setEditingDriverName(true)}
+                                            className="px-2 py-1 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700"
+                                        >Düzenle</button>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            value={driverName}
+                                            onChange={(e)=> setDriverName(e.target.value)}
+                                            placeholder="Ad Soyad"
+                                            className="px-3 py-1.5 border border-gray-300 rounded-md text-sm"
+                                        />
+                                        <button
+                                            onClick={async ()=>{
+                                                try {
+                                                    setSavingDriver(true);
+                                                    const headers: Record<string,string> = { 'Content-Type': 'application/json' };
+                                                    if (typeof window !== 'undefined') {
+                                                        const token = localStorage.getItem('token');
+                                                        if (token) headers['Authorization'] = `Bearer ${token}`;
+                                                    }
+                                                    const res = await fetch(`/api/drivers/${(reservation as any).driver.id}`, {
+                                                        method: 'PUT',
+                                                        headers,
+                                                        body: JSON.stringify({ name: driverName })
+                                                    });
+                                                    if (!res.ok) throw new Error('Güncellenemedi');
+                                                    setEditingDriverName(false);
+                                                } catch (e) {
+                                                    alert('Şoför adı güncellenemedi');
+                                                } finally {
+                                                    setSavingDriver(false);
+                                                }
+                                            }}
+                                            disabled={savingDriver}
+                                            className="px-3 py-1.5 text-xs rounded-md bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+                                        >{savingDriver ? 'Kaydediliyor...' : 'Kaydet'}</button>
+                                        <button
+                                            onClick={()=>{ setEditingDriverName(false); setDriverName((reservation as any).driver?.name || ''); }}
+                                            className="px-3 py-1.5 text-xs rounded-md border border-gray-300 hover:bg-gray-50"
+                                        >İptal</button>
+                                    </div>
+                                )}
+                            </div>
+                            {!editingDriverPhone ? (
+                                <div className="flex items-center gap-2">
+                                    <span className="font-mono text-sm">{driverPhone || (reservation as any).driver?.phoneNumber || '-'}</span>
+                                    <button
+                                        onClick={() => setEditingDriverPhone(true)}
+                                        className="px-3 py-1.5 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700"
+                                    >
+                                        Düzenle
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        value={driverPhone}
+                                        onChange={(e)=>setDriverPhone(e.target.value)}
+                                        placeholder="+90555..."
+                                        className="px-3 py-1.5 border border-gray-300 rounded-md text-sm"
+                                    />
+                                    <button
+                                        onClick={async () => {
+                                            try {
+                                                setSavingDriver(true);
+                                                const headers: Record<string,string> = { 'Content-Type': 'application/json' };
+                                                if (typeof window !== 'undefined') {
+                                                    const token = localStorage.getItem('token');
+                                                    if (token) headers['Authorization'] = `Bearer ${token}`;
+                                                }
+                                                const res = await fetch(`/api/drivers/${(reservation as any).driver.id}`, {
+                                                    method: 'PUT',
+                                                    headers,
+                                                    body: JSON.stringify({ phoneNumber: driverPhone })
+                                                });
+                                                if (!res.ok) throw new Error('Güncellenemedi');
+                                                setEditingDriverPhone(false);
+                                            } catch (e) {
+                                                alert('Şoför telefonu güncellenemedi');
+                                            } finally {
+                                                setSavingDriver(false);
+                                            }
+                                        }}
+                                        disabled={savingDriver}
+                                        className="px-3 py-1.5 text-xs rounded-md bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+                                    >
+                                        {savingDriver ? 'Kaydediliyor...' : 'Kaydet'}
+                                    </button>
+                                    <button
+                                        onClick={() => { setEditingDriverPhone(false); setDriverPhone((reservation as any).driver?.phoneNumber || ''); }}
+                                        className="px-3 py-1.5 text-xs rounded-md border border-gray-300 hover:bg-gray-50"
+                                    >
+                                        İptal
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
 
                 {/* Ödeme Bilgileri */}
                 {!isDriverVoucher && (
