@@ -48,6 +48,11 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
     const [editingDriverPhone, setEditingDriverPhone] = useState(false);
     const [driverPhone, setDriverPhone] = useState<string>((reservation as any)?.driver?.phoneNumber || '');
     const [savingDriver, setSavingDriver] = useState(false);
+    const [editingDriverName, setEditingDriverName] = useState(false);
+    const [driverName, setDriverName] = useState<string>((reservation as any)?.driver?.name || '');
+    const [editingDriverFee, setEditingDriverFee] = useState(false);
+    const [driverFee, setDriverFee] = useState<number | ''>(reservation.driverFee ?? '');
+    const [savingFee, setSavingFee] = useState(false);
     
     // Open address in navigation app (Yandex preferred), robust for mobile browsers
     const openInNavigation = (rawAddress: string) => {
@@ -562,8 +567,54 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                                 <h2 className="text-sm font-semibold text-gray-800 mb-3">Şoför İletişimi</h2>
                                 <div className="flex items-center justify-between gap-3">
                                     <div className="text-sm">
-                                        <div className="text-gray-600">Ad</div>
-                                        <div className="font-medium">{(reservation as any).driver?.name || '-'}</div>
+                                        <div className="text-gray-600">Ad Soyad</div>
+                                        {!editingDriverName ? (
+                                            <div className="flex items-center gap-2 font-medium">
+                                                <span>{driverName || (reservation as any).driver?.name || '-'}</span>
+                                                <button
+                                                    onClick={()=> setEditingDriverName(true)}
+                                                    className="px-2 py-1 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700"
+                                                >Düzenle</button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    value={driverName}
+                                                    onChange={(e)=> setDriverName(e.target.value)}
+                                                    placeholder="Ad Soyad"
+                                                    className="px-3 py-1.5 border border-gray-300 rounded-md text-sm"
+                                                />
+                                                <button
+                                                    onClick={async ()=>{
+                                                        try {
+                                                            setSavingDriver(true);
+                                                            const headers: Record<string,string> = { 'Content-Type': 'application/json' };
+                                                            if (typeof window !== 'undefined') {
+                                                                const token = localStorage.getItem('token');
+                                                                if (token) headers['Authorization'] = `Bearer ${token}`;
+                                                            }
+                                                            const res = await fetch(`/api/drivers/${(reservation as any).driver.id}`, {
+                                                                method: 'PUT',
+                                                                headers,
+                                                                body: JSON.stringify({ name: driverName })
+                                                            });
+                                                            if (!res.ok) throw new Error('Güncellenemedi');
+                                                            setEditingDriverName(false);
+                                                        } catch (e) {
+                                                            alert('Şoför adı güncellenemedi');
+                                                        } finally {
+                                                            setSavingDriver(false);
+                                                        }
+                                                    }}
+                                                    disabled={savingDriver}
+                                                    className="px-3 py-1.5 text-xs rounded-md bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+                                                >{savingDriver ? 'Kaydediliyor...' : 'Kaydet'}</button>
+                                                <button
+                                                    onClick={()=>{ setEditingDriverName(false); setDriverName((reservation as any).driver?.name || ''); }}
+                                                    className="px-3 py-1.5 text-xs rounded-md border border-gray-300 hover:bg-gray-50"
+                                                >İptal</button>
+                                            </div>
+                                        )}
                                     </div>
                                     {!editingDriverPhone ? (
                                         <div className="flex items-center gap-2">
@@ -635,7 +686,60 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                                 {t.driverFee}
                             </h2>
                             <div className="text-xl print:text-lg font-bold text-green-600 text-center">
-                                {reservation.driverFee} TL
+                                {editingDriverFee ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                        <input
+                                            type="number"
+                                            value={driverFee}
+                                            onChange={(e)=> setDriverFee(e.target.value === '' ? '' : Number(e.target.value))}
+                                            className="px-3 py-1.5 border border-gray-300 rounded-md text-sm w-32 text-center"
+                                            placeholder="Hakediş"
+                                        />
+                                        <button
+                                            onClick={async ()=>{
+                                                try {
+                                                    setSavingFee(true);
+                                                    const headers: Record<string,string> = { 'Content-Type': 'application/json' };
+                                                    if (typeof window !== 'undefined') {
+                                                        const token = localStorage.getItem('token');
+                                                        if (token) headers['Authorization'] = `Bearer ${token}`;
+                                                    }
+                                                    const res = await fetch(`/api/reservations/${reservation.voucherNumber}` ,{
+                                                        method: 'PUT',
+                                                        headers,
+                                                        body: JSON.stringify({ driverFee })
+                                                    });
+                                                    if (!res.ok) throw new Error('Hakediş güncellenemedi');
+                                                    setEditingDriverFee(false);
+                                                } catch (e) {
+                                                    alert('Hakediş güncellenemedi');
+                                                } finally {
+                                                    setSavingFee(false);
+                                                }
+                                            }}
+                                            disabled={savingFee}
+                                            className="px-3 py-1.5 text-xs rounded-md bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+                                        >
+                                            {savingFee ? 'Kaydediliyor...' : 'Kaydet'}
+                                        </button>
+                                        <button
+                                            onClick={()=>{ setEditingDriverFee(false); setDriverFee(reservation.driverFee ?? ''); }}
+                                            className="px-3 py-1.5 text-xs rounded-md border border-gray-300 hover:bg-gray-50"
+                                        >
+                                            İptal
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center justify-center gap-2">
+                                        <span>{(driverFee === '' ? reservation.driverFee : driverFee) ?? 0} TL</span>
+                                        <button
+                                            onClick={()=> setEditingDriverFee(true)}
+                                            className="px-3 py-1.5 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700"
+                                        >
+                                            Düzenle
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="bg-blue-50 p-4 print:p-2 rounded-xl print:bg-white border border-blue-100 print:border-none">
