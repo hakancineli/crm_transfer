@@ -745,7 +745,7 @@ export default function MarketingPage() {
           <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6">
             {[ 
               { name: 'Professional', price: '₺50.000', features: [
-                'Rol bazlı erişim kontrolü', 'Transfer Modülü', 'Tur Yönetimi', 'Konaklama Yönetimi', 'Raporlama', 'Kullanıcı Yönetimi', 'Şoför Atama',
+                'Rol bazlı erişim kontrolü', 'Transfer Modülü', 'Raporlama', 'Kullanıcı Yönetimi', 'Şoför Atama',
                 'İş saatine 1 saat kala kırmızı alarm', 'Voucher gönderimi (5 dil, WhatsApp müşteri + şoför)', 'Muhasebe', 'Sürücü için navigasyon'
               ] },
               { name: 'Enterprise', price: '₺60.000', features: [
