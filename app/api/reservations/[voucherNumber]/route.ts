@@ -151,10 +151,16 @@ export async function PUT(request: NextRequest, { params }: { params: { voucherN
       }
     }
 
-    // Yolcu isimlerini JSON string'e çevir ve boş isimleri filtrele
-    const passengerNames = Array.isArray(data.passengerNames) 
-        ? JSON.stringify(data.passengerNames.filter((name: string) => name && name.trim() !== ''))
-        : JSON.stringify([]);
+    // Yolcu isimlerini yalnızca gönderildiyse güncelle; aksi halde mevcut değeri koru
+    const passengerNames: string = (() => {
+      if (Object.prototype.hasOwnProperty.call(data, 'passengerNames')) {
+        const arr = Array.isArray(data.passengerNames)
+          ? data.passengerNames.filter((name: string) => name && name.trim() !== '')
+          : [];
+        return JSON.stringify(arr);
+      }
+      return existingReservation.passengerNames;
+    })();
 
     // Şoför ID'sinin geçerli olduğunu kontrol et
     if (data.driverId) {
@@ -173,18 +179,18 @@ export async function PUT(request: NextRequest, { params }: { params: { voucherN
     const updatedReservation = await prisma.reservation.update({
       where: { voucherNumber },
       data: {
-        date: data.date,
-        time: data.time,
-        from: data.from,
-        to: data.to,
-        flightCode: data.flightCode,
+        date: data.date ?? existingReservation.date,
+        time: data.time ?? existingReservation.time,
+        from: data.from ?? existingReservation.from,
+        to: data.to ?? existingReservation.to,
+        flightCode: data.flightCode ?? existingReservation.flightCode,
         passengerNames,
-        luggageCount: data.luggageCount,
-        price: data.price,
-        currency: data.currency,
-        phoneNumber: data.phoneNumber,
+        luggageCount: typeof data.luggageCount !== 'undefined' ? data.luggageCount : existingReservation.luggageCount,
+        price: typeof data.price !== 'undefined' ? data.price : existingReservation.price,
+        currency: data.currency ?? (existingReservation as any).currency,
+        phoneNumber: typeof data.phoneNumber !== 'undefined' ? data.phoneNumber : existingReservation.phoneNumber,
         driverId: data.driverId || existingReservation.driverId,
-        driverFee: data.driverFee ? parseFloat(data.driverFee) : existingReservation.driverFee,
+        driverFee: typeof data.driverFee !== 'undefined' ? parseFloat(data.driverFee) : existingReservation.driverFee,
         paymentStatus: data.paymentStatus || existingReservation.paymentStatus
       },
       include: { driver: true }
