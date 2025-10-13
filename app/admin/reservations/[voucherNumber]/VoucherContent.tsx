@@ -39,7 +39,6 @@ interface VoucherContentProps {
             companyName: string;
             subdomain: string;
         };
-    };
     isDriverVoucher?: boolean;
 }
 
@@ -53,6 +52,28 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
     const [editingDriverFee, setEditingDriverFee] = useState(false);
     const [driverFee, setDriverFee] = useState<number | ''>(reservation.driverFee ?? '');
     const [savingFee, setSavingFee] = useState(false);
+    const [changingDriver, setChangingDriver] = useState(false);
+    const [drivers, setDrivers] = useState<Array<{id:string; name:string; phoneNumber?:string}>>([]);
+    const [driversLoading, setDriversLoading] = useState(false);
+    const [selectedDriverId, setSelectedDriverId] = useState<string>('');
+    const fetchDrivers = async () => {
+        try {
+            setDriversLoading(true);
+            const headers: Record<string,string> = {};
+            if (typeof window !== 'undefined') {
+                const token = localStorage.getItem('token');
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+            }
+            const res = await fetch('/api/drivers', { headers });
+            if (!res.ok) throw new Error('Sürücüler alınamadı');
+            const data = await res.json();
+            setDrivers(Array.isArray(data) ? data : []);
+        } catch (e) {
+            alert('Sürücü listesi yüklenemedi');
+        } finally {
+            setDriversLoading(false);
+        }
+    };
     
     // Open address in navigation app (Yandex preferred), robust for mobile browsers
     const openInNavigation = (rawAddress: string) => {
@@ -667,6 +688,70 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                                             >
                                                 İptal
                                             </button>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="mt-4 pt-4 border-t border-gray-100">
+                                    {!changingDriver ? (
+                                        <button
+                                            onClick={async ()=>{ setChangingDriver(true); setSelectedDriverId(''); await fetchDrivers(); }}
+                                            className="px-3 py-1.5 text-xs rounded-md bg-purple-600 text-white hover:bg-purple-700"
+                                        >
+                                            Şoförü Değiştir
+                                        </button>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            <div className="flex items-center gap-2">
+                                                <select
+                                                    value={selectedDriverId}
+                                                    onChange={(e)=> setSelectedDriverId(e.target.value)}
+                                                    className="px-3 py-2 border border-gray-300 rounded-md text-sm min-w-[220px]"
+                                                    title="Şoför seçimi"
+                                                >
+                                                    <option value="" disabled>{driversLoading ? 'Yükleniyor...' : 'Şoför seçin'}</option>
+                                                    {drivers.map(d => (
+                                                        <option key={d.id} value={d.id}>{d.name}{d.phoneNumber ? ` (${d.phoneNumber})` : ''}</option>
+                                                    ))}
+                                                </select>
+                                                <button
+                                                    onClick={async ()=>{
+                                                        if (!selectedDriverId) { alert('Lütfen bir şoför seçin'); return; }
+                                                        try {
+                                                            setSavingDriver(true);
+                                                            const headers: Record<string,string> = { 'Content-Type': 'application/json' };
+                                                            if (typeof window !== 'undefined') {
+                                                                const token = localStorage.getItem('token');
+                                                                if (token) headers['Authorization'] = `Bearer ${token}`;
+                                                            }
+                                                            const res = await fetch(`/api/reservations/${reservation.voucherNumber}`, {
+                                                                method: 'PATCH',
+                                                                headers,
+                                                                body: JSON.stringify({ driverId: selectedDriverId, driverFee: driverFee === '' ? undefined : driverFee })
+                                                            });
+                                                            if (!res.ok) throw new Error('Şoför güncellenemedi');
+                                                            const updated = await res.json();
+                                                            // UI güncelle
+                                                            const newDriver = drivers.find(d=> d.id === selectedDriverId);
+                                                            if (newDriver) {
+                                                                setDriverName(newDriver.name || '');
+                                                                setDriverPhone(newDriver.phoneNumber || '');
+                                                            }
+                                                            if (typeof updated.driverFee !== 'undefined') setDriverFee(updated.driverFee);
+                                                            setChangingDriver(false);
+                                                        } catch (e) {
+                                                            alert('Şoför değiştirme başarısız');
+                                                        } finally {
+                                                            setSavingDriver(false);
+                                                        }
+                                                    }}
+                                                    disabled={driversLoading || savingDriver}
+                                                    className="px-3 py-1.5 text-xs rounded-md bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+                                                >Kaydet</button>
+                                                <button
+                                                    onClick={()=>{ setChangingDriver(false); setSelectedDriverId(''); }}
+                                                    className="px-3 py-1.5 text-xs rounded-md border border-gray-300 hover:bg-gray-50"
+                                                >İptal</button>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
