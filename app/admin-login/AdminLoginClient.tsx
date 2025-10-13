@@ -18,23 +18,7 @@ export default function AdminLoginClient() {
     }
   }, [isAuthenticated, router]);
 
-  // If navigated with #demo, auto-fill and auto-login with demo credentials
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (window.location.hash === '#demo') {
-      const demoUser = 'superuser';
-      const demoPass = 'Pamukkale34.';
-      setEmail(demoUser);
-      setPassword(demoPass);
-      (async () => {
-        setLoading(true);
-        setError('');
-        const ok = await login(demoUser, demoPass);
-        if (!ok) setError('Giriş başarısız');
-        setLoading(false);
-      })();
-    }
-  }, [login]);
+  // Demo auto-login removed intentionally
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,18 +96,7 @@ export default function AdminLoginClient() {
             </button>
           </form>
 
-          <div id="demo" className="mt-8 pt-6 border-t border-gray-200">
-            <div className="text-center">
-              <p className="text-sm text-gray-600 mb-3">Demo Giriş Bilgileri:</p>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-sm text-gray-700 font-medium">Superuser</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Kullanıcı: <span className="font-mono">superuser</span><br />
-                  Şifre: <span className="font-mono">Pamukkale34.</span>
-                </p>
-              </div>
-            </div>
-          </div>
+          {/* Demo credentials panel removed intentionally */}
         </div>
       </div>
     </div>
