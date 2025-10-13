@@ -528,7 +528,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
                   Gönderiliyor...
                                 </>
                             ) : (
-                'Rezervasyon Talebi Gönder'
+                'Rezervasyon oluştur'
                             )}
                         </button>
                     </div>

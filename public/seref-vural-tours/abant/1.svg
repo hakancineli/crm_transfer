@@ -1,0 +1,63 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lakeGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#4682B4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2F4F4F;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="forestGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#90EE90;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#228B22;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#006400;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="sunGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFA500;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Sky background -->
+  <rect width="400" height="300" fill="#E0F6FF"/>
+  
+  <!-- Sun -->
+  <circle cx="320" cy="50" r="20" fill="url(#sunGradient)"/>
+  
+  <!-- Mountain ranges -->
+  <path d="M0,250 L100,180 L200,200 L300,160 L400,190 L400,300 L0,300 Z" fill="url(#forestGradient)"/>
+  
+  <!-- Abant Lake -->
+  <ellipse cx="200" cy="180" rx="120" ry="40" fill="url(#lakeGradient)"/>
+  
+  <!-- Lake reflection -->
+  <ellipse cx="200" cy="180" rx="120" ry="20" fill="#4682B4" opacity="0.4"/>
+  
+  <!-- Pine trees around the lake -->
+  <polygon points="80,200 85,160 90,200" fill="#006400"/>
+  <polygon points="100,195 105,155 110,195" fill="#006400"/>
+  <polygon points="120,190 125,150 130,190" fill="#006400"/>
+  <polygon points="270,195 275,155 280,195" fill="#006400"/>
+  <polygon points="290,190 295,150 300,190" fill="#006400"/>
+  <polygon points="310,185 315,145 320,185" fill="#006400"/>
+  
+  <!-- Deciduous trees -->
+  <circle cx="90" cy="180" r="12" fill="#228B22"/>
+  <circle cx="110" cy="175" r="10" fill="#228B22"/>
+  <circle cx="280" cy="180" r="14" fill="#228B22"/>
+  <circle cx="300" cy="175" r="11" fill="#228B22"/>
+  
+  <!-- Water lilies on lake -->
+  <circle cx="150" cy="185" r="8" fill="#FFB6C1" opacity="0.8"/>
+  <circle cx="250" cy="180" r="6" fill="#FFB6C1" opacity="0.8"/>
+  <circle cx="180" cy="190" r="7" fill="#FFB6C1" opacity="0.8"/>
+  
+  <!-- Ducks on water -->
+  <ellipse cx="160" cy="185" rx="8" ry="4" fill="#8B4513"/>
+  <ellipse cx="240" cy="182" rx="6" ry="3" fill="#8B4513"/>
+  
+  <!-- Mist effect -->
+  <ellipse cx="200" cy="180" rx="140" ry="50" fill="white" opacity="0.1"/>
+  
+  <!-- Text overlay -->
+  <text x="200" y="250" text-anchor="middle" fill="white" font-family="Arial" font-size="20" font-weight="bold">Abant</text>
+  <text x="200" y="270" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Doğal Cennet</text>
+</svg>

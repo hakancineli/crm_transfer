@@ -94,7 +94,7 @@ export default function AdminLoginClient() {
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-gray-200">
+          <div id="demo" className="mt-8 pt-6 border-t border-gray-200">
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-3">Test Kullanıcı Bilgileri:</p>
               <div className="bg-gray-50 p-4 rounded-lg">

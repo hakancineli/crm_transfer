@@ -1,0 +1,47 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E0F6FF;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="buildingGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B4513;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#A0522D;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Sky background -->
+  <rect width="400" height="300" fill="url(#skyGradient)"/>
+  
+  <!-- Sun -->
+  <circle cx="320" cy="60" r="25" fill="#FFD700" opacity="0.9"/>
+  
+  <!-- Minarets and domes -->
+  <!-- Blue Mosque -->
+  <rect x="50" y="120" width="80" height="100" fill="url(#buildingGradient)" rx="5"/>
+  <rect x="60" y="100" width="20" height="40" fill="#8B4513"/>
+  <rect x="100" y="100" width="20" height="40" fill="#8B4513"/>
+  <circle cx="90" cy="80" r="15" fill="#8B4513"/>
+  
+  <!-- Hagia Sophia -->
+  <rect x="150" y="130" width="90" height="90" fill="url(#buildingGradient)" rx="8"/>
+  <rect x="170" y="110" width="20" height="30" fill="#8B4513"/>
+  <rect x="200" y="110" width="20" height="30" fill="#8B4513"/>
+  <circle cx="195" cy="90" r="18" fill="#8B4513"/>
+  
+  <!-- Topkapi Palace -->
+  <rect x="260" y="140" width="70" height="80" fill="url(#buildingGradient)" rx="6"/>
+  <rect x="275" y="120" width="15" height="25" fill="#8B4513"/>
+  <rect x="300" y="120" width="15" height="25" fill="#8B4513"/>
+  <circle cx="292" cy="105" r="12" fill="#8B4513"/>
+  
+  <!-- Bosphorus water -->
+  <rect x="0" y="220" width="400" height="80" fill="#4682B4" opacity="0.7"/>
+  
+  <!-- Water waves -->
+  <path d="M0,240 Q50,230 100,240 T200,240 T300,240 T400,240 L400,300 L0,300 Z" fill="#5F9EA0" opacity="0.6"/>
+  
+  <!-- Text overlay -->
+  <text x="200" y="280" text-anchor="middle" fill="white" font-family="Arial" font-size="18" font-weight="bold">İstanbul</text>
+  <text x="200" y="295" text-anchor="middle" fill="white" font-family="Arial" font-size="12">Tarihi Yarımada</text>
+</svg>

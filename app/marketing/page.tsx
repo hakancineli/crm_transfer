@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export default function MarketingPage() {
@@ -17,6 +17,38 @@ export default function MarketingPage() {
 
   const current = languages.find(l => l.code === language) || languages[0];
   const scRef = useRef<HTMLDivElement>(null);
+  const [isHover, setIsHover] = useState(false);
+  const screenshots = [
+    { title: 'Dashboard', desc: 'Anlık özet ve hızlı aksiyonlar', src: '/screenshots/dashboard.png' },
+    { title: 'Rezervasyon', desc: 'Yeni rezervasyon ve atama akışı', src: '/screenshots/reservation.png' },
+    { title: 'Tüm Rezervasyonlar', desc: 'Liste, filtreler ve durumlar', src: '/screenshots/tumrezervasyonlar.png' },
+    { title: 'Raporlar', desc: 'Gelir, dağılım ve popüler rotalar', src: '/screenshots/reports.png' },
+    { title: 'Voucher', desc: 'Paylaşılabilir rezervasyon özeti', src: '/screenshots/voucheri.png' },
+    { title: 'Müşteri Voucherı', desc: 'PDF/WhatsApp paylaşımı için voucher', src: '/screenshots/mvoucheri.png' },
+  ] as const;
+
+  useEffect(() => {
+    if (!scRef.current) return;
+    const reduce = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
+
+    let idx = 0;
+    const container = scRef.current;
+
+    const tick = () => {
+      if (!container) return;
+      const slides = container.querySelectorAll<HTMLElement>('[data-slide="true"]');
+      if (slides.length === 0) return;
+      idx = (idx + 1) % slides.length;
+      slides[idx]?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+    };
+
+    const interval = setInterval(() => {
+      if (!document.hidden && !isHover) tick();
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [isHover]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -117,14 +149,11 @@ export default function MarketingPage() {
               ref={scRef}
               className="flex gap-6 overflow-x-auto pb-2 snap-x snap-mandatory"
               aria-label="Ekran görüntüleri kaydırma galerisi"
+              onMouseEnter={() => setIsHover(true)}
+              onMouseLeave={() => setIsHover(false)}
             >
-              {[ 
-                { title: 'Dashboard', desc: 'Anlık özet ve hızlı aksiyonlar', src: '/screenshots/dashboard.png' },
-                { title: 'Rezervasyon', desc: 'Yeni rezervasyon ve atama akışı', src: '/screenshots/reservation.png' },
-                { title: 'Raporlar', desc: 'Gelir, dağılım ve popüler rotalar', src: '/screenshots/reports.png' },
-                { title: 'Müşteri Voucherı', desc: 'PDF/WhatsApp paylaşımı için voucher', src: '/screenshots/mvoucheri.png' },
-              ].map((s) => (
-                <div key={s.title} className="snap-start min-w-[280px] sm:min-w-[340px] lg:min-w-[420px] rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+              {screenshots.map((s) => (
+                <div data-slide="true" key={s.title} className="snap-start min-w-[280px] sm:min-w-[340px] lg:min-w-[420px] rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
                   <div className="p-4">
                     <div className="text-lg font-semibold text-gray-900">{s.title}</div>
                     <div className="text-gray-600 mt-1 text-sm">{s.desc}</div>
@@ -158,7 +187,7 @@ export default function MarketingPage() {
               </button>
             </div>
           </div>
-          <div className="text-xs text-gray-500 mt-3">Görseller <code>/public/screenshots/</code> altındaki <code>dashboard.png</code>, <code>reservation.png</code>, <code>reports.png</code>, <code>mvoucheri.png</code> dosyalarından yüklenir. Liste sağa-sola kaydırılabilir.</div>
+          <div className="text-xs text-gray-500 mt-3">Görseller <code>/public/screenshots/</code> altındaki <code>dashboard.png</code>, <code>reservation.png</code>, <code>tumrezervasyonlar.png</code>, <code>reports.png</code>, <code>voucheri.png</code>, <code>mvoucheri.png</code> dosyalarından yüklenir. Liste sağa-sola kaydırılabilir.</div>
         </div>
       </section>
 
