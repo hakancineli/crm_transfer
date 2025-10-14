@@ -34,7 +34,9 @@ export default function ReportsDashboard() {
     const { user } = useAuth();
     const { emojisEnabled } = useEmoji();
     const today = new Date();
-    const [startDate, setStartDate] = useState<string>(format(today, 'yyyy-MM-dd'));
+    const thirtyDaysAgo = new Date(today);
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+    const [startDate, setStartDate] = useState<string>(format(thirtyDaysAgo, 'yyyy-MM-dd'));
     const [endDate, setEndDate] = useState<string>(format(today, 'yyyy-MM-dd'));
     const [reportData, setReportData] = useState<ReportData | null>(null);
     const [isLoading, setIsLoading] = useState(false);

@@ -745,12 +745,13 @@ export default function MarketingPage() {
           <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6">
             {[ 
               { name: 'Professional', price: '₺50.000', features: [
-                'Rol bazlı erişim kontrolü', 'Transfer Modülü', 'Raporlama', 'Kullanıcı Yönetimi', 'Şoför Atama',
-                'İş saatine 1 saat kala kırmızı alarm', 'Voucher gönderimi (5 dil, WhatsApp müşteri + şoför)', 'Muhasebe', 'Sürücü için navigasyon'
+                'Transfer Modülü', 'Şoför Atama', 'Voucher gönderimi (5 dil, WhatsApp müşteri + şoför)', 'Sürücü için navigasyon',
+                'Rol bazlı erişim kontrolü', 'Kullanıcı Yönetimi', 'Muhasebe', 'Raporlama', 'İş saatine 1 saat kala kırmızı alarm'
               ] },
               { name: 'Enterprise', price: '₺60.000', features: [
+                'Transfer Modülü', 'Tur Yönetimi', 'Konaklama Yönetimi',
                 'Profesyonel paketteki tüm özellikler', 'Uçuş Yönetimi', 'API Erişimi', 'Tek Oturum Açma',
-                'Fatura ön‑dolum (prefill)', 'Rezervasyon lookup & push (API)', 'Gelişmiş Raporlama', 'Öncelikli Destek'
+                'Rezervasyon lookup & push (API)', 'Fatura ön‑dolum (prefill)', 'Gelişmiş Raporlama', 'Öncelikli Destek'
               ] },
               { name: 'Premium', price: '₺70.000', features: [
                 'Enterprise paketteki tüm özellikler', 'Website (çoklu tenant)', 'UETDS Entegrasyonu',
