@@ -144,6 +144,79 @@
         "reject": "Rejeter",
         "refresh": "Actualiser"
       }
+,
+"marketing": {
+  "nav": { "admin": "Admin", "demo": "Explore Demo" },
+  "hero": {
+    "title": "Business management CRM for agencies — Pro Acente",
+    "subtitle": "Back-office focused, operate with minimal workload. Assign from one screen, notify driver, share with customer. End-to-end: reservation → assignment → operations → accounting → reporting.",
+    "ctaStart": "Get Started",
+    "ctaFeatures": "See Features",
+    "note": "TR/EN/FR/RU and TRY/USD/EUR supported"
+  },
+  "sections": {
+    "screenshots": "Screenshots",
+    "valueProps": "Core value for agencies",
+    "features": "All Features",
+    "compare": "Compare Modules",
+    "testimonials": "User Experiences",
+    "video": "Short Intro Video",
+    "contact": "Contact Us",
+    "pricing": "Pricing",
+    "why": "Why Us",
+    "integrations": "Integrations",
+    "faq": "FAQ",
+    "cta": {
+      "title": "Digitize your operations today",
+      "subtitle": "Explore the demo or contact us.",
+      "start": "Get Started",
+      "demo": "Explore Demo",
+      "contact": "Contact Us"
+    }
+  },
+  "pricing": { "cta": "Get a Quote" },
+  "contact": { "name": "Full Name", "email": "Email", "message": "Your message", "submit": "Send" },
+  "buttons": { "openDemo": "Open Demo", "themePreview": "Preview Theme" }
+},
+"crm": {
+  "reports": {
+    "dateRange": "Date Range",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "updateNow": "Update Now",
+    "errorTitle": "Failed to Load Report",
+    "retry": "Retry",
+    "noData": "No report data found",
+    "summary": {
+      "revenueTL": "Total Revenue (TL)",
+      "revenueUSD": "Total Revenue (USD)",
+      "totalTransfers": "Total Transfers",
+      "netIncome": "Net Income"
+    },
+    "payment": {
+      "title": "Payment Status",
+      "paid": "Paid Transfers",
+      "unpaid": "Unpaid Transfers",
+      "driverPayments": "Driver Payments"
+    },
+    "types": {
+      "title": "Transfer Types",
+      "pickup": "Airport Pickup",
+      "dropoff": "Airport Dropoff",
+      "transfer": "City Transfer"
+    },
+    "popularRoutes": {
+      "title": "Popular Routes",
+      "route": "Route",
+      "count": "Transfer Count"
+    },
+    "usdRate": {
+      "title": "Current USD Rate",
+      "subtitle": "Rate at the time of report generation",
+      "unit": "1 USD = {rate} TL"
+    }
+  }
+}
     },
     "settings": {
       "title": "Paramètres du Système",
