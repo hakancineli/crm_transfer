@@ -118,6 +118,53 @@
       "driverWaiting": "Driver Waiting",
       "all": "All"
     }
+  ,
+  "marketing": {
+    "nav": {
+      "admin": "Admin",
+      "demo": "Explore Demo"
+    },
+    "hero": {
+      "title": "Business management CRM for agencies — Pro Acente",
+      "subtitle": "Back-office focused, operate with minimal workload. Assign from one screen, notify driver, share with customer. End-to-end: reservation → assignment → operations → accounting → reporting.",
+      "ctaStart": "Get Started",
+      "ctaFeatures": "See Features",
+      "note": "TR/EN/FR/RU and TRY/USD/EUR supported"
+    },
+    "sections": {
+      "screenshots": "Screenshots",
+      "valueProps": "Core value for agencies",
+      "features": "All Features",
+      "compare": "Compare Modules",
+      "testimonials": "User Experiences",
+      "video": "Short Intro Video",
+      "contact": "Contact Us",
+      "pricing": "Pricing",
+      "why": "Why Us",
+      "integrations": "Integrations",
+      "faq": "FAQ",
+      "cta": {
+        "title": "Digitize your operations today",
+        "subtitle": "Explore the demo or contact us.",
+        "start": "Get Started",
+        "demo": "Explore Demo",
+        "contact": "Contact Us"
+      }
+    },
+    "pricing": {
+      "cta": "Get a Quote"
+    },
+    "contact": {
+      "name": "Full Name",
+      "email": "Email",
+      "message": "Your message",
+      "submit": "Send"
+    },
+    "buttons": {
+      "openDemo": "Open Demo",
+      "themePreview": "Preview Theme"
+    }
+  }
   },
   "customerPanel": {
     "title": "My Reservations",

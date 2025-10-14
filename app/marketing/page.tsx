@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export default function MarketingPage() {
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const [open, setOpen] = useState(false);
   const languages = [
     { code: 'en', label: 'English' },
@@ -94,8 +94,8 @@ export default function MarketingPage() {
                 </div>
               )}
             </div>
-            <Link href="/admin-login" className="text-gray-600 hover:text-gray-900">Admin</Link>
-            <Link href="/admin-login?demo=1" className="inline-flex items-center px-3 py-1.5 rounded-lg bg-green-600 text-white hover:bg-green-700">Demoyu İncele</Link>
+            <Link href="/admin-login" className="text-gray-600 hover:text-gray-900">{t('marketing.nav.admin')}</Link>
+            <Link href="/admin-login?demo=1" className="inline-flex items-center px-3 py-1.5 rounded-lg bg-green-600 text-white hover:bg-green-700">{t('marketing.nav.demo')}</Link>
           </div>
         </div>
       </header>
@@ -104,17 +104,13 @@ export default function MarketingPage() {
       <section className="bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 grid lg:grid-cols-2 gap-10 items-center">
           <div>
-            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900">
-              Acenteler için iş yönetimi CRM — Pro Acente
-            </h1>
-            <p className="mt-6 text-lg text-gray-600">
-              Back ofis ağırlıklı, en az iş yükü ile operasyon yönetimi. Rezervasyonları tek ekrandan atayın, sürücüye iletin, müşteriye paylaşın. Uçtan uca: rezervasyon → atama → operasyon → muhasebe → rapor.
-            </p>
+            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900">{t('marketing.hero.title')}</h1>
+            <p className="mt-6 text-lg text-gray-600">{t('marketing.hero.subtitle')}</p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
-              <Link href="/admin-login" className="inline-flex items-center px-6 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700 font-semibold">Hemen Başlayın</Link>
-              <Link href="#features" className="inline-flex items-center px-6 py-3 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold">Özellikleri Gör</Link>
+              <Link href="/admin-login" className="inline-flex items-center px-6 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700 font-semibold">{t('marketing.hero.ctaStart')}</Link>
+              <Link href="#features" className="inline-flex items-center px-6 py-3 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold">{t('marketing.hero.ctaFeatures')}</Link>
             </div>
-            <div className="mt-6 text-sm text-gray-500">TR/EN/FR/RU ve TRY/USD/EUR destekli</div>
+            <div className="mt-6 text-sm text-gray-500">{t('marketing.hero.note')}</div>
           </div>
           <div className="lg:pl-8">
             <div className="rounded-2xl border border-gray-200 shadow-sm p-6 bg-white">
@@ -139,7 +135,7 @@ export default function MarketingPage() {
       {/* Ekran Görüntüleri */}
       <section className="py-16 bg-gray-50" id="screenshots">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">Ekran Görüntüleri</h2>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">{t('marketing.sections.screenshots')}</h2>
           <div className="relative">
             <div
               ref={scRef}
@@ -190,7 +186,7 @@ export default function MarketingPage() {
       {/* Değer Önerileri (3 ana başlık) */}
       <section className="py-16" id="value-props">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">Acenteler için temel değer</h2>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">{t('marketing.sections.valueProps')}</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[ 
               { title: 'Geliri ve operasyonu yönetin', desc: 'Canlı raporlar; komisyon, hakediş ve ödeme görünürlüğü.' },
@@ -209,7 +205,7 @@ export default function MarketingPage() {
       {/* Detaylı Özellik Listesi */}
       <section className="py-16" id="detailed-features">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">Tüm Özellikler</h2>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">{t('marketing.sections.features')}</h2>
           
           {/* Rezervasyon Yönetimi */}
           <div className="mb-12">
@@ -463,7 +459,7 @@ export default function MarketingPage() {
       {/* Modülleri Karşılaştır */}
       <section className="py-16 bg-gray-50" id="compare">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">Modülleri Karşılaştırın</h2>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">{t('marketing.sections.compare')}</h2>
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white border border-gray-200 rounded-xl overflow-hidden">
               <thead className="bg-gray-100">
@@ -529,7 +525,7 @@ export default function MarketingPage() {
       {/* Referanslar */}
       <section className="py-16" id="testimonials">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">Kullanıcı Deneyimleri</h2>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">{t('marketing.sections.testimonials')}</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
               { name: 'S. Vural Travel', quote: '5 dakikada canlıya aldık, sürücü atamaları yarı yarıya hızlandı.' },
@@ -572,14 +568,14 @@ export default function MarketingPage() {
       {/* Kısa Tanıtım Videosu */}
       <section className="py-16" id="video">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-6">Kısa Tanıtım Videosu</h2>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">{t('marketing.sections.video')}</h2>
           <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-4">
             <div className="aspect-video rounded-lg bg-black/80 flex items-center justify-center text-white">
               <button
                 onClick={() => window.open('/protransfer', '_blank')}
                 className="inline-flex items-center px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700"
               >
-                Demoyu Aç
+                {t('marketing.buttons.openDemo')}
               </button>
             </div>
             <div className="text-xs text-gray-500 mt-3">
@@ -592,7 +588,7 @@ export default function MarketingPage() {
       {/* İletişim Formu (hafif) */}
       <section className="py-16 bg-gray-50" id="contact">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">Bizimle İletişime Geçin</h2>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">{t('marketing.sections.contact')}</h2>
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -605,11 +601,11 @@ export default function MarketingPage() {
             }}
             className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 rounded-xl border border-gray-200 shadow-sm"
           >
-            <input name="name" required placeholder="Ad Soyad" className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600" />
-            <input name="email" type="email" required placeholder="E-posta" className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600" />
-            <textarea name="message" required placeholder="Mesajınız" rows={4} className="md:col-span-2 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600" />
+            <input name="name" required placeholder={t('marketing.contact.name')} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600" />
+            <input name="email" type="email" required placeholder={t('marketing.contact.email')} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600" />
+            <textarea name="message" required placeholder={t('marketing.contact.message')} rows={4} className="md:col-span-2 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600" />
             <div className="md:col-span-2 flex justify-end">
-              <button type="submit" className="inline-flex items-center px-6 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700 font-semibold">Gönder</button>
+              <button type="submit" className="inline-flex items-center px-6 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700 font-semibold">{t('marketing.contact.submit')}</button>
             </div>
           </form>
         </div>
@@ -740,7 +736,7 @@ export default function MarketingPage() {
       {/* Fiyatlandırma */}
       <section className="py-16" id="pricing">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">Fiyatlandırma</h2>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">{t('marketing.sections.pricing')}</h2>
           
           <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6">
             {[ 
@@ -773,15 +769,15 @@ export default function MarketingPage() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="ml-1 inline-flex items-center px-2 py-0.5 rounded bg-gray-100 text-gray-700 hover:bg-gray-200"
-                          title="Website temasını incele"
+                          title={t('marketing.buttons.themePreview')}
                         >
-                          Temayı incele
+                          {t('marketing.buttons.themePreview')}
                         </a>
                       )}
                     </li>
                   ))}
                 </ul>
-                <a href="#cta" className="mt-6 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-black">Teklif Al</a>
+                <a href="#cta" className="mt-6 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-black">{t('marketing.pricing.cta')}</a>
               </div>
             ))}
           </div>
@@ -859,12 +855,12 @@ export default function MarketingPage() {
       {/* CTA */}
       <section id="cta" className="py-16 bg-gray-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-extrabold mb-4">Operasyonunuzu bugün dijitalleştirin</h2>
-          <p className="text-gray-300 mb-8">Demoyu inceleyin veya bizimle iletişime geçin.</p>
+          <h2 className="text-3xl font-extrabold mb-4">{t('marketing.sections.cta.title')}</h2>
+          <p className="text-gray-300 mb-8">{t('marketing.sections.cta.subtitle')}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/admin-login" className="inline-flex items-center px-6 py-3 rounded-lg bg-white text-gray-900 hover:bg-gray-100 font-semibold">Hemen Başlayın</Link>
-            <Link href="/protransfer" className="inline-flex items-center px-6 py-3 rounded-lg border border-white text-white hover:bg-white hover:text-gray-900 font-semibold">Demoyu İncele</Link>
-            <a href="mailto:info@proacente.com" className="inline-flex items-center px-6 py-3 rounded-lg border border-white text-white hover:bg-white hover:text-gray-900 font-semibold">Bize Ulaşın</a>
+            <Link href="/admin-login" className="inline-flex items-center px-6 py-3 rounded-lg bg-white text-gray-900 hover:bg-gray-100 font-semibold">{t('marketing.sections.cta.start')}</Link>
+            <Link href="/protransfer" className="inline-flex items-center px-6 py-3 rounded-lg border border-white text-white hover:bg-white hover:text-gray-900 font-semibold">{t('marketing.sections.cta.demo')}</Link>
+            <a href="mailto:info@proacente.com" className="inline-flex items-center px-6 py-3 rounded-lg border border-white text-white hover:bg-white hover:text-gray-900 font-semibold">{t('marketing.sections.cta.contact')}</a>
           </div>
         </div>
       </section>

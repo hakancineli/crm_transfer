@@ -237,4 +237,51 @@
     "phone": "Telefon",
     "email": "E-posta"
   }
+  ,
+  "marketing": {
+    "nav": {
+      "admin": "Admin",
+      "demo": "Demoyu İncele"
+    },
+    "hero": {
+      "title": "Acenteler için iş yönetimi CRM — Pro Acente",
+      "subtitle": "Back ofis ağırlıklı, en az iş yükü ile operasyon yönetimi. Rezervasyonları tek ekrandan atayın, sürücüye iletin, müşteriye paylaşın. Uçtan uca: rezervasyon → atama → operasyon → muhasebe → rapor.",
+      "ctaStart": "Hemen Başlayın",
+      "ctaFeatures": "Özellikleri Gör",
+      "note": "TR/EN/FR/RU ve TRY/USD/EUR destekli"
+    },
+    "sections": {
+      "screenshots": "Ekran Görüntüleri",
+      "valueProps": "Acenteler için temel değer",
+      "features": "Tüm Özellikler",
+      "compare": "Modülleri Karşılaştırın",
+      "testimonials": "Kullanıcı Deneyimleri",
+      "video": "Kısa Tanıtım Videosu",
+      "contact": "Bizimle İletişime Geçin",
+      "pricing": "Fiyatlandırma",
+      "why": "Neden Biz",
+      "integrations": "Entegrasyonlar",
+      "faq": "Sık Sorulan Sorular",
+      "cta": {
+        "title": "Operasyonunuzu bugün dijitalleştirin",
+        "subtitle": "Demoyu inceleyin veya bizimle iletişime geçin.",
+        "start": "Hemen Başlayın",
+        "demo": "Demoyu İncele",
+        "contact": "Bize Ulaşın"
+      }
+    },
+    "pricing": {
+      "cta": "Teklif Al"
+    },
+    "contact": {
+      "name": "Ad Soyad",
+      "email": "E-posta",
+      "message": "Mesajınız",
+      "submit": "Gönder"
+    },
+    "buttons": {
+      "openDemo": "Demoyu Aç",
+      "themePreview": "Temayı incele"
+    }
+  }
 }
