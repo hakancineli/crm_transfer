@@ -764,7 +764,21 @@ export default function MarketingPage() {
                 <div className="mt-2 text-2xl font-extrabold text-gray-900">{p.price}</div>
                 <ul className="mt-4 space-y-2 text-sm text-gray-600 flex-1">
                   {p.features.map((f) => (
-                    <li key={f} className="flex items-center"><span className="mr-2">✅</span> {f}</li>
+                    <li key={f} className="flex items-center flex-wrap gap-2">
+                      <span className="mr-2">✅</span>
+                      <span>{f}</span>
+                      {p.name === 'Premium' && typeof f === 'string' && f.startsWith('Website') && (
+                        <a
+                          href="https://www.proacente.com/protransfer"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="ml-1 inline-flex items-center px-2 py-0.5 rounded bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          title="Website temasını incele"
+                        >
+                          Temayı incele
+                        </a>
+                      )}
+                    </li>
                   ))}
                 </ul>
                 <a href="#cta" className="mt-6 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-black">Teklif Al</a>
