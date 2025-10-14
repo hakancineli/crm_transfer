@@ -55,6 +55,13 @@ export default function AdminLoginClient() {
             <h2 className="text-3xl font-bold text-gray-900">ProAcente CRM</h2>
             <p className="mt-2 text-sm text-gray-600">Acente Yönetim Sistemi</p>
           </div>
+          {/* Demo info banner */}
+          {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('demo') === '1' && (
+            <div className="mb-4 rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">
+              Demo kullanıcı bilgileri: <span className="font-semibold">demo</span> / <span className="font-semibold">demo</span>
+            </div>
+          )}
+
           <form className="space-y-6" onSubmit={handleLogin}>
             <div className="space-y-4">
               <div>

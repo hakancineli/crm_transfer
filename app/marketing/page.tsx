@@ -760,9 +760,9 @@ export default function MarketingPage() {
                 <div className="mt-2 text-2xl font-extrabold text-gray-900">{p.price}</div>
                 <ul className="mt-4 space-y-2 text-sm text-gray-600 flex-1">
                   {p.features.map((f) => (
-                    <li key={f} className="flex items-center flex-wrap gap-2">
-                      <span className="mr-2">✅</span>
-                      <span>{f}</span>
+                    <li key={f} className="flex items-start gap-2">
+                      <span className="mr-1 flex-shrink-0">✅</span>
+                      <span className="leading-5">{f}</span>
                       {p.name === 'Premium' && typeof f === 'string' && f.startsWith('Website') && (
                         <a
                           href="https://www.proacente.com/protransfer"
