@@ -779,7 +779,7 @@ export default function MarketingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-3 gap-6">
           {[
             { title: 'Gerçek operasyonla test edildi', desc: 'Saha geri bildirimleriyle şekillenen akışlar.' },
-            { title: 'Hız ve güven', desc: 'Next.js + Prisma + Postgres, edge optimizasyonları.' },
+            { title: 'Hız ve güven', desc: 'Hızlı, güvenilir ve ölçeklenebilir altyapı.' },
             { title: 'Çoklu dil ve para birimi', desc: 'TR/EN/FR/RU ve TRY/USD/EUR desteği.' },
           ].map((n) => (
             <div key={n.title} className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm">
