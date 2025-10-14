@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { startOfDay, endOfDay, format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useLanguage } from '@/app/contexts/LanguageContext';
 import { useEmoji } from '@/app/contexts/EmojiContext';
 import { useDebounce } from '@/app/hooks/useDebounce';
 
@@ -33,6 +34,7 @@ interface ReportData {
 export default function ReportsDashboard() {
     const { user } = useAuth();
     const { emojisEnabled } = useEmoji();
+    const { t } = useLanguage();
     const today = new Date();
     const thirtyDaysAgo = new Date(today);
     thirtyDaysAgo.setDate(today.getDate() - 30);
@@ -140,7 +142,7 @@ export default function ReportsDashboard() {
                     </div>
                     <div className="ml-3">
                         <h3 className="text-sm font-medium text-red-800">
-                            Rapor Yüklenemedi
+                            {t('crm.reports.errorTitle')}
                         </h3>
                         <div className="mt-2 text-sm text-red-700">
                             <p>{error}</p>
@@ -150,7 +152,7 @@ export default function ReportsDashboard() {
                                 onClick={fetchReportData}
                                 className="bg-red-100 text-red-800 px-3 py-2 rounded-md text-sm font-medium hover:bg-red-200"
                             >
-                                Tekrar Dene
+                                {t('crm.reports.retry')}
                             </button>
                         </div>
                     </div>
@@ -162,7 +164,7 @@ export default function ReportsDashboard() {
     if (!reportData) {
         return (
             <div className="text-center py-12">
-                <p className="text-gray-500">Rapor verisi bulunamadı</p>
+                <p className="text-gray-500">{t('crm.reports.noData')}</p>
             </div>
         );
     }
@@ -171,11 +173,11 @@ export default function ReportsDashboard() {
         <div className="space-y-6">
             {/* Tarih Filtreleri */}
             <div className="bg-white p-6 rounded-lg shadow">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Tarih Aralığı</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('crm.reports.dateRange')}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Başlangıç Tarihi
+                            {t('crm.reports.startDate')}
                         </label>
                         <input
                             type="date"
@@ -186,7 +188,7 @@ export default function ReportsDashboard() {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Bitiş Tarihi
+                            {t('crm.reports.endDate')}
                         </label>
                         <input
                             type="date"
@@ -201,7 +203,7 @@ export default function ReportsDashboard() {
                             disabled={isLoading}
                             className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {isLoading ? 'Yükleniyor...' : 'Hemen Güncelle'}
+                            {isLoading ? t('common.loading') : t('crm.reports.updateNow')}
                         </button>
                     </div>
                 </div>
@@ -217,7 +219,7 @@ export default function ReportsDashboard() {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-500">Toplam Gelir (TL)</p>
+                            <p className="text-sm font-medium text-gray-500">{t('crm.reports.summary.revenueTL')}</p>
                             <p className="text-2xl font-semibold text-gray-900">
                                 {formatCurrency(reportData.totalRevenueTL)}
                             </p>
@@ -233,7 +235,7 @@ export default function ReportsDashboard() {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-500">Toplam Gelir (USD)</p>
+                            <p className="text-sm font-medium text-gray-500">{t('crm.reports.summary.revenueUSD')}</p>
                             <p className="text-2xl font-semibold text-gray-900">
                                 {formatCurrency(reportData.totalRevenueUSD, 'USD')}
                             </p>
@@ -249,7 +251,7 @@ export default function ReportsDashboard() {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-500">Toplam Transfer</p>
+                            <p className="text-sm font-medium text-gray-500">{t('crm.reports.summary.totalTransfers')}</p>
                             <p className="text-2xl font-semibold text-gray-900">
                                 {reportData.totalTransfers}
                             </p>
@@ -265,7 +267,7 @@ export default function ReportsDashboard() {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-500">Net Gelir</p>
+                            <p className="text-sm font-medium text-gray-500">{t('crm.reports.summary.netIncome')}</p>
                             <p className="text-2xl font-semibold text-gray-900">
                                 {formatCurrency(reportData.netIncome)}
                             </p>
@@ -278,18 +280,18 @@ export default function ReportsDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Ödeme Durumu */}
                 <div className="bg-white p-6 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Ödeme Durumu</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('crm.reports.payment.title')}</h3>
                     <div className="space-y-4">
                         <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">Ödenen Transferler</span>
+                            <span className="text-sm text-gray-600">{t('crm.reports.payment.paid')}</span>
                             <span className="font-semibold text-green-600">{reportData.paidTransfers}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">Ödenmemiş Transferler</span>
+                            <span className="text-sm text-gray-600">{t('crm.reports.payment.unpaid')}</span>
                             <span className="font-semibold text-red-600">{reportData.unpaidTransfers}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">Şoför Ödemeleri</span>
+                            <span className="text-sm text-gray-600">{t('crm.reports.payment.driverPayments')}</span>
                             <span className="font-semibold text-gray-900">{formatCurrency(reportData.driverPayments)}</span>
                         </div>
                     </div>
@@ -297,18 +299,18 @@ export default function ReportsDashboard() {
 
                 {/* Transfer Tipleri */}
                 <div className="bg-white p-6 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Transfer Tipleri</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('crm.reports.types.title')}</h3>
                     <div className="space-y-4">
                         <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">Havaalanından Alış</span>
+                            <span className="text-sm text-gray-600">{t('crm.reports.types.pickup')}</span>
                             <span className="font-semibold text-blue-600">{reportData.transfersByType.pickup}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">Havaalanına Gidiş</span>
+                            <span className="text-sm text-gray-600">{t('crm.reports.types.dropoff')}</span>
                             <span className="font-semibold text-green-600">{reportData.transfersByType.dropoff}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">Şehir İçi Transfer</span>
+                            <span className="text-sm text-gray-600">{t('crm.reports.types.transfer')}</span>
                             <span className="font-semibold text-purple-600">{reportData.transfersByType.transfer}</span>
                         </div>
                     </div>
@@ -318,17 +320,13 @@ export default function ReportsDashboard() {
             {/* Popüler Rotalar */}
             {reportData.popularRoutes.length > 0 && (
                 <div className="bg-white p-6 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Popüler Rotalar</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('crm.reports.popularRoutes.title')}</h3>
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Rota
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Transfer Sayısı
-                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('crm.reports.popularRoutes.route')}</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('crm.reports.popularRoutes.count')}</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
@@ -352,12 +350,12 @@ export default function ReportsDashboard() {
             <div className="bg-white p-6 rounded-lg shadow">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-900">Güncel USD Kuru</h3>
-                        <p className="text-sm text-gray-600">Rapor oluşturulma tarihindeki kur</p>
+                        <h3 className="text-lg font-semibold text-gray-900">{t('crm.reports.usdRate.title')}</h3>
+                        <p className="text-sm text-gray-600">{t('crm.reports.usdRate.subtitle')}</p>
                     </div>
                     <div className="text-right">
                         <p className="text-2xl font-bold text-gray-900">
-                            1 USD = {reportData.usdRate.toFixed(2)} TL
+                            {t('crm.reports.usdRate.unit').replace('{rate}', reportData.usdRate.toFixed(2))}
                         </p>
                     </div>
                 </div>

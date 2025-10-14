@@ -119,6 +119,46 @@
       "all": "All"
     }
   ,
+  "crm": {
+    "reports": {
+      "dateRange": "Date Range",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "updateNow": "Update Now",
+      "errorTitle": "Failed to Load Report",
+      "retry": "Retry",
+      "noData": "No report data found",
+      "summary": {
+        "revenueTL": "Total Revenue (TL)",
+        "revenueUSD": "Total Revenue (USD)",
+        "totalTransfers": "Total Transfers",
+        "netIncome": "Net Income"
+      },
+      "payment": {
+        "title": "Payment Status",
+        "paid": "Paid Transfers",
+        "unpaid": "Unpaid Transfers",
+        "driverPayments": "Driver Payments"
+      },
+      "types": {
+        "title": "Transfer Types",
+        "pickup": "Airport Pickup",
+        "dropoff": "Airport Dropoff",
+        "transfer": "City Transfer"
+      },
+      "popularRoutes": {
+        "title": "Popular Routes",
+        "route": "Route",
+        "count": "Transfer Count"
+      },
+      "usdRate": {
+        "title": "Current USD Rate",
+        "subtitle": "Rate at the time of report generation",
+        "unit": "1 USD = {rate} TL"
+      }
+    }
+  }
+  ,
   "marketing": {
     "nav": {
       "admin": "Admin",

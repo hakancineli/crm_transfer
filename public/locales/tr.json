@@ -146,6 +146,46 @@
         "reject": "Reddet",
         "refresh": "Yenile"
       }
+  ,
+  "crm": {
+    "reports": {
+      "dateRange": "Tarih Aralığı",
+      "startDate": "Başlangıç Tarihi",
+      "endDate": "Bitiş Tarihi",
+      "updateNow": "Hemen Güncelle",
+      "errorTitle": "Rapor Yüklenemedi",
+      "retry": "Tekrar Dene",
+      "noData": "Rapor verisi bulunamadı",
+      "summary": {
+        "revenueTL": "Toplam Gelir (TL)",
+        "revenueUSD": "Toplam Gelir (USD)",
+        "totalTransfers": "Toplam Transfer",
+        "netIncome": "Net Gelir"
+      },
+      "payment": {
+        "title": "Ödeme Durumu",
+        "paid": "Ödenen Transferler",
+        "unpaid": "Ödenmemiş Transferler",
+        "driverPayments": "Şoför Ödemeleri"
+      },
+      "types": {
+        "title": "Transfer Tipleri",
+        "pickup": "Havaalanından Alış",
+        "dropoff": "Havaalanına Gidiş",
+        "transfer": "Şehir İçi Transfer"
+      },
+      "popularRoutes": {
+        "title": "Popüler Rotalar",
+        "route": "Rota",
+        "count": "Transfer Sayısı"
+      },
+      "usdRate": {
+        "title": "Güncel USD Kuru",
+        "subtitle": "Rapor oluşturulma tarihindeki kur",
+        "unit": "1 USD = {rate} TL"
+      }
+    }
+  }
     },
     "settings": {
       "title": "Sistem Ayarları",
