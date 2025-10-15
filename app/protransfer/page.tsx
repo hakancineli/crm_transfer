@@ -273,7 +273,7 @@ export default function ProtransferWebsitePage() {
     heroSubtitle: 'Konforlu, güvenli ve profesyonel transfer, tur ve konaklama hizmetleri',
     contactInfo: {
       phone: '+905545812034',
-      email: '',
+      email: 'info@protransfer.com.tr',
       address: 'İstanbul',
       whatsapp: '+905545812034',
     },

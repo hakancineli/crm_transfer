@@ -278,21 +278,28 @@ export default function SerefVuralTemplate({ settings }: SerefVuralTemplateProps
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { title: 'Istanbul City Tour', tr: 'İstanbul Şehir Turu', img: '/seref-vural-tours/istanbul/1.svg', rating: 4.8 },
-              { title: 'Sapanca Nature Tour', tr: 'Sapanca Doğa Turu', img: '/seref-vural-tours/sapanca/1.svg', rating: 4.6 },
-              { title: 'Bursa Historical Tour', tr: 'Bursa Tarihi Turu', img: '/seref-vural-tours/bursa/1.svg', rating: 4.7 },
-              { title: 'Abant Lake Tour', tr: 'Abant Gölü Turu', img: '/seref-vural-tours/abant/1.svg', rating: 4.5 },
+              { title: 'Istanbul City Tour', tr: 'İstanbul Şehir Turu', img: '/seref-vural-tours/istanbul/1.svg', rating: 4.6, desc: 'Tarihi yarımada ve simge yapılar', duration: '8 saat', capacity: '7 kişi' },
+              { title: 'Sapanca Nature Tour', tr: 'Sapanca Doğa Turu', img: '/seref-vural-tours/sapanca/1.svg', rating: 4.7, desc: 'Göl kenarı, doğa yürüyüşü, piknik', duration: '6 saat', capacity: '7 kişi' },
+              { title: 'Bursa Historical Tour', tr: 'Bursa Tarihi Turu', img: '/seref-vural-tours/bursa/1.svg', rating: 4.5, desc: 'Ulu Camii, Yeşil Türbe ve çarşı', duration: '10 saat', capacity: '7 kişi' },
+              { title: 'Abant Lake Tour', tr: 'Abant Gölü Turu', img: '/seref-vural-tours/abant/1.svg', rating: undefined, desc: 'Göl çevresi, fotoğraf ve mola', duration: '7 saat', capacity: '7 kişi' },
             ].map((t, i) => (
               <div key={i} className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
                 <div className="relative h-44">
                   <img src={t.img} alt={t.title} className="object-cover w-full h-full" />
-                  <div className="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-full text-xs font-semibold text-green-600">
-                    ⭐ {t.rating}
-                  </div>
+                  {typeof t.rating === 'number' && (
+                    <div className="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-full text-xs font-semibold text-green-600">
+                      ⭐ {t.rating}
+                    </div>
+                  )}
                 </div>
                 <div className="p-5">
                   <div className="text-sm text-gray-500">{t.title}</div>
                   <div className="text-lg font-semibold text-gray-900">{t.tr}</div>
+                  <div className="text-sm text-gray-600 mt-1">{t.desc}</div>
+                  <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
+                    <span>{t.duration}</span>
+                    <span>{t.capacity}</span>
+                  </div>
                   <div className="mt-4 flex justify-between items-center">
                     <button
                       onClick={handleReservationTransfer}
@@ -414,7 +421,7 @@ export default function SerefVuralTemplate({ settings }: SerefVuralTemplateProps
           <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
             Sorularınız veya rezervasyon talepleriniz için bizimle iletişime geçin.
           </p>
-          <div className="flex justify-center space-x-6">
+          <div className="grid md:grid-cols-4 gap-8 justify-center">
             {settings.contactInfo.phone && (
               <a href={`tel:${settings.contactInfo.phone}`} className="text-gray-600 hover:text-gray-900">
                 <svg className="h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -438,6 +445,14 @@ export default function SerefVuralTemplate({ settings }: SerefVuralTemplateProps
                 </svg>
                 WhatsApp
               </a>
+            )}
+            {settings.contactInfo.address && (
+              <div className="text-gray-600">
+                <svg className="h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 12.414a4 4 0 10-5.657 5.657l4.243 4.243a8 8 0 1011.314-11.314l-4.243 4.243z" />
+                </svg>
+                {settings.contactInfo.address}
+              </div>
             )}
           </div>
         </div>
