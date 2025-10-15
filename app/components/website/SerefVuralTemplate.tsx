@@ -2,23 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-// Static imports for boat galleries (avoid Unicode path issues at runtime)
-import tekne1 from 'public/tekneturlari/tekne1.avif';
-import tekne2 from 'public/tekneturlari/tekne2.avif';
-import tekne3 from 'public/tekneturlari/tekne3.avif';
-import tekne4 from 'public/tekneturlari/tekne4.avif';
-import istinye1 from 'public/tekneturlari/istinye1.avif';
-import istinye2 from 'public/tekneturlari/istinye2.avif';
-import istinye3 from 'public/tekneturlari/istinye3.avif';
-import istinye4 from 'public/tekneturlari/istinye4.avif';
-import istinye5 from 'public/tekneturlari/istinye5.avif';
-import istinye6 from 'public/tekneturlari/istinye6.avif';
-import istinye7 from 'public/tekneturlari/istinye7.avif';
-import istinye8 from 'public/tekneturlari/istinye8.avif';
-import istinye9 from 'public/tekneturlari/istinye9.avif';
-import istinye10 from 'public/tekneturlari/istinye10.avif';
-import istinye11 from 'public/tekneturlari/istinye11.avif';
-import istinye12 from 'public/tekneturlari/istinye12.avif';
 import { MessageCircle, Calendar, Clock, Shield, Baby, Building, CheckCircle, MapPin, Star, Users, Wifi, Car, Coffee, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface SerefVuralTemplateProps {
@@ -414,10 +397,10 @@ export default function SerefVuralTemplate({ settings, content }: SerefVuralTemp
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {(content?.boats && content.boats.length > 0 ? content.boats : [
-              { title: 'Bebek, İstanbul', location: 'Bebek, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 25 kişi', rating: 4.99, pricePerHourTRY: 5500, img: tekne1.src, gallery: [tekne1.src, tekne2.src, tekne3.src, tekne4.src] },
+              { title: 'Bebek, İstanbul', location: 'Bebek, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 25 kişi', rating: 4.99, pricePerHourTRY: 5500, img: '/tekneturlari/tekne1.avif', gallery: ['/tekneturlari/tekne1.avif','/tekneturlari/tekne2.avif','/tekneturlari/tekne3.avif','/tekneturlari/tekne4.avif'] },
               { title: 'Eminönü, İstanbul', location: 'Eminönü, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 10 kişi', rating: 4.99, pricePerHourTRY: 3250, img: '/api/static/tekneturlari?name=eminonu1', gallery: ['/api/static/tekneturlari?name=eminonu1','/api/static/tekneturlari?name=eminonu2','/api/static/tekneturlari?name=eminonu3','/api/static/tekneturlari?name=eminonu4','/api/static/tekneturlari?name=eminonu5','/api/static/tekneturlari?name=eminonu6'] },
               { title: 'Arnavutköy, İstanbul', location: 'Arnavutköy, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 12 kişi', rating: 4.98, pricePerHourTRY: 3500, img: '/api/static/tekneturlari?name=arnavutkoy1', gallery: ['/api/static/tekneturlari?name=arnavutkoy1','/api/static/tekneturlari?name=arnavutkoy2','/api/static/tekneturlari?name=arnavutkoy3','/api/static/tekneturlari?name=arnavutkoy4','/api/static/tekneturlari?name=arnavutkoy5','/api/static/tekneturlari?name=arnavutkoy6','/api/static/tekneturlari?name=arnavutkoy7','/api/static/tekneturlari?name=arnavutkoy8','/api/static/tekneturlari?name=arnavutkoy9','/api/static/tekneturlari?name=arnavutkoy10','/api/static/tekneturlari?name=arnavutkoy11','/api/static/tekneturlari?name=arnavutkoy12','/api/static/tekneturlari?name=arnavutkoy13','/api/static/tekneturlari?name=arnavutkoy14'] },
-              { title: 'İstinye, İstanbul', location: 'İstinye, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 25 kişi', rating: 4.98, pricePerHourTRY: 5000, img: istinye1.src, gallery: [istinye1.src, istinye2.src, istinye3.src, istinye4.src, istinye5.src, istinye6.src, istinye7.src, istinye8.src, istinye9.src, istinye10.src, istinye11.src, istinye12.src] },
+              { title: 'İstinye, İstanbul', location: 'İstinye, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 25 kişi', rating: 4.98, pricePerHourTRY: 5000, img: '/tekneturlari/istinye1.avif', gallery: ['/tekneturlari/istinye1.avif','/tekneturlari/istinye2.avif','/tekneturlari/istinye3.avif','/tekneturlari/istinye4.avif','/tekneturlari/istinye5.avif','/tekneturlari/istinye6.avif','/tekneturlari/istinye7.avif','/tekneturlari/istinye8.avif','/tekneturlari/istinye9.avif','/tekneturlari/istinye10.avif','/tekneturlari/istinye11.avif','/tekneturlari/istinye12.avif'] },
             ]).map((b, i) => (
               <div key={i} className="relative bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
                 <div className="relative h-44 cursor-pointer" onClick={() => openLightbox((b as any).gallery?.length ? (b as any).gallery : [b.img], 0)}>
