@@ -42,15 +42,37 @@ export async function middleware(request: NextRequest) {
 		return NextResponse.next();
 	}
 
-    // protransfer.com.tr -> Only customer website (Şeref Vural theme)
+    // protransfer.com.tr -> Public customer website (Şeref Vural theme)
     if (hostname.includes('protransfer.com.tr')) {
+        // Allow static/public assets and Next assets
+        const staticAllowed = (
+            pathname.startsWith('/_next') ||
+            pathname.startsWith('/seref-vural-tours') ||
+            pathname.startsWith('/seref-vural-images') ||
+            pathname.startsWith('/vehicles') ||
+            pathname.startsWith('/screenshots') ||
+            pathname.startsWith('/locales') ||
+            pathname === '/favicon.ico' ||
+            pathname === '/logo.svg' ||
+            pathname === '/robots.txt' ||
+            pathname === '/sitemap.xml' ||
+            pathname === '/manifest.json' ||
+            pathname === '/site.webmanifest' ||
+            pathname === '/tanıtım-video.mp4' ||
+            /\.(svg|png|jpg|jpeg|webp|gif|ico|json|mp4)$/i.test(pathname)
+        );
+        if (staticAllowed) {
+            return NextResponse.next();
+        }
+
         // Root should serve dedicated protransfer page (keep URL as '/')
         if (pathname === '/') {
             const url = request.nextUrl.clone();
             url.pathname = '/protransfer';
             return NextResponse.rewrite(url);
         }
-        // Explicitly block CRM/auth paths on this domain and serve website content
+
+        // Block CRM/auth paths on this domain and serve website content
         if (
             pathname === '/admin-login' ||
             pathname === '/login' ||
@@ -60,10 +82,12 @@ export async function middleware(request: NextRequest) {
             url.pathname = '/protransfer';
             return NextResponse.rewrite(url);
         }
-        // Allow only website and website API on this domain
+
+        // Allow website pages and website API
         const isAllowed =
             pathname.startsWith('/website') ||
-            pathname.startsWith('/api/website');
+            pathname.startsWith('/api/website') ||
+            pathname.startsWith('/protransfer');
         if (!isAllowed) {
             const url = request.nextUrl.clone();
             url.pathname = '/protransfer';
