@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { promises as fs } from 'fs'
+import path from 'path'
+
+export const runtime = 'nodejs'
 
 // Map safe keys to actual filenames in public/tekneturlari
 const MAP: Record<string, string> = {
@@ -52,18 +56,35 @@ export async function GET(request: NextRequest) {
     if (!file) {
       return new NextResponse('Not Found', { status: 404 })
     }
-    const encodedPath = encodeURI(`/tekneturlari/${file}`)
-    const url = `${origin}${encodedPath}`
-    const upstream = await fetch(url, { next: { revalidate: 60 } })
-    if (!upstream.ok) {
-      return new NextResponse('Upstream Not Found', { status: upstream.status })
+    // First try direct FS read (Node.js runtime)
+    try {
+      const filePath = path.join(process.cwd(), 'public', 'tekneturlari', file)
+      const buf = await fs.readFile(filePath)
+      const res = new NextResponse(buf, { status: 200 })
+      res.headers.set('Content-Type', 'image/avif')
+      res.headers.set('Cache-Control', 'public, max-age=31536000, immutable')
+      return res
+    } catch (err) {
+      // Fallback to upstream fetch (should rarely be needed)
+      try {
+        const encodedPath = encodeURI(`/tekneturlari/${file}`)
+        const url = `${origin}${encodedPath}`
+        const upstream = await fetch(url, { next: { revalidate: 60 } })
+        if (!upstream.ok) {
+          return new NextResponse('Upstream Not Found', { status: upstream.status })
+        }
+        const buf = await upstream.arrayBuffer()
+        const res = new NextResponse(buf, { status: 200 })
+        res.headers.set('Content-Type', upstream.headers.get('content-type') || 'image/avif')
+        res.headers.set('Cache-Control', 'public, max-age=31536000, immutable')
+        return res
+      } catch (e) {
+        console.error('tekneturlari proxy error:', e)
+        return new NextResponse('Error', { status: 500 })
+      }
     }
-    const buf = await upstream.arrayBuffer()
-    const res = new NextResponse(buf, { status: 200 })
-    res.headers.set('Content-Type', upstream.headers.get('content-type') || 'image/avif')
-    res.headers.set('Cache-Control', 'public, max-age=31536000, immutable')
-    return res
-  } catch {
+  } catch (e) {
+    console.error('tekneturlari handler error:', e)
     return new NextResponse('Error', { status: 500 })
   }
 }
