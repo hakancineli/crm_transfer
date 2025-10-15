@@ -269,6 +269,92 @@ export default function SerefVuralTemplate({ settings }: SerefVuralTemplateProps
         </div>
       </section>
 
+      {/* Tours Section */}
+      <section id="tours" className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-extrabold text-gray-900">Daily Tours / Günlük Turlar</h2>
+            <p className="text-lg text-gray-600">İstanbul ve çevresindeki popüler tur rotaları</p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { title: 'Istanbul City Tour', tr: 'İstanbul Şehir Turu', img: '/seref-vural-tours/istanbul/1.svg', rating: 4.8 },
+              { title: 'Sapanca Nature Tour', tr: 'Sapanca Doğa Turu', img: '/seref-vural-tours/sapanca/1.svg', rating: 4.6 },
+              { title: 'Bursa Historical Tour', tr: 'Bursa Tarihi Turu', img: '/seref-vural-tours/bursa/1.svg', rating: 4.7 },
+              { title: 'Abant Lake Tour', tr: 'Abant Gölü Turu', img: '/seref-vural-tours/abant/1.svg', rating: 4.5 },
+            ].map((t, i) => (
+              <div key={i} className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+                <div className="relative h-44">
+                  <img src={t.img} alt={t.title} className="object-cover w-full h-full" />
+                  <div className="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-full text-xs font-semibold text-green-600">
+                    ⭐ {t.rating}
+                  </div>
+                </div>
+                <div className="p-5">
+                  <div className="text-sm text-gray-500">{t.title}</div>
+                  <div className="text-lg font-semibold text-gray-900">{t.tr}</div>
+                  <div className="mt-4 flex justify-between items-center">
+                    <button
+                      onClick={handleReservationTransfer}
+                      className="inline-flex items-center px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 text-sm font-semibold"
+                    >
+                      Rezervasyon Yap
+                    </button>
+                    <button
+                      onClick={handleWhatsAppTransfer}
+                      className="text-green-700 text-sm underline"
+                    >
+                      WhatsApp
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Hotels Section */}
+      <section id="hotels" className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-extrabold text-gray-900">Hotel Accommodation / Otel Konaklaması</h2>
+            <p className="text-lg text-gray-600">İstanbul'da konforlu ve güvenli konaklama seçenekleri</p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { title: 'Grand Hotel Istanbul', tr: 'Grand Otel İstanbul', loc: 'Sultanahmet, İstanbul', img: '/seref-vural-images/hotels/sultanahmet-palace.svg', rating: 4.9, price: 250 },
+              { title: 'Sapanca Resort Hotel', tr: 'Sapanca Resort Otel', loc: 'Sapanca, Sakarya', img: '/seref-vural-images/hotels/modern-istanbul.svg', rating: 4.6, price: 180 },
+              { title: 'Bursa Thermal Hotel', tr: 'Bursa Termal Otel', loc: 'Çekirge, Bursa', img: '/seref-vural-images/hotels/old-city-inn.svg', rating: 4.7, price: 220 },
+              { title: 'Abant Nature Hotel', tr: 'Abant Doğa Oteli', loc: 'Abant, Bolu', img: '/seref-vural-images/hotels/bosphorus-hotel.svg', rating: 4.4, price: 160 },
+            ].map((h, i) => (
+              <div key={i} className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+                <div className="relative h-44">
+                  <img src={h.img} alt={h.title} className="object-cover w-full h-full" />
+                  <div className="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-full text-xs font-semibold text-green-600">
+                    ⭐ {h.rating}
+                  </div>
+                </div>
+                <div className="p-5">
+                  <div className="text-sm text-gray-500">{h.title}</div>
+                  <div className="text-lg font-semibold text-gray-900">{h.tr}</div>
+                  <div className="text-sm text-gray-500 mt-1">{h.loc}</div>
+                  <div className="mt-4 flex justify-between items-center">
+                    <div className="text-2xl font-bold text-green-600">${'{'}h.price{'}'}</div>
+                    <button
+                      onClick={handleReservationTransfer}
+                      className="inline-flex items-center px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 text-sm font-semibold"
+                    >
+                      Rezervasyon Yap
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
