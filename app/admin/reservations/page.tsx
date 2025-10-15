@@ -15,15 +15,17 @@ export default function ReservationsPage() {
     const router = useRouter();
     const [title, setTitle] = useState(t('admin.reservations.allReservations'));
     const [description, setDescription] = useState(t('admin.reservations.allReservationsDescription'));
+    const [blocked, setBlocked] = useState(false);
 
     useEffect(() => {
         if (moduleLoading) return;
-        
         if (!isReservationsEnabled) {
-            router.push('/admin');
+            setBlocked(true);
             return;
+        } else {
+            setBlocked(false);
         }
-    }, [moduleLoading, isReservationsEnabled, router]);
+    }, [moduleLoading, isReservationsEnabled]);
 
     const rolePerms = user?.role ? (ROLE_PERMISSIONS as any)[user.role] || [] : [];
     const has = (perm: string) => rolePerms.includes(perm) || user?.permissions?.some(p => p.permission === perm && p.isActive);
@@ -42,7 +44,14 @@ export default function ReservationsPage() {
     }
 
     if (!isReservationsEnabled) {
-        return null;
+        return (
+            <div className="min-h-screen bg-gray-50 py-8">
+                <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
+                    <h1 className="text-2xl font-bold text-gray-800 mb-4">Modül Kapalı</h1>
+                    <p className="text-gray-600">Transfer modülü bu tenant için pasif görünüyor. Lütfen yetkili kullanıcı ile modül durumunu kontrol edin.</p>
+                </div>
+            </div>
+        );
     }
 
     if (!canViewAll && !canViewOwn) {
