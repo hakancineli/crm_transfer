@@ -16,6 +16,21 @@ const MAP: Record<string, string> = {
   tekne2: 'tekne2.avif',
   tekne3: 'tekne3.avif',
   tekne4: 'tekne4.avif',
+  // Arnavutköy (NFD filenames)
+  arnavutkoy1: 'Arnavutköy1.avif',
+  arnavutkoy2: 'Arnavutköy2.avif',
+  arnavutkoy3: 'Arnavutköy3.avif',
+  arnavutkoy4: 'Arnavutköy4.avif',
+  arnavutkoy5: 'Arnavutköy5.avif',
+  arnavutkoy6: 'Arnavutköy6.avif',
+  arnavutkoy7: 'Arnavutköy7.avif',
+  arnavutkoy8: 'Arnavutköy8.avif',
+  arnavutkoy9: 'Arnavutköy9.avif',
+  arnavutkoy10: 'Arnavutköy10.avif',
+  arnavutkoy11: 'Arnavutköy11.avif',
+  arnavutkoy12: 'Arnavutköy12.avif',
+  arnavutkoy13: 'Arnavutköy13.avif',
+  arnavutkoy14: 'Arnavutköy14.avif',
 }
 
 export async function GET(request: NextRequest) {
