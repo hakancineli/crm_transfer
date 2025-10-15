@@ -87,6 +87,7 @@ export async function middleware(request: NextRequest) {
         const isAllowed =
             pathname.startsWith('/website') ||
             pathname.startsWith('/api/website') ||
+            pathname.startsWith('/api/static') ||
             pathname.startsWith('/protransfer');
         if (!isAllowed) {
             const url = request.nextUrl.clone();

@@ -397,10 +397,10 @@ export default function SerefVuralTemplate({ settings, content }: SerefVuralTemp
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {(content?.boats && content.boats.length > 0 ? content.boats : [
-              { title: 'Bebek, İstanbul', location: 'Bebek, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 25 kişi', rating: 4.99, pricePerHourTRY: 5500, img: '/tekneturlari/tekne1.avif', gallery: ['/tekneturlari/tekne1.avif','/tekneturlari/tekne2.avif','/tekneturlari/tekne3.avif','/tekneturlari/tekne4.avif'] },
-              { title: 'Eminönü, İstanbul', location: 'Eminönü, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 10 kişi', rating: 4.99, pricePerHourTRY: 3250, img: '/tekneturlari/eminönü1.avif', gallery: ['/tekneturlari/eminönü1.avif','/tekneturlari/eminönü2.avif','/tekneturlari/eminönü3.avif','/tekneturlari/eminönü4.avif','/tekneturlari/eminönü5.avif','/tekneturlari/eminönü6.avif'] },
-              { title: 'Arnavutköy, İstanbul', location: 'Arnavutköy, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 12 kişi', rating: 4.98, pricePerHourTRY: 3500, img: '/tekneturlari/tekne3.avif' },
-              { title: 'İstinye, İstanbul', location: 'İstinye, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 25 kişi', rating: 4.98, pricePerHourTRY: 5000, img: '/tekneturlari/tekne4.avif' },
+              { title: 'Bebek, İstanbul', location: 'Bebek, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 25 kişi', rating: 4.99, pricePerHourTRY: 5500, img: '/api/static/tekneturlari?name=tekne1', gallery: ['/api/static/tekneturlari?name=tekne1','/api/static/tekneturlari?name=tekne2','/api/static/tekneturlari?name=tekne3','/api/static/tekneturlari?name=tekne4'] },
+              { title: 'Eminönü, İstanbul', location: 'Eminönü, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 10 kişi', rating: 4.99, pricePerHourTRY: 3250, img: '/api/static/tekneturlari?name=eminonu1', gallery: ['/api/static/tekneturlari?name=eminonu1','/api/static/tekneturlari?name=eminonu2','/api/static/tekneturlari?name=eminonu3','/api/static/tekneturlari?name=eminonu4','/api/static/tekneturlari?name=eminonu5','/api/static/tekneturlari?name=eminonu6'] },
+              { title: 'Arnavutköy, İstanbul', location: 'Arnavutköy, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 12 kişi', rating: 4.98, pricePerHourTRY: 3500, img: '/api/static/tekneturlari?name=tekne3' },
+              { title: 'İstinye, İstanbul', location: 'İstinye, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 25 kişi', rating: 4.98, pricePerHourTRY: 5000, img: '/api/static/tekneturlari?name=tekne4' },
             ]).map((b, i) => (
               <div key={i} className="relative bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
                 <div className="relative h-44 cursor-pointer" onClick={() => openLightbox((b as any).gallery?.length ? (b as any).gallery : [b.img], 0)}>
