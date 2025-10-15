@@ -59,7 +59,7 @@ export async function middleware(request: NextRequest) {
             pathname === '/manifest.json' ||
             pathname === '/site.webmanifest' ||
             pathname === '/tanıtım-video.mp4' ||
-            /\.(svg|png|jpg|jpeg|webp|gif|ico|json|mp4)$/i.test(pathname)
+            /\.(svg|png|jpg|jpeg|webp|gif|ico|json|mp4|avif)$/i.test(pathname)
         );
         if (staticAllowed) {
             return NextResponse.next();

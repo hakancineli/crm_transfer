@@ -51,6 +51,9 @@ const vehicleImages = [
 
 export default function SerefVuralTemplate({ settings, content }: SerefVuralTemplateProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -73,6 +76,15 @@ export default function SerefVuralTemplate({ settings, content }: SerefVuralTemp
   const goToSlide = (index: number) => {
     setCurrentIndex(index);
   };
+
+  const openLightbox = (images: string[], startIndex = 0) => {
+    setLightboxImages(images);
+    setLightboxIndex(startIndex);
+    setLightboxOpen(true);
+  };
+  const closeLightbox = () => setLightboxOpen(false);
+  const lbPrev = () => setLightboxIndex((p) => (p === 0 ? lightboxImages.length - 1 : p - 1));
+  const lbNext = () => setLightboxIndex((p) => (p === lightboxImages.length - 1 ? 0 : p + 1));
 
   const handleWhatsAppTransfer = () => {
     const message = `Merhaba! ${settings.companyName} transfer hizmeti hakkında bilgi almak istiyorum.`;
@@ -211,7 +223,7 @@ export default function SerefVuralTemplate({ settings, content }: SerefVuralTemp
                   >
                     {vehicleImages.map((image, index) => (
                       <div key={index} className="w-full flex-shrink-0">
-                        <div className="relative h-64 sm:h-80 md:h-96">
+                        <div className="relative h-64 sm:h-80 md:h-96 cursor-pointer" onClick={() => openLightbox(vehicleImages, index)}>
                           <Image
                             src={image}
                             alt={`Mercedes Vito ${index + 1}`}
@@ -289,7 +301,7 @@ export default function SerefVuralTemplate({ settings, content }: SerefVuralTemp
               { title: 'Abant Lake Tour', tr: 'Abant Gölü Turu', img: '/seref-vural-tours/abant/1.svg', rating: undefined, desc: 'Göl çevresi, fotoğraf ve mola', duration: '7 saat', capacity: '7 kişi' },
             ]).map((t, i) => (
               <div key={i} className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
-                <div className="relative h-44">
+                <div className="relative h-44 cursor-pointer" onClick={() => openLightbox([t.img], 0)}>
                   <img src={t.img} alt={t.title} className="object-cover w-full h-full" />
                   {typeof t.rating === 'number' && (
                     <div className="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-full text-xs font-semibold text-green-600">
@@ -338,13 +350,13 @@ export default function SerefVuralTemplate({ settings, content }: SerefVuralTemp
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {(content?.boats && content.boats.length > 0 ? content.boats : [
-              { title: 'Bebek, İstanbul', location: 'Bebek, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 25 kişi', rating: 4.99, pricePerHourTRY: 5500, img: '/vehicles/vito-1.jpg' },
-              { title: 'Eminönü, İstanbul', location: 'Eminönü, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 10 kişi', rating: 4.99, pricePerHourTRY: 3250, img: '/vehicles/vito-2.jpg' },
-              { title: 'Arnavutköy, İstanbul', location: 'Arnavutköy, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 12 kişi', rating: 4.98, pricePerHourTRY: 3500, img: '/vehicles/vito-3.jpg' },
-              { title: 'İstinye, İstanbul', location: 'İstinye, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 25 kişi', rating: 4.98, pricePerHourTRY: 5000, img: '/vehicles/vito-4.jpg' },
+              { title: 'Bebek, İstanbul', location: 'Bebek, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 25 kişi', rating: 4.99, pricePerHourTRY: 5500, img: '/tekneturlari/tekne1.avif', gallery: ['/tekneturlari/tekne1.avif','/tekneturlari/tekne2.avif','/tekneturlari/tekne3.avif','/tekneturlari/tekne4.avif'] },
+              { title: 'Eminönü, İstanbul', location: 'Eminönü, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 10 kişi', rating: 4.99, pricePerHourTRY: 3250, img: '/tekneturlari/eminönü1.avif', gallery: ['/tekneturlari/eminönü1.avif','/tekneturlari/eminönü2.avif','/tekneturlari/eminönü3.avif','/tekneturlari/eminönü4.avif','/tekneturlari/eminönü5.avif','/tekneturlari/eminönü6.avif'] },
+              { title: 'Arnavutköy, İstanbul', location: 'Arnavutköy, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 12 kişi', rating: 4.98, pricePerHourTRY: 3500, img: '/tekneturlari/tekne3.avif' },
+              { title: 'İstinye, İstanbul', location: 'İstinye, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 25 kişi', rating: 4.98, pricePerHourTRY: 5000, img: '/tekneturlari/tekne4.avif' },
             ]).map((b, i) => (
               <div key={i} className="relative bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
-                <div className="relative h-44">
+                <div className="relative h-44 cursor-pointer" onClick={() => openLightbox((b as any).gallery?.length ? (b as any).gallery : [b.img], 0)}>
                   <img src={b.img} alt={b.title} className="object-cover w-full h-full" />
                   <div className="absolute top-3 left-3 bg-indigo-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow">Anında Rezerve</div>
                   {typeof b.rating === 'number' && (
@@ -378,9 +390,9 @@ export default function SerefVuralTemplate({ settings, content }: SerefVuralTemp
               { title: 'Abant Nature Hotel', tr: 'Abant Doğa Oteli', loc: 'Abant, Bolu', img: '/seref-vural-images/hotels/bosphorus-hotel.svg', rating: 4.4, price: 160 },
             ].map((h, i) => (
               <div key={i} className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
-                <div className="relative h-44">
-                  <img src={h.img} alt={h.title} className="object-cover w-full h-full" />
-                  <div className="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-full text-xs font-semibold text-green-600">
+                <div className="relative h-48 cursor-pointer" onClick={() => openLightbox([h.img], 0)}>
+                  <Image src={h.img} alt={h.title} fill className="object-cover" />
+                  <div className="absolute top-4 right-4 bg-white px-2 py-1 rounded-full text-sm font-semibold text-green-600">
                     ⭐ {h.rating}
                   </div>
                 </div>
@@ -506,6 +518,17 @@ export default function SerefVuralTemplate({ settings, content }: SerefVuralTemp
           <p>&copy; 2024 {settings.companyName}. Tüm hakları saklıdır.</p>
         </div>
       </footer>
+
+      {/* Lightbox Modal */}
+      {lightboxOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
+          <button className="absolute top-5 right-5 text-white text-2xl" onClick={closeLightbox}>✕</button>
+          <button className="absolute left-5 text-white text-3xl" onClick={lbPrev}>‹</button>
+          <img src={lightboxImages[lightboxIndex]} alt="preview" className="max-h-[90vh] max-w-[90vw] object-contain" />
+          <button className="absolute right-5 text-white text-3xl" onClick={lbNext}>›</button>
+          <div className="absolute bottom-6 text-white text-sm">{lightboxIndex + 1} / {lightboxImages.length}</div>
+        </div>
+      )}
     </main>
   );
 }
