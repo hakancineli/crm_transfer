@@ -284,6 +284,43 @@ export default function ProtransferWebsitePage() {
               setContent(null);
             }
           }
+          // If default content is being served for this domain and we have tenant id, seed content once
+          if (data?.isDefault && data?.tenant?.id && typeof window !== 'undefined') {
+            const seededKey = `website_seeded_${host}`;
+            if (!localStorage.getItem(seededKey)) {
+              const seedContent = {
+                tours: [
+                  { title: 'Istanbul City Tour', tr: 'İstanbul Şehir Turu', img: '/seref-vural-tours/istanbul/1.svg', rating: 4.6, desc: 'Tarihi yarımada ve simge yapılar', duration: '8 saat', capacity: '7 kişi' },
+                  { title: 'Sapanca Nature Tour', tr: 'Sapanca Doğa Turu', img: '/seref-vural-tours/sapanca/1.svg', rating: 4.7, desc: 'Göl kenarı, doğa yürüyüşü, piknik', duration: '6 saat', capacity: '7 kişi' },
+                  { title: 'Bursa Historical Tour', tr: 'Bursa Tarihi Turu', img: '/seref-vural-tours/bursa/1.svg', rating: 4.5, desc: 'Ulu Camii, Yeşil Türbe ve çarşı', duration: '10 saat', capacity: '7 kişi' },
+                  { title: 'Abant Lake Tour', tr: 'Abant Gölü Turu', img: '/seref-vural-tours/abant/1.svg', desc: 'Göl çevresi, fotoğraf ve mola', duration: '7 saat', capacity: '7 kişi' }
+                ],
+                hotels: [
+                  { title: 'Grand Hotel Istanbul', tr: 'Grand Otel İstanbul', loc: 'Sultanahmet, İstanbul', img: '/seref-vural-images/hotels/sultanahmet-palace.svg', rating: 4.9, price: 250 },
+                  { title: 'Sapanca Resort Hotel', tr: 'Sapanca Resort Otel', loc: 'Sapanca, Sakarya', img: '/seref-vural-images/hotels/modern-istanbul.svg', rating: 4.6, price: 180 }
+                ],
+                boats: [
+                  { title: 'Bebek, İstanbul', location: 'Bebek, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 25 kişi', rating: 4.99, pricePerHourTRY: 5500, img: '/tekneturlari/tekne1.avif', gallery: ['/tekneturlari/tekne1.avif','/tekneturlari/tekne2.avif','/tekneturlari/tekne3.avif','/tekneturlari/tekne4.avif'] },
+                  { title: 'Eminönü, İstanbul', location: 'Eminönü, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 10 kişi', rating: 4.99, pricePerHourTRY: 3250, img: '/tekneturlari/eminönü1.avif', gallery: ['/tekneturlari/eminönü1.avif','/tekneturlari/eminönü2.avif','/tekneturlari/eminönü3.avif','/tekneturlari/eminönü4.avif','/tekneturlari/eminönü5.avif','/tekneturlari/eminönü6.avif'] }
+                ],
+                cars: [
+                  { title: 'Mercedes Vito', type: 'Minivan', capacity: '7 kişi', pricePerDayTRY: 3500, img: '/vehicles/vito-1.jpg', gallery: ['/vehicles/vito-1.jpg','/vehicles/vito-2.jpg','/vehicles/vito-3.jpg'] },
+                  { title: 'Mercedes Vito', type: 'Minivan', capacity: '7 kişi', pricePerDayTRY: 3600, img: '/vehicles/vito-4.jpg', gallery: ['/vehicles/vito-4.jpg','/vehicles/vito-5.jpg'] }
+                ]
+              };
+              try {
+                const saveRes = await fetch('/api/website/content', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ tenantId: data.tenant.id, content: seedContent })
+                });
+                if (saveRes.ok) {
+                  localStorage.setItem(seededKey, '1');
+                  setContent(seedContent);
+                }
+              } catch (_) {}
+            }
+          }
         }
       } catch (_) {
         // ignore

@@ -31,6 +31,7 @@ interface SerefVuralTemplateProps {
     tours?: Array<{ title: string; tr: string; img: string; rating?: number; desc?: string; duration?: string; capacity?: string }>;
     hotels?: Array<{ title: string; tr: string; loc?: string; img: string; rating?: number; price?: number; features?: string[] }>;
     boats?: Array<{ title: string; location: string; type: string; capacity: string; rating?: number; pricePerHourTRY?: number; img: string }>;
+    cars?: Array<{ title: string; type: string; capacity: string; pricePerDayTRY?: number; img: string; gallery?: string[] }>;
   };
 }
 
@@ -317,6 +318,52 @@ export default function SerefVuralTemplate({ settings, content }: SerefVuralTemp
                     <span>{t.duration}</span>
                     <span>{t.capacity}</span>
                   </div>
+                  <div className="mt-4 flex justify-between items-center">
+                    <button
+                      onClick={handleReservationTransfer}
+                      className="inline-flex items-center px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 text-sm font-semibold"
+                    >
+                      Rezervasyon Yap
+                    </button>
+                    <button
+                      onClick={handleWhatsAppTransfer}
+                      className="text-green-700 text-sm underline"
+                    >
+                      WhatsApp
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Car Rental Section */}
+      <section id="cars" className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-extrabold text-gray-900">Araç Kiralama</h2>
+            <p className="text-lg text-gray-600">Sürücüsüz günlük/haftalık kiralık araç seçenekleri</p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {(content?.cars && content.cars.length > 0 ? content.cars : [
+              { title: 'Mercedes Vito', type: 'Minivan', capacity: '7 kişi', pricePerDayTRY: 3500, img: '/vehicles/vito-1.jpg', gallery: ['/vehicles/vito-1.jpg','/vehicles/vito-2.jpg','/vehicles/vito-3.jpg'] },
+              { title: 'Mercedes Vito', type: 'Minivan', capacity: '7 kişi', pricePerDayTRY: 3600, img: '/vehicles/vito-4.jpg', gallery: ['/vehicles/vito-4.jpg','/vehicles/vito-5.jpg'] },
+              { title: 'Mercedes Vito', type: 'Minivan', capacity: '7 kişi', pricePerDayTRY: 3700, img: '/vehicles/vito-6.jpg', gallery: ['/vehicles/vito-6.jpg','/vehicles/vito-7.jpg'] },
+              { title: 'Mercedes Vito', type: 'Minivan', capacity: '7 kişi', pricePerDayTRY: 3800, img: '/vehicles/vito-8.jpg', gallery: ['/vehicles/vito-8.jpg','/vehicles/vito-9.jpg'] },
+            ]).map((c, i) => (
+              <div key={i} className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+                <div className="relative h-44 cursor-pointer" onClick={() => openLightbox((c as any).gallery?.length ? (c as any).gallery : [c.img], 0)}>
+                  <img src={c.img} alt={c.title} className="object-cover w-full h-full" />
+                </div>
+                <div className="p-5">
+                  <div className="text-gray-900 font-semibold">{c.title}</div>
+                  <div className="text-sm text-gray-500">{c.type}</div>
+                  <div className="text-sm text-gray-500">{c.capacity}</div>
+                  {typeof c.pricePerDayTRY === 'number' && (
+                    <div className="mt-3 text-2xl font-bold text-gray-900">₺{c.pricePerDayTRY.toLocaleString('tr-TR')}/gün</div>
+                  )}
                   <div className="mt-4 flex justify-between items-center">
                     <button
                       onClick={handleReservationTransfer}
