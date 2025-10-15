@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { promises as fs } from 'fs'
-import path from 'path'
 
 // Map safe keys to actual filenames in public/tekneturlari
 const MAP: Record<string, string> = {
@@ -31,26 +29,41 @@ const MAP: Record<string, string> = {
   arnavutkoy12: 'Arnavutköy12.avif',
   arnavutkoy13: 'Arnavutköy13.avif',
   arnavutkoy14: 'Arnavutköy14.avif',
+  // Istinye
+  istinye1: 'istinye1.avif',
+  istinye2: 'istinye2.avif',
+  istinye3: 'istinye3.avif',
+  istinye4: 'istinye4.avif',
+  istinye5: 'istinye5.avif',
+  istinye6: 'istinye6.avif',
+  istinye7: 'istinye7.avif',
+  istinye8: 'istinye8.avif',
+  istinye9: 'istinye9.avif',
+  istinye10: 'istinye10.avif',
+  istinye11: 'istinye11.avif',
+  istinye12: 'istinye12.avif',
 }
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
+    const { searchParams, origin } = new URL(request.url)
     const name = (searchParams.get('name') || '').toLowerCase()
     const file = MAP[name]
     if (!file) {
       return new NextResponse('Not Found', { status: 404 })
     }
-    const filePath = path.join(process.cwd(), 'public', 'tekneturlari', file)
-    const buf = await fs.readFile(filePath)
-    return new NextResponse(buf, {
-      status: 200,
-      headers: {
-        'Content-Type': 'image/avif',
-        'Cache-Control': 'public, max-age=31536000, immutable',
-      },
-    })
-  } catch (e) {
+    const encodedPath = encodeURI(`/tekneturlari/${file}`)
+    const url = `${origin}${encodedPath}`
+    const upstream = await fetch(url, { next: { revalidate: 60 } })
+    if (!upstream.ok) {
+      return new NextResponse('Upstream Not Found', { status: upstream.status })
+    }
+    const buf = await upstream.arrayBuffer()
+    const res = new NextResponse(buf, { status: 200 })
+    res.headers.set('Content-Type', upstream.headers.get('content-type') || 'image/avif')
+    res.headers.set('Cache-Control', 'public, max-age=31536000, immutable')
+    return res
+  } catch {
     return new NextResponse('Error', { status: 500 })
   }
 }
