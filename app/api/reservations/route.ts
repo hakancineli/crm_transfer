@@ -15,6 +15,11 @@ export async function GET(request: NextRequest) {
     const pageSize = parseInt(searchParams.get('pageSize') || '50');
     const offset = (page - 1) * pageSize;
     let tenantId = searchParams.get('tenantId');
+    // SUPERUSER için TenantContext tarafından gönderilen seçili tenant header'ını onurlandır
+    const headerTenant = request.headers.get('x-tenant-id');
+    if (headerTenant) {
+      tenantId = headerTenant;
+    }
     let userIdScope: string | null = null;
 
     // If caller is an agency user and didn't pass tenantId, scope by token
@@ -193,23 +198,27 @@ export async function POST(request: NextRequest) {
     // Determine user and tenant from token
     let userIdFromToken: string | null = null;
     let tenantIdFromToken: string | null = null;
+    let roleFromToken: string | null = null;
+    const headerTenant = request.headers.get('x-tenant-id');
     try {
       const authHeader = request.headers.get('authorization');
       if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.substring(7);
         const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
         userIdFromToken = decoded?.userId || null;
+        roleFromToken = decoded?.role || null;
         if (decoded?.role && decoded.role !== 'SUPERUSER') {
           const link = await prisma.tenantUser.findFirst({ where: { userId: userIdFromToken || '', isActive: true }, select: { tenantId: true } });
           tenantIdFromToken = link?.tenantId || null;
-        } else if (decoded?.role === 'SUPERUSER' && body.tenantId) {
-          tenantIdFromToken = body.tenantId; // allow superuser to specify
+        } else if (decoded?.role === 'SUPERUSER') {
+          // SUPERUSER: Öncelik x-tenant-id header, sonra body.tenantId
+          tenantIdFromToken = headerTenant || body.tenantId || null;
         }
       }
     } catch {}
     
     // Website rezervasyonu için tenant ID'yi domain'den bul
-    let targetTenantId = body.tenantId || tenantIdFromToken;
+    let targetTenantId = body.tenantId || headerTenant || tenantIdFromToken;
     
     if (body.source === 'website' && body.tenantId) {
       // Domain'den tenant ID'yi bul
@@ -231,6 +240,18 @@ export async function POST(request: NextRequest) {
 
     // Rezervasyon kaynağını belirle
     const source = body.source || (userIdFromToken ? 'admin' : 'website');
+
+    // Admin kaynaklı istekler için tenantId zorunluluğu
+    if (source === 'admin') {
+      // Non-superuser ise token'dan gelen tenantId kullanılmalı; yoksa 400
+      if (roleFromToken !== 'SUPERUSER' && !targetTenantId) {
+        return NextResponse.json({ error: 'Tenant bağlantısı bulunamadı' }, { status: 400 });
+      }
+      // SUPERUSER ise header/body ile gelmeli; yoksa 400
+      if (roleFromToken === 'SUPERUSER' && !targetTenantId) {
+        return NextResponse.json({ error: 'SUPERUSER için tenantId gerekli (x-tenant-id veya body.tenantId)' }, { status: 400 });
+      }
+    }
     
     // Basit rezervasyon oluşturma
     const reservation = await prisma.reservation.create({

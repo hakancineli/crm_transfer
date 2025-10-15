@@ -28,19 +28,32 @@ export async function GET(request: NextRequest) {
 
     const userId = decoded.userId;
     const userRole = decoded.role;
+    const headerTenantId = request.headers.get('x-tenant-id');
 
-    // Kullanıcının tenant'larını al
-    const tenantUsers = await prisma.tenantUser.findMany({
-      where: {
-        userId: userId,
-        isActive: true
-      },
-      select: {
-        tenantId: true
+    // Tenant kapsamını belirle
+    let tenantIds: string[] = [];
+
+    if (userRole === 'SUPERUSER') {
+      // SUPERUSER: x-tenant-id varsa onu kullan; yoksa tüm aktif tenantları getir
+      if (headerTenantId) {
+        tenantIds = [headerTenantId];
+      } else {
+        const tenants = await prisma.tenant.findMany({ where: { isActive: true }, select: { id: true } });
+        tenantIds = tenants.map(t => t.id);
       }
-    });
-
-    const tenantIds = tenantUsers.map((tu: any) => tu.tenantId);
+    } else {
+      // AGENCY roller: sadece kendi bağlı olduğu tenant(lar)
+      const tenantUsers = await prisma.tenantUser.findMany({
+        where: { userId, isActive: true },
+        select: { tenantId: true }
+      });
+      const linkedIds = tenantUsers.map(tu => tu.tenantId);
+      if (headerTenantId && linkedIds.includes(headerTenantId)) {
+        tenantIds = [headerTenantId];
+      } else {
+        tenantIds = linkedIds;
+      }
+    }
 
     if (tenantIds.length === 0) {
       return NextResponse.json({
@@ -53,6 +66,7 @@ export async function GET(request: NextRequest) {
     const tenantModules = await prisma.tenantModule.findMany({
       where: { tenantId: { in: tenantIds }, isEnabled: true },
       select: {
+        tenantId: true,
         moduleId: true,
         isEnabled: true,
         module: { select: { name: true } }

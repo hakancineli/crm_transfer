@@ -570,16 +570,15 @@ export default function MarketingPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-extrabold text-gray-900 mb-8">{t('marketing.sections.video')}</h2>
           <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-4">
-            <div className="aspect-video rounded-lg bg-black/80 flex items-center justify-center text-white">
-              <button
-                onClick={() => window.open('/protransfer', '_blank')}
-                className="inline-flex items-center px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700"
+            <div className="aspect-video rounded-lg overflow-hidden bg-black">
+              <video
+                className="w-full h-full"
+                controls
+                preload="metadata"
+                src="/tanıtım-video.mp4"
               >
-                {t('marketing.buttons.openDemo')}
-              </button>
-            </div>
-            <div className="text-xs text-gray-500 mt-3">
-              Not: Demo akışını canlı olarak görmek için butona tıklayın.
+                Tarayıcınız video etiketini desteklemiyor.
+              </video>
             </div>
           </div>
         </div>
