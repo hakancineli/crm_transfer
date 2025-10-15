@@ -87,7 +87,12 @@ export function useModule(moduleName: keyof ModuleSettings) {
             const hasModuleAccess = tenantModules.some((tm: any) => 
               (tm.module?.name || '').toLowerCase().includes(moduleName)
             );
-            setIsEnabled(hasModuleAccess);
+            // Fallback: Agency Admin için transfer modülü boş dönüyorsa açık kabul et
+            if (!hasModuleAccess && moduleName === 'transfer') {
+              setIsEnabled(true);
+            } else {
+              setIsEnabled(hasModuleAccess);
+            }
           } else {
             console.error('useModule: API response not ok for AGENCY_ADMIN:', response.status);
             setIsEnabled(false);
@@ -128,6 +133,7 @@ export function useModule(moduleName: keyof ModuleSettings) {
             const hasModuleAccess = tenantModules.some((tm: any) => 
               (tm.module?.name || '').toLowerCase().includes(moduleName)
             );
+            // Fallback: Seller için transfer modülü boş dönerse kapalı bırak (fallback yok)
             setIsEnabled(hasModuleAccess);
           } else {
             console.error('useModule: API response not ok for SELLER:', response.status);
@@ -164,7 +170,12 @@ export function useModule(moduleName: keyof ModuleSettings) {
             const hasModuleAccess = tenantModules.some((tm: any) => 
               (tm.module?.name || '').toLowerCase().includes(moduleName)
             );
-            setIsEnabled(hasModuleAccess);
+            // Fallback: Agency Admin için transfer modülü boş dönüyorsa açık kabul et
+            if (!hasModuleAccess && moduleName === 'transfer' && user.role === 'AGENCY_ADMIN') {
+              setIsEnabled(true);
+            } else {
+              setIsEnabled(hasModuleAccess);
+            }
           }
         } catch (error) {
           console.error('useModule: Tenant modül kontrolü hatası:', error);
