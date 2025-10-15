@@ -14,41 +14,44 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '50');
     const offset = (page - 1) * pageSize;
-    let tenantId = searchParams.get('tenantId');
-    // SUPERUSER için TenantContext tarafından gönderilen seçili tenant header'ını onurlandır
+    let tenantId: string | null = null;
     const headerTenant = request.headers.get('x-tenant-id');
-    if (headerTenant) {
-      tenantId = headerTenant;
-    }
     let userIdScope: string | null = null;
+    let role: string | null = null;
 
-    // If caller is an agency user and didn't pass tenantId, scope by token
+    // Determine role and tenant scope from token
     try {
       const authHeader = request.headers.get('authorization');
-      if (!tenantId && authHeader && authHeader.startsWith('Bearer ')) {
+      if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.substring(7);
         const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-        const role = decoded?.role;
-        if (role && role !== 'SUPERUSER') {
+        role = decoded?.role || null;
+        if (role === 'SUPERUSER') {
+          // SUPERUSER: allow optional scoping by header or query
+          tenantId = headerTenant || searchParams.get('tenantId');
+        } else {
+          // Non-superuser: strictly scope by tenantUser link; ignore header/query
           const link = await prisma.tenantUser.findFirst({
             where: { userId: decoded.userId, isActive: true },
             select: { tenantId: true }
           });
-          if (link?.tenantId) {
-            tenantId = link.tenantId;
-            // Non-privileged roles only see their own sales
-            const privileged = ['SUPERUSER', 'AGENCY_ADMIN', 'OPERATION', 'ACCOUNTANT'];
-            if (!privileged.includes(role)) {
-              userIdScope = decoded.userId || null;
-            }
-          } else {
-            // Non-superuser without tenant link should see nothing
+          if (!link?.tenantId) {
             return NextResponse.json([]);
           }
+          tenantId = link.tenantId;
+          // Non-privileged roles only see their own sales
+          const privileged = ['SUPERUSER', 'AGENCY_ADMIN', 'OPERATION', 'ACCOUNTANT'];
+          if (!privileged.includes(role || '')) {
+            userIdScope = decoded.userId || null;
+          }
         }
+      } else {
+        // No token: do not return unscoped admin data
+        return NextResponse.json([]);
       }
     } catch (e) {
-      // ignore scoping errors and continue unscoped only for superuser or public
+      // On token errors, do not return unscoped data
+      return NextResponse.json([]);
     }
 
     const whereClauseBase: any = tenantId ? { tenantId } : {};
