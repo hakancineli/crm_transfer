@@ -7,26 +7,6 @@ import tekne1 from '../../../public/tekneturlari/tekne1.avif';
 import tekne2 from '../../../public/tekneturlari/tekne2.avif';
 import tekne3 from '../../../public/tekneturlari/tekne3.avif';
 import tekne4 from '../../../public/tekneturlari/tekne4.avif';
-import eminonu1 from '../../../public/tekneturlari/eminönü1.avif';
-import eminonu2 from '../../../public/tekneturlari/eminönü2.avif';
-import eminonu3 from '../../../public/tekneturlari/eminönü3.avif';
-import eminonu4 from '../../../public/tekneturlari/eminönü4.avif';
-import eminonu5 from '../../../public/tekneturlari/eminönü5.avif';
-import eminonu6 from '../../../public/tekneturlari/eminönü6.avif';
-import arnavutkoy1 from '../../../public/tekneturlari/Arnavutköy1.avif';
-import arnavutkoy2 from '../../../public/tekneturlari/Arnavutköy2.avif';
-import arnavutkoy3 from '../../../public/tekneturlari/Arnavutköy3.avif';
-import arnavutkoy4 from '../../../public/tekneturlari/Arnavutköy4.avif';
-import arnavutkoy5 from '../../../public/tekneturlari/Arnavutköy5.avif';
-import arnavutkoy6 from '../../../public/tekneturlari/Arnavutköy6.avif';
-import arnavutkoy7 from '../../../public/tekneturlari/Arnavutköy7.avif';
-import arnavutkoy8 from '../../../public/tekneturlari/Arnavutköy8.avif';
-import arnavutkoy9 from '../../../public/tekneturlari/Arnavutköy9.avif';
-import arnavutkoy10 from '../../../public/tekneturlari/Arnavutköy10.avif';
-import arnavutkoy11 from '../../../public/tekneturlari/Arnavutköy11.avif';
-import arnavutkoy12 from '../../../public/tekneturlari/Arnavutköy12.avif';
-import arnavutkoy13 from '../../../public/tekneturlari/Arnavutköy13.avif';
-import arnavutkoy14 from '../../../public/tekneturlari/Arnavutköy14.avif';
 import istinye1 from '../../../public/tekneturlari/istinye1.avif';
 import istinye2 from '../../../public/tekneturlari/istinye2.avif';
 import istinye3 from '../../../public/tekneturlari/istinye3.avif';
@@ -40,7 +20,6 @@ import istinye10 from '../../../public/tekneturlari/istinye10.avif';
 import istinye11 from '../../../public/tekneturlari/istinye11.avif';
 import istinye12 from '../../../public/tekneturlari/istinye12.avif';
 import { MessageCircle, Calendar, Clock, Shield, Baby, Building, CheckCircle, MapPin, Star, Users, Wifi, Car, Coffee, ChevronLeft, ChevronRight } from 'lucide-react';
-import Image from 'next/image';
 
 interface SerefVuralTemplateProps {
   settings: {
@@ -436,8 +415,8 @@ export default function SerefVuralTemplate({ settings, content }: SerefVuralTemp
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {(content?.boats && content.boats.length > 0 ? content.boats : [
               { title: 'Bebek, İstanbul', location: 'Bebek, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 25 kişi', rating: 4.99, pricePerHourTRY: 5500, img: tekne1.src, gallery: [tekne1.src, tekne2.src, tekne3.src, tekne4.src] },
-              { title: 'Eminönü, İstanbul', location: 'Eminönü, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 10 kişi', rating: 4.99, pricePerHourTRY: 3250, img: eminonu1.src, gallery: [eminonu1.src, eminonu2.src, eminonu3.src, eminonu4.src, eminonu5.src, eminonu6.src] },
-              { title: 'Arnavutköy, İstanbul', location: 'Arnavutköy, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 12 kişi', rating: 4.98, pricePerHourTRY: 3500, img: arnavutkoy1.src, gallery: [arnavutkoy1.src, arnavutkoy2.src, arnavutkoy3.src, arnavutkoy4.src, arnavutkoy5.src, arnavutkoy6.src, arnavutkoy7.src, arnavutkoy8.src, arnavutkoy9.src, arnavutkoy10.src, arnavutkoy11.src, arnavutkoy12.src, arnavutkoy13.src, arnavutkoy14.src] },
+              { title: 'Eminönü, İstanbul', location: 'Eminönü, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 10 kişi', rating: 4.99, pricePerHourTRY: 3250, img: '/api/static/tekneturlari?name=eminonu1', gallery: ['/api/static/tekneturlari?name=eminonu1','/api/static/tekneturlari?name=eminonu2','/api/static/tekneturlari?name=eminonu3','/api/static/tekneturlari?name=eminonu4','/api/static/tekneturlari?name=eminonu5','/api/static/tekneturlari?name=eminonu6'] },
+              { title: 'Arnavutköy, İstanbul', location: 'Arnavutköy, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 12 kişi', rating: 4.98, pricePerHourTRY: 3500, img: '/api/static/tekneturlari?name=arnavutkoy1', gallery: ['/api/static/tekneturlari?name=arnavutkoy1','/api/static/tekneturlari?name=arnavutkoy2','/api/static/tekneturlari?name=arnavutkoy3','/api/static/tekneturlari?name=arnavutkoy4','/api/static/tekneturlari?name=arnavutkoy5','/api/static/tekneturlari?name=arnavutkoy6','/api/static/tekneturlari?name=arnavutkoy7','/api/static/tekneturlari?name=arnavutkoy8','/api/static/tekneturlari?name=arnavutkoy9','/api/static/tekneturlari?name=arnavutkoy10','/api/static/tekneturlari?name=arnavutkoy11','/api/static/tekneturlari?name=arnavutkoy12','/api/static/tekneturlari?name=arnavutkoy13','/api/static/tekneturlari?name=arnavutkoy14'] },
               { title: 'İstinye, İstanbul', location: 'İstinye, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 25 kişi', rating: 4.98, pricePerHourTRY: 5000, img: istinye1.src, gallery: [istinye1.src, istinye2.src, istinye3.src, istinye4.src, istinye5.src, istinye6.src, istinye7.src, istinye8.src, istinye9.src, istinye10.src, istinye11.src, istinye12.src] },
             ]).map((b, i) => (
               <div key={i} className="relative bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
