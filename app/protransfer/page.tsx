@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import SerefVuralTemplate from '../components/website/SerefVuralTemplate';
 
 // Varsayılan içerik (panel verisi yoksa fallback) - Full demo content
@@ -267,6 +267,30 @@ const defaultContent = {
 };
 
 export default function ProtransferWebsitePage() {
+  const [content, setContent] = useState<any>(null);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const host = typeof window !== 'undefined' ? window.location.hostname : '';
+        if (!host) return;
+        const res = await fetch(`/api/website/content/${host}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.content) {
+            try {
+              setContent(JSON.parse(data.content));
+            } catch (_) {
+              setContent(null);
+            }
+          }
+        }
+      } catch (_) {
+        // ignore
+      }
+    };
+    load();
+  }, []);
   const settings = useMemo(() => ({
     companyName: 'Pro Transfer',
     heroTitle: 'İstanbul Havalimanı Transfer Hizmeti',
@@ -285,7 +309,7 @@ export default function ProtransferWebsitePage() {
     },
   }), []);
 
-  return <SerefVuralTemplate settings={settings} />;
+  return <SerefVuralTemplate settings={settings} content={content} />;
 }
 
 

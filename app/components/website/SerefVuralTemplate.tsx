@@ -27,6 +27,11 @@ interface SerefVuralTemplateProps {
       accent: string;
     };
   };
+  content?: {
+    tours?: Array<{ title: string; tr: string; img: string; rating?: number; desc?: string; duration?: string; capacity?: string }>;
+    hotels?: Array<{ title: string; tr: string; loc?: string; img: string; rating?: number; price?: number; features?: string[] }>;
+    boats?: Array<{ title: string; location: string; type: string; capacity: string; rating?: number; pricePerHourTRY?: number; img: string }>;
+  };
 }
 
 const vehicleImages = [
@@ -44,7 +49,7 @@ const vehicleImages = [
   '/vehicles/vito-12.jpg',
 ];
 
-export default function SerefVuralTemplate({ settings }: SerefVuralTemplateProps) {
+export default function SerefVuralTemplate({ settings, content }: SerefVuralTemplateProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
@@ -277,12 +282,12 @@ export default function SerefVuralTemplate({ settings }: SerefVuralTemplateProps
             <p className="text-lg text-gray-600">İstanbul ve çevresindeki popüler tur rotaları</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
+            {(content?.tours && content.tours.length > 0 ? content.tours : [
               { title: 'Istanbul City Tour', tr: 'İstanbul Şehir Turu', img: '/seref-vural-tours/istanbul/1.svg', rating: 4.6, desc: 'Tarihi yarımada ve simge yapılar', duration: '8 saat', capacity: '7 kişi' },
               { title: 'Sapanca Nature Tour', tr: 'Sapanca Doğa Turu', img: '/seref-vural-tours/sapanca/1.svg', rating: 4.7, desc: 'Göl kenarı, doğa yürüyüşü, piknik', duration: '6 saat', capacity: '7 kişi' },
               { title: 'Bursa Historical Tour', tr: 'Bursa Tarihi Turu', img: '/seref-vural-tours/bursa/1.svg', rating: 4.5, desc: 'Ulu Camii, Yeşil Türbe ve çarşı', duration: '10 saat', capacity: '7 kişi' },
               { title: 'Abant Lake Tour', tr: 'Abant Gölü Turu', img: '/seref-vural-tours/abant/1.svg', rating: undefined, desc: 'Göl çevresi, fotoğraf ve mola', duration: '7 saat', capacity: '7 kişi' },
-            ].map((t, i) => (
+            ]).map((t, i) => (
               <div key={i} className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
                 <div className="relative h-44">
                   <img src={t.img} alt={t.title} className="object-cover w-full h-full" />
@@ -314,6 +319,43 @@ export default function SerefVuralTemplate({ settings }: SerefVuralTemplateProps
                       WhatsApp
                     </button>
                   </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Boats Section */}
+      <section id="boats" className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-6">
+            <div>
+              <h2 className="text-3xl font-extrabold text-gray-900">İstanbul Boğazındaki Tekne Turları</h2>
+              <p className="text-lg text-gray-600">İstanbul Boğazı'nın Keyfini Sonuna Kadar Çıkarabileceğiniz Tekne Turları</p>
+            </div>
+            <a href="#boats" className="text-sm text-gray-600 hover:text-green-600">Tümünü Gör &gt;</a>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {(content?.boats && content.boats.length > 0 ? content.boats : [
+              { title: 'Bebek, İstanbul', location: 'Bebek, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 25 kişi', rating: 4.99, pricePerHourTRY: 5500, img: '/vehicles/vito-1.jpg' },
+              { title: 'Eminönü, İstanbul', location: 'Eminönü, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 10 kişi', rating: 4.99, pricePerHourTRY: 3250, img: '/vehicles/vito-2.jpg' },
+              { title: 'Arnavutköy, İstanbul', location: 'Arnavutköy, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 12 kişi', rating: 4.98, pricePerHourTRY: 3500, img: '/vehicles/vito-3.jpg' },
+              { title: 'İstinye, İstanbul', location: 'İstinye, İstanbul', type: 'Motoryat', capacity: 'Kapasite: 25 kişi', rating: 4.98, pricePerHourTRY: 5000, img: '/vehicles/vito-4.jpg' },
+            ]).map((b, i) => (
+              <div key={i} className="relative bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+                <div className="relative h-44">
+                  <img src={b.img} alt={b.title} className="object-cover w-full h-full" />
+                  <div className="absolute top-3 left-3 bg-indigo-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow">Anında Rezerve</div>
+                  {typeof b.rating === 'number' && (
+                    <div className="absolute bottom-3 left-3 bg-white/90 text-green-600 text-xs font-semibold px-2 py-1 rounded-full shadow">⭐ {b.rating}</div>
+                  )}
+                </div>
+                <div className="p-5">
+                  <div className="text-gray-900 font-semibold">{b.title}</div>
+                  <div className="text-sm text-gray-500">{b.type}</div>
+                  <div className="text-sm text-gray-500">{b.capacity}</div>
+                  <div className="mt-3 text-2xl font-bold text-gray-900">₺{b.pricePerHourTRY?.toLocaleString('tr-TR')}/saat</div>
                 </div>
               </div>
             ))}
