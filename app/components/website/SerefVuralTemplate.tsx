@@ -3,22 +3,22 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 // Static imports for boat galleries (avoid Unicode path issues at runtime)
-import tekne1 from '../../../public/tekneturlari/tekne1.avif';
-import tekne2 from '../../../public/tekneturlari/tekne2.avif';
-import tekne3 from '../../../public/tekneturlari/tekne3.avif';
-import tekne4 from '../../../public/tekneturlari/tekne4.avif';
-import istinye1 from '../../../public/tekneturlari/istinye1.avif';
-import istinye2 from '../../../public/tekneturlari/istinye2.avif';
-import istinye3 from '../../../public/tekneturlari/istinye3.avif';
-import istinye4 from '../../../public/tekneturlari/istinye4.avif';
-import istinye5 from '../../../public/tekneturlari/istinye5.avif';
-import istinye6 from '../../../public/tekneturlari/istinye6.avif';
-import istinye7 from '../../../public/tekneturlari/istinye7.avif';
-import istinye8 from '../../../public/tekneturlari/istinye8.avif';
-import istinye9 from '../../../public/tekneturlari/istinye9.avif';
-import istinye10 from '../../../public/tekneturlari/istinye10.avif';
-import istinye11 from '../../../public/tekneturlari/istinye11.avif';
-import istinye12 from '../../../public/tekneturlari/istinye12.avif';
+import tekne1 from 'public/tekneturlari/tekne1.avif';
+import tekne2 from 'public/tekneturlari/tekne2.avif';
+import tekne3 from 'public/tekneturlari/tekne3.avif';
+import tekne4 from 'public/tekneturlari/tekne4.avif';
+import istinye1 from 'public/tekneturlari/istinye1.avif';
+import istinye2 from 'public/tekneturlari/istinye2.avif';
+import istinye3 from 'public/tekneturlari/istinye3.avif';
+import istinye4 from 'public/tekneturlari/istinye4.avif';
+import istinye5 from 'public/tekneturlari/istinye5.avif';
+import istinye6 from 'public/tekneturlari/istinye6.avif';
+import istinye7 from 'public/tekneturlari/istinye7.avif';
+import istinye8 from 'public/tekneturlari/istinye8.avif';
+import istinye9 from 'public/tekneturlari/istinye9.avif';
+import istinye10 from 'public/tekneturlari/istinye10.avif';
+import istinye11 from 'public/tekneturlari/istinye11.avif';
+import istinye12 from 'public/tekneturlari/istinye12.avif';
 import { MessageCircle, Calendar, Clock, Shield, Baby, Building, CheckCircle, MapPin, Star, Users, Wifi, Car, Coffee, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface SerefVuralTemplateProps {
