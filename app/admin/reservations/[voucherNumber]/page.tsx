@@ -12,6 +12,12 @@ async function ReservationPage({
     const voucherNumber = params.voucherNumber;
     const viewMode = searchParams.view;
     const editMode = searchParams.edit;
+
+    // Redirect tour reservations to tour-specific pages
+    if (voucherNumber.startsWith('TUR-')) {
+        redirect(`/admin/tour/reservations`);
+    }
+
     const reservation = await getReservation(voucherNumber);
 
     // Eğer edit=true parametresi varsa, düzenleme sayfasına yönlendir
