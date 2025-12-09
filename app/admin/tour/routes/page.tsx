@@ -11,6 +11,7 @@ interface TourRoute {
   name: string;
   duration: number;
   price: number;
+  currency?: string;
   description?: string;
   isActive: boolean;
 }
