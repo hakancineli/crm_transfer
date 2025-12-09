@@ -48,14 +48,14 @@ export function useModule(moduleName: keyof ModuleSettings) {
   useEffect(() => {
     const checkTenantModule = async () => {
       setIsLoading(true);
-      
+
       // User null ise, modülleri gizle
       if (!user) {
         setIsEnabled(false);
         setIsLoading(false);
         return;
       }
-      
+
       // SUPERUSER için tüm modüllere erişim var
       if (user?.role === 'SUPERUSER') {
         setIsEnabled(true);
@@ -79,13 +79,13 @@ export function useModule(moduleName: keyof ModuleSettings) {
               'Content-Type': 'application/json'
             }
           });
-          
+
           if (response.ok) {
             const data = await response.json();
             const tenantModules = data.tenantModules || [];
-            // Modül adından kontrol et
-            const hasModuleAccess = tenantModules.some((tm: any) => 
-              (tm.module?.name || '').toLowerCase().includes(moduleName)
+            // Check by module ID instead of module name
+            const hasModuleAccess = tenantModules.some((tm: any) =>
+              tm.moduleId === moduleName || (tm.module?.id || '').toLowerCase() === moduleName.toLowerCase()
             );
             // Fallback: Agency Admin için transfer modülü boş dönüyorsa açık kabul et
             if (!hasModuleAccess && moduleName === 'transfer') {
@@ -108,7 +108,7 @@ export function useModule(moduleName: keyof ModuleSettings) {
 
       // SELLER için modül kontrolü - promise ve yetkilere göre
       if (user?.role === 'SELLER') {
-        
+
         // SELLER için tenant modül kontrolü yap
         try {
           const token = localStorage.getItem('token');
@@ -125,13 +125,13 @@ export function useModule(moduleName: keyof ModuleSettings) {
               'Content-Type': 'application/json'
             }
           });
-          
+
           if (response.ok) {
             const data = await response.json();
             const tenantModules = data.tenantModules || [];
-            // Modül adından kontrol et
-            const hasModuleAccess = tenantModules.some((tm: any) => 
-              (tm.module?.name || '').toLowerCase().includes(moduleName)
+            // Check by module ID instead of module name
+            const hasModuleAccess = tenantModules.some((tm: any) =>
+              tm.moduleId === moduleName || (tm.module?.id || '').toLowerCase() === moduleName.toLowerCase()
             );
             // Fallback: Seller için transfer modülü boş dönerse kapalı bırak (fallback yok)
             setIsEnabled(hasModuleAccess);
@@ -167,8 +167,9 @@ export function useModule(moduleName: keyof ModuleSettings) {
           if (response.ok) {
             const data = await response.json();
             const tenantModules = data.tenantModules || [];
-            const hasModuleAccess = tenantModules.some((tm: any) => 
-              (tm.module?.name || '').toLowerCase().includes(moduleName)
+            // Check by module ID instead of module name
+            const hasModuleAccess = tenantModules.some((tm: any) =>
+              tm.moduleId === moduleName || (tm.module?.id || '').toLowerCase() === moduleName.toLowerCase()
             );
             // Fallback: Agency Admin için transfer modülü boş dönüyorsa açık kabul et
             if (!hasModuleAccess && moduleName === 'transfer' && user.role === 'AGENCY_ADMIN') {
@@ -187,7 +188,7 @@ export function useModule(moduleName: keyof ModuleSettings) {
         setIsLoading(false);
       }
     };
-    
+
     // Diğer modüller için normal kontrol
     if (user) {
       checkTenantModule();
@@ -207,7 +208,7 @@ export function useAllModules() {
     if (typeof window === 'undefined') {
       return;
     }
-    
+
     try {
       const saved = localStorage.getItem('moduleSettings');
       if (saved) {
