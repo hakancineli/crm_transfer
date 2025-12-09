@@ -93,9 +93,21 @@ export default function TourVoucher({ bookingId }: TourVoucherProps) {
 
   const formatDate = (dateStr: string) => {
     try {
-      const [year, month, day] = dateStr.split('-');
+      // Parse the date string and format as DD/MM/YYYY
+      const date = new Date(dateStr);
+
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        return dateStr;
+      }
+
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+
       return `${day}/${month}/${year}`;
     } catch (e) {
+      console.error('Date formatting error:', e);
       return dateStr;
     }
   };
@@ -143,9 +155,9 @@ export default function TourVoucher({ bookingId }: TourVoucherProps) {
           {/* ProTransfer şirketi için logo göster */}
           {booking.tenant?.companyName?.toLowerCase().includes('protransfer') ? (
             <>
-              <img 
-                src="/logo.svg" 
-                alt="ProTransfer" 
+              <img
+                src="/logo.svg"
+                alt="ProTransfer"
                 className="h-16 w-16 print:h-12 print:w-12 mr-4 drop-shadow-sm"
               />
               <span className="text-4xl print:text-2xl font-bold tracking-tight bg-gradient-to-r from-gray-800 to-green-600 bg-clip-text text-transparent">
