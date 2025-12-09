@@ -43,10 +43,10 @@ export default function NewTourReservationPage() {
   const { user } = useAuth();
   const { isEnabled: tourEnabled, isLoading } = useModule('tour');
   const router = useRouter();
-  
+
   // Bugünün tarihini YYYY-MM-DD formatında al
   const today = new Date().toISOString().split('T')[0];
-  
+
   const [formData, setFormData] = useState({
     routeId: '',
     customRouteName: '',
@@ -92,7 +92,7 @@ export default function NewTourReservationPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    
+
     // Özel rota seçildiğinde fiyatı sıfırla
     if (name === 'routeId' && value === 'custom') {
       setFormData(prev => ({
@@ -105,7 +105,7 @@ export default function NewTourReservationPage() {
       // Kişi sayısı değiştiğinde yolcu isimlerini güncelle
       const newGroupSize = parseInt(value) || 1;
       const currentPassengerNames = formData.passengerNames;
-      
+
       let newPassengerNames: string[];
       if (newGroupSize > currentPassengerNames.length) {
         // Daha fazla kişi eklendi, boş isimler ekle
@@ -117,7 +117,7 @@ export default function NewTourReservationPage() {
         // Aynı sayıda, değişiklik yok
         newPassengerNames = currentPassengerNames;
       }
-      
+
       setFormData(prev => ({
         ...prev,
         groupSize: newGroupSize,
@@ -156,7 +156,8 @@ export default function NewTourReservationPage() {
       if (response.ok) {
         const result = await response.json();
         // Tour rezervasyonu için customer voucher sayfasına yönlendir
-        router.push(`/admin/tour/reservations/${result.id}/customer-voucher`);
+        // API response: { success: true, booking: { id, ... }, voucherNumber, ... }
+        router.push(`/admin/tour/reservations/${result.booking.id}/customer-voucher`);
       } else {
         const error = await response.json();
         alert('Hata: ' + (error.message || 'Rezervasyon oluşturulamadı'));
@@ -210,7 +211,7 @@ export default function NewTourReservationPage() {
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h2 className="text-lg font-medium text-gray-900 mb-6">Tur Bilgileri</h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Tur Rotası */}
               <div>
