@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId, role, tenantIds } = await getRequestUserContext(request);
+    let { userId, role, tenantIds } = await getRequestUserContext(request);
     const body = await request.json();
 
     const { name, duration, price, description } = body;
@@ -37,6 +37,15 @@ export async function POST(request: NextRequest) {
         { error: 'Rota adı, süre ve fiyat gereklidir' },
         { status: 400 }
       );
+    }
+
+    // Hydrate tenantIds if missing (for non-SUPERUSER)
+    if (role !== 'SUPERUSER' && (!tenantIds || tenantIds.length === 0) && userId) {
+      const links = await prisma.tenantUser.findMany({
+        where: { userId, isActive: true },
+        select: { tenantId: true }
+      });
+      tenantIds = links.map((l: any) => l.tenantId);
     }
 
     // Determine tenant ID
@@ -58,6 +67,7 @@ export async function POST(request: NextRequest) {
       name,
       duration: parseInt(duration),
       price: parseFloat(price),
+      currency: body.currency || 'EUR',
       description: description || '',
       isActive: true,
       tenantId,
