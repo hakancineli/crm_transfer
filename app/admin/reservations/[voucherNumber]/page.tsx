@@ -36,9 +36,14 @@ async function ReservationPage({
         );
     }
 
+    // Additional safety check: if somehow a tour reservation got through, redirect
+    if ('reservationType' in reservation && reservation.reservationType === 'tour') {
+        redirect(`/admin/tour/reservations`);
+    }
+
     return (
         <ReservationDetail
-            reservation={reservation}
+            reservation={reservation as any}
             isDriverVoucher={viewMode === 'driver'}
             isEditMode={!!editMode}
             editType={editMode as 'customer' | 'driver'}
