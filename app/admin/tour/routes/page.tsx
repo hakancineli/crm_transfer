@@ -33,6 +33,7 @@ export default function TourRoutesPage() {
     name: '',
     duration: 8,
     price: 0,
+    currency: 'EUR',
     description: '',
   });
   const [loading, setLoading] = useState(true);
@@ -52,11 +53,21 @@ export default function TourRoutesPage() {
   const fetchRoutes = async () => {
     try {
       setLoading(true);
+
+      // Get default routes from API
       const response = await fetch('/api/tour-routes');
-      const data = await response.json();
-      setRoutes(data);
+      const defaultRoutes = await response.json();
+
+      // Get custom routes from localStorage
+      const customRoutesJson = localStorage.getItem('customTourRoutes');
+      const customRoutes = customRoutesJson ? JSON.parse(customRoutesJson) : [];
+
+      // Combine default and custom routes
+      setRoutes([...defaultRoutes, ...customRoutes]);
     } catch (error) {
       console.error('Tur rotaları getirme hatası:', error);
+      // Fallback to default routes only
+      setRoutes(DEFAULT_ROUTES);
     } finally {
       setLoading(false);
     }
@@ -76,7 +87,7 @@ export default function TourRoutesPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600 mb-4">Modül Kapalı</h1>
           <p className="text-gray-600">Tur modülü aktif değil. Modül Yönetimi'nden aktifleştirin.</p>
-          <Link 
+          <Link
             href="/admin/modules"
             className="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
@@ -97,23 +108,35 @@ export default function TourRoutesPage() {
           },
           body: JSON.stringify(newRoute),
         });
-        
+
         if (response.ok) {
           const newRouteData = await response.json();
+
+          // Save to localStorage
+          const customRoutesJson = localStorage.getItem('customTourRoutes');
+          const customRoutes = customRoutesJson ? JSON.parse(customRoutesJson) : [];
+          customRoutes.push(newRouteData);
+          localStorage.setItem('customTourRoutes', JSON.stringify(customRoutes));
+
+          // Update state
           setRoutes([...routes, newRouteData]);
-          setNewRoute({ name: '', duration: 8, price: 0, description: '' });
+          setNewRoute({ name: '', duration: 8, price: 0, currency: 'EUR', description: '' });
           setShowAddForm(false);
         } else {
-          console.error('Tur rotası oluşturulamadı');
+          const error = await response.json();
+          alert('Hata: ' + (error.error || 'Tur rotası oluşturulamadı'));
         }
       } catch (error) {
         console.error('Tur rotası oluşturma hatası:', error);
+        alert('Tur rotası oluşturulurken bir hata oluştu');
       }
+    } else {
+      alert('Lütfen rota adı ve fiyat girin');
     }
   };
 
   const toggleRouteStatus = (id: string) => {
-    setRoutes(routes.map(route => 
+    setRoutes(routes.map(route =>
       route.id === id ? { ...route, isActive: !route.isActive } : route
     ));
   };
@@ -155,7 +178,7 @@ export default function TourRoutesPage() {
                 <input
                   type="text"
                   value={newRoute.name}
-                  onChange={(e) => setNewRoute({...newRoute, name: e.target.value})}
+                  onChange={(e) => setNewRoute({ ...newRoute, name: e.target.value })}
                   placeholder="Örn: Antalya Turu"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -167,7 +190,7 @@ export default function TourRoutesPage() {
                 <input
                   type="number"
                   value={newRoute.duration}
-                  onChange={(e) => setNewRoute({...newRoute, duration: parseInt(e.target.value)})}
+                  onChange={(e) => setNewRoute({ ...newRoute, duration: parseInt(e.target.value) })}
                   min="1"
                   max="24"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -175,16 +198,28 @@ export default function TourRoutesPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Fiyat (EUR) *
+                  Fiyat *
                 </label>
-                <input
-                  type="number"
-                  value={newRoute.price}
-                  onChange={(e) => setNewRoute({...newRoute, price: parseFloat(e.target.value)})}
-                  min="0"
-                  step="0.01"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div className="flex">
+                  <input
+                    type="number"
+                    value={newRoute.price}
+                    onChange={(e) => setNewRoute({ ...newRoute, price: parseFloat(e.target.value) })}
+                    min="0"
+                    step="0.01"
+                    placeholder="Fiyat girin"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <select
+                    value={newRoute.currency}
+                    onChange={(e) => setNewRoute({ ...newRoute, currency: e.target.value })}
+                    className="px-3 py-2 border border-l-0 border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="EUR">EUR (€)</option>
+                    <option value="USD">USD ($)</option>
+                    <option value="TRY">TRY (₺)</option>
+                  </select>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -193,7 +228,7 @@ export default function TourRoutesPage() {
                 <input
                   type="text"
                   value={newRoute.description}
-                  onChange={(e) => setNewRoute({...newRoute, description: e.target.value})}
+                  onChange={(e) => setNewRoute({ ...newRoute, description: e.target.value })}
                   placeholder="Örn: Antalya, Side, Aspendos"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -225,11 +260,10 @@ export default function TourRoutesPage() {
                 <div className="flex space-x-2">
                   <button
                     onClick={() => toggleRouteStatus(route.id)}
-                    className={`px-2 py-1 text-xs rounded-full ${
-                      route.isActive 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}
+                    className={`px-2 py-1 text-xs rounded-full ${route.isActive
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                      }`}
                   >
                     {route.isActive ? 'Aktif' : 'Pasif'}
                   </button>
@@ -243,7 +277,7 @@ export default function TourRoutesPage() {
                   )}
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Süre:</span>
@@ -251,9 +285,11 @@ export default function TourRoutesPage() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Fiyat:</span>
-                  <span className="font-medium">{route.price}€</span>
-                </div>
-                {route.description && (
+                  <span className="font-medium">
+                    {route.price}
+                    {route.currency === 'EUR' ? '€' : route.currency === 'USD' ? '$' : route.currency === 'TRY' ? '₺' : '€'}
+                  </span>
+                </div>                {route.description && (
                   <div className="text-sm text-gray-600 mt-2">
                     {route.description}
                   </div>

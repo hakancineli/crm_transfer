@@ -26,11 +26,45 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Şimdilik statik rotalar kullanıyoruz, POST işlemi desteklenmiyor
-    return NextResponse.json(
-      { error: 'Tur rotası oluşturma şu anda desteklenmiyor' },
-      { status: 501 }
-    );
+    const { userId, role, tenantIds } = await getRequestUserContext(request);
+    const body = await request.json();
+
+    const { name, duration, price, description } = body;
+
+    // Validate required fields
+    if (!name || !duration || price === undefined) {
+      return NextResponse.json(
+        { error: 'Rota adı, süre ve fiyat gereklidir' },
+        { status: 400 }
+      );
+    }
+
+    // Determine tenant ID
+    let tenantId: string;
+    if (role === 'SUPERUSER') {
+      tenantId = body.tenantId || tenantIds?.[0] || '985046c2-aaa0-467b-8a10-ed965f6cdb43';
+    } else if (tenantIds && tenantIds.length > 0) {
+      tenantId = tenantIds[0];
+    } else {
+      return NextResponse.json(
+        { error: 'Tenant ID bulunamadı' },
+        { status: 400 }
+      );
+    }
+
+    // Create custom route object
+    const newRoute = {
+      id: `custom-${Date.now()}`,
+      name,
+      duration: parseInt(duration),
+      price: parseFloat(price),
+      description: description || '',
+      isActive: true,
+      tenantId,
+      createdAt: new Date().toISOString()
+    };
+
+    return NextResponse.json(newRoute, { status: 201 });
   } catch (error) {
     console.error('Tur rotası oluşturma hatası:', error);
     return NextResponse.json(
