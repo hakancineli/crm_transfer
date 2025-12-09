@@ -41,6 +41,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check for x-tenant-id header (used by frontend)
+    const headerTenantId = request.headers.get('x-tenant-id');
+    if (headerTenantId && (!tenantIds || !tenantIds.includes(headerTenantId))) {
+      console.log('📋 Found x-tenant-id header:', headerTenantId);
+      tenantIds = [headerTenantId];
+    }
+
     // Hydrate tenantIds if missing (for non-SUPERUSER)
     if (role !== 'SUPERUSER' && (!tenantIds || tenantIds.length === 0) && userId) {
       console.log('🔄 Hydrating tenantIds for userId:', userId);
@@ -55,7 +62,7 @@ export async function POST(request: NextRequest) {
     // Determine tenant ID
     let tenantId: string;
     if (role === 'SUPERUSER') {
-      tenantId = body.tenantId || tenantIds?.[0] || '985046c2-aaa0-467b-8a10-ed965f6cdb43';
+      tenantId = headerTenantId || body.tenantId || tenantIds?.[0] || '985046c2-aaa0-467b-8a10-ed965f6cdb43';
       console.log('👑 SUPERUSER tenantId:', tenantId);
     } else if (tenantIds && tenantIds.length > 0) {
       tenantId = tenantIds[0];
