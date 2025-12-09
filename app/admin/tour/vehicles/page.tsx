@@ -230,7 +230,7 @@ export default function TourVehiclesPage() {
                 </label>
                 <select
                   value={newVehicle.type}
-                  onChange={(e) => setNewVehicle({...newVehicle, type: e.target.value})}
+                  onChange={(e) => setNewVehicle({ ...newVehicle, type: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Araç tipi seçin</option>
@@ -242,7 +242,7 @@ export default function TourVehiclesPage() {
                   <option value="CUSTOM">Özel Araç Tipi</option>
                 </select>
               </div>
-              
+
               {/* Custom Type Name Input */}
               {newVehicle.type === 'CUSTOM' && (
                 <>
@@ -253,7 +253,7 @@ export default function TourVehiclesPage() {
                     <input
                       type="text"
                       value={newVehicle.customTypeName}
-                      onChange={(e) => setNewVehicle({...newVehicle, customTypeName: e.target.value})}
+                      onChange={(e) => setNewVehicle({ ...newVehicle, customTypeName: e.target.value })}
                       placeholder="Örn: Mercedes Vito Lüks"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
@@ -267,13 +267,12 @@ export default function TourVehiclesPage() {
                       min="1"
                       max="50"
                       value={newVehicle.capacity}
-                      onChange={(e) => setNewVehicle({...newVehicle, capacity: parseInt(e.target.value) || 6})}
+                      onChange={(e) => setNewVehicle({ ...newVehicle, capacity: parseInt(e.target.value) || 6 })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </>
               )}
-              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Plaka *
@@ -281,7 +280,7 @@ export default function TourVehiclesPage() {
                 <input
                   type="text"
                   value={newVehicle.licensePlate}
-                  onChange={(e) => setNewVehicle({...newVehicle, licensePlate: e.target.value})}
+                  onChange={(e) => setNewVehicle({ ...newVehicle, licensePlate: e.target.value })}
                   placeholder="34 ABC 123"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -293,7 +292,7 @@ export default function TourVehiclesPage() {
                 <input
                   type="text"
                   value={newVehicle.driverName}
-                  onChange={(e) => setNewVehicle({...newVehicle, driverName: e.target.value})}
+                  onChange={(e) => setNewVehicle({ ...newVehicle, driverName: e.target.value })}
                   placeholder="Ahmet Yılmaz"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -305,7 +304,7 @@ export default function TourVehiclesPage() {
                 <input
                   type="text"
                   value={newVehicle.driverPhone}
-                  onChange={(e) => setNewVehicle({...newVehicle, driverPhone: e.target.value})}
+                  onChange={(e) => setNewVehicle({ ...newVehicle, driverPhone: e.target.value })}
                   placeholder="+90 532 123 4567"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -329,101 +328,101 @@ export default function TourVehiclesPage() {
           </div>
         )}
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-medium text-gray-900">Araç Listesi</h2>
-        </div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-900">Araç Listesi</h2>
+          </div>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Araç Tipi
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Plaka
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Kapasite
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Şoför
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Telefon
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Durum
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Son Bakım
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  İşlemler
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {vehicles.map((vehicle) => (
-                <tr key={vehicle.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {getVehicleTypeName(vehicle.type)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {vehicle.licensePlate}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {vehicle.capacity} kişi
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {vehicle.driverName || '-'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {vehicle.driverPhone || '-'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <button
-                      onClick={() => toggleVehicleStatus(vehicle.id)}
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${vehicle.isAvailable
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Araç Tipi
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Plaka
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Kapasite
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Şoför
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Telefon
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Durum
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Son Bakım
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    İşlemler
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {vehicles.map((vehicle) => (
+                  <tr key={vehicle.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {getVehicleTypeName(vehicle.type)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {vehicle.licensePlate}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {vehicle.capacity} kişi
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {vehicle.driverName || '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {vehicle.driverPhone || '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <button
+                        onClick={() => toggleVehicleStatus(vehicle.id)}
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${vehicle.isAvailable
                           ? 'bg-green-100 text-green-800'
                           : 'bg-red-100 text-red-800'
-                        }`}
-                    >
-                      {vehicle.isAvailable ? 'Müsait' : 'Kullanımda'}
-                    </button>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {vehicle.lastMaintenance ? new Date(vehicle.lastMaintenance).toLocaleDateString('tr-TR') : '-'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => deleteVehicle(vehicle.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      Sil
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                          }`}
+                      >
+                        {vehicle.isAvailable ? 'Müsait' : 'Kullanımda'}
+                      </button>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {vehicle.lastMaintenance ? new Date(vehicle.lastMaintenance).toLocaleDateString('tr-TR') : '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button
+                        onClick={() => deleteVehicle(vehicle.id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Sil
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
 
-      {vehicles.length === 0 && (
-        <div className="text-center py-12">
-          <div className="text-4xl mb-4">🚐</div>
-          <p className="text-gray-500 mb-4">Henüz araç bulunmuyor</p>
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-          >
-            İlk Aracı Ekle
-          </button>
-        </div>
-      )}
-    </div>
+        {vehicles.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-4xl mb-4">🚐</div>
+            <p className="text-gray-500 mb-4">Henüz araç bulunmuyor</p>
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            >
+              İlk Aracı Ekle
+            </button>
+          </div>
+        )}
+      </div>
     </div >
   );
 }
