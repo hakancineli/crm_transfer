@@ -70,7 +70,7 @@ export async function PUT(
     let { userId, role, tenantIds } = await getRequestUserContext(request);
     const bookingId = params.id;
     const body = await request.json();
-    
+
     // Load booking first to determine its tenant
     const bookingForAuth = await prisma.tourBooking.findUnique({ where: { id: bookingId }, select: { id: true, tenantId: true } });
     if (!bookingForAuth) {
@@ -154,7 +154,7 @@ export async function PUT(
         routeName: routeName || existingBooking.routeName,
         vehicleType: vehicleType || existingBooking.vehicleType,
         groupSize: groupSize || existingBooking.groupSize,
-        price: price || existingBooking.price,
+        price: price ? parseFloat(price) : existingBooking.price,
         currency: currency || existingBooking.currency,
         pickupLocation: pickupLocation || existingBooking.pickupLocation,
         tourDate: tourDate ? new Date(tourDate) : existingBooking.tourDate,
