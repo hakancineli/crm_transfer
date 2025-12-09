@@ -5,7 +5,7 @@ import { getRequestUserContext } from '@/app/lib/requestContext';
 export async function GET(request: NextRequest) {
   try {
     const { userId, role, tenantIds } = await getRequestUserContext(request);
-    
+
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
@@ -127,6 +127,8 @@ export async function POST(request: NextRequest) {
       } else if (currency === 'TRY') {
         usdPrice = price / 30.5; // TRY to USD
       }
+      // Round to 2 decimal places
+      usdPrice = Math.round(usdPrice * 100) / 100;
     }
 
     // Rezervasyon oluştur
@@ -136,7 +138,7 @@ export async function POST(request: NextRequest) {
         routeName,
         vehicleType,
         groupSize: parseInt(groupSize),
-        price: usdPrice, // USD olarak kaydet
+        price: usdPrice, // USD olarak kaydet (yuvarlanmış)
         currency: 'USD', // Her zaman USD olarak kaydet
         pickupLocation,
         tourDate: new Date(tourDate),
