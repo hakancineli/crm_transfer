@@ -413,6 +413,7 @@ model TourBooking {
   paidAmount     Float     @default(0)
   remainingAmount Float    @default(0)
   paymentReminder DateTime?
+  passengerDetails Json?   // [{name, surname, seatNumber, type}]
 
   @@map("tour_bookings")
 }

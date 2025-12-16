@@ -21,9 +21,9 @@ export default function SeatMap({ capacity, occupiedSeats, selectedSeat, onSelec
         const isOccupied = occupiedSeats.includes(seatStr);
         const isSelected = selectedSeat === seatStr;
 
-        let seatColor = "bg-white border-gray-300 hover:border-blue-500 text-gray-700";
-        if (isOccupied) seatColor = "bg-red-100 border-red-300 text-red-400 cursor-not-allowed";
-        if (isSelected) seatColor = "bg-blue-600 border-blue-600 text-white";
+        let seatColor = "stroke-gray-400 fill-white text-gray-700 hover:fill-blue-50";
+        if (isOccupied) seatColor = "stroke-red-400 fill-red-100 text-red-500 cursor-not-allowed";
+        if (isSelected) seatColor = "stroke-blue-600 fill-blue-600 text-white";
 
         return (
             <button
@@ -31,73 +31,95 @@ export default function SeatMap({ capacity, occupiedSeats, selectedSeat, onSelec
                 type="button"
                 disabled={isOccupied}
                 onClick={() => onSelect(seatStr)}
-                className={`w-10 h-10 m-1 rounded-t-lg border-2 flex items-center justify-center font-bold text-sm transition-colors ${seatColor}`}
-                title={isOccupied ? 'Dolu' : `Koltuk ${seatNum}`}
+                className="relative group p-1"
+                title={isOccupied ? `Koltuk ${seatNum} (Dolu)` : `Koltuk ${seatNum}`}
             >
-                {seatNum}
+                {/* SVG Seat Icon */}
+                <svg width="40" height="40" viewBox="0 0 100 100" className={`transition-colors ${seatColor}`}>
+                    <path d="M 20 20 L 80 20 C 90 20 90 30 90 40 L 90 80 C 90 90 80 90 70 90 L 30 90 C 20 90 10 90 10 80 L 10 40 C 10 30 10 20 20 20 Z" strokeWidth="6" />
+                    {/* Armrests */}
+                    <path d="M 10 50 L 10 80" strokeWidth="6" />
+                    <path d="M 90 50 L 90 80" strokeWidth="6" />
+                </svg>
+                <span className={`absolute inset-0 flex items-center justify-center font-bold text-xs ${isSelected ? 'text-white' : (isOccupied ? 'text-red-500' : 'text-gray-600')}`}>
+                    {seatNum}
+                </span>
             </button>
         );
     };
 
     const renderLayout = () => {
-        // Determine layout strategy
-        // Small (Vito): 6-8 seats
-        // Medium (Sprinter): 10-19 seats
-        // Large (Bus): 20+ seats
-
         const rows = [];
-        let seatsPerRow = 3; // Default for Sprinter (1+2)
-        let aisleIndex = 1;  // Gap after 1st seat
+        let seatsPerRow = 3;
+        let aisleIndex = 1;
 
         if (capacity > 20) {
             seatsPerRow = 4; // 2+2 for bus
-            aisleIndex = 2;
+            aisleIndex = 2; // Index 0,1 | 2,3
         } else if (capacity <= 8) {
             seatsPerRow = 3;
-            aisleIndex = -1; // No aisle, just rows
+            aisleIndex = -1;
         }
 
-        // Helper to group seats into rows
         let currentSeat = 1;
-        const totalRows = Math.ceil(capacity / seatsPerRow);
+        // Logic to handle back row often having 5 seats in 2+2 configs
+        // If capacity % 4 !== 0, usually the last row is full 5. 
+        // But for simplicity, we map strictly until capacity reached.
+
+        const seatGrid = [];
+        while (currentSeat <= capacity) {
+            const rowSeats = [];
+            // Special handling for last row if it's a 2+2 bus and we are at the end
+            // Usually buses are:
+            // 2+2
+            // 2+2
+            // ...
+            // 5 (Back row)
+
+            // For now, standard grid generation:
+            for (let i = 0; i < seatsPerRow; i++) {
+                // If it's a bus (seatsPerRow=4) and we are creating columns
+                // 0, 1 (Left) | Aisle | 2, 3 (Right)
+
+                // Add aisle gap before index 2 (if aisle exists)
+                if (i === aisleIndex && aisleIndex !== -1) {
+                    rowSeats.push(<div key={`aisle-${currentSeat}`} className="w-6"></div>);
+                }
+
+                if (currentSeat <= capacity) {
+                    rowSeats.push(renderSeat(currentSeat));
+                    currentSeat++;
+                } else {
+                    // Empty spacer
+                    rowSeats.push(<div key={`empty-${i}`} className="w-10 h-10 m-1"></div>);
+                }
+            }
+            seatGrid.push(<div key={seatGrid.length} className="flex justify-center">{rowSeats}</div>);
+        }
 
         return (
-            <div className="flex flex-col gap-2 p-4 bg-gray-100 rounded-lg border border-gray-300 max-w-xs mx-auto">
+            <div className="flex flex-col gap-1 p-4 bg-white rounded-lg border border-gray-300 max-w-sm mx-auto shadow-sm">
                 {/* Driver Area */}
-                <div className="flex justify-start mb-4 border-b-2 border-dashed border-gray-300 pb-2">
-                    <div className="w-10 h-10 border-2 border-gray-400 rounded-full flex items-center justify-center bg-gray-200 text-xs font-bold text-gray-600">
-                        ŞOFÖR
+                <div className="flex justify-start mb-6 border-b border-gray-100 pb-4">
+                    <div className="flex flex-col items-center">
+                        <svg width="40" height="40" viewBox="0 0 100 100" className="stroke-gray-400 fill-gray-200">
+                            <circle cx="50" cy="50" r="40" strokeWidth="4" />
+                            <path d="M 50 10 L 50 90" strokeWidth="4" />
+                            <path d="M 10 50 L 90 50" strokeWidth="4" />
+                        </svg>
+                        <span className="text-[10px] font-bold text-gray-500 mt-1">ŞOFÖR</span>
                     </div>
                 </div>
 
-                {/* Seats */}
+                {/* Seats Container */}
                 <div className="flex flex-col gap-2">
-                    {Array.from({ length: totalRows }).map((_, rowIndex) => (
-                        <div key={rowIndex} className="flex justify-center gap-2">
-                            {Array.from({ length: seatsPerRow }).map((_, colIndex) => {
-                                if (currentSeat > capacity) return <div key={`empty-${colIndex}`} className="w-10 h-10 m-1" />;
-
-                                // Add aisle gap
-                                if (colIndex === aisleIndex && aisleIndex !== -1) {
-                                    const seat = renderSeat(currentSeat++);
-                                    return (
-                                        <div key={currentSeat - 1} className="flex">
-                                            <div className="w-4"></div> {/* Aisle */}
-                                            {seat}
-                                        </div>
-                                    );
-                                }
-
-                                return renderSeat(currentSeat++);
-                            })}
-                        </div>
-                    ))}
+                    {seatGrid}
                 </div>
 
                 {/* Legend */}
-                <div className="mt-4 flex gap-4 text-xs justify-center border-t pt-2">
+                <div className="mt-6 flex gap-4 text-xs justify-center border-t border-gray-100 pt-4">
                     <div className="flex items-center gap-1">
-                        <div className="w-4 h-4 rounded bg-white border border-gray-300"></div>
+                        <div className="w-4 h-4 rounded border border-gray-400 bg-white"></div>
                         <span>Boş</span>
                     </div>
                     <div className="flex items-center gap-1">
@@ -105,7 +127,7 @@ export default function SeatMap({ capacity, occupiedSeats, selectedSeat, onSelec
                         <span>Seçili</span>
                     </div>
                     <div className="flex items-center gap-1">
-                        <div className="w-4 h-4 rounded bg-red-100 border border-red-300"></div>
+                        <div className="w-4 h-4 rounded border border-red-300 bg-red-100"></div>
                         <span>Dolu</span>
                     </div>
                 </div>

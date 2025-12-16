@@ -34,6 +34,12 @@ interface TourBooking {
     name: string;
     surname: string;
   } | null;
+  seatNumber?: string | null;
+  passengerDetails?: Array<{
+    name: string;
+    surname: string;
+    seatNumber: string;
+  }> | null;
 }
 
 interface TourVoucherProps {
@@ -243,6 +249,12 @@ export default function TourVoucher({ bookingId }: TourVoucherProps) {
                 <span className="text-gray-600">{t.price}:</span>
                 <span className="font-medium text-green-600">{booking.price} {booking.currency}</span>
               </div>
+              {booking.seatNumber && (
+                <div className="flex justify-between items-center py-1 border-t border-gray-100 mt-2 pt-2 bg-yellow-50 px-2 rounded">
+                  <span className="text-gray-700 font-bold">Koltuk No:</span>
+                  <span className="font-bold text-lg text-blue-600">{booking.seatNumber}</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -309,21 +321,59 @@ export default function TourVoucher({ bookingId }: TourVoucherProps) {
         </div>
 
         {/* Yolcular */}
-        <div className="bg-gradient-to-br from-cyan-50 to-blue-50 p-6 print:p-3 rounded-2xl print:bg-white border border-cyan-100 shadow-sm hover:shadow-md transition-shadow duration-200">
-          <h2 className="text-sm font-semibold text-gray-800 mb-3 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            {t.passengerList}
-          </h2>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            {booking.passengerNames.map((name, index) => (
-              <div key={index} className="py-1 border-b border-gray-100 last:border-0">
-                <span className="font-medium">{name}</span>
-              </div>
-            ))}
+        {/* Yolcular / Boarding Passes */}
+        {booking.passengerDetails && booking.passengerDetails.length > 0 ? (
+          <div className="space-y-4">
+            <h2 className="text-sm font-semibold text-gray-800 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+              </svg>
+              {t.passengerList || 'Yolcu Biniş Kartları'}
+            </h2>
+            <div className="grid grid-cols-1 gap-4">
+              {booking.passengerDetails.map((passenger, index) => (
+                <div key={index} className="bg-white border-2 border-dashed border-gray-300 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4 print:break-inside-avoid">
+                  {/* Left: Passenger Info */}
+                  <div className="flex-grow text-center sm:text-left">
+                    <div className="text-xs text-gray-500 uppercase tracking-wider">Yolcu Adı</div>
+                    <div className="text-lg font-bold text-gray-900">{passenger.name} {passenger.surname}</div>
+                    <div className="text-sm text-gray-600 mt-1">{booking.routeName}</div>
+                  </div>
+
+                  {/* Center: Date/Time */}
+                  <div className="text-center border-l border-r border-gray-100 px-4 hidden sm:block">
+                    <div className="text-xs text-gray-500">Tarih</div>
+                    <div className="font-semibold">{formatDate(booking.tourDate)}</div>
+                    <div className="text-xs text-gray-500 mt-1">Saat</div>
+                    <div className="font-semibold">{booking.tourTime}</div>
+                  </div>
+
+                  {/* Right: Seat Number */}
+                  <div className="flex flex-col items-center justify-center bg-blue-50 rounded-lg p-3 min-w-[80px]">
+                    <div className="text-xs text-blue-800 font-bold uppercase">Koltuk</div>
+                    <div className="text-3xl font-extrabold text-blue-600">{passenger.seatNumber}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-gradient-to-br from-cyan-50 to-blue-50 p-6 print:p-3 rounded-2xl print:bg-white border border-cyan-100 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <h2 className="text-sm font-semibold text-gray-800 mb-3 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              {t.passengerList}
+            </h2>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              {booking.passengerNames.map((name, index) => (
+                <div key={index} className="py-1 border-b border-gray-100 last:border-0">
+                  <span className="font-medium">{name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Şoför Bilgileri */}
         {booking.driver && (

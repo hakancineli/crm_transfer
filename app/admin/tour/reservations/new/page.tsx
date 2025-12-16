@@ -30,6 +30,9 @@ const VEHICLE_TYPES: VehicleType[] = [
   { id: 'SPRINTER_10', name: 'Mercedes Sprinter', capacity: 10 },
   { id: 'SPRINTER_13', name: 'Mercedes Sprinter', capacity: 13 },
   { id: 'SPRINTER_16', name: 'Mercedes Sprinter', capacity: 16 },
+  { id: 'BUS_46', name: 'Mercedes Travego/Tourismo (46)', capacity: 46 },
+  { id: 'BUS_50', name: 'Mercedes Travego/Tourismo (50)', capacity: 50 },
+  { id: 'BUS_54', name: 'Mercedes Travego/Tourismo (54)', capacity: 54 },
 ];
 
 export default function NewTourReservationPage() {
@@ -62,6 +65,18 @@ export default function NewTourReservationPage() {
     seatNumber: '', // Selected Seat
     paymentReminderDate: '', // YYYY-MM-DD
     paymentReminderTime: '10:00', // HH:MM
+    // New Customer Manual Entry
+    newCustomerName: '',
+    newCustomerSurname: '',
+    newCustomerPhone: '',
+    // Detailed Passenger Data
+    passengerDetails: [] as Array<{
+      seatNumber: string;
+      name: string;
+      surname: string;
+      id?: string; // Optional TCKN/Passport
+    }>,
+    selectedSeats: [] as string[],
   });
 
   const [loading, setLoading] = useState(false);
@@ -193,16 +208,71 @@ export default function NewTourReservationPage() {
 
   // Handle Customer Selection
   const handleCustomerSelect = (customer: any) => {
-    // Fill form data
-    const newPassengerNames = [...formData.passengerNames];
-    if (newPassengerNames.length > 0) newPassengerNames[0] = `${customer.name} ${customer.surname}`;
-
     setFormData(prev => ({
       ...prev,
       customerId: customer.id,
       customerName: `${customer.name} ${customer.surname}`,
-      passengerNames: newPassengerNames
+      // passengerDetails will be updated by handleSeatSelect if seats are chosen
+      // or can be manually updated here if no seats are selected yet.
+      // For now, let handleSeatSelect manage the passengerDetails auto-fill.
     }));
+  };
+
+  const handleSeatSelect = (seatNumber: string) => {
+    setFormData(prev => {
+      const currentSeats = prev.selectedSeats;
+      const isSelected = currentSeats.includes(seatNumber);
+      let newSeats;
+
+      if (isSelected) {
+        newSeats = currentSeats.filter(s => s !== seatNumber);
+      } else {
+        newSeats = [...currentSeats, seatNumber].sort((a, b) => Number(a) - Number(b));
+      }
+
+      // Sync passengerDetails with seats
+      // Preserve existing details for kept seats, add empty for new
+      const newPassengerDetails = newSeats.map(seat => {
+        const existing = prev.passengerDetails.find(p => p.seatNumber === seat);
+        return existing || { seatNumber: seat, name: '', surname: '' };
+      });
+
+      // Auto-fill first passenger if it's the group leader/customer
+      if (newPassengerDetails.length > 0 && !newPassengerDetails[0].name && prev.customerName) {
+        // This might be tricky with "Name Surname" string, simple split
+        const parts = prev.customerName.split(' ');
+        if (parts.length > 0) {
+          newPassengerDetails[0].name = parts[0];
+          newPassengerDetails[0].surname = parts.slice(1).join(' ');
+        }
+      } else if (newPassengerDetails.length > 0 && !newPassengerDetails[0].name && prev.newCustomerName) {
+        newPassengerDetails[0].name = prev.newCustomerName;
+        newPassengerDetails[0].surname = prev.newCustomerSurname;
+      }
+
+      return {
+        ...prev,
+        selectedSeats: newSeats,
+        groupSize: newSeats.length > 0 ? newSeats.length : 1,
+        seatNumber: newSeats.join(', '), // Comma separated for legacy field
+        passengerDetails: newPassengerDetails,
+        // Update legacy passengerNames array for backward compatibility if needed
+        passengerNames: newPassengerDetails.map(p => `${p.name} ${p.surname}`.trim())
+      };
+    });
+  };
+
+  const handlePassengerDetailChange = (index: number, field: 'name' | 'surname' | 'id', value: string) => {
+    setFormData(prev => {
+      const updated = [...prev.passengerDetails];
+      updated[index] = { ...updated[index], [field]: value };
+      return {
+        ...prev,
+        passengerDetails: updated,
+        // Sync legacy string array for backward compatibility
+        passengerNames: updated.map(p => `${p.name} ${p.surname}`.trim())
+      };
+    });
   };
 
   useEffect(() => {
@@ -225,7 +295,7 @@ export default function NewTourReservationPage() {
         setFormData(prev => ({
           ...prev,
           price: route.basePrice,
-          groupSize: Math.min(prev.groupSize, route.capacity || 16)
+          // groupSize: Math.min(prev.groupSize, route.capacity || 16) // Group size now managed by selectedSeats
         }));
       }
     } else {
@@ -244,29 +314,24 @@ export default function NewTourReservationPage() {
         price: '',
         customRouteName: '',
         tourId: '', // Clear scheduled tour selection if route changes to custom
-        seatNumber: ''
+        seatNumber: '',
+        selectedSeats: [], // Clear selected seats
+        passengerDetails: [], // Clear passenger details
+        groupSize: 1, // Reset group size
       }));
     } else if (name === 'groupSize') {
       // Kişi sayısı değiştiğinde yolcu isimlerini güncelle
+      // This logic is now largely superseded by selectedSeats and passengerDetails
+      // Keeping it for now, but it might become redundant or need adjustment.
       const newGroupSize = parseInt(value) || 1;
-      const currentPassengerNames = formData.passengerNames;
-
-      let newPassengerNames: string[];
-      if (newGroupSize > currentPassengerNames.length) {
-        // Daha fazla kişi eklendi, boş isimler ekle
-        newPassengerNames = [...currentPassengerNames, ...Array(newGroupSize - currentPassengerNames.length).fill('')];
-      } else if (newGroupSize < currentPassengerNames.length) {
-        // Daha az kişi, fazla isimleri kaldır
-        newPassengerNames = currentPassengerNames.slice(0, newGroupSize);
-      } else {
-        // Aynı sayıda, değişiklik yok
-        newPassengerNames = currentPassengerNames;
-      }
-
+      // If groupSize is changed manually, we need to decide how it affects selectedSeats/passengerDetails.
+      // For now, let's assume groupSize is primarily driven by selectedSeats.
+      // If user manually changes groupSize, it might imply clearing seat selection or adjusting it.
+      // For this change, we'll let handleSeatSelect manage groupSize.
       setFormData(prev => ({
         ...prev,
         groupSize: newGroupSize,
-        passengerNames: newPassengerNames
+        // passengerNames: newPassengerNames // This will be derived from passengerDetails
       }));
     } else {
       setFormData(prev => ({
@@ -276,7 +341,10 @@ export default function NewTourReservationPage() {
     }
   };
 
+  // This function is now largely superseded by handlePassengerDetailChange
   const handlePassengerNameChange = (index: number, value: string) => {
+    // This function might become obsolete if passengerDetails is the primary source.
+    // For now, it's not directly used in the new passenger input structure.
     const newPassengerNames = [...formData.passengerNames];
     newPassengerNames[index] = value;
     setFormData(prev => ({
@@ -295,7 +363,11 @@ export default function NewTourReservationPage() {
         ...formData,
         price: formData.price === '' ? 0 : Number(formData.price),
         routeName: formData.customRouteName || selectedRoute?.name,
-        passengerNames: formData.passengerNames.filter(name => name.trim() !== ''),
+        // Use passengerDetails for submission, filter out empty names
+        passengerDetails: formData.passengerDetails.filter(p => p.name.trim() !== '' && p.surname.trim() !== ''),
+        // Ensure passengerNames is also updated for legacy API compatibility if needed
+        passengerNames: formData.passengerDetails.map(p => `${p.name} ${p.surname}`.trim()).filter(name => name.trim() !== ''),
+        seatNumber: formData.selectedSeats.join(', '), // Ensure seatNumber is correctly formatted
       });
 
       if (response.ok) {
@@ -374,8 +446,45 @@ export default function NewTourReservationPage() {
               </div>
             )}
             {!formData.customerId && (
-              <div className="text-sm text-yellow-600 mt-2">
-                * CRM kaydı oluşturmak için müşteri seçmeniz önerilir. Seçmezseniz sadece isim ile devam edebilirsiniz.
+              <div className="mt-4 border-t pt-4">
+                <div className="text-sm font-medium text-gray-700 mb-3 block">
+                  Yeni Müşteri Oluştur (Kayıtlı Müşteri Seçilmedi)
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Ad *</label>
+                    <input
+                      type="text"
+                      value={formData.newCustomerName}
+                      onChange={(e) => setFormData(prev => ({ ...prev, newCustomerName: e.target.value }))}
+                      className="w-full px-3 py-2 border rounded-md"
+                      placeholder="Müşteri Adı"
+                      required={!formData.customerId}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Soyad *</label>
+                    <input
+                      type="text"
+                      value={formData.newCustomerSurname}
+                      onChange={(e) => setFormData(prev => ({ ...prev, newCustomerSurname: e.target.value }))}
+                      className="w-full px-3 py-2 border rounded-md"
+                      placeholder="Müşteri Soyadı"
+                      required={!formData.customerId}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Telefon *</label>
+                    <input
+                      type="tel"
+                      value={formData.newCustomerPhone}
+                      onChange={(e) => setFormData(prev => ({ ...prev, newCustomerPhone: e.target.value }))}
+                      className="w-full px-3 py-2 border rounded-md"
+                      placeholder="Telefon (5xx...)"
+                      required={!formData.customerId}
+                    />
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -454,11 +563,12 @@ export default function NewTourReservationPage() {
                   type="number"
                   name="groupSize"
                   value={formData.groupSize}
-                  onChange={handleInputChange}
+                  onChange={handleInputChange} // This will now be largely driven by selectedSeats.length
                   min="1"
                   max="16"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
+                  readOnly // Make it read-only as it's derived from seat selection
                 />
               </div>
 
@@ -501,10 +611,11 @@ export default function NewTourReservationPage() {
                     type="number"
                     name="groupSize"
                     value={formData.groupSize}
-                    onChange={handleInputChange}
+                    onChange={handleInputChange} // This will now be largely driven by selectedSeats.length
                     min="1"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
+                    readOnly // Make it read-only as it's derived from seat selection
                   />
                 </div>
                 <div>
@@ -533,21 +644,51 @@ export default function NewTourReservationPage() {
               </p>
             </div>
 
-            <div className="space-y-4">
-              {formData.passengerNames.map((name, index) => (
-                <div key={index} className="flex items-center space-x-4">
-                  <div className="flex-1">
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => handlePassengerNameChange(index, e.target.value)}
-                      placeholder={`Yolcu ${index + 1} adı`}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
+            {/* Passenger List by Seat */}
+            {formData.selectedSeats.length > 0 && (
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <h3 className="text-md font-semibold text-blue-900 mb-3">Yolcu & Koltuk Eşleşmesi</h3>
+                <div className="space-y-3">
+                  {formData.passengerDetails.map((passenger, index) => (
+                    <div key={passenger.seatNumber} className="flex gap-3 items-center bg-white p-2 rounded border border-blue-100">
+                      <div className="w-12 h-12 flex items-center justify-center bg-blue-100 text-blue-800 font-bold rounded-full border-2 border-white shadow-sm flex-shrink-0">
+                        {passenger.seatNumber}
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 flex-grow">
+                        <div>
+                          <label className="text-xs text-gray-500 block mb-1">Ad</label>
+                          <input
+                            type="text"
+                            value={passenger.name}
+                            onChange={(e) => handlePassengerDetailChange(index, 'name', e.target.value)}
+                            placeholder="Ad"
+                            className="w-full text-sm border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500 block mb-1">Soyad</label>
+                          <input
+                            type="text"
+                            value={passenger.surname}
+                            onChange={(e) => handlePassengerDetailChange(index, 'surname', e.target.value)}
+                            placeholder="Soyad"
+                            className="w-full text-sm border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
+
+            {formData.selectedSeats.length === 0 && (
+              <div className="text-center p-8 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
+                <p className="text-gray-500">Lütfen yukarıdaki oturma planından koltuk seçiniz.</p>
+              </div>
+            )}
           </div>
 
           {/* Notlar */}

@@ -96,7 +96,11 @@ export async function POST(request: NextRequest) {
       notes,
       // New fields
       tourId,
-      seatNumber
+      seatNumber,
+      // Auto-create customer
+      newCustomerName,
+      newCustomerSurname,
+      newCustomerPhone
     } = body;
 
     // Determine tenant ID based on user role
@@ -134,6 +138,36 @@ export async function POST(request: NextRequest) {
       const route = predefinedRoutes.find(r => r.id === routeId);
       if (route) {
         routeName = route.name;
+      }
+    }
+
+
+    // CRM Enforcement: Handle Customer Creation if not provided
+    let finalCustomerId = body.customerId;
+
+    if (!finalCustomerId && newCustomerName && newCustomerPhone) {
+      // Check if customer exists by phone
+      const existingCustomer = await prisma.customer.findFirst({
+        where: { phone: newCustomerPhone, tenantId: tenantId }
+      });
+
+      if (existingCustomer) {
+        finalCustomerId = existingCustomer.id;
+      } else {
+        // Create new customer
+        const newCustomer = await prisma.customer.create({
+          data: {
+            tenantId,
+            name: newCustomerName,
+            surname: newCustomerSurname || '',
+            phone: newCustomerPhone,
+            passportNumber: '', // Optional or add input
+            email: '',
+            nationality: '',
+            source: 'booking_auto_create'
+          }
+        });
+        finalCustomerId = newCustomer.id;
       }
     }
 
@@ -176,15 +210,17 @@ export async function POST(request: NextRequest) {
         status: 'PENDING',
         source: role === 'SUPERUSER' ? 'admin' : 'agency',
         // New CRM and Payment fields
-        customerId: body.customerId || null,
+        source: role === 'SUPERUSER' ? 'admin' : 'agency',
+        customerId: finalCustomerId,
         paymentStatus: body.paymentStatus || 'PENDING',
         paymentMethod: body.paymentMethod || 'CASH',
         paidAmount: body.paidAmount ? parseFloat(body.paidAmount) : 0,
-        remainingAmount: parseFloat(price) - (body.paidAmount ? parseFloat(body.paidAmount) : 0),
+        remainingAmount: body.paymentStatus === 'PAID' ? 0 : (body.price - (body.paidAmount || 0)),
         // Scheduled Tour Links
         tourId: tourId || null,
         seatNumber: seatNumber || null,
-        paymentReminder: paymentReminder
+        paymentReminder: body.paymentStatus !== 'PAID' && body.paymentReminderDate ? new Date(`${body.paymentReminderDate}T${body.paymentReminderTime || '10:00'}`) : null,
+        passengerDetails: body.passengerDetails || null, // Store detailed seat mapping
       },
       include: {
         tenant: {
