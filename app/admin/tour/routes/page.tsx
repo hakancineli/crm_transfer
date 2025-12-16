@@ -10,20 +10,11 @@ interface TourRoute {
   id: string;
   name: string;
   duration: number;
-  price: number;
+  basePrice: number;
   currency?: string;
   description?: string;
   isActive: boolean;
 }
-
-const DEFAULT_ROUTES: TourRoute[] = [
-  { id: 'istanbul-city', name: 'İstanbul Şehir Turu', duration: 8, price: 150, description: 'Sultanahmet, Ayasofya, Topkapı Sarayı', isActive: true },
-  { id: 'cappadocia', name: 'Kapadokya Turu', duration: 12, price: 300, description: 'Peri bacaları, Göreme Açık Hava Müzesi', isActive: true },
-  { id: 'trabzon', name: 'Trabzon Turu', duration: 10, price: 250, description: 'Sümela Manastırı, Uzungöl', isActive: true },
-  { id: 'sapanca', name: 'Sapanca Turu', duration: 10, price: 200, description: 'Sapanca Gölü, Maşukiye', isActive: true },
-  { id: 'abant', name: 'Abant Turu', duration: 10, price: 180, description: 'Abant Gölü, Mudurnu', isActive: true },
-  { id: 'bursa', name: 'Bursa Turu', duration: 10, price: 220, description: 'Uludağ, Yeşil Türbe, Koza Han', isActive: true },
-];
 
 export default function TourRoutesPage() {
   const { user } = useAuth();
@@ -54,21 +45,22 @@ export default function TourRoutesPage() {
   const fetchRoutes = async () => {
     try {
       setLoading(true);
+      const token = localStorage.getItem('token');
+      // Get routes from API
+      const response = await fetch('/api/tour-routes', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
-      // Get default routes from API
-      const response = await fetch('/api/tour-routes');
-      const defaultRoutes = await response.json();
-
-      // Get custom routes from localStorage
-      const customRoutesJson = localStorage.getItem('customTourRoutes');
-      const customRoutes = customRoutesJson ? JSON.parse(customRoutesJson) : [];
-
-      // Combine default and custom routes
-      setRoutes([...defaultRoutes, ...customRoutes]);
+      if (response.ok) {
+        const data = await response.json();
+        setRoutes(data);
+      } else {
+        console.error('Tur rotaları yüklenemedi');
+      }
     } catch (error) {
       console.error('Tur rotaları getirme hatası:', error);
-      // Fallback to default routes only
-      setRoutes(DEFAULT_ROUTES);
     } finally {
       setLoading(false);
     }
@@ -113,15 +105,7 @@ export default function TourRoutesPage() {
 
         if (response.ok) {
           const newRouteData = await response.json();
-
-          // Save to localStorage
-          const customRoutesJson = localStorage.getItem('customTourRoutes');
-          const customRoutes = customRoutesJson ? JSON.parse(customRoutesJson) : [];
-          customRoutes.push(newRouteData);
-          localStorage.setItem('customTourRoutes', JSON.stringify(customRoutes));
-
-          // Update state
-          setRoutes([...routes, newRouteData]);
+          setRoutes(prev => [...prev, newRouteData]);
           setNewRoute({ name: '', duration: 8, price: 0, currency: 'EUR', description: '' });
           setShowAddForm(false);
         } else {
@@ -138,6 +122,8 @@ export default function TourRoutesPage() {
   };
 
   const toggleRouteStatus = (id: string) => {
+    // Implement API call for toggle if needed, for now just local state update or ignore
+    // Ideally this should be an API call to PUT /api/tour-routes/[id]
     setRoutes(routes.map(route =>
       route.id === id ? { ...route, isActive: !route.isActive } : route
     ));
@@ -288,9 +274,10 @@ export default function TourRoutesPage() {
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Fiyat:</span>
                   <span className="font-medium">
-                    {route.price}
-                    {route.currency === 'EUR' ? '€' : route.currency === 'USD' ? '$' : route.currency === 'TRY' ? '₺' : '€'}
-                  </span>
+                    <div className="text-2xl font-bold text-gray-900">
+                      {route.currency === 'EUR' ? '€' : route.currency === 'USD' ? '$' : '₺'}
+                      {route.basePrice}
+                    </div></span>
                 </div>                {route.description && (
                   <div className="text-sm text-gray-600 mt-2">
                     {route.description}

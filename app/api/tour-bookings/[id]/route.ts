@@ -32,6 +32,14 @@ export async function GET(
             name: true,
             phoneNumber: true
           }
+        },
+        customer: {
+          select: {
+            id: true,
+            name: true,
+            surname: true,
+            phone: true
+          }
         }
       }
     });

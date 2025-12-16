@@ -20,6 +20,13 @@ interface TourBooking {
   status: string;
   passengerNames: string[];
   createdAt: string;
+  paymentStatus?: string;
+  remainingAmount?: number;
+  customer?: {
+    phone: string;
+    name: string;
+    surname: string;
+  };
 }
 
 export default function TourReservationsPage() {
@@ -69,7 +76,7 @@ export default function TourReservationsPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600 mb-4">Modül Kapalı</h1>
           <p className="text-gray-600">Tur modülü aktif değil. Modül Yönetimi'nden aktifleştirin.</p>
-          <Link 
+          <Link
             href="/admin/modules"
             className="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
@@ -156,12 +163,12 @@ export default function TourReservationsPage() {
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-medium text-gray-900">Rezervasyon Listesi</h2>
           </div>
-          
+
           {bookings.length === 0 ? (
             <div className="p-6 text-center">
               <div className="text-4xl mb-4">🚌</div>
               <p className="text-gray-500 mb-4">Henüz tur rezervasyonu bulunmuyor</p>
-              <Link 
+              <Link
                 href="/admin/tour/reservations/new"
                 className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
               >
@@ -204,8 +211,8 @@ export default function TourReservationsPage() {
                     <tr key={booking.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         <div className="font-mono text-xs px-2 py-1 rounded border inline-block whitespace-nowrap text-gray-700 bg-gray-100 border-gray-200">
-                          {booking.voucherNumber.startsWith('TUR-') 
-                            ? `TUR${new Date(booking.tourDate).toISOString().slice(2,10).replace(/-/g, '')}-${Math.floor(Math.random() * 9) + 1}`
+                          {booking.voucherNumber.startsWith('TUR-')
+                            ? `TUR${new Date(booking.tourDate).toISOString().slice(2, 10).replace(/-/g, '')}-${Math.floor(Math.random() * 9) + 1}`
                             : booking.voucherNumber
                           }
                         </div>
@@ -252,6 +259,26 @@ export default function TourReservationsPage() {
                           >
                             Düzenle
                           </Link>
+                          {/* Payment Reminder Button */}
+                          {booking.status !== 'CANCELLED' && booking.paymentStatus !== 'PAID' && (
+                            <button
+                              onClick={() => {
+                                const phone = booking.customer?.phone || '';
+                                if (!phone) {
+                                  alert('Müşteri telefon numarası bulunamadı.');
+                                  return;
+                                }
+                                const remaining = booking.remainingAmount || booking.price; // Fallback if remaining not set
+                                const msg = `Sayın ${booking.customer?.name || 'Müşteri'}, \n${new Date(booking.tourDate).toLocaleDateString('tr-TR')} tarihli ${booking.routeName} turu için ${remaining} ${booking.currency} tutarında ödemeniz eksiktir. Lütfen ödeme yapınız.`;
+                                const url = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
+                                window.open(url, '_blank');
+                              }}
+                              className="ml-2 text-yellow-600 hover:text-yellow-900 border border-yellow-200 bg-yellow-50 px-2 py-1 rounded text-xs flex items-center gap-1"
+                              title="Ödeme Hatırlat"
+                            >
+                              <span>🔔</span> Hatırlat
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>

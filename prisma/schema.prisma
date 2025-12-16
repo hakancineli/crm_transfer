@@ -97,6 +97,9 @@ model Tenant {
   tourBookings         TourBooking[]
   vehicles             Vehicle[]
   invoices             Invoice[]
+  customers            Customer[]
+  tourRoutes           TourRoute[]
+  tours                Tour[]
 
   @@map("tenants")
 }
@@ -367,6 +370,7 @@ model Vehicle {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   tenant          Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tours           Tour[]
 
   @@map("vehicles")
 }
@@ -396,8 +400,88 @@ model TourBooking {
   driver         Driver?  @relation(fields: [driverId], references: [id])
   tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   User           User?    @relation(fields: [userId], references: [id])
+  
+  // New Relations & Fields
+  customerId     String?
+  customer       Customer? @relation(fields: [customerId], references: [id])
+  tourId         String?
+  tour           Tour?     @relation(fields: [tourId], references: [id])
+  
+  seatNumber     String?
+  paymentStatus  String    @default("PENDING") // PENDING, PAID, PARTIAL
+  paymentMethod  String?   // CASH, CARD, TRANSFER
+  paidAmount     Float     @default(0)
+  remainingAmount Float    @default(0)
+  paymentReminder DateTime?
 
   @@map("tour_bookings")
+}
+
+model Customer {
+  id             String        @id @default(uuid())
+  tenantId       String
+  name           String
+  surname        String?
+  email          String?
+  phone          String?
+  passportNumber String?
+  nationality    String?
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  
+  tenant         Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tourBookings   TourBooking[]
+  
+  @@map("customers")
+}
+
+model TourRoute {
+  id             String   @id @default(uuid())
+  tenantId       String
+  name           String
+  description    String?
+  regions        String   @default("[]") // JSON array of regions
+  duration       Int      @default(1) // Days
+  basePrice      Float    @default(0)
+  currency       String   @default("EUR")
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tours          Tour[]
+  
+  @@map("tour_routes")
+}
+
+model Tour {
+  id             String   @id @default(uuid())
+  tenantId       String
+  routeId        String
+  vehicleId      String?
+  driverId       String?
+  guideId        String?  // Could be relation to User or separate Guide model later
+  
+  startDate      DateTime
+  startTime      String?
+  endDate        DateTime?
+  
+  seatConfig     String?  // JSON snapshot of seat configuration
+  capacity       Int      @default(0)
+  occupancy      Int      @default(0)
+  
+  status         String   @default("SCHEDULED") // SCHEDULED, ACTIVE, COMPLETED, CANCELLED
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  tenant         Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  route          TourRoute   @relation(fields: [routeId], references: [id])
+  vehicle        Vehicle?    @relation(fields: [vehicleId], references: [id])
+  bookings       TourBooking[]
+  
+  @@map("tours")
 }
 
 model TenantWebsite {

@@ -4,15 +4,20 @@ import { getRequestUserContext } from '@/app/lib/requestContext';
 
 export async function GET(request: NextRequest) {
   try {
-    // Statik tur rotaları döndür
-    const routes = [
-      { id: 'istanbul-city', name: 'İstanbul Şehir Turu', duration: 10, price: 150 },
-      { id: 'cappadocia', name: 'Kapadokya Turu', duration: 10, price: 300 },
-      { id: 'trabzon', name: 'Trabzon Turu', duration: 10, price: 250 },
-      { id: 'sapanca', name: 'Sapanca Turu', duration: 10, price: 200 },
-      { id: 'abant', name: 'Abant Turu', duration: 10, price: 180 },
-      { id: 'bursa', name: 'Bursa Turu', duration: 10, price: 220 },
-    ];
+    const context = await getRequestUserContext(request);
+    let tenantId = '985046c2-aaa0-467b-8a10-ed965f6cdb43'; // Default tenant
+
+    if (context && context.tenantIds && context.tenantIds.length > 0) {
+      tenantId = context.tenantIds[0];
+    }
+
+    const routes = await prisma.tourRoute.findMany({
+      where: {
+        tenantId,
+        isActive: true
+      },
+      orderBy: { name: 'asc' }
+    });
 
     return NextResponse.json(routes);
   } catch (error) {
@@ -75,18 +80,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create custom route object
-    const newRoute = {
-      id: `custom-${Date.now()}`,
-      name,
-      duration: parseInt(duration),
-      price: parseFloat(price),
-      currency: body.currency || 'EUR',
-      description: description || '',
-      isActive: true,
-      tenantId,
-      createdAt: new Date().toISOString()
-    };
+    // Create route in database
+    const newRoute = await prisma.tourRoute.create({
+      data: {
+        tenantId,
+        name,
+        duration: parseInt(duration),
+        basePrice: parseFloat(price), // Schema uses basePrice, correct this from price
+        currency: body.currency || 'EUR',
+        description: description || '',
+        regions: body.regions || JSON.stringify([]),
+        isActive: true
+      }
+    });
 
     return NextResponse.json(newRoute, { status: 201 });
   } catch (error) {

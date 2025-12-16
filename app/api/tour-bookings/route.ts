@@ -17,6 +17,12 @@ export async function GET(request: NextRequest) {
       whereClause.tenantId = { in: tenantIds };
     }
 
+    // Add filtering by tourId if provided
+    const tourId = searchParams.get('tourId');
+    if (tourId) {
+      whereClause.tourId = tourId;
+    }
+
     const bookings = await prisma.tourBooking.findMany({
       where: whereClause,
       skip,
@@ -33,6 +39,15 @@ export async function GET(request: NextRequest) {
             id: true,
             name: true,
             phoneNumber: true,
+          }
+        },
+        customer: {
+          select: {
+            id: true,
+            name: true,
+            surname: true,
+            phone: true,
+            passportNumber: true
           }
         }
       },
@@ -78,7 +93,10 @@ export async function POST(request: NextRequest) {
       tourTime,
       tourDuration,
       passengerNames,
-      notes
+      notes,
+      // New fields
+      tourId,
+      seatNumber
     } = body;
 
     // Determine tenant ID based on user role
@@ -132,23 +150,41 @@ export async function POST(request: NextRequest) {
     }
 
     // Rezervasyon oluştur
+    // Construct Payment Reminder Date
+    let paymentReminder: Date | null = null;
+    if (body.paymentReminderDate) {
+      const reminderString = `${body.paymentReminderDate}T${body.paymentReminderTime || '10:00'}:00`;
+      paymentReminder = new Date(reminderString);
+    }
+
+    // Rezervasyon oluştur
     const booking = await prisma.tourBooking.create({
       data: {
+        tenantId,
         voucherNumber,
-        routeName,
+        routeName: customRouteName || 'Özel Rota', // Default to provided name or generic
+        passengerNames: passengerNames.join(', '),
+        price: parseFloat(price),
+        currency,
         vehicleType,
         groupSize: parseInt(groupSize),
-        price: usdPrice, // USD olarak kaydet (yuvarlanmış)
-        currency: 'USD', // Her zaman USD olarak kaydet
         pickupLocation,
         tourDate: new Date(tourDate),
         tourTime,
-        tourDuration: parseInt(tourDuration) || 1, // Gün cinsinden
-        passengerNames: JSON.stringify(passengerNames.filter((name: string) => name.trim() !== '')),
-        notes: notes || '',
+        tourDuration: parseInt(tourDuration),
+        notes,
         status: 'PENDING',
-        tenantId: tenantId,
-        userId: userId, // Kullanıcı ID'sini ekle
+        source: role === 'SUPERUSER' ? 'admin' : 'agency',
+        // New CRM and Payment fields
+        customerId: body.customerId || null,
+        paymentStatus: body.paymentStatus || 'PENDING',
+        paymentMethod: body.paymentMethod || 'CASH',
+        paidAmount: body.paidAmount ? parseFloat(body.paidAmount) : 0,
+        remainingAmount: parseFloat(price) - (body.paidAmount ? parseFloat(body.paidAmount) : 0),
+        // Scheduled Tour Links
+        tourId: tourId || null,
+        seatNumber: seatNumber || null,
+        paymentReminder: paymentReminder
       },
       include: {
         tenant: {
@@ -159,6 +195,23 @@ export async function POST(request: NextRequest) {
         }
       }
     });
+
+    // If linked to a scheduled tour, update occupancy
+    if (tourId) {
+      try {
+        await prisma.tour.update({
+          where: { id: tourId },
+          data: {
+            occupancy: {
+              increment: parseInt(groupSize) // Assuming groupSize = 1 for seat selection but safe to use variable
+            }
+          }
+        });
+      } catch (updateError) {
+        console.error('Error updating tour occupancy:', updateError);
+        // Don't fail the booking if this fails, but log it
+      }
+    }
 
     return NextResponse.json({
       success: true,

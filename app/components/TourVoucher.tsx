@@ -26,9 +26,13 @@ interface TourBooking {
     subdomain: string;
   };
   driver?: {
-    id: string;
     name: string;
     phoneNumber?: string;
+  } | null;
+  customer?: {
+    phone: string;
+    name: string;
+    surname: string;
   } | null;
 }
 
@@ -70,6 +74,34 @@ export default function TourVoucher({ bookingId }: TourVoucherProps) {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleSendWhatsApp = () => {
+    if (!booking) return;
+
+    // Try to get phone from customer record first, then vehicle/reservation phone if existed? 
+    // TourBooking doesn't have top level phone.
+    const phone = booking.customer?.phone;
+
+    if (!phone) {
+      alert('Müşteri telefon numarası bulunamadı.');
+      return;
+    }
+
+    const msgLines = [
+      'Sayın ' + (booking.customer?.name || 'Müşteri'),
+      `Tur Voucherınız Hazır.`,
+      `Tur: ${booking.routeName}`,
+      `Tarih: ${formatDate(booking.tourDate)} Saat: ${booking.tourTime || 'Belirtilmedi'}`,
+      `Kişi: ${booking.groupSize}`,
+      `Voucher No: ${booking.voucherNumber}`,
+      `Detaylar için lütfen linke tıklayınız:`,
+      window.location.href
+    ];
+
+    const text = encodeURIComponent(msgLines.join('\n'));
+    const waUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${text}`;
+    window.open(waUrl, '_blank');
   };
 
   if (loading) {
@@ -341,16 +373,22 @@ export default function TourVoucher({ bookingId }: TourVoucherProps) {
           </div>
         )}
 
-        {/* Yazdır Butonu */}
-        <div className="mt-8 text-center print:hidden no-print">
+        {/* Header Actions */}
+        <div className="flex justify-end gap-3 mb-6 no-print print:hidden">
+          <button
+            onClick={handleSendWhatsApp}
+            className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+          >
+            <span>📱</span> WhatsApp Gönder
+          </button>
           <button
             onClick={handlePrint}
-            className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-8 py-3 rounded-2xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 font-semibold text-lg"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            <svg className="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
             </svg>
-            {t.print}
+            Yazdır / PDF
           </button>
         </div>
 
