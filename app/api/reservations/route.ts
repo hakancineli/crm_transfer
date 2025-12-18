@@ -154,6 +154,7 @@ export async function GET(request: NextRequest) {
       price: r.price,
       currency: r.currency,
       paymentStatus: r.paymentStatus,
+      status: (r as any).status || 'PENDING',
       phoneNumber: r.phoneNumber,
       createdAt: (r as any).createdAt ?? null,
       tenantId: (r as any).tenantId ?? r.tenant?.id ?? null,
@@ -165,57 +166,28 @@ export async function GET(request: NextRequest) {
       source: (r as any).source ?? ((r as any).userId ? 'admin' : 'website')
     }));
 
-    // Tur rezervasyonlarını formatla - Her yolcuyu ayrı bir girdi olarak CRM'e sok
-    const tourResults: any[] = [];
-    tourBookings.forEach(t => {
-      const details = (t.passengerDetails as any[]) || [];
-      if (details.length > 0) {
-        details.forEach(p => {
-          tourResults.push({
-            id: `${t.id}-${p.seatNumber}`,
-            voucherNumber: t.voucherNumber,
-            date: t.tourDate.toISOString().split('T')[0],
-            time: t.tourTime || '00:00',
-            from: t.pickupLocation,
-            to: t.routeName,
-            passengerNames: [`${p.name} ${p.surname}`],
-            price: Number(p.amount) || (t.price / t.groupSize),
-            currency: t.currency,
-            paymentStatus: p.paymentStatus || t.paymentStatus,
-            phoneNumber: t.customer?.phone || (t as any).phoneNumber || '',
-            createdAt: (t as any).createdAt ?? null,
-            tenantId: (t as any).tenantId ?? t.tenant?.id ?? null,
-            user: t.User,
-            driver: t.driver,
-            tenant: t.tenant,
-            type: 'tur',
-            source: (t as any).source || 'admin'
-          });
-        });
-      } else {
-        // Fallback if no details
-        tourResults.push({
-          id: t.id,
-          voucherNumber: t.voucherNumber,
-          date: t.tourDate.toISOString().split('T')[0],
-          time: t.tourTime || '00:00',
-          from: t.pickupLocation,
-          to: t.routeName,
-          passengerNames: safeParseArray(t.passengerNames),
-          price: t.price,
-          currency: t.currency,
-          paymentStatus: t.status,
-          phoneNumber: t.customer?.phone || (t as any).phoneNumber || '',
-          createdAt: (t as any).createdAt ?? null,
-          tenantId: (t as any).tenantId ?? t.tenant?.id ?? null,
-          user: t.User,
-          driver: t.driver,
-          tenant: t.tenant,
-          type: 'tur',
-          source: (t as any).source || 'admin'
-        });
-      }
-    });
+    // Tur rezervasyonlarını formatla - Tek satırda göster
+    const tourResults = tourBookings.map(t => ({
+      id: t.id,
+      voucherNumber: t.voucherNumber,
+      date: t.tourDate.toISOString().split('T')[0],
+      time: t.tourTime || '00:00',
+      from: t.pickupLocation,
+      to: t.routeName,
+      passengerNames: safeParseArray(t.passengerNames),
+      price: t.price,
+      currency: t.currency,
+      paymentStatus: t.paymentStatus,
+      status: t.status || 'PENDING',
+      phoneNumber: t.customer?.phone || (t as any).phoneNumber || '',
+      createdAt: (t as any).createdAt ?? null,
+      tenantId: (t as any).tenantId ?? t.tenant?.id ?? null,
+      user: t.User,
+      driver: t.driver,
+      tenant: t.tenant,
+      type: 'tur',
+      source: (t as any).source || 'admin'
+    }));
 
     // Tüm rezervasyonları birleştir ve tarihe göre sırala
     const allResults = [...transferResults, ...tourResults]

@@ -9,6 +9,7 @@ import { PERMISSIONS, ROLE_PERMISSIONS } from '@/app/lib/permissions';
 
 interface Customer {
   phoneNumber: string;
+  customerName: string;
   totalReservations: number;
   totalSpent: number;
   lastReservation: string;
@@ -24,10 +25,11 @@ export default function CustomersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTenant, setSelectedTenant] = useState<string>('all');
   const [tenants, setTenants] = useState<Array<{ id: string; companyName: string; subdomain: string }>>([]);
-  
+
   const handleExportCSV = () => {
-    const header = ['Telefon', 'Toplam Rezervasyon', 'Toplam Harcama (USD)', 'Son Rezervasyon'];
+    const header = ['Müşteri', 'Telefon', 'Toplam Rezervasyon', 'Toplam Harcama (USD)', 'Son Rezervasyon'];
     const rows = filteredCustomers.map(c => [
+      c.customerName,
       c.phoneNumber,
       String(c.totalReservations),
       c.totalSpent.toFixed(2),
@@ -42,12 +44,12 @@ export default function CustomersPage() {
     a.click();
     URL.revokeObjectURL(url);
   };
-
   const handleExportPDF = () => {
-    const win = window.open('', '_blank', 'width=900,height=700');
+    const win = window.open('', '_blank', 'width=1000,height=700');
     if (!win) return;
     const rows = filteredCustomers.map(c => `
       <tr>
+        <td style="padding:8px;border:1px solid #e5e7eb;">${c.customerName}</td>
         <td style="padding:8px;border:1px solid #e5e7eb;">${c.phoneNumber}</td>
         <td style="padding:8px;border:1px solid #e5e7eb;">${c.totalReservations}</td>
         <td style="padding:8px;border:1px solid #e5e7eb;">$${c.totalSpent.toFixed(2)}</td>
@@ -72,6 +74,7 @@ export default function CustomersPage() {
           <table>
             <thead>
               <tr>
+                <th>Müşteri</th>
                 <th>Telefon</th>
                 <th>Toplam Rezervasyon</th>
                 <th>Toplam Harcama (USD)</th>
@@ -86,21 +89,21 @@ export default function CustomersPage() {
     `);
     win.document.close();
   };
-  
+
   const canViewCustomers =
     user?.role === 'SUPERUSER' ||
     (user?.role && ((ROLE_PERMISSIONS as any)[user.role]?.includes(PERMISSIONS.VIEW_CUSTOMER_DATA) ||
-                    (ROLE_PERMISSIONS as any)[user.role]?.includes(PERMISSIONS.MANAGE_CUSTOMERS))) ||
+      (ROLE_PERMISSIONS as any)[user.role]?.includes(PERMISSIONS.MANAGE_CUSTOMERS))) ||
     user?.permissions?.some(p => (p.permission === PERMISSIONS.VIEW_CUSTOMER_DATA || p.permission === PERMISSIONS.MANAGE_CUSTOMERS) && p.isActive);
 
   useEffect(() => {
     if (moduleLoading) return;
-    
+
     if (!isCustomersEnabled) {
       router.push('/admin');
       return;
     }
-    
+
     if (!canViewCustomers) return;
     fetchCustomers();
   }, [canViewCustomers, selectedTenant, moduleLoading, isCustomersEnabled, router]);
@@ -113,7 +116,7 @@ export default function CustomersPage() {
         headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
       });
       const reservations = await response.json();
-      
+
       // SUPERUSER için acente listesini hazırla
       if (user?.role === 'SUPERUSER') {
         const foundTenants = new Map<string, { id: string; companyName: string; subdomain: string }>();
@@ -128,42 +131,48 @@ export default function CustomersPage() {
         });
         setTenants(Array.from(foundTenants.values()).sort((a, b) => a.companyName.localeCompare(b.companyName)));
       }
-      
+
       // SUPERUSER tenant filtresi uygula
       const scopedReservations = user?.role === 'SUPERUSER' && selectedTenant !== 'all'
         ? reservations.filter((r: any) => r.tenant?.id === selectedTenant)
         : reservations;
-      
+
       // Müşterileri telefon numarasına göre grupla
       const customerMap = new Map<string, Customer>();
-      
+
       scopedReservations.forEach((reservation: any) => {
         if (!reservation.phoneNumber) return;
-        
+
         const phone = reservation.phoneNumber;
         if (!customerMap.has(phone)) {
           customerMap.set(phone, {
             phoneNumber: phone,
+            customerName: reservation.passengerNames?.[0] || 'Bilinmiyor',
             totalReservations: 0,
             totalSpent: 0,
             lastReservation: reservation.createdAt,
             reservations: []
           });
         }
-        
+
         const customer = customerMap.get(phone)!;
         customer.totalReservations++;
         customer.totalSpent += reservation.price;
         customer.reservations.push(reservation);
-        
+
+        // Isim varsa ve mevcutsa güncelle (daha güncel bir isim bulmuş olabiliriz)
+        if (reservation.passengerNames?.[0] && customer.customerName === 'Bilinmiyor') {
+          customer.customerName = reservation.passengerNames[0];
+        }
+
         if (new Date(reservation.createdAt) > new Date(customer.lastReservation)) {
           customer.lastReservation = reservation.createdAt;
         }
       });
-      
+
       const customerList = Array.from(customerMap.values())
         .sort((a, b) => b.totalSpent - a.totalSpent);
-      
+
       setCustomers(customerList);
     } catch (error) {
       console.error('Müşteriler yüklenirken hata:', error);
@@ -173,7 +182,8 @@ export default function CustomersPage() {
   };
 
   const filteredCustomers = customers.filter(customer =>
-    customer.phoneNumber.toLowerCase().includes(searchTerm.toLowerCase())
+    customer.phoneNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    customer.customerName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const formatPhoneNumber = (phone: string) => {
@@ -290,7 +300,7 @@ export default function CustomersPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
@@ -304,7 +314,7 @@ export default function CustomersPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -325,7 +335,7 @@ export default function CustomersPage() {
           <div className="px-6 py-4 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900">Müşteri Listesi</h3>
           </div>
-          
+
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">

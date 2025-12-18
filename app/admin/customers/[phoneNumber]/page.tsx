@@ -16,13 +16,15 @@ interface Reservation {
   passengerNames: string[];
   price: number;
   currency: string;
-  paymentStatus: string;
   driver?: {
     id: string;
     name: string;
     phoneNumber?: string;
   } | null;
   createdAt: string;
+  type: 'transfer' | 'tur';
+  status: string;
+  paymentStatus: string;
 }
 
 interface Customer {
@@ -39,11 +41,11 @@ export default function CustomerDetailPage() {
   const router = useRouter();
   const { user } = useAuth();
   const phoneNumber = params.phoneNumber as string;
-  
+
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   const canViewCustomers =
     user?.role === 'SUPERUSER' ||
     (user?.role && (ROLE_PERMISSIONS as any)[user.role]?.includes(PERMISSIONS.VIEW_CUSTOMER_DATA)) ||
@@ -67,33 +69,41 @@ export default function CustomerDetailPage() {
         headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
       });
       const reservations = await response.json();
-      
+
       // Bu telefon numarasına sahip rezervasyonları filtrele
-      const customerReservations = reservations.filter((reservation: any) => 
-        reservation.phoneNumber === phoneNumber
-      );
-      
+      // URL'den gelen + işareti bazen boşluk olarak gelebilir, düzeltiyoruz.
+      const normalizedPhone = decodeURIComponent(phoneNumber).replace(/ /g, '+');
+
+      const customerReservations = reservations.filter((reservation: any) => {
+        if (!reservation.phoneNumber) return false;
+        const resPhone = reservation.phoneNumber.replace(/ /g, '+');
+        return resPhone === normalizedPhone ||
+          resPhone === normalizedPhone.replace('+', '') ||
+          resPhone.replace('+', '') === normalizedPhone;
+      });
+
       if (customerReservations.length === 0) {
+        console.warn('Customer not found for phone:', normalizedPhone, 'Available phones:', Array.from(new Set(reservations.map((r: any) => r.phoneNumber))));
         setError('Müşteri bulunamadı');
         return;
       }
-      
+
       // Müşteri bilgilerini hesapla
       const totalSpent = customerReservations.reduce((sum: number, r: any) => sum + r.price, 0);
       const lastReservation = customerReservations
         .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
-      
+
       const customerData: Customer = {
         phoneNumber,
         totalReservations: customerReservations.length,
         totalSpent,
         lastReservation: lastReservation.createdAt,
-        reservations: customerReservations.sort((a: any, b: any) => 
+        reservations: customerReservations.sort((a: any, b: any) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         ),
         customerName: customerReservations[0]?.passengerNames?.[0] || 'Bilinmiyor'
       };
-      
+
       setCustomer(customerData);
     } catch (error) {
       console.error('Müşteri detayları yüklenirken hata:', error);
@@ -121,6 +131,26 @@ export default function CustomerDetailPage() {
       case 'PAID': return 'Ödendi';
       case 'PENDING': return 'Bekliyor';
       case 'UNPAID': return 'Ödenmedi';
+      case 'PARTIAL': return 'Kısmi';
+      default: return status;
+    }
+  };
+
+  const getTripStatusColor = (status: string) => {
+    switch (status) {
+      case 'COMPLETED': return 'bg-blue-100 text-blue-800';
+      case 'CANCELLED': return 'bg-gray-100 text-gray-500 line-through';
+      case 'CONFIRMED': return 'bg-green-100 text-green-800';
+      default: return 'bg-yellow-100 text-yellow-800';
+    }
+  };
+
+  const getTripStatusText = (status: string) => {
+    switch (status) {
+      case 'COMPLETED': return 'Tamamlandı';
+      case 'CANCELLED': return 'İptal Edildi';
+      case 'CONFIRMED': return 'Onaylandı';
+      case 'PENDING': return 'Beklemede';
       default: return status;
     }
   };
@@ -200,7 +230,7 @@ export default function CustomerDetailPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
@@ -212,7 +242,7 @@ export default function CustomerDetailPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -224,7 +254,7 @@ export default function CustomerDetailPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
@@ -247,11 +277,14 @@ export default function CustomerDetailPage() {
               Rezervasyon Geçmişi ({customer.reservations.length})
             </h3>
           </div>
-          
+
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Tür
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Voucher
                   </th>
@@ -262,16 +295,10 @@ export default function CustomerDetailPage() {
                     Güzergah
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Yolcular
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Tutar
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Şoför
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Ödeme Durumu
+                    Ödeme / Yolculuk
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     İşlemler
@@ -281,6 +308,11 @@ export default function CustomerDetailPage() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {customer.reservations.map((reservation) => (
                   <tr key={reservation.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${reservation.type === 'tur' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}`}>
+                        {reservation.type}
+                      </span>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-purple-700">
                         {reservation.voucherNumber}
@@ -295,40 +327,33 @@ export default function CustomerDetailPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm text-gray-900 font-medium">
                         {reservation.from} → {reservation.to}
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">
-                        {Array.isArray(reservation.passengerNames) 
+                      <div className="text-xs text-gray-500 truncate max-w-[200px]">
+                        {Array.isArray(reservation.passengerNames)
                           ? reservation.passengerNames.join(', ')
                           : 'N/A'
                         }
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      ${reservation.price.toFixed(2)} {reservation.currency}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                      {reservation.price} {reservation.currency}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {reservation.driver?.name || 'Atanmamış'}
+                      <div className="flex flex-col gap-1">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium w-fit ${getPaymentStatusColor(reservation.paymentStatus)}`}>
+                          💰 {getPaymentStatusText(reservation.paymentStatus)}
+                        </span>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium w-fit ${getTripStatusColor(reservation.status)}`}>
+                          🚗 {getTripStatusText(reservation.status)}
+                        </span>
                       </div>
-                      {reservation.driver?.phoneNumber && (
-                        <div className="text-sm text-gray-500">
-                          {reservation.driver.phoneNumber}
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusColor(reservation.paymentStatus)}`}>
-                        {getPaymentStatusText(reservation.paymentStatus)}
-                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <Link
-                        href={`/admin/reservations/${reservation.voucherNumber}`}
-                        className="text-green-600 hover:text-green-900"
+                        href={reservation.type === 'tur' ? `/admin/tour/reservations/${reservation.id}` : `/admin/reservations/${reservation.voucherNumber}`}
+                        className="text-green-600 hover:text-green-900 bg-green-50 px-3 py-1 rounded"
                       >
                         Görüntüle
                       </Link>
