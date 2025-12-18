@@ -83,6 +83,48 @@ export async function GET(
   }
 }
 
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { role, tenantIds } = await getRequestUserContext(request);
+    const bookingId = params.id;
+    const body = await request.json();
+
+    const booking = await prisma.tourBooking.findUnique({
+      where: { id: bookingId }
+    });
+
+    if (!booking) {
+      return NextResponse.json({ error: 'Rezervasyon bulunamadı' }, { status: 404 });
+    }
+
+    // Auth check
+    if (role !== 'SUPERUSER' && (!tenantIds || !tenantIds.includes(booking.tenantId))) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 403 });
+    }
+
+    const data: any = {};
+    if (body.paymentReminderDate) {
+      data.paymentReminder = new Date(`${body.paymentReminderDate}T${body.paymentReminderTime || '10:00'}`);
+    }
+    if (body.paymentStatus) data.paymentStatus = body.paymentStatus;
+    if (body.paidAmount !== undefined) data.paidAmount = parseFloat(body.paidAmount);
+    if (body.remainingAmount !== undefined) data.remainingAmount = parseFloat(body.remainingAmount);
+
+    const updated = await prisma.tourBooking.update({
+      where: { id: bookingId },
+      data
+    });
+
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error('PATCH Error:', error);
+    return NextResponse.json({ error: 'Güncellenemedi' }, { status: 500 });
+  }
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }

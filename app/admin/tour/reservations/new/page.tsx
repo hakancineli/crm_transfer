@@ -269,11 +269,25 @@ export default function NewTourReservationPage() {
     setFormData(prev => {
       const updated = [...prev.passengerDetails];
       updated[index] = { ...updated[index], [field]: value };
+
+      // Calculate total paid amount from individual passenger details
+      const totalIndividualPaid = updated.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+
+      // Determine overall payment status
+      let newPaymentStatus = prev.paymentStatus;
+      if (totalIndividualPaid >= Number(prev.price) && Number(prev.price) > 0) {
+        newPaymentStatus = 'PAID';
+      } else if (totalIndividualPaid > 0) {
+        newPaymentStatus = 'PARTIAL';
+      }
+
       return {
         ...prev,
         passengerDetails: updated,
         // Sync legacy string array for backward compatibility
-        passengerNames: updated.map(p => `${p.name} ${p.surname}`.trim())
+        passengerNames: updated.map(p => `${p.name} ${p.surname}`.trim()),
+        paidAmount: totalIndividualPaid > 0 ? totalIndividualPaid : prev.paidAmount,
+        paymentStatus: totalIndividualPaid > 0 ? newPaymentStatus : prev.paymentStatus
       };
     });
   };
@@ -521,8 +535,27 @@ export default function NewTourReservationPage() {
                 </div>
               </div>
             )}
+
+            {/* Toplam Bilgi Özeti */}
+            <div className="mt-8 pt-8 border-t border-gray-200">
+              <div className="flex justify-between items-center bg-gray-50 p-6 rounded-xl">
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Tahmini Toplam Tutar</h3>
+                  <div className="text-3xl font-bold text-gray-900 mt-1">
+                    {formData.price} {formData.currency}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Tahsil Edilen (Yolcu Toplamı)</h3>
+                  <div className={`text-3xl font-bold mt-1 ${Number(formData.paidAmount) >= Number(formData.price || 0) ? 'text-green-600' : 'text-blue-600'}`}>
+                    {formData.paidAmount} {formData.currency}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
+          {/* Tur Bilgileri Card */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h2 className="text-lg font-medium text-gray-900 mb-6">Tur Bilgileri</h2>
 
@@ -548,6 +581,23 @@ export default function NewTourReservationPage() {
                   <option value="custom">Özel Rota</option>
                 </select>
               </div>
+
+              {formData.routeId === 'custom' && (
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tur Detayı / Özel Rota Adı *
+                  </label>
+                  <input
+                    type="text"
+                    name="customRouteName"
+                    value={formData.customRouteName}
+                    onChange={handleInputChange}
+                    placeholder="Örn: Pamukkale Özel Turu"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+              )}
 
               {/* Araç Tipi */}
               <div>
@@ -618,7 +668,7 @@ export default function NewTourReservationPage() {
               {/* Fiyat */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Tur Fiyatı
+                  Tur Fiyatı (Toplam)
                 </label>
                 <div className="flex">
                   <input
@@ -725,7 +775,7 @@ export default function NewTourReservationPage() {
             </div>
           </div>
 
-          {/* Yolcu Bilgileri */}
+          {/* Yolcu Bilgileri Card */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="mb-6">
               <h2 className="text-lg font-medium text-gray-900">Yolcu Bilgileri</h2>
@@ -783,28 +833,29 @@ export default function NewTourReservationPage() {
                             className="w-full text-sm border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
                           />
                         </div>
-                        {/* Ödeme Durumu */}
-                        <div>
-                          <label className="text-xs text-gray-500 block mb-1">Ödeme Durumu</label>
-                          <select
-                            value={(passenger as any).paymentStatus || 'PENDING'}
-                            onChange={(e) => handlePassengerDetailChange(index, 'paymentStatus', e.target.value)}
-                            className="w-full text-sm border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-                          >
-                            <option value="PENDING">Bekliyor</option>
-                            <option value="PAID">Ödendi</option>
-                          </select>
-                        </div>
-                        {/* Tutar */}
-                        <div>
-                          <label className="text-xs text-gray-500 block mb-1">Ödenen Tutar</label>
-                          <input
-                            type="number"
-                            value={(passenger as any).amount || 0}
-                            onChange={(e) => handlePassengerDetailChange(index, 'amount', Number(e.target.value))}
-                            placeholder="0.00"
-                            className="w-full text-sm border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-                          />
+                        {/* Ödeme Durumu & Tutar */}
+                        <div className="flex gap-2">
+                          <div className="flex-1">
+                            <label className="text-xs text-gray-500 block mb-1">Durum</label>
+                            <select
+                              value={(passenger as any).paymentStatus || 'PENDING'}
+                              onChange={(e) => handlePassengerDetailChange(index, 'paymentStatus', e.target.value)}
+                              className="w-full text-sm border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                            >
+                              <option value="PENDING">Bekliyor</option>
+                              <option value="PAID">Ödendi</option>
+                            </select>
+                          </div>
+                          <div className="flex-1">
+                            <label className="text-xs text-gray-500 block mb-1">Tutar</label>
+                            <input
+                              type="number"
+                              value={(passenger as any).amount || 0}
+                              onChange={(e) => handlePassengerDetailChange(index, 'amount', Number(e.target.value))}
+                              placeholder="0.00"
+                              className="w-full text-sm border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -821,68 +872,30 @@ export default function NewTourReservationPage() {
             )}
           </div>
 
-          {/* Notlar */}
+          {/* Notlar & Hatırlatıcı Card */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Notlar</h2>
-            <textarea
-              name="notes"
-              value={formData.notes}
-              onChange={handleInputChange}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Varsa özel notlar..."
-            />
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Notlar ve Ödeme Hatırlatıcı</h2>
 
-            {/* Payment Fields */}
-            <div className="mt-6 border-t pt-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Ödeme Bilgileri</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Ödeme Durumu</label>
-                  <select
-                    name="paymentStatus"
-                    value={formData.paymentStatus}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  >
-                    <option value="PENDING">Bekliyor (Borçlu)</option>
-                    <option value="PAID">Ödendi (Tam)</option>
-                    <option value="PARTIAL">Kısmi Ödeme</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Ödeme Yöntemi</label>
-                  <select
-                    name="paymentMethod"
-                    value={formData.paymentMethod}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  >
-                    <option value="CASH">Nakit</option>
-                    <option value="CARD">Kredi Kartı</option>
-                    <option value="TRANSFER">Havale / EFT</option>
-                    <option value="AGENCY">Acente Bakiyesi</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Ödenen Tutar</label>
-                  <input
-                    type="number"
-                    name="paidAmount"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    value={formData.paidAmount}
-                    onChange={(e) => setFormData(prev => ({ ...prev, paidAmount: Number(e.target.value) }))}
-                  />
-                </div>
+            <div className="grid grid-cols-1 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Notlar</label>
+                <textarea
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleInputChange}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Varsa özel notlar..."
+                />
               </div>
 
-              {formData.paymentStatus !== 'PAID' && (
-                <div className="mt-4 bg-yellow-50 p-4 rounded-md border border-yellow-200">
+              {Number(formData.paidAmount) < Number(formData.price || 0) && (
+                <div className="bg-yellow-50 p-4 rounded-md border border-yellow-200">
                   <h4 className="text-sm font-medium text-yellow-800 mb-2 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
-                    Ödeme Hatırlatıcı
+                    Ödeme Hatırlatıcı (Kalan Borç İçin)
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>

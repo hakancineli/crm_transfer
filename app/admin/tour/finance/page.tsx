@@ -110,6 +110,7 @@ export default function TourFinancePage() {
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Müşteri</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tur</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Durum</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hatırlatıcı</th>
                                         <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Kalan Tutar</th>
                                         <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">İşlem</th>
                                     </tr>
@@ -133,6 +134,15 @@ export default function TourFinancePage() {
                                                     }`}>
                                                     {booking.paymentStatus === 'PARTIAL' ? 'Kısmi Ödeme' : 'Bekliyor'}
                                                 </span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                {(booking as any).paymentReminder ? (
+                                                    <div className={`text-xs p-1 rounded ${new Date((booking as any).paymentReminder).getTime() <= Date.now() ? 'bg-orange-100 text-orange-800 font-bold animate-pulse' : 'bg-gray-100 text-gray-600'}`}>
+                                                        ⏰ {new Date((booking as any).paymentReminder).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-xs text-gray-400">Yok</span>
+                                                )}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-red-600">
                                                 {booking.remainingAmount} {booking.currency}

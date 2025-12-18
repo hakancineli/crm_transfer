@@ -218,21 +218,27 @@ export async function POST(request: NextRequest) {
     }
 
     // Rezervasyon oluştur
+    // Rezervasyon oluştur
+    const numericPrice = parseFloat(String(price || 0));
+    const numericPaid = parseFloat(String(body.paidAmount || 0));
+    const numericGroupSize = parseInt(String(groupSize || 1));
+    const numericDuration = parseInt(String(tourDuration || 1));
+
     const booking = await prisma.tourBooking.create({
       data: {
         tenantId,
         voucherNumber,
-        routeName: customRouteName || 'Özel Rota', // Default to provided name or generic
-        passengerNames: passengerNames.join(', '),
-        price: parseFloat(price),
+        routeName: customRouteName || (routeId === 'custom' ? 'Özel Rota' : routeName) || 'Tur',
+        passengerNames: Array.isArray(passengerNames) ? passengerNames.join(', ') : String(passengerNames || ''),
+        price: numericPrice,
         currency,
         vehicleType,
-        groupSize: parseInt(groupSize),
+        groupSize: numericGroupSize,
         pickupLocation,
         tourDate: new Date(tourDate),
         tourTime,
-        tourDuration: parseInt(tourDuration),
-        notes,
+        tourDuration: numericDuration,
+        notes: notes || '',
         status: 'PENDING',
         source: role === 'SUPERUSER' ? 'admin' : 'agency',
         // New CRM and Payment fields
@@ -240,8 +246,8 @@ export async function POST(request: NextRequest) {
         customerId: finalCustomerId,
         paymentStatus: body.paymentStatus || 'PENDING',
         paymentMethod: body.paymentMethod || 'CASH',
-        paidAmount: body.paidAmount ? parseFloat(body.paidAmount) : 0,
-        remainingAmount: body.paymentStatus === 'PAID' ? 0 : (body.price - (body.paidAmount || 0)),
+        paidAmount: numericPaid,
+        remainingAmount: body.paymentStatus === 'PAID' ? 0 : (numericPrice - numericPaid),
         // Scheduled Tour Links
         tourId: tourId || null,
         seatNumber: seatNumber || null,

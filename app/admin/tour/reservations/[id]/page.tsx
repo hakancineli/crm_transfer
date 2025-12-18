@@ -139,6 +139,40 @@ export default function TourBookingDetailPage() {
                         >
                             <span>👨‍✈️</span> Şoför Voucherı
                         </Link>
+                        {booking.status !== 'CANCELLED' && (booking as any).remainingAmount > 0 && (
+                            <button
+                                onClick={async () => {
+                                    const date = prompt('Hatırlatma Tarihi (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+                                    if (!date) return;
+                                    const time = prompt('Hatırlatma Saati (HH:MM):', '10:00');
+                                    if (!time) return;
+
+                                    try {
+                                        const res = await fetch(`/api/tour-bookings/${booking.id}`, {
+                                            method: 'PATCH',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({
+                                                paymentReminderDate: date,
+                                                paymentReminderTime: time
+                                            })
+                                        });
+
+                                        if (res.ok) {
+                                            alert('Hatırlatıcı başarıyla kuruldu.');
+                                            fetchBooking();
+                                        } else {
+                                            alert('Hatırlatıcı kurulurken hata oluştu.');
+                                        }
+                                    } catch (err) {
+                                        console.error(err);
+                                        alert('Bir hata oluştu.');
+                                    }
+                                }}
+                                className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 shadow-sm transition-colors flex items-center gap-2"
+                            >
+                                <span>🔔</span> Ödeme Hatırlat / İste
+                            </button>
+                        )}
                     </div>
                 </div>
 

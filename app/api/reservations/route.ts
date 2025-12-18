@@ -8,7 +8,7 @@ import jwt from 'jsonwebtoken';
 export async function GET(request: NextRequest) {
   try {
     console.log('API: Rezervasyonlar getiriliyor...');
-    
+
     // URL parametrelerini al
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
@@ -56,9 +56,9 @@ export async function GET(request: NextRequest) {
 
     const whereClauseBase: any = tenantId ? { tenantId } : {};
     const whereClause: any = userIdScope ? { ...whereClauseBase, userId: userIdScope } : whereClauseBase;
-    
+
     console.log(`API: Sayfa ${page}, Boyut ${pageSize}, Offset ${offset}`);
-    
+
     // Transfer rezervasyonlarını getir
     const reservations = await prisma.reservation.findMany({
       take: pageSize,
@@ -115,6 +115,14 @@ export async function GET(request: NextRequest) {
             companyName: true,
             subdomain: true
           }
+        },
+        customer: {
+          select: {
+            id: true,
+            name: true,
+            surname: true,
+            phone: true
+          }
         }
       }
     });
@@ -157,27 +165,57 @@ export async function GET(request: NextRequest) {
       source: (r as any).source ?? ((r as any).userId ? 'admin' : 'website')
     }));
 
-    // Tur rezervasyonlarını formatla
-    const tourResults = tourBookings.map(t => ({
-      id: t.id,
-      voucherNumber: t.voucherNumber,
-      date: t.tourDate.toISOString().split('T')[0],
-      time: t.tourTime || '00:00',
-      from: t.pickupLocation,
-      to: t.routeName,
-      passengerNames: safeParseArray((t as any).passengerNames),
-      price: t.price,
-      currency: t.currency,
-      paymentStatus: t.status,
-      phoneNumber: (t as any).phoneNumber ?? '',
-      createdAt: (t as any).createdAt ?? null,
-      tenantId: (t as any).tenantId ?? t.tenant?.id ?? null,
-      user: t.User,
-      driver: t.driver,
-      tenant: t.tenant,
-      type: 'tur',
-      source: (t as any).source || 'admin'
-    }));
+    // Tur rezervasyonlarını formatla - Her yolcuyu ayrı bir girdi olarak CRM'e sok
+    const tourResults: any[] = [];
+    tourBookings.forEach(t => {
+      const details = (t.passengerDetails as any[]) || [];
+      if (details.length > 0) {
+        details.forEach(p => {
+          tourResults.push({
+            id: `${t.id}-${p.seatNumber}`,
+            voucherNumber: t.voucherNumber,
+            date: t.tourDate.toISOString().split('T')[0],
+            time: t.tourTime || '00:00',
+            from: t.pickupLocation,
+            to: t.routeName,
+            passengerNames: [`${p.name} ${p.surname}`],
+            price: Number(p.amount) || (t.price / t.groupSize),
+            currency: t.currency,
+            paymentStatus: p.paymentStatus || t.paymentStatus,
+            phoneNumber: t.customer?.phone || (t as any).phoneNumber || '',
+            createdAt: (t as any).createdAt ?? null,
+            tenantId: (t as any).tenantId ?? t.tenant?.id ?? null,
+            user: t.User,
+            driver: t.driver,
+            tenant: t.tenant,
+            type: 'tur',
+            source: (t as any).source || 'admin'
+          });
+        });
+      } else {
+        // Fallback if no details
+        tourResults.push({
+          id: t.id,
+          voucherNumber: t.voucherNumber,
+          date: t.tourDate.toISOString().split('T')[0],
+          time: t.tourTime || '00:00',
+          from: t.pickupLocation,
+          to: t.routeName,
+          passengerNames: safeParseArray(t.passengerNames),
+          price: t.price,
+          currency: t.currency,
+          paymentStatus: t.status,
+          phoneNumber: t.customer?.phone || (t as any).phoneNumber || '',
+          createdAt: (t as any).createdAt ?? null,
+          tenantId: (t as any).tenantId ?? t.tenant?.id ?? null,
+          user: t.User,
+          driver: t.driver,
+          tenant: t.tenant,
+          type: 'tur',
+          source: (t as any).source || 'admin'
+        });
+      }
+    });
 
     // Tüm rezervasyonları birleştir ve tarihe göre sırala
     const allResults = [...transferResults, ...tourResults]
@@ -218,15 +256,15 @@ export async function POST(request: NextRequest) {
           tenantIdFromToken = headerTenant || body.tenantId || null;
         }
       }
-    } catch {}
-    
+    } catch { }
+
     // Website rezervasyonu için tenant ID'yi domain'den bul
     let targetTenantId = body.tenantId || headerTenant || tenantIdFromToken;
-    
+
     if (body.source === 'website' && body.tenantId) {
       // Domain'den tenant ID'yi bul
       const tenant = await prisma.tenant.findFirst({
-        where: { 
+        where: {
           OR: [
             { domain: body.tenantId },
             { subdomain: body.tenantId }
@@ -255,7 +293,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'SUPERUSER için tenantId gerekli (x-tenant-id veya body.tenantId)' }, { status: 400 });
       }
     }
-    
+
     // Basit rezervasyon oluşturma
     const reservation = await prisma.reservation.create({
       data: {
@@ -269,7 +307,7 @@ export async function POST(request: NextRequest) {
         price: body.price || 50.0,
         currency: body.currency || 'USD',
         phoneNumber: body.phoneNumber || body.phone || '',
-        voucherNumber: body.voucherNumber || `VIP${new Date().toISOString().slice(2,10).replace(/-/g, '')}-${Math.floor(Math.random() * 1000)}`,
+        voucherNumber: body.voucherNumber || `VIP${new Date().toISOString().slice(2, 10).replace(/-/g, '')}-${Math.floor(Math.random() * 1000)}`,
         driverFee: body.driverFee || 0,
         userId: userIdFromToken,
         paymentStatus: body.paymentStatus || 'PENDING',
@@ -281,7 +319,7 @@ export async function POST(request: NextRequest) {
         source: source
       }
     });
-    
+
     console.log('API: Rezervasyon oluşturuldu:', reservation.id);
     // Telegram bildirimi gönder
     try {
