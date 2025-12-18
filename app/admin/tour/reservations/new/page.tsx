@@ -35,6 +35,7 @@ const VEHICLE_TYPES: VehicleType[] = [
   { id: 'BUS_54', name: 'Mercedes Travego/Tourismo (54)', capacity: 54 },
 ];
 
+// Force update - v2
 export default function NewTourReservationPage() {
   const { user } = useAuth();
   const { isEnabled: tourEnabled, isLoading } = useModule('tour');

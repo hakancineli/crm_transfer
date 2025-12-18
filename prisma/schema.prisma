@@ -427,6 +427,7 @@ model Customer {
   phone          String?
   passportNumber String?
   nationality    String?
+  source        String? @default("manual")
   notes          String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
