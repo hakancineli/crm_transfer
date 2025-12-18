@@ -22,6 +22,8 @@ interface TourBooking {
     groupSize: number;
     price: number;
     currency: string;
+    paidAmount: number;
+    remainingAmount: number;
     pickupLocation: string;
     tourDate: string;
     tourTime: string;
@@ -56,9 +58,15 @@ export default function TourBookingDetailPage() {
     const bookingId = params.id as string;
     const [booking, setBooking] = useState<TourBooking | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
+    const [reminderDate, setReminderDate] = useState(new Date().toISOString().split('T')[0]);
+    const [reminderTime, setReminderTime] = useState('10:00');
+    const [isSubmittingReminder, setIsSubmittingReminder] = useState(false);
 
     useEffect(() => {
-        fetchBooking();
+        if (bookingId) {
+            fetchBooking();
+        }
     }, [bookingId]);
 
     const fetchBooking = async () => {
@@ -139,40 +147,6 @@ export default function TourBookingDetailPage() {
                         >
                             <span>👨‍✈️</span> Şoför Voucherı
                         </Link>
-                        {booking.status !== 'CANCELLED' && (booking as any).remainingAmount > 0 && (
-                            <button
-                                onClick={async () => {
-                                    const date = prompt('Hatırlatma Tarihi (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
-                                    if (!date) return;
-                                    const time = prompt('Hatırlatma Saati (HH:MM):', '10:00');
-                                    if (!time) return;
-
-                                    try {
-                                        const res = await fetch(`/api/tour-bookings/${booking.id}`, {
-                                            method: 'PATCH',
-                                            headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify({
-                                                paymentReminderDate: date,
-                                                paymentReminderTime: time
-                                            })
-                                        });
-
-                                        if (res.ok) {
-                                            alert('Hatırlatıcı başarıyla kuruldu.');
-                                            fetchBooking();
-                                        } else {
-                                            alert('Hatırlatıcı kurulurken hata oluştu.');
-                                        }
-                                    } catch (err) {
-                                        console.error(err);
-                                        alert('Bir hata oluştu.');
-                                    }
-                                }}
-                                className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 shadow-sm transition-colors flex items-center gap-2"
-                            >
-                                <span>🔔</span> Ödeme Hatırlat / İste
-                            </button>
-                        )}
                     </div>
                 </div>
 
@@ -342,17 +316,126 @@ export default function TourBookingDetailPage() {
                             </div>
                             <div className="p-6 space-y-4">
                                 <div className="flex justify-between items-center text-lg font-bold">
-                                    <span>Toplam Tutar:</span>
-                                    <span className="text-green-600">{booking.price} {booking.currency}</span>
+                                    <span className="text-gray-700">Toplam Tutar:</span>
+                                    <span className="text-blue-600">{booking.price} {booking.currency}</span>
                                 </div>
-                                <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
-                                    <span className="text-gray-600">Kişi Başı:</span>
-                                    <span className="font-medium">{(booking.price / (booking.groupSize || 1)).toFixed(2)} {booking.currency}</span>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-gray-500">Kişi Başı:</span>
+                                    <span className="font-medium text-gray-700">{(booking.price / (booking.groupSize || 1)).toFixed(2)} {booking.currency}</span>
                                 </div>
+                                <div className="pt-4 border-t border-gray-100 space-y-3">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-gray-600 font-medium">Ödenen:</span>
+                                        <span className="font-bold text-green-600">{booking.paidAmount || 0} {booking.currency}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                                        <span className="text-red-700 font-bold">Kalan Bakiye:</span>
+                                        <span className="font-black text-red-700 text-xl">{booking.remainingAmount || 0} {booking.currency}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-xs text-gray-400">
+                                        <span>Ödenmeyen Kişi:</span>
+                                        <span>{(booking.passengerDetails || []).filter(p => p.paymentStatus !== 'PAID').length} Kişi</span>
+                                    </div>
+                                </div>
+
+                                {booking.status !== 'CANCELLED' && booking.remainingAmount > 0 && (
+                                    <button
+                                        onClick={() => setIsReminderModalOpen(true)}
+                                        className="w-full mt-4 px-4 py-3 bg-orange-500 text-white rounded-xl hover:bg-orange-600 shadow-md transition-all flex items-center justify-center gap-2 font-bold transform hover:scale-[1.02] active:scale-[0.98]"
+                                    >
+                                        <span>🔔</span> Ödeme Hatırlat / İste
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
+
+                {/* Reminder Modal */}
+                {isReminderModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+                        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+                            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                    <span className="text-orange-500">🔔</span> Ödeme Hatırlatıcısı Kur
+                                </h3>
+                                <button
+                                    onClick={() => setIsReminderModalOpen(false)}
+                                    className="p-2 hover:bg-gray-100 rounded-full text-gray-400 transition-colors"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                            <div className="p-6 space-y-6">
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-2">Hatırlatma Tarihi</label>
+                                        <input
+                                            type="date"
+                                            value={reminderDate}
+                                            onChange={(e) => setReminderDate(e.target.value)}
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-2">Hatırlatma Saati</label>
+                                        <input
+                                            type="time"
+                                            value={reminderTime}
+                                            onChange={(e) => setReminderTime(e.target.value)}
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="p-4 bg-orange-50 rounded-xl border border-orange-100">
+                                    <p className="text-sm text-orange-800 leading-relaxed">
+                                        <strong>ℹ️ Bilgi:</strong> Belirlediğiniz tarih ve saatte sistem size hatırlatma yapacak veya (varsa) otomatik bildirim kanalları üzerinden müşteriye hatırlatma iletilecektir.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex gap-3">
+                                <button
+                                    onClick={() => setIsReminderModalOpen(false)}
+                                    className="flex-1 px-4 py-2 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-white transition-colors"
+                                >
+                                    İptal
+                                </button>
+                                <button
+                                    onClick={async () => {
+                                        try {
+                                            setIsSubmittingReminder(true);
+                                            const res = await fetch(`/api/tour-bookings/${booking.id}`, {
+                                                method: 'PATCH',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({
+                                                    paymentReminderDate: reminderDate,
+                                                    paymentReminderTime: reminderTime
+                                                })
+                                            });
+
+                                            if (res.ok) {
+                                                setIsReminderModalOpen(false);
+                                                fetchBooking();
+                                            } else {
+                                                alert('Hata oluştu.');
+                                            }
+                                        } catch (err) {
+                                            console.error(err);
+                                            alert('Bir hata oluştu.');
+                                        } finally {
+                                            setIsSubmittingReminder(false);
+                                        }
+                                    }}
+                                    disabled={isSubmittingReminder}
+                                    className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 disabled:opacity-50 transition-all shadow-md active:scale-95"
+                                >
+                                    {isSubmittingReminder ? 'Kuruluyor...' : 'Hatırlatıcıyı Kur'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
