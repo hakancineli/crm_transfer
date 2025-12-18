@@ -51,10 +51,23 @@ export async function GET(
       );
     }
 
-    // Parse passenger names
+    // Safe Parse passenger names
+    let passengers: string[] = [];
+    if (booking.passengerNames) {
+      if (booking.passengerNames.trim().startsWith('[')) {
+        try {
+          passengers = JSON.parse(booking.passengerNames);
+        } catch (e) {
+          passengers = booking.passengerNames.split(',').map(s => s.trim());
+        }
+      } else {
+        passengers = booking.passengerNames.split(',').map(s => s.trim());
+      }
+    }
+
     const parsedBooking = {
       ...booking,
-      passengerNames: JSON.parse(booking.passengerNames || '[]'),
+      passengerNames: passengers,
       tourDate: booking.tourDate.toISOString(),
       createdAt: booking.createdAt.toISOString(),
       updatedAt: booking.updatedAt.toISOString()
@@ -190,10 +203,23 @@ export async function PUT(
       }
     });
 
-    // Parse passenger names
+    // Safe Parse passenger names
+    let passengers: string[] = [];
+    if (updatedBooking.passengerNames) {
+      if (updatedBooking.passengerNames.trim().startsWith('[')) {
+        try {
+          passengers = JSON.parse(updatedBooking.passengerNames);
+        } catch (e) {
+          passengers = updatedBooking.passengerNames.split(',').map(s => s.trim());
+        }
+      } else {
+        passengers = updatedBooking.passengerNames.split(',').map(s => s.trim());
+      }
+    }
+
     const parsedBooking = {
       ...updatedBooking,
-      passengerNames: JSON.parse(updatedBooking.passengerNames || '[]'),
+      passengerNames: passengers,
       tourDate: updatedBooking.tourDate.toISOString(),
       createdAt: updatedBooking.createdAt.toISOString(),
       updatedAt: updatedBooking.updatedAt.toISOString()

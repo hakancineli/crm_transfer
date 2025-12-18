@@ -9,97 +9,80 @@ datasource db {
 }
 
 model Tenant {
-  id                   String           @id @default(uuid())
-  subdomain            String           @unique
-  companyName          String
-  domain               String?
-  isActive             Boolean          @default(true)
-  subscriptionPlan     String           @default("basic")
-  createdAt            DateTime         @default(now())
-  updatedAt            DateTime         @updatedAt
-  paymentAccountHolder String?
-  paymentBank          String?
-  paymentIban          String?
-  websiteModuleEnabled Boolean          @default(false)
-  
-  // Genel Bilgiler
-  taxNumber            String?
-  address              String?
-  phone                String?
-  email                String?
-  website              String?
-  logoUrl              String?
-  workingHours         String?
-  holidayDays          String?
-  
-  // Marka & Tasarım
-  primaryColor         String?          @default("#3B82F6")
-  secondaryColor       String?          @default("#10B981")
-  fontFamily           String?          @default("Inter")
-  voucherBackgroundUrl String?
-  
-  // Sistem Ayarları
-  defaultLanguage      String?          @default("tr")
-  defaultCurrency      String?          @default("TRY")
-  timezone             String?          @default("Europe/Istanbul")
-  dateFormat           String?          @default("DD/MM/YYYY")
-  temperatureUnit      String?          @default("celsius")
-  
-  // Entegrasyonlar
-  whatsappApiKey       String?
-  googleMapsApiKey     String?
-  yandexMapsEnabled    Boolean          @default(false)
-  // E-Fatura / E-Arşiv Ayarları
-  eInvoiceEnabled      Boolean          @default(false)
-  eIntegrator          String?          // Örn: Parasut, Foriba, Kolaybi vs. (adapter ile)
-  eInvoiceSenderVKN    String?          // Gönderici VKN/TCKN
-  eInvoiceAlias        String?          // Gönderici posta kutusu/alias
-  eInvoiceSerie        String?          // Fatura seri
-  eInvoiceNextNumber   Int?             // Sıradaki numara (uygulanırsa)
-  eInvoiceDefaultVAT   Float?           @default(20)
-  
-  // U-ETDS Entegrasyonu
-  uetdsEnabled         Boolean          @default(false)
-  uetdsUsername        String?
-  uetdsPassword        String?
-  uetdsUnetNo          String?
-  uetdsTestMode        Boolean          @default(true)
-  
-  // Kullanıcı Yönetimi
-  maxUsers             Int?             @default(10)
-  maxConcurrentSessions Int?            @default(5)
-  passwordMinLength    Int?             @default(8)
-  passwordExpiryDays   Int?             @default(90)
-  
-  // Raporlama & Analitik
-  dataRetentionDays    Int?             @default(365)
-  autoArchiveEnabled   Boolean          @default(false)
-  reportLogoEnabled    Boolean          @default(true)
-  
-  // Güvenlik
-  apiKeyExpiryDays     Int?             @default(30)
-  auditLogRetentionDays Int?            @default(180)
-  dataEncryptionLevel  String?          @default("standard")
-  activities           Activity[]
-  reservations         Reservation[]
-  drivers              Driver[]
-  hotelBookings        HotelBooking[]
-  hotelPricePool       HotelPricePool[]
-  uetdsSeferler        UetdsSefer[]
-  uetdsYolcular        UetdsYolcu[]
-  uetdsPersoneller     UetdsPersonel[]
-  uetdsGruplar         UetdsGrup[]
-  uetdsLogs            UetdsLog[]
-  hotelRequests        HotelRequest[]
-  modules              TenantModule[]
-  users                TenantUser[]
-  websites             TenantWebsite[]
-  tourBookings         TourBooking[]
-  vehicles             Vehicle[]
-  invoices             Invoice[]
-  customers            Customer[]
-  tourRoutes           TourRoute[]
-  tours                Tour[]
+  id                    String           @id @default(uuid())
+  subdomain             String           @unique
+  companyName           String
+  domain                String?
+  isActive              Boolean          @default(true)
+  subscriptionPlan      String           @default("basic")
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+  paymentAccountHolder  String?
+  paymentBank           String?
+  paymentIban           String?
+  websiteModuleEnabled  Boolean          @default(false)
+  address               String?
+  apiKeyExpiryDays      Int?             @default(30)
+  auditLogRetentionDays Int?             @default(180)
+  autoArchiveEnabled    Boolean          @default(false)
+  dataEncryptionLevel   String?          @default("standard")
+  dataRetentionDays     Int?             @default(365)
+  dateFormat            String?          @default("DD/MM/YYYY")
+  defaultCurrency       String?          @default("TRY")
+  defaultLanguage       String?          @default("tr")
+  email                 String?
+  fontFamily            String?          @default("Inter")
+  googleMapsApiKey      String?
+  holidayDays           String?
+  logoUrl               String?
+  maxConcurrentSessions Int?             @default(5)
+  maxUsers              Int?             @default(10)
+  passwordExpiryDays    Int?             @default(90)
+  passwordMinLength     Int?             @default(8)
+  phone                 String?
+  primaryColor          String?          @default("#3B82F6")
+  reportLogoEnabled     Boolean          @default(true)
+  secondaryColor        String?          @default("#10B981")
+  taxNumber             String?
+  temperatureUnit       String?          @default("celsius")
+  timezone              String?          @default("Europe/Istanbul")
+  voucherBackgroundUrl  String?
+  website               String?
+  whatsappApiKey        String?
+  workingHours          String?
+  yandexMapsEnabled     Boolean          @default(false)
+  uetdsEnabled          Boolean          @default(false)
+  uetdsPassword         String?
+  uetdsTestMode         Boolean          @default(true)
+  uetdsUnetNo           String?
+  uetdsUsername         String?
+  eIntegrator           String?
+  eInvoiceAlias         String?
+  eInvoiceDefaultVAT    Float?           @default(20)
+  eInvoiceEnabled       Boolean          @default(false)
+  eInvoiceNextNumber    Int?
+  eInvoiceSenderVKN     String?
+  eInvoiceSerie         String?
+  activities            Activity[]
+  reservations          Reservation[]
+  customers             Customer[]
+  drivers               Driver[]
+  hotelBookings         HotelBooking[]
+  hotelPricePool        HotelPricePool[]
+  hotelRequests         HotelRequest[]
+  invoices              Invoice[]
+  modules               TenantModule[]
+  users                 TenantUser[]
+  websites              TenantWebsite[]
+  tourBookings          TourBooking[]
+  tourRoutes            TourRoute[]
+  tours                 Tour[]
+  uetdsGruplar          UetdsGrup[]
+  uetdsLogs             UetdsLog[]
+  uetdsPersoneller      UetdsPersonel[]
+  uetdsSeferler         UetdsSefer[]
+  uetdsYolcular         UetdsYolcu[]
+  vehicles              Vehicle[]
 
   @@map("tenants")
 }
@@ -245,8 +228,8 @@ model Reservation {
   tenant                  Tenant?        @relation(fields: [tenantId], references: [id])
   user                    User?          @relation(fields: [userId], references: [id])
   hotelBookings           HotelBooking[]
-  uetdsSeferler           UetdsSefer[]
   invoices                Invoice[]
+  uetdsSeferler           UetdsSefer[]
 }
 
 model HotelRequest {
@@ -369,51 +352,48 @@ model Vehicle {
   tenantId        String
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-  tenant          Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   tours           Tour[]
+  tenant          Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@map("vehicles")
 }
 
 model TourBooking {
-  id             String   @id @default(uuid())
-  voucherNumber  String   @unique
-  routeName      String
-  vehicleType    String
-  groupSize      Int
-  price          Float
-  currency       String   @default("USD")
-  pickupLocation String
-  tourDate       DateTime
-  tourTime       String?
-  passengerNames String
-  notes          String?
-  status         String   @default("PENDING")
-  tenantId       String
-  userId         String?
-  driverId       String?
-  driverFee      Float?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  tourDuration   Int      @default(1)
-  source         String   @default("admin")
-  driver         Driver?  @relation(fields: [driverId], references: [id])
-  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  User           User?    @relation(fields: [userId], references: [id])
-  
-  // New Relations & Fields
-  customerId     String?
-  customer       Customer? @relation(fields: [customerId], references: [id])
-  tourId         String?
-  tour           Tour?     @relation(fields: [tourId], references: [id])
-  
-  seatNumber     String?
-  paymentStatus  String    @default("PENDING") // PENDING, PAID, PARTIAL
-  paymentMethod  String?   // CASH, CARD, TRANSFER
-  paidAmount     Float     @default(0)
-  remainingAmount Float    @default(0)
-  paymentReminder DateTime?
-  passengerDetails Json?   // [{name, surname, seatNumber, type}]
+  id               String    @id @default(uuid())
+  voucherNumber    String    @unique
+  routeName        String
+  vehicleType      String
+  groupSize        Int
+  price            Float
+  currency         String    @default("USD")
+  pickupLocation   String
+  tourDate         DateTime
+  tourTime         String?
+  passengerNames   String
+  notes            String?
+  status           String    @default("PENDING")
+  tenantId         String
+  userId           String?
+  driverId         String?
+  driverFee        Float?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  tourDuration     Int       @default(1)
+  source           String    @default("admin")
+  customerId       String?
+  paidAmount       Float     @default(0)
+  paymentMethod    String?
+  paymentStatus    String    @default("PENDING")
+  remainingAmount  Float     @default(0)
+  seatNumber       String?
+  tourId           String?
+  paymentReminder  DateTime?
+  passengerDetails Json?
+  customer         Customer? @relation(fields: [customerId], references: [id])
+  driver           Driver?   @relation(fields: [driverId], references: [id])
+  tenant           Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tour             Tour?     @relation(fields: [tourId], references: [id])
+  User             User?     @relation(fields: [userId], references: [id])
 
   @@map("tour_bookings")
 }
@@ -427,62 +407,55 @@ model Customer {
   phone          String?
   passportNumber String?
   nationality    String?
-  source        String? @default("manual")
   notes          String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
-  
+  source         String?       @default("manual")
   tenant         Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   tourBookings   TourBooking[]
-  
+
   @@map("customers")
 }
 
 model TourRoute {
-  id             String   @id @default(uuid())
-  tenantId       String
-  name           String
-  description    String?
-  regions        String   @default("[]") // JSON array of regions
-  duration       Int      @default(1) // Days
-  basePrice      Float    @default(0)
-  currency       String   @default("EUR")
-  isActive       Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  
-  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  tours          Tour[]
-  
+  id          String   @id @default(uuid())
+  tenantId    String
+  name        String
+  description String?
+  regions     String   @default("[]")
+  duration    Int      @default(1)
+  basePrice   Float    @default(0)
+  currency    String   @default("EUR")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tours       Tour[]
+
   @@map("tour_routes")
 }
 
 model Tour {
-  id             String   @id @default(uuid())
-  tenantId       String
-  routeId        String
-  vehicleId      String?
-  driverId       String?
-  guideId        String?  // Could be relation to User or separate Guide model later
-  
-  startDate      DateTime
-  startTime      String?
-  endDate        DateTime?
-  
-  seatConfig     String?  // JSON snapshot of seat configuration
-  capacity       Int      @default(0)
-  occupancy      Int      @default(0)
-  
-  status         String   @default("SCHEDULED") // SCHEDULED, ACTIVE, COMPLETED, CANCELLED
-  
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  
-  tenant         Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  route          TourRoute   @relation(fields: [routeId], references: [id])
-  vehicle        Vehicle?    @relation(fields: [vehicleId], references: [id])
-  bookings       TourBooking[]
-  
+  id         String        @id @default(uuid())
+  tenantId   String
+  routeId    String
+  vehicleId  String?
+  driverId   String?
+  guideId    String?
+  startDate  DateTime
+  startTime  String?
+  endDate    DateTime?
+  seatConfig String?
+  capacity   Int           @default(0)
+  occupancy  Int           @default(0)
+  status     String        @default("SCHEDULED")
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  bookings   TourBooking[]
+  route      TourRoute     @relation(fields: [routeId], references: [id])
+  tenant     Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  vehicle    Vehicle?      @relation(fields: [vehicleId], references: [id])
+
   @@map("tours")
 }
 
@@ -495,9 +468,9 @@ model TenantWebsite {
   theme     String           @default("default")
   customCSS String?
   favicon   String?
-  content   Json?            // Website content as JSON
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
+  content   Json?
   tenant    Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   pages     WebsitePage[]
   sections  WebsiteSection[]
@@ -562,23 +535,12 @@ model WebsiteSection {
   @@map("website_sections")
 }
 
-enum UserRole {
-  SUPERUSER
-  OPERATION
-  SELLER
-  ACCOUNTANT
-  AGENCY_ADMIN
-  AGENCY_USER
-}
-
-// U-ETDS Modelleri
-// Fatura Modelleri
 model Invoice {
   id              String        @id @default(uuid())
   tenantId        String
   reservationId   String?
   number          String        @unique
-  type            String        @default("EARSIV") // EARSIV | EINVOICE
+  type            String        @default("EARSIV")
   issueDate       DateTime      @default(now())
   currency        String        @default("TRY")
   customerName    String
@@ -590,164 +552,165 @@ model Invoice {
   vatAmount       Float         @default(0)
   total           Float         @default(0)
   notes           String?
-  status          String        @default("DRAFT") // DRAFT | SENT | CANCELLED
+  status          String        @default("DRAFT")
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
-
-  tenant          Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  reservation     Reservation?  @relation(fields: [reservationId], references: [id])
   items           InvoiceItem[]
+  reservation     Reservation?  @relation(fields: [reservationId], references: [id])
+  tenant          Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@map("invoices")
 }
 
 model InvoiceItem {
-  id          String   @id @default(uuid())
+  id          String  @id @default(uuid())
   invoiceId   String
   description String
-  quantity    Float    @default(1)
-  unitPrice   Float    @default(0)
-  vatRate     Float    @default(20)
-  total       Float    @default(0)
-
-  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  quantity    Float   @default(1)
+  unitPrice   Float   @default(0)
+  vatRate     Float   @default(20)
+  total       Float   @default(0)
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 
   @@map("invoice_items")
 }
 
-// U-ETDS Modelleri
 model UetdsSefer {
-  id                    String           @id @default(uuid())
-  tenantId              String
-  reservationId         String?          // Rezervasyon ile bağlantı
-  uetdsSeferReferansNo  String?          // U-ETDS'den dönen referans numarası
-  aracPlaka             String
-  hareketTarihi         DateTime
-  hareketSaati          String
-  seferAciklama         String?
-  aracTelefonu          String?
-  firmaSeferNo          String?
-  seferBitisTarihi      DateTime
-  seferBitisSaati       String
-  seferDurum            String           @default("AKTIF") // AKTIF, IPTAL
-  bildirimZamani        DateTime?        // U-ETDS'ye bildirim zamanı
-  sonucKodu             Int?             // U-ETDS'den dönen sonuç kodu
-  sonucMesaji           String?          // U-ETDS'den dönen sonuç mesajı
-  createdAt             DateTime         @default(now())
-  updatedAt             DateTime         @updatedAt
-  
-  tenant                Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  reservation           Reservation?     @relation(fields: [reservationId], references: [id])
-  yolcular              UetdsYolcu[]
-  personeller           UetdsPersonel[]
-  gruplar               UetdsGrup[]
-  logs                  UetdsLog[]
-  
+  id                   String          @id @default(uuid())
+  tenantId             String
+  reservationId        String?
+  uetdsSeferReferansNo String?
+  aracPlaka            String
+  hareketTarihi        DateTime
+  hareketSaati         String
+  seferAciklama        String?
+  aracTelefonu         String?
+  firmaSeferNo         String?
+  seferBitisTarihi     DateTime
+  seferBitisSaati      String
+  seferDurum           String          @default("AKTIF")
+  bildirimZamani       DateTime?
+  sonucKodu            Int?
+  sonucMesaji          String?
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+  gruplar              UetdsGrup[]
+  logs                 UetdsLog[]
+  personeller          UetdsPersonel[]
+  reservation          Reservation?    @relation(fields: [reservationId], references: [id])
+  tenant               Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  yolcular             UetdsYolcu[]
+
   @@map("uetds_seferler")
 }
 
 model UetdsYolcu {
-  id                    String           @id @default(uuid())
-  tenantId              String
-  seferId               String
-  grupId                String?          // Grup ID'si
-  uetdsYolcuRefNo       String?          // U-ETDS'den dönen yolcu referans numarası
-  uyrukUlke             String           // Ülke kodu
-  cinsiyet              String           // E - K
-  tcKimlikPasaportNo    String
-  adi                   String
-  soyadi                String
-  koltukNo              String?
-  telefonNo             String?
-  hesKodu               String?
-  durum                 String           @default("AKTIF") // AKTIF, IPTAL, GELMEDI
-  iptalAciklama         String?
-  bildirimZamani        DateTime?        // U-ETDS'ye bildirim zamanı
-  sonucKodu             Int?             // U-ETDS'den dönen sonuç kodu
-  sonucMesaji           String?          // U-ETDS'den dönen sonuç mesajı
-  createdAt             DateTime         @default(now())
-  updatedAt             DateTime         @updatedAt
-  
-  tenant                Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  sefer                 UetdsSefer       @relation(fields: [seferId], references: [id], onDelete: Cascade)
-  grup                  UetdsGrup?       @relation(fields: [grupId], references: [id])
-  
+  id                 String     @id @default(uuid())
+  tenantId           String
+  seferId            String
+  grupId             String?
+  uetdsYolcuRefNo    String?
+  uyrukUlke          String
+  cinsiyet           String
+  tcKimlikPasaportNo String
+  adi                String
+  soyadi             String
+  koltukNo           String?
+  telefonNo          String?
+  hesKodu            String?
+  durum              String     @default("AKTIF")
+  iptalAciklama      String?
+  bildirimZamani     DateTime?
+  sonucKodu          Int?
+  sonucMesaji        String?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  grup               UetdsGrup? @relation(fields: [grupId], references: [id])
+  sefer              UetdsSefer @relation(fields: [seferId], references: [id], onDelete: Cascade)
+  tenant             Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   @@map("uetds_yolcular")
 }
 
 model UetdsPersonel {
-  id                    String           @id @default(uuid())
-  tenantId              String
-  seferId               String
-  uetdsPersonelId       String?          // U-ETDS'den dönen personel ID'si
-  turKodu               Int              // 0-Şoför, 1-Şoför Yrd., 2-Host, 3-Hostes, 4-Diğer, 5-Rehber
-  uyrukUlke             String           // Ülke kodu
-  tcKimlikPasaportNo    String
-  cinsiyet              String           // E - K
-  adi                   String
-  soyadi                String
-  telefon               String?
-  adres                 String?
-  hesKodu               String?
-  durum                 String           @default("AKTIF") // AKTIF, IPTAL
-  iptalAciklama         String?
-  bildirimZamani        DateTime?        // U-ETDS'ye bildirim zamanı
-  sonucKodu             Int?             // U-ETDS'den dönen sonuç kodu
-  sonucMesaji           String?          // U-ETDS'den dönen sonuç mesajı
-  createdAt             DateTime         @default(now())
-  updatedAt             DateTime         @updatedAt
-  
-  tenant                Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  sefer                 UetdsSefer       @relation(fields: [seferId], references: [id], onDelete: Cascade)
-  
+  id                 String     @id @default(uuid())
+  tenantId           String
+  seferId            String
+  uetdsPersonelId    String?
+  turKodu            Int
+  uyrukUlke          String
+  tcKimlikPasaportNo String
+  cinsiyet           String
+  adi                String
+  soyadi             String
+  telefon            String?
+  adres              String?
+  hesKodu            String?
+  durum              String     @default("AKTIF")
+  iptalAciklama      String?
+  bildirimZamani     DateTime?
+  sonucKodu          Int?
+  sonucMesaji        String?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  sefer              UetdsSefer @relation(fields: [seferId], references: [id], onDelete: Cascade)
+  tenant             Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   @@map("uetds_personeller")
 }
 
 model UetdsGrup {
-  id                    String           @id @default(uuid())
-  tenantId              String
-  seferId               String
-  uetdsGrupRefNo        String?          // U-ETDS'den dönen grup referans numarası
-  grupAdi               String
-  grupAciklama          String
-  baslangicUlke         String           // Ülke kodu
-  baslangicIl           Int?             // Mernis il kodu
-  baslangicIlce         Int?             // Mernis ilçe kodu
-  baslangicYer          String?          // Başlangıç yer bilgisi
-  bitisUlke             String           // Ülke kodu
-  bitisIl               Int?             // Mernis il kodu
-  bitisIlce             Int?             // Mernis ilçe kodu
-  bitisYer              String?          // Bitiş yer bilgisi
-  grupUcret             String?          // Grup taşıma ücreti
-  durum                 String           @default("AKTIF") // AKTIF, IPTAL
-  iptalAciklama         String?
-  bildirimZamani        DateTime?        // U-ETDS'ye bildirim zamanı
-  sonucKodu             Int?             // U-ETDS'den dönen sonuç kodu
-  sonucMesaji           String?          // U-ETDS'den dönen sonuç mesajı
-  createdAt             DateTime         @default(now())
-  updatedAt             DateTime         @updatedAt
-  
-  tenant                Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  sefer                 UetdsSefer       @relation(fields: [seferId], references: [id], onDelete: Cascade)
-  yolcular              UetdsYolcu[]
-  
+  id             String       @id @default(uuid())
+  tenantId       String
+  seferId        String
+  uetdsGrupRefNo String?
+  grupAdi        String
+  grupAciklama   String
+  baslangicUlke  String
+  baslangicIl    Int?
+  baslangicIlce  Int?
+  baslangicYer   String?
+  bitisUlke      String
+  bitisIl        Int?
+  bitisIlce      Int?
+  bitisYer       String?
+  grupUcret      String?
+  durum          String       @default("AKTIF")
+  iptalAciklama  String?
+  bildirimZamani DateTime?
+  sonucKodu      Int?
+  sonucMesaji    String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  sefer          UetdsSefer   @relation(fields: [seferId], references: [id], onDelete: Cascade)
+  tenant         Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  yolcular       UetdsYolcu[]
+
   @@map("uetds_gruplar")
 }
 
 model UetdsLog {
-  id                    String           @id @default(uuid())
-  tenantId              String
-  seferId               String?
-  islemTuru             String           // seferEkle, yolcuEkle, personelEkle, etc.
-  islemParametreleri    Json             // Gönderilen parametreler
-  sonucKodu             Int?             // U-ETDS'den dönen sonuç kodu
-  sonucMesaji           String?          // U-ETDS'den dönen sonuç mesajı
-  sonucVerisi           Json?            // U-ETDS'den dönen tüm veri
-  hataDetayi            String?          // Hata detayı
-  islemZamani           DateTime         @default(now())
-  
-  tenant                Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  sefer                 UetdsSefer?      @relation(fields: [seferId], references: [id])
-  
+  id                 String      @id @default(uuid())
+  tenantId           String
+  seferId            String?
+  islemTuru          String
+  islemParametreleri Json
+  sonucKodu          Int?
+  sonucMesaji        String?
+  sonucVerisi        Json?
+  hataDetayi         String?
+  islemZamani        DateTime    @default(now())
+  sefer              UetdsSefer? @relation(fields: [seferId], references: [id])
+  tenant             Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   @@map("uetds_logs")
+}
+
+enum UserRole {
+  SUPERUSER
+  OPERATION
+  SELLER
+  ACCOUNTANT
+  AGENCY_ADMIN
+  AGENCY_USER
 }

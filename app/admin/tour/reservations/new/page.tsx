@@ -70,14 +70,16 @@ export default function NewTourReservationPage() {
     newCustomerName: '',
     newCustomerSurname: '',
     newCustomerPhone: '',
-    // Detailed Passenger Data
     passengerDetails: [] as Array<{
       seatNumber: string;
       name: string;
       surname: string;
       id?: string; // Optional TCKN/Passport
+      paymentStatus?: string;
+      amount?: number;
     }>,
     selectedSeats: [] as string[],
+    seatingMode: 'MANUAL' as 'AUTO' | 'MANUAL',
   });
 
   const [loading, setLoading] = useState(false);
@@ -221,6 +223,8 @@ export default function NewTourReservationPage() {
 
   const handleSeatSelect = (seatNumber: string) => {
     setFormData(prev => {
+      // Switch to manual mode if user starts selecting seats manually
+      const currentMode = prev.seatingMode;
       const currentSeats = prev.selectedSeats;
       const isSelected = currentSeats.includes(seatNumber);
       let newSeats;
@@ -232,33 +236,30 @@ export default function NewTourReservationPage() {
       }
 
       // Sync passengerDetails with seats
-      // Preserve existing details for kept seats, add empty for new
       const newPassengerDetails = newSeats.map(seat => {
         const existing = prev.passengerDetails.find(p => p.seatNumber === seat);
         return existing || { seatNumber: seat, name: '', surname: '' };
       });
 
-      // Auto-fill first passenger if it's the group leader/customer
-      if (newPassengerDetails.length > 0 && !newPassengerDetails[0].name && prev.customerName) {
-        // This might be tricky with "Name Surname" string, simple split
-        const parts = prev.customerName.split(' ');
-        if (parts.length > 0) {
+      // Auto-fill logic...
+      if (newPassengerDetails.length > 0 && !newPassengerDetails[0].name) {
+        if (prev.customerName) {
+          const parts = prev.customerName.split(' ');
           newPassengerDetails[0].name = parts[0];
           newPassengerDetails[0].surname = parts.slice(1).join(' ');
+        } else if (prev.newCustomerName) {
+          newPassengerDetails[0].name = prev.newCustomerName;
+          newPassengerDetails[0].surname = prev.newCustomerSurname;
         }
-      } else if (newPassengerDetails.length > 0 && !newPassengerDetails[0].name && prev.newCustomerName) {
-        newPassengerDetails[0].name = prev.newCustomerName;
-        newPassengerDetails[0].surname = prev.newCustomerSurname;
       }
 
       return {
         ...prev,
+        seatingMode: 'MANUAL', // Always switch to manual when user interacts with seat map
         selectedSeats: newSeats,
-        // Only increase groupSize if selected seats exceed current size
-        groupSize: newSeats.length > prev.groupSize ? newSeats.length : prev.groupSize,
-        seatNumber: newSeats.join(', '), // Comma separated for legacy field
+        groupSize: newSeats.length > 0 ? newSeats.length : prev.groupSize,
+        seatNumber: newSeats.join(', '),
         passengerDetails: newPassengerDetails,
-        // Update legacy passengerNames array for backward compatibility if needed
         passengerNames: newPassengerDetails.map(p => `${p.name} ${p.surname}`.trim())
       };
     });
@@ -322,19 +323,50 @@ export default function NewTourReservationPage() {
         groupSize: 1, // Reset group size
       }));
     } else if (name === 'groupSize') {
-      // Kişi sayısı değiştiğinde yolcu isimlerini güncelle
-      // This logic is now largely superseded by selectedSeats and passengerDetails
-      // Keeping it for now, but it might become redundant or need adjustment.
       const newGroupSize = parseInt(value) || 1;
-      // If groupSize is changed manually, we need to decide how it affects selectedSeats/passengerDetails.
-      // For now, let's assume groupSize is primarily driven by selectedSeats.
-      // If user manually changes groupSize, it might imply clearing seat selection or adjusting it.
-      // For this change, we'll let handleSeatSelect manage groupSize.
-      setFormData(prev => ({
-        ...prev,
-        groupSize: newGroupSize,
-        // passengerNames: newPassengerNames // This will be derived from passengerDetails
-      }));
+
+      setFormData(prev => {
+        let newSeats = prev.selectedSeats;
+        let newPassengerDetails = prev.passengerDetails;
+
+        if (prev.seatingMode === 'AUTO') {
+          // Auto-assign seats
+          const totalCapacity = VEHICLE_TYPES.find(v => v.id === prev.vehicleType)?.capacity || 16;
+          const availableSeats = [];
+          for (let i = 1; i <= totalCapacity; i++) {
+            const s = i.toString();
+            if (!occupiedSeats.includes(s)) {
+              availableSeats.push(s);
+            }
+          }
+
+          newSeats = availableSeats.slice(0, newGroupSize);
+          newPassengerDetails = newSeats.map(seat => {
+            const existing = prev.passengerDetails.find(p => p.seatNumber === seat);
+            return existing || { seatNumber: seat, name: '', surname: '' };
+          });
+
+          // Sync first passenger
+          if (newPassengerDetails.length > 0 && !newPassengerDetails[0].name) {
+            if (prev.customerName) {
+              const parts = prev.customerName.split(' ');
+              newPassengerDetails[0].name = parts[0];
+              newPassengerDetails[0].surname = parts.slice(1).join(' ');
+            } else if (prev.newCustomerName) {
+              newPassengerDetails[0].name = prev.newCustomerName;
+              newPassengerDetails[0].surname = prev.newCustomerSurname;
+            }
+          }
+        }
+
+        return {
+          ...prev,
+          groupSize: newGroupSize,
+          selectedSeats: newSeats,
+          passengerDetails: newPassengerDetails,
+          passengerNames: newPassengerDetails.map(p => `${p.name} ${p.surname}`.trim())
+        };
+      });
     } else {
       setFormData(prev => ({
         ...prev,
@@ -576,7 +608,7 @@ export default function NewTourReservationPage() {
                   type="number"
                   name="groupSize"
                   value={formData.groupSize}
-                  onChange={(e) => setFormData(prev => ({ ...prev, groupSize: parseInt(e.target.value) || 1 }))}
+                  onChange={handleInputChange}
                   min="1"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
@@ -628,34 +660,69 @@ export default function NewTourReservationPage() {
               </div>
             </div>
 
-            {/* Seat selection map */}
-            {formData.vehicleType && (
-              <div className="mt-8 pt-8 border-t border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Oturma Planı</h3>
-                <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 overflow-x-auto">
-                  <SeatMap
-                    capacity={VEHICLE_TYPES.find(v => v.id === formData.vehicleType)?.capacity || 16}
-                    selectedSeats={formData.selectedSeats}
-                    onSelect={handleSeatSelect}
-                    occupiedSeats={occupiedSeats}
+            {/* Seating Mode Selection */}
+            <div className="mt-8 pt-8 border-t border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Koltuklama Yöntemi</h3>
+              <div className="flex flex-col sm:flex-row gap-4 mb-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
+                <label className={`flex-1 flex items-center p-3 rounded-md border cursor-pointer transition-colors ${formData.seatingMode === 'AUTO' ? 'bg-white border-blue-500 shadow-sm' : 'border-gray-200 hover:border-blue-300'}`}>
+                  <input
+                    type="radio"
+                    name="seatingMode"
+                    value="AUTO"
+                    checked={formData.seatingMode === 'AUTO'}
+                    onChange={() => setFormData(prev => ({ ...prev, seatingMode: 'AUTO' }))}
+                    className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                   />
-                </div>
-                <div className="mt-4 flex gap-4 text-sm text-gray-600">
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-4 h-4 bg-white border border-gray-400 rounded-sm"></div>
-                    <span>Müsait</span>
+                  <div className="ml-3">
+                    <span className="block text-sm font-medium text-gray-900">Otomatik Koltuklama</span>
+                    <span className="block text-xs text-gray-500">Sistem boş koltukları sırayla atar</span>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-4 h-4 bg-blue-600 rounded-sm"></div>
-                    <span>Seçili</span>
+                </label>
+                <label className={`flex-1 flex items-center p-3 rounded-md border cursor-pointer transition-colors ${formData.seatingMode === 'MANUAL' ? 'bg-white border-blue-500 shadow-sm' : 'border-gray-200 hover:border-blue-300'}`}>
+                  <input
+                    type="radio"
+                    name="seatingMode"
+                    value="MANUAL"
+                    checked={formData.seatingMode === 'MANUAL'}
+                    onChange={() => setFormData(prev => ({ ...prev, seatingMode: 'MANUAL' }))}
+                    className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                  />
+                  <div className="ml-3">
+                    <span className="block text-sm font-medium text-gray-900">Manuel Seçim</span>
+                    <span className="block text-xs text-gray-500">Koltukları listeden kendiniz seçin</span>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-4 h-4 bg-red-100 border border-red-400 rounded-sm"></div>
-                    <span>Dolu</span>
-                  </div>
-                </div>
+                </label>
               </div>
-            )}
+
+              {/* Seat selection map */}
+              {formData.vehicleType && (
+                <div className="mt-8 pt-8 border-t border-gray-200">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Oturma Planı</h3>
+                  <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 overflow-x-auto">
+                    <SeatMap
+                      capacity={VEHICLE_TYPES.find(v => v.id === formData.vehicleType)?.capacity || 16}
+                      selectedSeats={formData.selectedSeats}
+                      onSelect={handleSeatSelect}
+                      occupiedSeats={occupiedSeats}
+                    />
+                  </div>
+                  <div className="mt-4 flex gap-4 text-sm text-gray-600">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-4 h-4 bg-white border border-gray-400 rounded-sm"></div>
+                      <span>Müsait</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-4 h-4 bg-blue-600 rounded-sm"></div>
+                      <span>Seçili</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-4 h-4 bg-red-100 border border-red-400 rounded-sm"></div>
+                      <span>Dolu</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Yolcu Bilgileri */}
@@ -703,6 +770,17 @@ export default function NewTourReservationPage() {
                             placeholder="Soyad"
                             className="w-full text-sm border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
                             required
+                          />
+                        </div>
+                        {/* TCKN/Pasaport */}
+                        <div>
+                          <label className="text-xs text-gray-500 block mb-1">TC / Pasaport No</label>
+                          <input
+                            type="text"
+                            value={passenger.id || ''}
+                            onChange={(e) => handlePassengerDetailChange(index, 'id', e.target.value)}
+                            placeholder="TC / Pasaport"
+                            className="w-full text-sm border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
                           />
                         </div>
                         {/* Ödeme Durumu */}

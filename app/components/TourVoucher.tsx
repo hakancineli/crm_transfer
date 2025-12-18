@@ -60,6 +60,16 @@ export default function TourVoucher({ bookingId }: TourVoucherProps) {
 
   const t = translations[selectedLanguage as keyof typeof translations];
 
+  // Get seat number from URL search params for individual boarding pass
+  const [targetSeat, setTargetSeat] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      setTargetSeat(params.get('seat'));
+    }
+  }, []);
+
   useEffect(() => {
     fetchBooking();
   }, [bookingId]);
@@ -328,33 +338,35 @@ export default function TourVoucher({ bookingId }: TourVoucherProps) {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
               </svg>
-              {t.passengerList || 'Yolcu Biniş Kartları'}
+              {targetSeat ? 'Biniş Kartı' : (t.passengerList || 'Yolcu Biniş Kartları')}
             </h2>
             <div className="grid grid-cols-1 gap-4">
-              {booking.passengerDetails.map((passenger, index) => (
-                <div key={index} className="bg-white border-2 border-dashed border-gray-300 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4 print:break-inside-avoid">
-                  {/* Left: Passenger Info */}
-                  <div className="flex-grow text-center sm:text-left">
-                    <div className="text-xs text-gray-500 uppercase tracking-wider">Yolcu Adı</div>
-                    <div className="text-lg font-bold text-gray-900">{passenger.name} {passenger.surname}</div>
-                    <div className="text-sm text-gray-600 mt-1">{booking.routeName}</div>
-                  </div>
+              {booking.passengerDetails
+                .filter(p => !targetSeat || p.seatNumber === targetSeat)
+                .map((passenger, index) => (
+                  <div key={index} className="bg-white border-2 border-dashed border-gray-300 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4 print:break-inside-avoid">
+                    {/* Left: Passenger Info */}
+                    <div className="flex-grow text-center sm:text-left">
+                      <div className="text-xs text-gray-500 uppercase tracking-wider">Yolcu Adı</div>
+                      <div className="text-lg font-bold text-gray-900">{passenger.name} {passenger.surname}</div>
+                      <div className="text-sm text-gray-600 mt-1">{booking.routeName}</div>
+                    </div>
 
-                  {/* Center: Date/Time */}
-                  <div className="text-center border-l border-r border-gray-100 px-4 hidden sm:block">
-                    <div className="text-xs text-gray-500">Tarih</div>
-                    <div className="font-semibold">{formatDate(booking.tourDate)}</div>
-                    <div className="text-xs text-gray-500 mt-1">Saat</div>
-                    <div className="font-semibold">{booking.tourTime}</div>
-                  </div>
+                    {/* Center: Date/Time */}
+                    <div className="text-center border-l border-r border-gray-100 px-4 hidden sm:block">
+                      <div className="text-xs text-gray-500">Tarih</div>
+                      <div className="font-semibold">{formatDate(booking.tourDate)}</div>
+                      <div className="text-xs text-gray-500 mt-1">Saat</div>
+                      <div className="font-semibold">{booking.tourTime}</div>
+                    </div>
 
-                  {/* Right: Seat Number */}
-                  <div className="flex flex-col items-center justify-center bg-blue-50 rounded-lg p-3 min-w-[80px]">
-                    <div className="text-xs text-blue-800 font-bold uppercase">Koltuk</div>
-                    <div className="text-3xl font-extrabold text-blue-600">{passenger.seatNumber}</div>
+                    {/* Right: Seat Number */}
+                    <div className="flex flex-col items-center justify-center bg-blue-50 rounded-lg p-3 min-w-[80px]">
+                      <div className="text-xs text-blue-800 font-bold uppercase">Koltuk</div>
+                      <div className="text-3xl font-extrabold text-blue-600">{passenger.seatNumber}</div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         ) : (

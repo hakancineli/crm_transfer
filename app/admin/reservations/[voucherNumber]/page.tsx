@@ -14,7 +14,15 @@ async function ReservationPage({
     const editMode = searchParams.edit;
 
     // Redirect tour reservations to tour-specific pages
+    // Redirect tour reservations to tour-specific pages
     if (voucherNumber.startsWith('TUR-')) {
+        const { prisma } = await import('@/lib/prisma');
+        const tourBooking = await prisma.tourBooking.findUnique({
+            where: { voucherNumber }
+        });
+        if (tourBooking) {
+            redirect(`/admin/tour/reservations/${tourBooking.id}`);
+        }
         redirect(`/admin/tour/reservations`);
     }
 
