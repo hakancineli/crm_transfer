@@ -11,7 +11,7 @@ interface Customer {
   phoneNumber: string;
   customerName: string;
   totalReservations: number;
-  totalSpent: number;
+  currencyTotals: Record<string, number>;
   lastReservation: string;
   reservations: any[];
 }
@@ -32,7 +32,7 @@ export default function CustomersPage() {
       c.customerName,
       c.phoneNumber,
       String(c.totalReservations),
-      c.totalSpent.toFixed(2),
+      Object.entries(c.currencyTotals).map(([curr, total]) => `${total.toFixed(2)} ${curr}`).join(' / '),
       new Date(c.lastReservation).toLocaleString('tr-TR')
     ]);
     const csvContent = [header, ...rows].map(r => r.map(field => `"${String(field).replace(/"/g, '""')}"`).join(',')).join('\n');
@@ -52,7 +52,7 @@ export default function CustomersPage() {
         <td style="padding:8px;border:1px solid #e5e7eb;">${c.customerName}</td>
         <td style="padding:8px;border:1px solid #e5e7eb;">${c.phoneNumber}</td>
         <td style="padding:8px;border:1px solid #e5e7eb;">${c.totalReservations}</td>
-        <td style="padding:8px;border:1px solid #e5e7eb;">$${c.totalSpent.toFixed(2)}</td>
+        <td style="padding:8px;border:1px solid #e5e7eb;">${Object.entries(c.currencyTotals).map(([curr, total]) => `${total.toFixed(2)} ${curr}`).join('<br/>')}</td>
         <td style="padding:8px;border:1px solid #e5e7eb;">${new Date(c.lastReservation).toLocaleString('tr-TR')}</td>
       </tr>
     `).join('');
@@ -139,17 +139,18 @@ export default function CustomersPage() {
 
       // Müşterileri telefon numarasına göre grupla
       const customerMap = new Map<string, Customer>();
+      const normalize = (val: string) => val ? val.replace(/[\u202A\u202B\u202C\u202D\u202E\u200B\u200C\u200D\u200E\u200F]/g, '').trim() : '';
 
       scopedReservations.forEach((reservation: any) => {
         if (!reservation.phoneNumber) return;
 
-        const phone = reservation.phoneNumber;
+        const phone = normalize(reservation.phoneNumber);
         if (!customerMap.has(phone)) {
           customerMap.set(phone, {
             phoneNumber: phone,
             customerName: reservation.passengerNames?.[0] || 'Bilinmiyor',
             totalReservations: 0,
-            totalSpent: 0,
+            currencyTotals: {},
             lastReservation: reservation.createdAt,
             reservations: []
           });
@@ -157,7 +158,8 @@ export default function CustomersPage() {
 
         const customer = customerMap.get(phone)!;
         customer.totalReservations++;
-        customer.totalSpent += reservation.price;
+        const curr = reservation.currency || 'USD';
+        customer.currencyTotals[curr] = (customer.currencyTotals[curr] || 0) + (Number(reservation.price) || 0);
         customer.reservations.push(reservation);
 
         // Isim varsa ve mevcutsa güncelle (daha güncel bir isim bulmuş olabiliriz)
@@ -171,7 +173,12 @@ export default function CustomersPage() {
       });
 
       const customerList = Array.from(customerMap.values())
-        .sort((a, b) => b.totalSpent - a.totalSpent);
+        .sort((a, b) => {
+          // Sort by total volume (rough estimate if mixed)
+          const sumA = Object.values(a.currencyTotals).reduce((s, v) => s + v, 0);
+          const sumB = Object.values(b.currencyTotals).reduce((s, v) => s + v, 0);
+          return sumB - sumA;
+        });
 
       setCustomers(customerList);
     } catch (error) {
@@ -306,11 +313,21 @@ export default function CustomersPage() {
               <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                 <span className="text-green-600 text-lg">💰</span>
               </div>
-              <div className="ml-4">
+              <div className="ml-4 overflow-hidden">
                 <p className="text-sm font-medium text-gray-600">Toplam Gelir</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  ${customers.reduce((sum, c) => sum + c.totalSpent, 0).toFixed(2)}
-                </p>
+                <div className="flex flex-col">
+                  {Object.entries(customers.reduce((acc, c) => {
+                    Object.entries(c.currencyTotals).forEach(([curr, total]) => {
+                      acc[curr] = (acc[curr] || 0) + total;
+                    });
+                    return acc;
+                  }, {} as Record<string, number>)).map(([curr, total]) => (
+                    <p key={curr} className="text-sm font-bold text-gray-900 leading-tight">
+                      {total.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {curr}
+                    </p>
+                  ))}
+                  {customers.length === 0 && <p className="text-2xl font-bold text-gray-900">0.00</p>}
+                </div>
               </div>
             </div>
           </div>
@@ -383,7 +400,13 @@ export default function CustomersPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      ${customer.totalSpent.toFixed(2)}
+                      <div className="flex flex-col">
+                        {Object.entries(customer.currencyTotals).map(([curr, total]) => (
+                          <span key={curr} className="whitespace-nowrap">
+                            {total.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {curr}
+                          </span>
+                        ))}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(customer.lastReservation).toLocaleDateString('tr-TR')}

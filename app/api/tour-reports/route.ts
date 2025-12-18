@@ -53,10 +53,10 @@ export async function GET(request: NextRequest) {
         });
 
         // Aggregation Logic
-        const summary = {
-            totalSales: 0,
-            totalPaid: 0,
-            totalPending: 0,
+        const summary: any = {
+            totalSales: {},
+            totalPaid: {},
+            totalPending: {},
             totalHeadcount: 0,
             bookingCount: bookings.length
         };
@@ -65,18 +65,14 @@ export async function GET(request: NextRequest) {
         const bySeller: Record<string, any> = {};
 
         bookings.forEach(booking => {
-            // Normalize currency (mvp: assume base currency or simple summation, real world needs conversion)
-            // For now, we'll just sum specific currencies separately if needed, but for simplicity let's assume primary currency is tracked or just sum the amounts. 
-            // Ideally we should group by currency too. For this MVP, let's assume mostly EUR/USD and just sum properly if currency matches usage.
-            // Let's stick to summing raw values for now but frontend might need to handle mixed currencies.
-
+            const curr = booking.currency || 'EUR';
             const salesAmount = booking.price;
             const paid = booking.paidAmount;
             const pending = booking.remainingAmount || (booking.paymentStatus === 'PAID' ? 0 : booking.price - booking.paidAmount);
 
-            summary.totalSales += salesAmount;
-            summary.totalPaid += paid;
-            summary.totalPending += pending;
+            summary.totalSales[curr] = (summary.totalSales[curr] || 0) + salesAmount;
+            summary.totalPaid[curr] = (summary.totalPaid[curr] || 0) + paid;
+            summary.totalPending[curr] = (summary.totalPending[curr] || 0) + pending;
             summary.totalHeadcount += booking.groupSize;
 
             // Group by Route
@@ -84,12 +80,12 @@ export async function GET(request: NextRequest) {
                 byRoute[booking.routeName] = {
                     name: booking.routeName,
                     count: 0,
-                    sales: 0,
+                    sales: {},
                     headcount: 0
                 };
             }
             byRoute[booking.routeName].count++;
-            byRoute[booking.routeName].sales += salesAmount;
+            byRoute[booking.routeName].sales[curr] = (byRoute[booking.routeName].sales[curr] || 0) + salesAmount;
             byRoute[booking.routeName].headcount += booking.groupSize;
 
             // Group by Seller
@@ -101,20 +97,21 @@ export async function GET(request: NextRequest) {
                     id: sellerId,
                     name: sellerName,
                     count: 0,
-                    sales: 0,
+                    sales: {},
                     headcount: 0
                 };
             }
             bySeller[sellerId].count++;
-            bySeller[sellerId].sales += salesAmount;
+            bySeller[sellerId].sales[curr] = (bySeller[sellerId].sales[curr] || 0) + salesAmount;
             bySeller[sellerId].headcount += booking.groupSize;
         });
 
         return NextResponse.json({
             summary,
-            byRoute: Object.values(byRoute).sort((a: any, b: any) => b.sales - a.sales),
-            bySeller: Object.values(bySeller).sort((a: any, b: any) => b.sales - a.sales),
-            currency: bookings.length > 0 ? bookings[0].currency : 'EUR' // Naive currency hint
+            byRoute: Object.values(byRoute),
+            bySeller: Object.values(bySeller),
+            // Multi-currency support
+            currencies: Array.from(new Set(bookings.map(b => b.currency)))
         });
 
     } catch (error) {

@@ -3,14 +3,17 @@ import { prisma } from '@/lib/prisma';
 import { Reservation } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 
-async function getUSDRate() {
+async function getRates() {
     try {
         const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
         const data = await response.json();
-        return data.rates.TRY;
+        return {
+            usd: data.rates.TRY || 31.50,
+            eur: (data.rates.TRY / data.rates.EUR) || 34.20
+        };
     } catch (error) {
-        console.error('USD kuru alınamadı:', error);
-        return 31.50; // Fallback kur
+        console.error('Kurlar alınamadı:', error);
+        return { usd: 31.50, eur: 34.20 }; // Fallback
     }
 }
 
@@ -18,13 +21,11 @@ export async function POST(request: NextRequest) {
     try {
         const { startDate, endDate } = await request.json();
 
-        // startDate / endDate formatını YYYY-MM-DD kabul edelim
         if (!startDate || !endDate) {
             return NextResponse.json({ error: 'Tarih aralığı gerekli' }, { status: 400 });
         }
-        const usdRate = await getUSDRate();
+        const rates = await getRates();
 
-        // Tenant scoping for non-SUPERUSER
         const authHeader = request.headers.get('authorization');
         let currentUserRole: string | null = null;
         let currentTenantIds: string[] = [];
@@ -40,94 +41,99 @@ export async function POST(request: NextRequest) {
                     });
                     currentTenantIds = links.map((l: any) => l.tenantId);
                 }
-            } catch (_) {}
+            } catch (_) { }
         }
 
         const whereClause: any = {
-            // date alanı string (YYYY-MM-DD). Postgres için doğrudan karşılaştırma yapılabilir.
-            date: {
-                gte: String(startDate),
-                lte: String(endDate)
+            date: { gte: String(startDate), lte: String(endDate) }
+        };
+        const tourWhereClause: any = {
+            tourDate: {
+                gte: new Date(startDate),
+                lte: new Date(new Date(endDate).setHours(23, 59, 59, 999))
             }
         };
+
         if (currentUserRole && currentUserRole !== 'SUPERUSER') {
             if (currentTenantIds.length > 0) {
                 whereClause.tenantId = { in: currentTenantIds };
+                tourWhereClause.tenantId = { in: currentTenantIds };
             } else {
                 whereClause.tenantId = '__none__';
+                tourWhereClause.tenantId = '__none__';
             }
         }
 
-        // Tarih aralığındaki tüm rezervasyonları getir
-        const reservations = await prisma.reservation.findMany({
-            where: whereClause,
-            include: {
-                driver: true
+        // Fetch Both
+        const [reservations, tourBookings] = await Promise.all([
+            prisma.reservation.findMany({
+                where: whereClause,
+                include: { driver: true }
+            }),
+            prisma.tourBooking.findMany({
+                where: tourWhereClause,
+                include: { driver: true }
+            })
+        ]);
+
+        console.log(`Rapor API: ${reservations.length} transfer, ${tourBookings.length} tur bulundu.`);
+
+        const allItems = [
+            ...reservations.map(r => ({ ...r, itemType: 'transfer' })),
+            ...tourBookings.map(t => ({
+                ...t,
+                date: t.tourDate.toISOString().split('T')[0],
+                itemType: 'tour'
+            }))
+        ];
+
+        // Toplam gelir (Normalize to TL)
+        let totalRevenueTL = 0;
+        let totalRevenueUSD = 0;
+        let totalRevenueEUR = 0;
+
+        allItems.forEach((res: any) => {
+            const price = Number(res.price) || 0;
+            if (res.currency === 'USD') {
+                totalRevenueUSD += price;
+                totalRevenueTL += (price * rates.usd);
+            } else if (res.currency === 'EUR') {
+                totalRevenueEUR += price;
+                totalRevenueTL += (price * rates.eur);
+            } else {
+                totalRevenueTL += price;
             }
         });
 
-        console.log(`Rapor API: ${reservations.length} rezervasyon bulundu (${startDate} - ${endDate})`);
-
-        // Toplam gelir (USD -> TL)
-        const totalRevenueUSD = reservations.reduce((sum: number, res: any) => {
-            if (res.currency === 'USD') {
-                return sum + res.price;
-            }
-            return sum;
-        }, 0);
-
-        const totalRevenueTL = reservations.reduce((sum: number, res: any) => {
-            if (res.currency === 'USD') {
-                return sum + (res.price * usdRate);
-            }
-            return sum + res.price;
-        }, 0);
-
-        // Şoför ödemeleri (TL)
-        const driverPayments = reservations.reduce((sum: number, res: any) => sum + (res.driverFee || 0), 0);
-
-        // Transfer tipleri
-        const transfersByType = {
-            pickup: reservations.filter((r: Reservation) => r.from.includes('IST') || r.from.includes('SAW')).length,
-            dropoff: reservations.filter((r: Reservation) => r.to.includes('IST') || r.to.includes('SAW')).length,
-            transfer: reservations.filter((r: Reservation) => 
-                (!r.from.includes('IST') && !r.from.includes('SAW')) && 
-                (!r.to.includes('IST') && !r.to.includes('SAW'))
-            ).length
-        };
-
-        // Popüler rotalar
-        const routes = reservations.map((r: Reservation) => `${r.from} → ${r.to}`);
-        const routeCounts = routes.reduce((acc: { [key: string]: number }, route: string) => {
-            acc[route] = (acc[route] || 0) + 1;
-            return acc;
-        }, {});
-
-        const popularRoutes = Object.entries(routeCounts)
-            .map(([route, count]) => ({ route, count: count as number }))
-            .sort((a, b) => b.count - a.count)
-            .slice(0, 10);
+        const driverPayments = allItems.reduce((sum: number, res: any) => sum + (Number(res.driverFee) || 0), 0);
 
         const result = {
             totalRevenueUSD,
+            totalRevenueEUR,
             totalRevenueTL,
-            usdRate,
+            usdRate: rates.usd,
+            eurRate: rates.eur,
             totalTransfers: reservations.length,
-            paidTransfers: reservations.filter((r: any) => r.paymentStatus === 'PAID').length,
-            unpaidTransfers: reservations.filter((r: any) => r.paymentStatus === 'UNPAID').length,
+            totalTours: tourBookings.length,
+            totalItems: allItems.length,
+            paidItems: allItems.filter((r: any) => r.paymentStatus === 'PAID').length,
+            unpaidItems: allItems.filter((r: any) => r.paymentStatus === 'UNPAID' || r.paymentStatus === 'PENDING').length,
             driverPayments,
             netIncome: totalRevenueTL - driverPayments,
-            transfersByType,
-            popularRoutes
+            transfersByType: {
+                pickup: reservations.filter((r: any) => r.from.includes('IST') || r.from.includes('SAW')).length,
+                dropoff: reservations.filter((r: any) => r.to.includes('IST') || r.to.includes('SAW')).length,
+                transfer: reservations.filter((r: any) =>
+                    (!r.from.includes('IST') && !r.from.includes('SAW')) &&
+                    (!r.to.includes('IST') && !r.to.includes('SAW'))
+                ).length,
+                tour: tourBookings.length
+            }
         };
 
-        console.log('Rapor API sonucu:', result);
         return NextResponse.json(result);
     } catch (error) {
         console.error('Rapor verisi getirme hatası:', error);
-        return NextResponse.json(
-            { error: 'Rapor verisi getirilemedi' },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: 'Rapor verisi getirilemedi' }, { status: 500 });
     }
 } 

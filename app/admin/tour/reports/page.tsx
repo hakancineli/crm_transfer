@@ -6,26 +6,26 @@ import { canViewTourModule } from '@/app/lib/permissions';
 
 interface ReportData {
   summary: {
-    totalSales: number;
-    totalPaid: number;
-    totalPending: number;
+    totalSales: Record<string, number>;
+    totalPaid: Record<string, number>;
+    totalPending: Record<string, number>;
     totalHeadcount: number;
     bookingCount: number;
   };
   byRoute: Array<{
     name: string;
     count: number;
-    sales: number;
+    sales: Record<string, number>;
     headcount: number;
   }>;
   bySeller: Array<{
     id: string;
     name: string;
     count: number;
-    sales: number;
+    sales: Record<string, number>;
     headcount: number;
   }>;
-  currency: string;
+  currencies: string[];
 }
 
 export default function TourReportsPage() {
@@ -66,7 +66,7 @@ export default function TourReportsPage() {
   if (!data && loading) return <div className="p-8 text-center">Yükleniyor...</div>;
   if (!data) return <div className="p-8 text-center text-red-500">Veri yüklenemedi.</div>;
 
-  const { summary, byRoute, bySeller, currency } = data;
+  const { summary, byRoute, bySeller, currencies } = data;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -105,21 +105,36 @@ export default function TourReportsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <h3 className="text-sm font-medium text-gray-500">Toplam Satış</h3>
-            <div className="text-2xl font-bold text-gray-900 mt-2">
-              {summary.totalSales.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {currency}
+            <div className="text-lg font-bold text-gray-900 mt-2 space-y-1">
+              {Object.entries(summary.totalSales).map(([curr, total]) => (
+                <div key={curr}>
+                  {total.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {curr}
+                </div>
+              ))}
+              {Object.keys(summary.totalSales).length === 0 && <div>0.00</div>}
             </div>
             <div className="text-sm text-gray-500 mt-1">{summary.bookingCount} Rezervasyon</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-sm border border-green-200 bg-green-50">
             <h3 className="text-sm font-medium text-green-700">Tahsil Edilen</h3>
-            <div className="text-2xl font-bold text-green-700 mt-2">
-              {summary.totalPaid.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {currency}
+            <div className="text-lg font-bold text-green-700 mt-2 space-y-1">
+              {Object.entries(summary.totalPaid).map(([curr, total]) => (
+                <div key={curr}>
+                  {total.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {curr}
+                </div>
+              ))}
+              {Object.keys(summary.totalPaid).length === 0 && <div>0.00</div>}
             </div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-sm border border-yellow-200 bg-yellow-50">
             <h3 className="text-sm font-medium text-yellow-700">Bekleyen Tahsilat</h3>
-            <div className="text-2xl font-bold text-yellow-700 mt-2">
-              {summary.totalPending.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {currency}
+            <div className="text-lg font-bold text-yellow-700 mt-2 space-y-1">
+              {Object.entries(summary.totalPending).map(([curr, total]) => (
+                <div key={curr}>
+                  {total.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {curr}
+                </div>
+              ))}
+              {Object.keys(summary.totalPending).length === 0 && <div>0.00</div>}
             </div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-sm border border-blue-200 bg-blue-50">
@@ -152,7 +167,11 @@ export default function TourReportsPage() {
                     <td className="px-6 py-4 text-sm text-gray-500">{item.count}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">{item.headcount}</td>
                     <td className="px-6 py-4 text-sm text-gray-900 text-right font-medium">
-                      {item.sales.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {currency}
+                      {Object.entries(item.sales).map(([curr, total]) => (
+                        <div key={curr}>
+                          {total.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {curr}
+                        </div>
+                      ))}
                     </td>
                   </tr>
                 ))}
@@ -186,7 +205,11 @@ export default function TourReportsPage() {
                     <td className="px-6 py-4 text-sm text-gray-500">{item.count}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">{item.headcount}</td>
                     <td className="px-6 py-4 text-sm text-gray-900 text-right font-medium">
-                      {item.sales.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {currency}
+                      {Object.entries(item.sales).map(([curr, total]) => (
+                        <div key={curr}>
+                          {total.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {curr}
+                        </div>
+                      ))}
                     </td>
                   </tr>
                 ))}

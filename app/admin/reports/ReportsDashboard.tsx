@@ -11,10 +11,13 @@ import { useDebounce } from '@/app/hooks/useDebounce';
 interface ReportData {
     totalRevenueUSD: number;
     totalRevenueTL: number;
+    totalRevenueEUR: number;
     usdRate: number;
+    eurRate: number;
     totalTransfers: number;
-    paidTransfers: number;
-    unpaidTransfers: number;
+    totalTours: number;
+    paidItems: number;
+    unpaidItems: number;
     driverPayments: number;
     netIncome: number;
     transfersByType: {
@@ -78,7 +81,7 @@ export default function ReportsDashboard() {
                     endDate: debouncedEndDate,
                 }),
             });
-            
+
             const data = await response.json();
 
             if (!response.ok || data?.error) {
@@ -90,10 +93,13 @@ export default function ReportsDashboard() {
             const safeData: ReportData = {
                 totalRevenueUSD: Number(data.totalRevenueUSD) || 0,
                 totalRevenueTL: Number(data.totalRevenueTL) || 0,
+                totalRevenueEUR: Number(data.totalRevenueEUR) || 0,
                 usdRate: Number(data.usdRate) || 0,
+                eurRate: Number(data.eurRate) || 0,
                 totalTransfers: Number(data.totalTransfers) || 0,
-                paidTransfers: Number(data.paidTransfers) || 0,
-                unpaidTransfers: Number(data.unpaidTransfers) || 0,
+                totalTours: Number(data.totalTours) || 0,
+                paidItems: Number(data.paidItems) || 0,
+                unpaidItems: Number(data.unpaidItems) || 0,
                 driverPayments: Number(data.driverPayments) || 0,
                 netIncome: Number(data.netIncome) || 0,
                 transfersByType: {
@@ -210,8 +216,8 @@ export default function ReportsDashboard() {
             </div>
 
             {/* Özet Kartları */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-white p-6 rounded-lg shadow">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="bg-white p-5 rounded-lg shadow">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -219,15 +225,15 @@ export default function ReportsDashboard() {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-500">{t('crm.reports.summary.revenueTL')}</p>
-                            <p className="text-2xl font-semibold text-gray-900">
+                            <p className="text-xs font-medium text-gray-500 uppercase">Toplam (TL)</p>
+                            <p className="text-lg font-bold text-gray-900">
                                 {formatCurrency(reportData.totalRevenueTL)}
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-lg shadow">
+                <div className="bg-white p-5 rounded-lg shadow border-l-4 border-blue-400">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -235,31 +241,50 @@ export default function ReportsDashboard() {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-500">{t('crm.reports.summary.revenueUSD')}</p>
-                            <p className="text-2xl font-semibold text-gray-900">
+                            <p className="text-xs font-medium text-gray-500 uppercase">Dolar Satış</p>
+                            <p className="text-lg font-bold text-gray-900">
                                 {formatCurrency(reportData.totalRevenueUSD, 'USD')}
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-lg shadow">
+                <div className="bg-white p-5 rounded-lg shadow border-l-4 border-indigo-400">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
-                            <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                                <span className="text-purple-600 font-semibold">🚗</span>
+                            <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                                <span className="text-indigo-600 font-semibold">€</span>
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-500">{t('crm.reports.summary.totalTransfers')}</p>
-                            <p className="text-2xl font-semibold text-gray-900">
-                                {reportData.totalTransfers}
+                            <p className="text-xs font-medium text-gray-500 uppercase">Euro Satış</p>
+                            <p className="text-lg font-bold text-gray-900">
+                                {formatCurrency(reportData.totalRevenueEUR, 'EUR')}
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-lg shadow">
+                <div className="bg-white p-5 rounded-lg shadow border-l-4 border-purple-400">
+                    <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                            <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                <span className="text-purple-600 font-semibold">📊</span>
+                            </div>
+                        </div>
+                        <div className="ml-4">
+                            <p className="text-xs font-medium text-gray-500 uppercase">Toplam İşlem</p>
+                            <p className="text-lg font-bold text-gray-900">
+                                {reportData.totalTransfers + reportData.totalTours}
+                            </p>
+                            <p className="text-[10px] text-gray-400">
+                                {reportData.totalTransfers} Trf / {reportData.totalTours} Tur
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white p-5 rounded-lg shadow border-l-4 border-yellow-400">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
@@ -267,8 +292,8 @@ export default function ReportsDashboard() {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-500">{t('crm.reports.summary.netIncome')}</p>
-                            <p className="text-2xl font-semibold text-gray-900">
+                            <p className="text-xs font-medium text-gray-500 uppercase">Net Kar (TL)</p>
+                            <p className="text-lg font-bold text-gray-900">
                                 {formatCurrency(reportData.netIncome)}
                             </p>
                         </div>
@@ -284,11 +309,11 @@ export default function ReportsDashboard() {
                     <div className="space-y-4">
                         <div className="flex justify-between items-center">
                             <span className="text-sm text-gray-600">{t('crm.reports.payment.paid')}</span>
-                            <span className="font-semibold text-green-600">{reportData.paidTransfers}</span>
+                            <span className="font-semibold text-green-600">{reportData.paidItems}</span>
                         </div>
                         <div className="flex justify-between items-center">
                             <span className="text-sm text-gray-600">{t('crm.reports.payment.unpaid')}</span>
-                            <span className="font-semibold text-red-600">{reportData.unpaidTransfers}</span>
+                            <span className="font-semibold text-red-600">{reportData.unpaidItems}</span>
                         </div>
                         <div className="flex justify-between items-center">
                             <span className="text-sm text-gray-600">{t('crm.reports.payment.driverPayments')}</span>
@@ -312,6 +337,10 @@ export default function ReportsDashboard() {
                         <div className="flex justify-between items-center">
                             <span className="text-sm text-gray-600">{t('crm.reports.types.transfer')}</span>
                             <span className="font-semibold text-purple-600">{reportData.transfersByType.transfer}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Tur</span>
+                            <span className="font-semibold text-indigo-600">{reportData.transfersByType.tour}</span>
                         </div>
                     </div>
                 </div>
@@ -354,8 +383,8 @@ export default function ReportsDashboard() {
                         <p className="text-sm text-gray-600">{t('crm.reports.usdRate.subtitle')}</p>
                     </div>
                     <div className="text-right">
-                        <p className="text-2xl font-bold text-gray-900">
-                            {t('crm.reports.usdRate.unit').replace('{rate}', reportData.usdRate.toFixed(2))}
+                        <p className="text-lg font-bold text-gray-900">
+                            USD: {reportData.usdRate.toFixed(2)} ₺ / EUR: {reportData.eurRate.toFixed(2)} ₺
                         </p>
                     </div>
                 </div>

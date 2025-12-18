@@ -30,7 +30,7 @@ interface Reservation {
 interface Customer {
   phoneNumber: string;
   totalReservations: number;
-  totalSpent: number;
+  currencyTotals?: Record<string, number>;
   lastReservation: string;
   reservations: Reservation[];
   customerName?: string;
@@ -72,31 +72,37 @@ export default function CustomerDetailPage() {
 
       // Bu telefon numarasına sahip rezervasyonları filtrele
       // URL'den gelen + işareti bazen boşluk olarak gelebilir, düzeltiyoruz.
-      const normalizedPhone = decodeURIComponent(phoneNumber).replace(/ /g, '+');
+      // Ayrıca gizli unicode karakterlerini (LTR embedding vb) temizliyoruz.
+      const normalize = (val: string) => val.replace(/[\u202A\u202B\u202C\u202D\u202E\u200B\u200C\u200D\u200E\u200F]/g, '').replace(/ /g, '+').trim();
+      const normalizedPhone = normalize(decodeURIComponent(phoneNumber));
 
       const customerReservations = reservations.filter((reservation: any) => {
         if (!reservation.phoneNumber) return false;
-        const resPhone = reservation.phoneNumber.replace(/ /g, '+');
+        const resPhone = normalize(reservation.phoneNumber);
         return resPhone === normalizedPhone ||
           resPhone === normalizedPhone.replace('+', '') ||
           resPhone.replace('+', '') === normalizedPhone;
       });
 
       if (customerReservations.length === 0) {
-        console.warn('Customer not found for phone:', normalizedPhone, 'Available phones:', Array.from(new Set(reservations.map((r: any) => r.phoneNumber))));
         setError('Müşteri bulunamadı');
         return;
       }
 
-      // Müşteri bilgilerini hesapla
-      const totalSpent = customerReservations.reduce((sum: number, r: any) => sum + r.price, 0);
+      // Müşteri bilgilerini hesapla - Para birimine göre gruplayarak
+      const currencyTotals: Record<string, number> = {};
+      customerReservations.forEach((r: any) => {
+        const curr = r.currency || 'USD';
+        currencyTotals[curr] = (currencyTotals[curr] || 0) + r.price;
+      });
+
       const lastReservation = customerReservations
         .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
 
-      const customerData: Customer = {
-        phoneNumber,
+      const customerData: Customer = { // Changed type to Customer
+        phoneNumber: normalizedPhone, // Use normalizedPhone here
         totalReservations: customerReservations.length,
-        totalSpent,
+        currencyTotals, // Use currencyTotals here
         lastReservation: lastReservation.createdAt,
         reservations: customerReservations.sort((a: any, b: any) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -248,9 +254,18 @@ export default function CustomerDetailPage() {
               <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                 <span className="text-purple-600 text-lg">💰</span>
               </div>
-              <div className="ml-4">
+              <div className="ml-4 overflow-hidden">
                 <p className="text-sm font-medium text-gray-600">Toplam Harcama</p>
-                <p className="text-2xl font-bold text-gray-900">${customer.totalSpent.toFixed(2)}</p>
+                <div className="flex flex-col">
+                  {Object.entries((customer as any).currencyTotals || {}).map(([curr, total]) => (
+                    <p key={curr} className="text-lg font-bold text-gray-900">
+                      {(total as number).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {curr}
+                    </p>
+                  ))}
+                  {Object.keys((customer as any).currencyTotals || {}).length === 0 && (
+                    <p className="text-lg font-bold text-gray-900">0.00</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>

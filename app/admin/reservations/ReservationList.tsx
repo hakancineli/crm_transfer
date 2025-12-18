@@ -100,21 +100,21 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             params.set('page', String(page));
             params.set('pageSize', String(pageSize));
             const url = `/api/reservations?${params.toString()}`;
-            
+
             console.log('Frontend: Rezervasyonlar getiriliyor...', { page, pageSize, url, hasToken: !!token });
-            
+
             const response = await fetch(url, {
                 headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
             });
             const data = await response.json();
-            
+
             console.log('Frontend: API Response:', { status: response.status, dataLength: Array.isArray(data) ? data.length : 'not array', data: data });
-            
+
             // Eğer hata objesi dönerse veya veri dizi değilse, boş dizi kullan
             const sortedData = Array.isArray(data)
                 ? data.map((reservation: any) => ({
                     ...reservation,
-                    passengerNames: typeof reservation.passengerNames === 'string' 
+                    passengerNames: typeof reservation.passengerNames === 'string'
                         ? JSON.parse(reservation.passengerNames || '[]')
                         : reservation.passengerNames || []
                 })).sort((a: Reservation, b: Reservation) => {
@@ -165,7 +165,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                 headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
             });
             const data = await response.json();
-            
+
             if (Array.isArray(data)) {
                 // Tenants are now managed by TenantContext
             }
@@ -177,40 +177,42 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
     // Format phone number with country code detection
     const formatPhoneNumber = (phone: string): string => {
         if (!phone) return '';
-        
-        // Remove all non-digit characters except +
-        const cleanPhone = phone.replace(/[^\d+]/g, '');
-        
+
+        // Remove all non-digit characters except + and strip hidden Unicode marks (LTR/RTL embeddings)
+        const cleanPhone = phone
+            .replace(/[\u202A\u202B\u202C\u202D\u202E\u200B\u200C\u200D\u200E\u200F]/g, '')
+            .replace(/[^\d+]/g, '');
+
         // If already has country code, return as is
         if (cleanPhone.startsWith('+')) {
             return cleanPhone;
         }
-        
+
         // If starts with 0, remove it and add +90 (Turkey)
         if (cleanPhone.startsWith('0')) {
             return `+90${cleanPhone.substring(1)}`;
         }
-        
+
         // If 10 digits (Turkish mobile), add +90
         if (cleanPhone.length === 10) {
             return `+90${cleanPhone}`;
         }
-        
+
         // If 11 digits and starts with 5 (Turkish mobile), add +90
         if (cleanPhone.length === 11 && cleanPhone.startsWith('5')) {
             return `+90${cleanPhone}`;
         }
-        
+
         // Default: assume Turkish number and add +90
-        return `+90${cleanPhone}`;
+        return cleanPhone.length > 5 ? `+90${cleanPhone}` : cleanPhone;
     };
 
     const handleSearch = (query: string) => {
         const lowercaseQuery = query.toLowerCase();
-        
+
         // Tarih formatını kontrol et (YYYY-MM-DD)
         const isDateSearch = /^\d{4}-\d{2}-\d{2}$/.test(query);
-        
+
         const filtered = reservations.filter(reservation => {
             if (isDateSearch) {
                 return reservation.date === query;
@@ -219,28 +221,28 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             // Yolcu isimlerini kontrol et
             let passengerNames: string[] = [];
             try {
-                passengerNames = typeof reservation.passengerNames === 'string' 
+                passengerNames = typeof reservation.passengerNames === 'string'
                     ? JSON.parse(reservation.passengerNames)
                     : reservation.passengerNames;
             } catch (e) {
-                passengerNames = Array.isArray(reservation.passengerNames) 
-                    ? reservation.passengerNames 
+                passengerNames = Array.isArray(reservation.passengerNames)
+                    ? reservation.passengerNames
                     : [];
             }
-            
+
             return reservation.voucherNumber.toLowerCase().includes(lowercaseQuery) ||
                 reservation.from.toLowerCase().includes(lowercaseQuery) ||
                 reservation.to.toLowerCase().includes(lowercaseQuery) ||
-                passengerNames.some(name => 
+                passengerNames.some(name =>
                     name.toLowerCase().includes(lowercaseQuery)
                 );
         });
-        
+
         setFilteredReservations(filtered);
     };
 
     const handleFilter = (filter: string) => {
-        
+
         // API'de zaten kullanıcı filtrelemesi yapıldığı için burada ek filtreleme yapmaya gerek yok
         let filtered = [...reservations];
 
@@ -248,13 +250,13 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
         if (user?.role === 'SUPERUSER' && selectedTenant !== 'all') {
             filtered = filtered.filter(reservation => reservation.tenantId === selectedTenant);
         }
-        
+
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        
+
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
-        
+
         const nextWeek = new Date(today);
         nextWeek.setDate(nextWeek.getDate() + 7);
 
@@ -287,21 +289,21 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                 });
                 break;
             case 'karsilama':
-                filtered = filtered.filter(r => 
+                filtered = filtered.filter(r =>
                     (r.type !== 'tur' && !r.voucherNumber.startsWith('TUR-')) && // Tur rezervasyonlarını hariç tut
                     (r.from.includes('IST') || r.from.includes('SAW'))
                 );
                 break;
             case 'cikis':
-                filtered = filtered.filter(r => 
+                filtered = filtered.filter(r =>
                     (r.type !== 'tur' && !r.voucherNumber.startsWith('TUR-')) && // Tur rezervasyonlarını hariç tut
                     (r.to.includes('IST') || r.to.includes('SAW'))
                 );
                 break;
             case 'araTransfer':
-                filtered = filtered.filter(r => 
+                filtered = filtered.filter(r =>
                     r.type !== 'tur' && !r.voucherNumber.startsWith('TUR-') && // Tur rezervasyonlarını hariç tut
-                    !r.from.includes('IST') && !r.from.includes('SAW') && 
+                    !r.from.includes('IST') && !r.from.includes('SAW') &&
                     !r.to.includes('IST') && !r.to.includes('SAW')
                 );
                 break;
@@ -311,8 +313,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             default:
                 break;
         }
-        
-        console.log('Final filtered count:', filtered.length, 'filtered reservations:', filtered.map(r => ({type: r.type, voucher: r.voucherNumber})));
+
+        console.log('Final filtered count:', filtered.length, 'filtered reservations:', filtered.map(r => ({ type: r.type, voucher: r.voucherNumber })));
         setFilteredReservations(filtered);
         onFilterChange(filter);
     };
@@ -333,18 +335,18 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             }
 
             // Sadece local state'i güncelle, sayfayı yenileme
-            setReservations(prevReservations => 
-                prevReservations.map(reservation => 
-                    reservation.voucherNumber === voucherNumber 
+            setReservations(prevReservations =>
+                prevReservations.map(reservation =>
+                    reservation.voucherNumber === voucherNumber
                         ? { ...reservation, paymentStatus: newStatus }
                         : reservation
                 )
             );
-            
+
             // Filtrelenmiş listeyi de güncelle
-            setFilteredReservations(prevFiltered => 
-                prevFiltered.map(reservation => 
-                    reservation.voucherNumber === voucherNumber 
+            setFilteredReservations(prevFiltered =>
+                prevFiltered.map(reservation =>
+                    reservation.voucherNumber === voucherNumber
                         ? { ...reservation, paymentStatus: newStatus }
                         : reservation
                 )
@@ -374,17 +376,17 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
     }
 
     // Transfer sayılarını hesapla
-    const karsilamaCount = filteredReservations.filter(r => 
-        (r.type !== 'tur' && !r.voucherNumber.startsWith('TUR-')) && 
+    const karsilamaCount = filteredReservations.filter(r =>
+        (r.type !== 'tur' && !r.voucherNumber.startsWith('TUR-')) &&
         (r.from.includes('IST') || r.from.includes('SAW'))
     ).length;
-    const cikisCount = filteredReservations.filter(r => 
-        (r.type !== 'tur' && !r.voucherNumber.startsWith('TUR-')) && 
+    const cikisCount = filteredReservations.filter(r =>
+        (r.type !== 'tur' && !r.voucherNumber.startsWith('TUR-')) &&
         (r.to.includes('IST') || r.to.includes('SAW'))
     ).length;
-    const araTransferCount = filteredReservations.filter(r => 
+    const araTransferCount = filteredReservations.filter(r =>
         r.type !== 'tur' && !r.voucherNumber.startsWith('TUR-') && // Tur rezervasyonlarını hariç tut
-        (!r.from.includes('IST') && !r.from.includes('SAW')) && 
+        (!r.from.includes('IST') && !r.from.includes('SAW')) &&
         (!r.to.includes('IST') && !r.to.includes('SAW'))
     ).length;
     const turCount = filteredReservations.filter(r => r.type === 'tur' || r.voucherNumber.startsWith('TUR-')).length;
@@ -399,53 +401,48 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                     </div>
                     {filteredReservations.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-3">
-        <button 
-            onClick={() => handleFilter('karsilama')}
-            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${
-                activeFilter === 'karsilama' 
-                    ? 'bg-green-600 text-white border-green-600' 
-                    : 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200'
-            }`}
-        >
-            {karsilamaCount} Karşılama
-        </button>
-                            <button 
+                            <button
+                                onClick={() => handleFilter('karsilama')}
+                                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${activeFilter === 'karsilama'
+                                        ? 'bg-green-600 text-white border-green-600'
+                                        : 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200'
+                                    }`}
+                            >
+                                {karsilamaCount} Karşılama
+                            </button>
+                            <button
                                 onClick={() => handleFilter('cikis')}
-                                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${
-                                    activeFilter === 'cikis' 
-                                        ? 'bg-orange-600 text-white border-orange-600' 
+                                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${activeFilter === 'cikis'
+                                        ? 'bg-orange-600 text-white border-orange-600'
                                         : 'bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200'
-                                }`}
+                                    }`}
                             >
                                 {cikisCount} Çıkış
                             </button>
-                            <button 
+                            <button
                                 onClick={() => handleFilter('araTransfer')}
-                                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors whitespace-nowrap ${
-                                    activeFilter === 'araTransfer' 
-                                        ? 'bg-purple-600 text-white border-purple-600' 
+                                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors whitespace-nowrap ${activeFilter === 'araTransfer'
+                                        ? 'bg-purple-600 text-white border-purple-600'
                                         : 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200'
-                                }`}
+                                    }`}
                             >
                                 {araTransferCount} Ara Transfer
                             </button>
-        <button 
-            onClick={() => handleFilter('tur')}
-            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${
-                activeFilter === 'tur' 
-                    ? 'bg-blue-600 text-white border-blue-600' 
-                    : 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200'
-            }`}
-        >
-            {turCount} Tur
-        </button>
-                            <button 
+                            <button
+                                onClick={() => handleFilter('tur')}
+                                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${activeFilter === 'tur'
+                                        ? 'bg-blue-600 text-white border-blue-600'
+                                        : 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200'
+                                    }`}
+                            >
+                                {turCount} Tur
+                            </button>
+                            <button
                                 onClick={() => handleFilter('all')}
-                                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${
-                                    activeFilter === 'all' 
-                                        ? 'bg-green-600 text-white border-green-600' 
+                                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${activeFilter === 'all'
+                                        ? 'bg-green-600 text-white border-green-600'
                                         : 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200'
-                                }`}
+                                    }`}
                             >
                                 Tümü
                             </button>
@@ -490,20 +487,20 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
 
             {/* Arama ve Filtreleme */}
             <div className="mb-6">
-                <SearchAndFilter 
-                    onSearch={handleSearch} 
+                <SearchAndFilter
+                    onSearch={handleSearch}
                     onFilter={handleFilter}
                     pageSizeControl={
                         <div className="flex items-end gap-2">
                             <div>
                                 <label className="block text-xs text-gray-500 mb-1">Sayfa Boyutu</label>
-                                <select value={pageSize} onChange={(e)=>setPageSize(parseInt(e.target.value))} title="Sayfa boyutu" className="px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                <select value={pageSize} onChange={(e) => setPageSize(parseInt(e.target.value))} title="Sayfa boyutu" className="px-3 py-2 border border-gray-300 rounded-md text-sm">
                                     <option value={10}>10</option>
                                     <option value={20}>20</option>
                                     <option value={50}>50</option>
                                 </select>
                             </div>
-                            <button onClick={()=>fetchReservations()} className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">Uygula</button>
+                            <button onClick={() => fetchReservations()} className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">Uygula</button>
                         </div>
                     }
                 />
@@ -601,25 +598,24 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                         : typeof reservation.passengerNames === 'string'
                                             ? JSON.parse(reservation.passengerNames).map((name: string) => formatPassengerName(name))
                                             : [];
-                                    
+
                                     return (
-                                        <tr key={reservation.id} 
+                                        <tr key={reservation.id}
                                             onClick={(e) => {
                                                 if (!(e.target as HTMLElement).closest('button, a, select')) {
                                                     window.location.href = `/admin/reservations/${reservation.voucherNumber}`;
                                                 }
                                             }}
-                                            className={`transition-all duration-200 cursor-pointer ${
-                                                isUrgent
+                                            className={`transition-all duration-200 cursor-pointer ${isUrgent
                                                     ? 'bg-red-50 hover:bg-red-100 border-l-4 border-red-500'
                                                     : isPast
                                                         ? 'bg-gray-100 hover:bg-gray-200'
                                                         : 'hover:bg-gray-50 hover:shadow-sm'
-                                            }`}>
+                                                }`}>
                                             <td className="px-6 py-4 text-sm font-bold align-middle">
                                                 <div className="font-mono text-xs px-2 py-1 rounded border inline-block whitespace-nowrap text-gray-700 bg-gray-100 border-gray-200">
-                                                    {reservation.voucherNumber.startsWith('TUR-') 
-                                                        ? `TUR${new Date(reservation.date).toISOString().slice(2,10).replace(/-/g, '')}-${Math.floor(Math.random() * 9) + 1}`
+                                                    {reservation.voucherNumber.startsWith('TUR-')
+                                                        ? `TUR${new Date(reservation.date).toISOString().slice(2, 10).replace(/-/g, '')}-${Math.floor(Math.random() * 9) + 1}`
                                                         : reservation.voucherNumber
                                                     }
                                                 </div>
@@ -627,22 +623,21 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             <td className="px-6 py-4 text-sm text-gray-900 align-middle">
                                                 <div className="flex flex-col gap-2">
                                                     <div className="flex flex-col gap-1">
-                                                        <span className={`inline-flex items-center justify-center px-4 py-2 rounded-full text-xs font-semibold min-w-[80px] whitespace-nowrap ${
-                                                            reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')
+                                                        <span className={`inline-flex items-center justify-center px-4 py-2 rounded-full text-xs font-semibold min-w-[80px] whitespace-nowrap ${reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')
                                                                 ? 'bg-blue-100 text-blue-800 border border-blue-200'
                                                                 : reservation.type === 'Konaklama' || reservation.voucherNumber.startsWith('HOTEL-')
                                                                     ? 'bg-purple-100 text-purple-800 border border-purple-200'
-                                                                    : reservation.from.includes('IST') || reservation.from.includes('SAW') 
-                                                                        ? 'bg-green-100 text-green-800 border border-green-200' 
+                                                                    : reservation.from.includes('IST') || reservation.from.includes('SAW')
+                                                                        ? 'bg-green-100 text-green-800 border border-green-200'
                                                                         : reservation.to.includes('IST') || reservation.to.includes('SAW')
                                                                             ? 'bg-orange-100 text-orange-800 border border-orange-200'
                                                                             : 'bg-purple-100 text-purple-800 border border-purple-200'
-                                                        }`}>
+                                                            }`}>
                                                             {reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')
                                                                 ? 'Tur'
                                                                 : reservation.type === 'Konaklama' || reservation.voucherNumber.startsWith('HOTEL-')
                                                                     ? 'Konaklama'
-                                                                    : reservation.from.includes('IST') || reservation.from.includes('SAW') 
+                                                                    : reservation.from.includes('IST') || reservation.from.includes('SAW')
                                                                         ? 'Karşılama'
                                                                         : reservation.to.includes('IST') || reservation.to.includes('SAW')
                                                                             ? 'Çıkış'
@@ -684,7 +679,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    
+
                                                     {/* Uçuş Kodu - Ayrı Bir Bölümde */}
                                                     {reservation.flightCode && (
                                                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-2">
@@ -698,13 +693,13 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 align-top">
+                                            <td className="px-6 py-4 text-sm text-gray-900 align-top max-w-[200px]">
                                                 <div className="flex flex-col">
-                                                    <div className="font-medium whitespace-normal break-words leading-tight" title={formattedPassengerNames.join(', ')}>
+                                                    <div className="font-medium line-clamp-2 leading-tight" title={formattedPassengerNames.join(', ')}>
                                                         {formattedPassengerNames.join(', ')}
                                                     </div>
                                                     {reservation.phoneNumber && (
-                                                        <div className="text-xs text-gray-500 mt-1 whitespace-normal break-words" title={formatPhoneNumber(reservation.phoneNumber)}>
+                                                        <div className="text-xs text-gray-500 mt-1 truncate" title={formatPhoneNumber(reservation.phoneNumber)}>
                                                             {formatPhoneNumber(reservation.phoneNumber)}
                                                         </div>
                                                     )}
@@ -713,12 +708,12 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             {user?.role === 'SUPERUSER' && (
                                                 <td className="px-6 py-4 text-sm text-gray-900 align-middle">
                                                     <div className="font-medium text-blue-600">
-                                                        {reservation.tenant?.companyName || 
-                                                         (selectedTenantId ? tenants.find(t => t.id === selectedTenantId)?.companyName : 'Bilinmiyor')}
+                                                        {reservation.tenant?.companyName ||
+                                                            (selectedTenantId ? tenants.find(t => t.id === selectedTenantId)?.companyName : 'Bilinmiyor')}
                                                     </div>
                                                     <div className="text-xs text-gray-500">
-                                                        {reservation.tenant?.subdomain || 
-                                                         (selectedTenantId ? tenants.find(t => t.id === selectedTenantId)?.subdomain : 'N/A')}
+                                                        {reservation.tenant?.subdomain ||
+                                                            (selectedTenantId ? tenants.find(t => t.id === selectedTenantId)?.subdomain : 'N/A')}
                                                     </div>
                                                 </td>
                                             )}
@@ -752,13 +747,12 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             </td>
                                             <td className="px-6 py-4 text-sm align-middle">
                                                 <div className="flex items-center gap-2">
-                                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                                                        reservation.paymentStatus === 'PAID' ? 'bg-green-100 text-green-800 border border-green-200' :
-                                                        reservation.paymentStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' :
-                                                        'bg-red-100 text-red-800 border border-red-200'
-                                                    }` }>
+                                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${reservation.paymentStatus === 'PAID' ? 'bg-green-100 text-green-800 border border-green-200' :
+                                                            reservation.paymentStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' :
+                                                                'bg-red-100 text-red-800 border border-red-200'
+                                                        }`}>
                                                         {reservation.paymentStatus === 'PAID' ? 'Ödendi' :
-                                                         reservation.paymentStatus === 'PENDING' ? 'Bekliyor' : 'Ödenmedi'}
+                                                            reservation.paymentStatus === 'PENDING' ? 'Bekliyor' : 'Ödenmedi'}
                                                     </span>
                                                     {reservation.paymentStatus === 'PENDING' ? (
                                                         <div className="flex items-center gap-1">
@@ -817,7 +811,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                             >
                                                                 🔄
                                                             </button>
-                                                            <Link 
+                                                            <Link
                                                                 href={reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')
                                                                     ? `/admin/tour/reservations/${reservation.id}/driver-voucher`
                                                                     : `/admin/reservations/${reservation.voucherNumber}/driver-voucher`
@@ -827,7 +821,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                             >
                                                                 👨‍✈️
                                                             </Link>
-                                                            <Link 
+                                                            <Link
                                                                 href={reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')
                                                                     ? `/admin/tour/reservations/${reservation.id}/customer-voucher`
                                                                     : `/admin/reservations/${reservation.voucherNumber}/customer-voucher`
@@ -837,7 +831,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                             >
                                                                 🎫
                                                             </Link>
-                                                            <Link 
+                                                            <Link
                                                                 href={`/admin/reservations/${reservation.voucherNumber}/edit`}
                                                                 className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
                                                                 title="Rezervasyonu Düzenle"
@@ -854,7 +848,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                             >
                                                                 🔄
                                                             </button>
-                                                            <Link 
+                                                            <Link
                                                                 href={reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')
                                                                     ? `/admin/tour/reservations/${reservation.id}/driver-voucher`
                                                                     : `/admin/reservations/${reservation.voucherNumber}/driver-voucher`
@@ -864,7 +858,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                             >
                                                                 👨‍✈️
                                                             </Link>
-                                                            <Link 
+                                                            <Link
                                                                 href={reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')
                                                                     ? `/admin/tour/reservations/${reservation.id}/customer-voucher`
                                                                     : `/admin/reservations/${reservation.voucherNumber}/customer-voucher`
@@ -874,7 +868,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                             >
                                                                 🎫
                                                             </Link>
-                                                            <Link 
+                                                            <Link
                                                                 href={`/admin/reservations/${reservation.voucherNumber}/edit`}
                                                                 className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
                                                                 title="Rezervasyonu Düzenle"
@@ -921,18 +915,17 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                             : typeof reservation.passengerNames === 'string'
                                 ? JSON.parse(reservation.passengerNames).map((name: string) => formatPassengerName(name))
                                 : [];
-                        
+
                         return (
-                            <div 
+                            <div
                                 key={reservation.id}
                                 onClick={(e) => {
                                     if (!(e.target as HTMLElement).closest('button, a')) {
                                         window.location.href = `/admin/reservations/${reservation.voucherNumber}`;
                                     }
                                 }}
-                                className={`bg-white rounded-lg shadow-sm border p-4 cursor-pointer transition-colors duration-150 ${
-                                    isUrgent ? 'border-red-200 bg-red-50' : 'border-gray-200 hover:bg-gray-50'
-                                }`}
+                                className={`bg-white rounded-lg shadow-sm border p-4 cursor-pointer transition-colors duration-150 ${isUrgent ? 'border-red-200 bg-red-50' : 'border-gray-200 hover:bg-gray-50'
+                                    }`}
                             >
                                 {/* Header */}
                                 <div className="flex justify-between items-start mb-3">
@@ -941,14 +934,13 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             <span className="text-sm font-medium text-blue-600">
                                                 {reservation.voucherNumber}
                                             </span>
-                                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-                                                reservation.from.includes('IST') || reservation.from.includes('SAW') 
-                                                    ? 'bg-blue-100 text-blue-800' 
+                                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${reservation.from.includes('IST') || reservation.from.includes('SAW')
+                                                    ? 'bg-blue-100 text-blue-800'
                                                     : reservation.to.includes('IST') || reservation.to.includes('SAW')
                                                         ? 'bg-orange-100 text-orange-800'
                                                         : 'bg-purple-100 text-purple-800'
-                                            }`}>
-                                                {reservation.from.includes('IST') || reservation.from.includes('SAW') 
+                                                }`}>
+                                                {reservation.from.includes('IST') || reservation.from.includes('SAW')
                                                     ? 'Karşılama'
                                                     : reservation.to.includes('IST') || reservation.to.includes('SAW')
                                                         ? 'Çıkış'
@@ -999,12 +991,12 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                     <div className="mb-3">
                                         <div className="text-sm text-gray-600 mb-1">Acente:</div>
                                         <div className="text-sm font-medium text-blue-600">
-                                            {reservation.tenant?.companyName || 
-                                             (selectedTenantId ? tenants.find(t => t.id === selectedTenantId)?.companyName : 'Bilinmiyor')}
+                                            {reservation.tenant?.companyName ||
+                                                (selectedTenantId ? tenants.find(t => t.id === selectedTenantId)?.companyName : 'Bilinmiyor')}
                                         </div>
                                         <div className="text-xs text-gray-500">
-                                            {reservation.tenant?.subdomain || 
-                                             (selectedTenantId ? tenants.find(t => t.id === selectedTenantId)?.subdomain : 'N/A')}
+                                            {reservation.tenant?.subdomain ||
+                                                (selectedTenantId ? tenants.find(t => t.id === selectedTenantId)?.subdomain : 'N/A')}
                                         </div>
                                     </div>
                                 )}
@@ -1023,9 +1015,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                         )}
                                     </div>
                                     <div className="text-right">
-                                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                            reservation.driver ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                                        }`}>
+                                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${reservation.driver ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                            }`}>
                                             {reservation.driver ? 'Atandı' : 'Bekliyor'}
                                         </span>
                                     </div>
@@ -1035,13 +1026,12 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 <div className="flex justify-between items-center mb-3">
                                     <div>
                                         <div className="text-sm text-gray-600 mb-1">Ödeme:</div>
-                                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                            reservation.paymentStatus === 'PAID' ? 'bg-green-100 text-green-800' :
-                                            reservation.paymentStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                                            'bg-red-100 text-red-800'
-                                        }`}>
+                                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${reservation.paymentStatus === 'PAID' ? 'bg-green-100 text-green-800' :
+                                                reservation.paymentStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                                                    'bg-red-100 text-red-800'
+                                            }`}>
                                             {reservation.paymentStatus === 'PAID' ? 'Ödendi' :
-                                             reservation.paymentStatus === 'PENDING' ? 'Bekliyor' : 'Ödenmedi'}
+                                                reservation.paymentStatus === 'PENDING' ? 'Bekliyor' : 'Ödenmedi'}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-1">
@@ -1086,10 +1076,10 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                         <>
                                             <button
                                                 onClick={() => {
-                                                    console.log('Şoför Ata butonuna tıklandı:', { 
-                                                        type: reservation.type, 
-                                                        voucherNumber: reservation.voucherNumber, 
-                                                        id: reservation.id 
+                                                    console.log('Şoför Ata butonuna tıklandı:', {
+                                                        type: reservation.type,
+                                                        voucherNumber: reservation.voucherNumber,
+                                                        id: reservation.id
                                                     });
                                                     if (reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')) {
                                                         console.log('Tur rezervasyonu - yönlendiriliyor:', `/admin/tour/reservations/${reservation.id}/driver-assign`);
@@ -1109,8 +1099,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             >
                                                 🔄 Dönüş
                                             </button>
-                                            <Link 
-                                                href={reservation.type === 'Tur' 
+                                            <Link
+                                                href={reservation.type === 'Tur'
                                                     ? `/admin/tour/reservations/${reservation.id}/customer-voucher`
                                                     : `/admin/reservations/${reservation.voucherNumber}/customer-voucher`
                                                 }
@@ -1118,7 +1108,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             >
                                                 Müşteri
                                             </Link>
-                                            <Link 
+                                            <Link
                                                 href={`/admin/reservations/${reservation.voucherNumber}/edit`}
                                                 className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
                                             >
@@ -1133,8 +1123,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             >
                                                 🔄 Dönüş
                                             </button>
-                                            <Link 
-                                                href={reservation.type === 'Tur' 
+                                            <Link
+                                                href={reservation.type === 'Tur'
                                                     ? `/admin/tour/reservations/${reservation.id}/driver-voucher`
                                                     : `/admin/reservations/${reservation.voucherNumber}/driver-voucher`
                                                 }
@@ -1142,8 +1132,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             >
                                                 Şoför
                                             </Link>
-                                            <Link 
-                                                href={reservation.type === 'Tur' 
+                                            <Link
+                                                href={reservation.type === 'Tur'
                                                     ? `/admin/tour/reservations/${reservation.id}/customer-voucher`
                                                     : `/admin/reservations/${reservation.voucherNumber}/customer-voucher`
                                                 }
@@ -1151,7 +1141,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             >
                                                 Müşteri
                                             </Link>
-                                            <Link 
+                                            <Link
                                                 href={`/admin/reservations/${reservation.voucherNumber}/edit`}
                                                 className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
                                             >
@@ -1168,13 +1158,13 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             {/* Sayfalama Kontrolleri */}
             <div className="mt-6 flex items-center justify-between">
                 <button
-                    onClick={() => { if (page > 1) { setPage(page-1); fetchReservations(); } }}
+                    onClick={() => { if (page > 1) { setPage(page - 1); fetchReservations(); } }}
                     className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50 disabled:opacity-50"
                     disabled={page === 1}
                 >Önceki</button>
                 <div className="text-sm text-gray-600">Sayfa {page}</div>
                 <button
-                    onClick={() => { setPage(page+1); fetchReservations(); }}
+                    onClick={() => { setPage(page + 1); fetchReservations(); }}
                     className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50"
                 >Sonraki</button>
             </div>
