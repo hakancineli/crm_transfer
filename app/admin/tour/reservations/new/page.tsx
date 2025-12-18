@@ -254,7 +254,8 @@ export default function NewTourReservationPage() {
       return {
         ...prev,
         selectedSeats: newSeats,
-        groupSize: newSeats.length > 0 ? newSeats.length : 1,
+        // Only increase groupSize if selected seats exceed current size
+        groupSize: newSeats.length > prev.groupSize ? newSeats.length : prev.groupSize,
         seatNumber: newSeats.join(', '), // Comma separated for legacy field
         passengerDetails: newPassengerDetails,
         // Update legacy passengerNames array for backward compatibility if needed
@@ -263,7 +264,7 @@ export default function NewTourReservationPage() {
     });
   };
 
-  const handlePassengerDetailChange = (index: number, field: 'name' | 'surname' | 'id', value: string) => {
+  const handlePassengerDetailChange = (index: number, field: string, value: string | number) => {
     setFormData(prev => {
       const updated = [...prev.passengerDetails];
       updated[index] = { ...updated[index], [field]: value };
@@ -564,12 +565,11 @@ export default function NewTourReservationPage() {
                   type="number"
                   name="groupSize"
                   value={formData.groupSize}
-                  onChange={handleInputChange} // This will now be largely driven by selectedSeats.length
+                  onChange={(e) => setFormData(prev => ({ ...prev, groupSize: parseInt(e.target.value) || 1 }))}
                   min="1"
                   max="16"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
-                  readOnly // Make it read-only as it's derived from seat selection
                 />
               </div>
 
@@ -612,11 +612,10 @@ export default function NewTourReservationPage() {
                     type="number"
                     name="groupSize"
                     value={formData.groupSize}
-                    onChange={handleInputChange} // This will now be largely driven by selectedSeats.length
+                    onChange={(e) => setFormData(prev => ({ ...prev, groupSize: parseInt(e.target.value) || 1 }))}
                     min="1"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
-                    readOnly // Make it read-only as it's derived from seat selection
                   />
                 </div>
                 <div>
@@ -648,14 +647,18 @@ export default function NewTourReservationPage() {
             {/* Passenger List by Seat */}
             {formData.selectedSeats.length > 0 && (
               <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <h3 className="text-md font-semibold text-blue-900 mb-3">Yolcu & Koltuk Eşleşmesi</h3>
+                <h3 className="text-md font-semibold text-blue-900 mb-3">Yolcu & Koltuk Eşleşmesi ve Ödeme Durumu</h3>
                 <div className="space-y-3">
                   {formData.passengerDetails.map((passenger, index) => (
-                    <div key={passenger.seatNumber} className="flex gap-3 items-center bg-white p-2 rounded border border-blue-100">
-                      <div className="w-12 h-12 flex items-center justify-center bg-blue-100 text-blue-800 font-bold rounded-full border-2 border-white shadow-sm flex-shrink-0">
-                        {passenger.seatNumber}
+                    <div key={passenger.seatNumber} className="flex flex-col sm:flex-row gap-3 items-start sm:items-center bg-white p-3 rounded border border-blue-100 shadow-sm">
+                      <div className="flex items-center gap-3 w-full sm:w-auto">
+                        <div className="w-10 h-10 flex items-center justify-center bg-blue-100 text-blue-800 font-bold rounded-full border-2 border-white shadow-sm flex-shrink-0">
+                          {passenger.seatNumber}
+                        </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-2 flex-grow">
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 flex-grow w-full">
+                        {/* Ad */}
                         <div>
                           <label className="text-xs text-gray-500 block mb-1">Ad</label>
                           <input
@@ -667,6 +670,7 @@ export default function NewTourReservationPage() {
                             required
                           />
                         </div>
+                        {/* Soyad */}
                         <div>
                           <label className="text-xs text-gray-500 block mb-1">Soyad</label>
                           <input
@@ -678,11 +682,35 @@ export default function NewTourReservationPage() {
                             required
                           />
                         </div>
+                        {/* Ödeme Durumu */}
+                        <div>
+                          <label className="text-xs text-gray-500 block mb-1">Ödeme Durumu</label>
+                          <select
+                            value={(passenger as any).paymentStatus || 'PENDING'}
+                            onChange={(e) => handlePassengerDetailChange(index, 'paymentStatus', e.target.value)}
+                            className="w-full text-sm border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                          >
+                            <option value="PENDING">Bekliyor</option>
+                            <option value="PAID">Ödendi</option>
+                          </select>
+                        </div>
+                        {/* Tutar */}
+                        <div>
+                          <label className="text-xs text-gray-500 block mb-1">Ödenen Tutar</label>
+                          <input
+                            type="number"
+                            value={(passenger as any).amount || 0}
+                            onChange={(e) => handlePassengerDetailChange(index, 'amount', Number(e.target.value))}
+                            placeholder="0.00"
+                            className="w-full text-sm border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
+
             )}
 
             {formData.selectedSeats.length === 0 && (
@@ -749,33 +777,38 @@ export default function NewTourReservationPage() {
 
               {formData.paymentStatus !== 'PAID' && (
                 <div className="mt-4 bg-yellow-50 p-4 rounded-md border border-yellow-200">
-                  <h4 className="text-sm font-medium text-yellow-800 mb-3">🔔 Ödeme Hatırlatıcı</h4>
-                  <div className="grid grid-cols-2 gap-4">
+                  <h4 className="text-sm font-medium text-yellow-800 mb-2 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    Ödeme Hatırlatıcı
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Hatırlatma Tarihi</label>
+                      <label className="block text-xs text-yellow-700 mb-1">Hatırlatma Tarihi</label>
                       <input
                         type="date"
                         name="paymentReminderDate"
                         value={formData.paymentReminderDate}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                        className="w-full px-3 py-2 border border-yellow-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500"
+                        min={today}
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Hatırlatma Saati</label>
+                      <label className="block text-xs text-yellow-700 mb-1">Hatırlatma Saati</label>
                       <input
                         type="time"
                         name="paymentReminderTime"
                         value={formData.paymentReminderTime}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                        className="w-full px-3 py-2 border border-yellow-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500"
                       />
                     </div>
                   </div>
                 </div>
               )}
             </div>
-
           </div>
 
           {/* Submit Button */}
@@ -795,8 +828,7 @@ export default function NewTourReservationPage() {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
-
