@@ -142,11 +142,11 @@ export async function POST(request: NextRequest) {
     }
 
 
-    // CRM Enforcement: Handle Customer Creation if not provided
+    // CRM Enforcement: Handle Customer Creation for all passengers
     let finalCustomerId = body.customerId;
 
+    // Handle the main booking customer first
     if (!finalCustomerId && newCustomerName && newCustomerPhone) {
-      // Check if customer exists by phone
       const existingCustomer = await prisma.customer.findFirst({
         where: { phone: newCustomerPhone, tenantId: tenantId }
       });
@@ -154,20 +154,46 @@ export async function POST(request: NextRequest) {
       if (existingCustomer) {
         finalCustomerId = existingCustomer.id;
       } else {
-        // Create new customer
         const newCustomer = await prisma.customer.create({
           data: {
             tenantId,
             name: newCustomerName,
             surname: newCustomerSurname || '',
             phone: newCustomerPhone,
-            passportNumber: '', // Optional or add input
+            passportNumber: '',
             email: '',
             nationality: '',
             source: 'booking_auto_create'
           }
         });
         finalCustomerId = newCustomer.id;
+      }
+    }
+
+    // Now handle other passengers as customers if they have names and surnames
+    if (body.passengerDetails && Array.isArray(body.passengerDetails)) {
+      for (const p of body.passengerDetails) {
+        if (p.name && p.surname) {
+          // Check if this passenger already exists (by name and surname as phone might be missing)
+          const existing = await prisma.customer.findFirst({
+            where: {
+              name: p.name,
+              surname: p.surname,
+              tenantId
+            }
+          });
+
+          if (!existing) {
+            await prisma.customer.create({
+              data: {
+                tenantId,
+                name: p.name,
+                surname: p.surname,
+                source: 'passenger_auto_create'
+              }
+            });
+          }
+        }
       }
     }
 

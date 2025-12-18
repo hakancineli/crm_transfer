@@ -5,12 +5,12 @@ import { useState, useEffect } from 'react';
 interface SeatMapProps {
     capacity: number;
     occupiedSeats: string[]; // Array of seat numbers
-    selectedSeat: string | null;
+    selectedSeats: string[]; // Array of seat numbers
     onSelect: (seatNumber: string) => void;
     vehicleType?: string;
 }
 
-export default function SeatMap({ capacity, occupiedSeats, selectedSeat, onSelect, vehicleType }: SeatMapProps) {
+export default function SeatMap({ capacity, occupiedSeats, selectedSeats, onSelect, vehicleType }: SeatMapProps) {
     // Generate seat layout based on capacity
     // This is a simplified layout generator. 
     // For a real bus, we might need specific templates (e.g., 2+1, 2+2).
@@ -19,7 +19,7 @@ export default function SeatMap({ capacity, occupiedSeats, selectedSeat, onSelec
     const renderSeat = (seatNum: number) => {
         const seatStr = seatNum.toString();
         const isOccupied = occupiedSeats.includes(seatStr);
-        const isSelected = selectedSeat === seatStr;
+        const isSelected = selectedSeats.includes(seatStr);
 
         let seatColor = "stroke-gray-400 fill-white text-gray-700 hover:fill-blue-50";
         if (isOccupied) seatColor = "stroke-red-400 fill-red-100 text-red-500 cursor-not-allowed";
@@ -114,22 +114,6 @@ export default function SeatMap({ capacity, occupiedSeats, selectedSeat, onSelec
                 {/* Seats Container */}
                 <div className="flex flex-col gap-2">
                     {seatGrid}
-                </div>
-
-                {/* Legend */}
-                <div className="mt-6 flex gap-4 text-xs justify-center border-t border-gray-100 pt-4">
-                    <div className="flex items-center gap-1">
-                        <div className="w-4 h-4 rounded border border-gray-400 bg-white"></div>
-                        <span>Boş</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                        <div className="w-4 h-4 rounded bg-blue-600"></div>
-                        <span>Seçili</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                        <div className="w-4 h-4 rounded border border-red-300 bg-red-100"></div>
-                        <span>Dolu</span>
-                    </div>
                 </div>
             </div>
         );

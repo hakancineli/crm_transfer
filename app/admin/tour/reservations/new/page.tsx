@@ -517,24 +517,6 @@ export default function NewTourReservationPage() {
                 </select>
               </div>
 
-              {/* Özel Rota Adı - Sadece "Özel Rota" seçildiğinde görünür */}
-              {formData.routeId === 'custom' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Özel Rota Adı *
-                  </label>
-                  <input
-                    type="text"
-                    name="customRouteName"
-                    value={formData.customRouteName}
-                    onChange={handleInputChange}
-                    placeholder="Özel rota adı girin"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required={formData.routeId === 'custom'}
-                  />
-                </div>
-              )}
-
               {/* Araç Tipi */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -556,6 +538,35 @@ export default function NewTourReservationPage() {
                 </select>
               </div>
 
+              {/* Tur Tarihi & Saati */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tur Tarihi *
+                </label>
+                <input
+                  type="date"
+                  name="tourDate"
+                  value={formData.tourDate}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tur Saati *
+                </label>
+                <input
+                  type="time"
+                  name="tourTime"
+                  value={formData.tourTime}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  required
+                />
+              </div>
+
               {/* Kişi Sayısı */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -567,7 +578,6 @@ export default function NewTourReservationPage() {
                   value={formData.groupSize}
                   onChange={(e) => setFormData(prev => ({ ...prev, groupSize: parseInt(e.target.value) || 1 }))}
                   min="1"
-                  max="16"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
@@ -602,37 +612,50 @@ export default function NewTourReservationPage() {
                 </div>
               </div>
 
-              {/* Araç Tipi ve Kişi Sayısı */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Kişi Sayısı *
-                  </label>
-                  <input
-                    type="number"
-                    name="groupSize"
-                    value={formData.groupSize}
-                    onChange={(e) => setFormData(prev => ({ ...prev, groupSize: parseInt(e.target.value) || 1 }))}
-                    min="1"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Alınacak Yer
-                  </label>
-                  <input
-                    type="text"
-                    name="pickupLocation"
-                    value={formData.pickupLocation}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    placeholder="Otel adı veya adres..."
-                  />
-                </div>
+              {/* Alınacak Yer */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Alınacak Yer
+                </label>
+                <input
+                  type="text"
+                  name="pickupLocation"
+                  value={formData.pickupLocation}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  placeholder="Otel adı veya adres..."
+                />
               </div>
             </div>
+
+            {/* Seat selection map */}
+            {formData.vehicleType && (
+              <div className="mt-8 pt-8 border-t border-gray-200">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Oturma Planı</h3>
+                <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 overflow-x-auto">
+                  <SeatMap
+                    capacity={VEHICLE_TYPES.find(v => v.id === formData.vehicleType)?.capacity || 16}
+                    selectedSeats={formData.selectedSeats}
+                    onSelect={handleSeatSelect}
+                    occupiedSeats={occupiedSeats}
+                  />
+                </div>
+                <div className="mt-4 flex gap-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-4 h-4 bg-white border border-gray-400 rounded-sm"></div>
+                    <span>Müsait</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-4 h-4 bg-blue-600 rounded-sm"></div>
+                    <span>Seçili</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-4 h-4 bg-red-100 border border-red-400 rounded-sm"></div>
+                    <span>Dolu</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Yolcu Bilgileri */}
