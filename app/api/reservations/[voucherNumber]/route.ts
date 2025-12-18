@@ -120,7 +120,7 @@ export async function PUT(request: NextRequest, { params }: { params: { voucherN
     }) as any;
 
     let isTour = false;
-    let existingTourBooking = null;
+    let existingTourBooking: any = null;
 
     if (!existingReservation && voucherNumber.startsWith('TUR-')) {
       existingTourBooking = (await prisma.tourBooking.findUnique({
