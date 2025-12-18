@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
         status: 'PENDING',
         source: role === 'SUPERUSER' ? 'admin' : 'agency',
         // New CRM and Payment fields
-        source: role === 'SUPERUSER' ? 'admin' : 'agency',
+
         customerId: finalCustomerId,
         paymentStatus: body.paymentStatus || 'PENDING',
         paymentMethod: body.paymentMethod || 'CASH',
