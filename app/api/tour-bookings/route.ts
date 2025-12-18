@@ -122,23 +122,19 @@ export async function POST(request: NextRequest) {
     const voucherNumber = `TUR-${Date.now()}`;
 
     // Rota adını belirle
-    let routeName = 'Özel Tur';
-    if (routeId === 'custom' && customRouteName) {
-      routeName = customRouteName;
-    } else if (routeId !== 'custom') {
-      // Önceden tanımlı rotalar için rota adını bul
-      const predefinedRoutes = [
-        { id: 'istanbul-city', name: 'İstanbul Şehir Turu' },
-        { id: 'cappadocia', name: 'Kapadokya Turu' },
-        { id: 'trabzon', name: 'Trabzon Turu' },
-        { id: 'sapanca', name: 'Sapanca Turu' },
-        { id: 'abant', name: 'Abant Turu' },
-        { id: 'bursa', name: 'Bursa Turu' },
-      ];
-      const route = predefinedRoutes.find(r => r.id === routeId);
-      if (route) {
-        routeName = route.name;
+    let finalRouteName = body.routeName || 'Özel Tur';
+
+    if (routeId && routeId !== 'custom') {
+      // Eğer rota ID'si varsa veritabanından rota adını çekmeyi dene
+      const dbRoute = await prisma.tourRoute.findUnique({
+        where: { id: routeId },
+        select: { name: true }
+      });
+      if (dbRoute) {
+        finalRouteName = dbRoute.name;
       }
+    } else if (routeId === 'custom' && customRouteName) {
+      finalRouteName = customRouteName;
     }
 
 
@@ -228,7 +224,7 @@ export async function POST(request: NextRequest) {
       data: {
         tenantId,
         voucherNumber,
-        routeName: customRouteName || (routeId === 'custom' ? 'Özel Rota' : routeName) || 'Tur',
+        routeName: finalRouteName,
         passengerNames: Array.isArray(passengerNames) ? passengerNames.join(', ') : String(passengerNames || ''),
         price: numericPrice,
         currency,

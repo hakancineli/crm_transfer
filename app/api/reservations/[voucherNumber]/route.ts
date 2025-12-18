@@ -113,11 +113,28 @@ export async function PUT(request: NextRequest, { params }: { params: { voucherN
     }
 
     const data = await request.json();
-    
+
     // Önce rezervasyonun mevcut olduğunu kontrol et
-    const existingReservation = await prisma.reservation.findUnique({
+    let existingReservation = await prisma.reservation.findUnique({
       where: { voucherNumber }
-    });
+    }) as any;
+
+    let isTour = false;
+    let existingTourBooking = null;
+
+    if (!existingReservation && voucherNumber.startsWith('TUR-')) {
+      existingTourBooking = (await prisma.tourBooking.findUnique({
+        where: { voucherNumber }
+      })) as any;
+      if (existingTourBooking) {
+        isTour = true;
+        // Map to a common interface for auth check or handling
+        existingReservation = {
+          ...existingTourBooking,
+          type: 'tur'
+        };
+      }
+    }
 
     if (!existingReservation) {
       return NextResponse.json(
@@ -128,26 +145,58 @@ export async function PUT(request: NextRequest, { params }: { params: { voucherN
 
     // Eğer sadece ödeme durumu güncelleniyorsa
     if (data.paymentStatus && Object.keys(data).length === 1) {
-      const updatedReservation = await prisma.reservation.update({
-        where: { voucherNumber },
-        data: {
-          paymentStatus: data.paymentStatus
-        },
-        include: { driver: true }
-      });
+      if (isTour) {
+        // Tour Booking Specific Payment Sync
+        const newStatus = data.paymentStatus;
+        const price = existingTourBooking.price;
+        const paidAmount = newStatus === 'PAID' ? price : (newStatus === 'UNPAID' ? 0 : existingTourBooking.paidAmount);
+        const remainingAmount = price - paidAmount;
+        const status = newStatus === 'PAID' ? 'CONFIRMED' : existingTourBooking.status;
 
-      try {
-        const parsedNames = JSON.parse(updatedReservation.passengerNames || '[]');
-        return NextResponse.json({
-          ...updatedReservation,
-          passengerNames: parsedNames
+        // Sync passengerDetails JSON if it exists
+        let passengerDetails = existingTourBooking.passengerDetails;
+        if (passengerDetails && Array.isArray(passengerDetails)) {
+          passengerDetails = passengerDetails.map((p: any) => ({
+            ...p,
+            paymentStatus: newStatus === 'PAID' ? 'PAID' : (newStatus === 'UNPAID' ? 'PENDING' : p.paymentStatus),
+            amount: newStatus === 'PAID' ? (price / (existingTourBooking.groupSize || 1)) : (newStatus === 'UNPAID' ? 0 : p.amount)
+          }));
+        }
+
+        const updatedTour = await prisma.tourBooking.update({
+          where: { voucherNumber },
+          data: {
+            paymentStatus: newStatus,
+            paidAmount,
+            remainingAmount,
+            status,
+            passengerDetails: passengerDetails || undefined
+          }
         });
-      } catch (e) {
-        console.error('Yolcu isimleri parse edilemedi:', e);
-        return NextResponse.json({
-          ...updatedReservation,
-          passengerNames: []
+
+        return NextResponse.json(updatedTour);
+      } else {
+        const updatedReservation = await prisma.reservation.update({
+          where: { voucherNumber },
+          data: {
+            paymentStatus: data.paymentStatus
+          },
+          include: { driver: true }
         });
+
+        try {
+          const parsedNames = JSON.parse(updatedReservation.passengerNames || '[]');
+          return NextResponse.json({
+            ...updatedReservation,
+            passengerNames: parsedNames
+          });
+        } catch (e) {
+          console.error('Yolcu isimleri parse edilemedi:', e);
+          return NextResponse.json({
+            ...updatedReservation,
+            passengerNames: []
+          });
+        }
       }
     }
 
@@ -229,7 +278,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { vouche
     }
 
     const data = await request.json();
-    
+
     // Şoför atama için gerekli alanları kontrol et
     if (!data.driverId || data.driverFee === undefined) {
       return NextResponse.json(
@@ -257,7 +306,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { vouche
         driverId: data.driverId,
         driverFee: parseFloat(data.driverFee)
       },
-      include: { 
+      include: {
         driver: true,
         tenant: {
           select: {
@@ -327,8 +376,8 @@ export async function PATCH(request: NextRequest, { params }: { params: { vouche
             );
 
             // Yolcuları ekle
-            const passengerNames = Array.isArray(updatedReservation.passengerNames) 
-              ? updatedReservation.passengerNames 
+            const passengerNames = Array.isArray(updatedReservation.passengerNames)
+              ? updatedReservation.passengerNames
               : JSON.parse(updatedReservation.passengerNames || '[]');
 
             for (const passengerName of passengerNames) {
