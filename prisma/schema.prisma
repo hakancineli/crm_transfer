@@ -731,6 +731,7 @@ model WhatsAppChat {
   lastMsg   String?
   lastMsgAt DateTime?
   unread    Int               @default(0)
+  archived  Boolean           @default(false)
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
   session   WhatsAppSession   @relation(fields: [userId], references: [userId])

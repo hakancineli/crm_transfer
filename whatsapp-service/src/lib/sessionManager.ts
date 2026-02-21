@@ -50,7 +50,7 @@ import { downloadMediaMessage } from '@whiskeysockets/baileys';
 async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, tenantId: string) {
     try {
         const chatId = message.key.remoteJid;
-        if (!chatId || chatId.includes('@g.us')) return;
+        if (!chatId) return;
 
         const fromMe = message.key.fromMe || false;
 
@@ -112,7 +112,7 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
         }
 
         // Upsert chat
-        const phone = chatId.replace('@s.whatsapp.net', '');
+        const phone = chatId.replace('@s.whatsapp.net', '').replace('@g.us', '');
         const pushName = (message as any).pushName || '';
 
         const chat = await prisma.whatsAppChat.upsert({
@@ -164,6 +164,35 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
         }
     } catch (err) {
         console.error('Error saving message to DB:', err);
+    }
+}
+
+async function syncChat(userId: string, tenantId: string, chat: any) {
+    try {
+        const { id: chatId, name, archived, unreadCount } = chat;
+        if (!chatId) return;
+
+        const phone = chatId.replace('@s.whatsapp.net', '').replace('@g.us', '');
+
+        await prisma.whatsAppChat.upsert({
+            where: { userId_chatId: { userId, chatId } },
+            update: {
+                name: name || undefined,
+                archived: archived !== undefined ? !!archived : undefined,
+                unread: unreadCount !== undefined ? unreadCount : undefined,
+            },
+            create: {
+                userId,
+                tenantId,
+                chatId,
+                name: name || phone,
+                phone: phone,
+                archived: !!archived,
+                unread: unreadCount || 0,
+            }
+        });
+    } catch (err) {
+        console.error('Error syncing chat:', err);
     }
 }
 
@@ -309,10 +338,33 @@ export async function createSession(userId: string, tenantId: string, retryCount
     });
 
     // Sync history messages
-    sock.ev.on('messaging-history.set', async ({ messages }) => {
-        console.log(`📜 Syncing ${messages.length} historical messages for ${userId}`);
+    sock.ev.on('messaging-history.set', async ({ messages, chats }) => {
+        console.log(`📜 Syncing ${messages.length} historical messages and ${chats?.length || 0} chats for ${userId}`);
+        if (chats) {
+            for (const chat of chats) {
+                await syncChat(userId, tenantId, chat);
+            }
+        }
         for (const msg of messages) {
             await saveMessageToDB(userId, msg, tenantId);
+        }
+    });
+
+    sock.ev.on('chats.set', async ({ chats }) => {
+        for (const chat of chats) {
+            await syncChat(userId, tenantId, chat);
+        }
+    });
+
+    sock.ev.on('chats.upsert', async (chats) => {
+        for (const chat of chats) {
+            await syncChat(userId, tenantId, chat);
+        }
+    });
+
+    sock.ev.on('chats.update', async (updates) => {
+        for (const update of updates) {
+            await syncChat(userId, tenantId, update as any);
         }
     });
 }

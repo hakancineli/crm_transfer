@@ -12,6 +12,7 @@ interface Chat {
     lastMsg: string | null;
     lastMsgAt: string | null;
     unread: number;
+    archived: boolean;
 }
 
 interface WAMessage {
@@ -68,6 +69,7 @@ export default function WhatsAppPage() {
     const [selectMode, setSelectMode] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
     const [recordingDuration, setRecordingDuration] = useState(0);
+    const [showArchived, setShowArchived] = useState(false);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -405,12 +407,17 @@ export default function WhatsAppPage() {
         }
     };
 
-    const filteredChats = chats.filter(c =>
-        !searchQuery ||
-        (c.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (c.phone || '').includes(searchQuery) ||
-        (c.lastMsg || '').toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredChats = chats
+        .filter(chat => showArchived ? chat.archived : !chat.archived)
+        .filter(chat => {
+            if (!searchQuery) return true;
+            const searchLower = searchQuery.toLowerCase();
+            return (
+                chat.name?.toLowerCase().includes(searchLower) ||
+                chat.phone?.toLowerCase().includes(searchLower) ||
+                chat.lastMsg?.toLowerCase().includes(searchLower)
+            );
+        });
 
     // ── Render: Not connected ──────────────────────────────────────────────────
     if (session.status === 'NOT_CONNECTED' || session.status === 'DISCONNECTED' || session.status === 'SERVICE_UNAVAILABLE') {
@@ -484,14 +491,24 @@ export default function WhatsAppPage() {
             <div className="flex flex-1 overflow-hidden">
                 {/* ── Chat List Sidebar ────────────────────────────────────────── */}
                 <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
-                    <div className="p-3 border-b">
+                    {/* Search and Toggle */}
+                    <div className="p-4 bg-gray-50 border-b border-gray-200">
                         <input
                             type="text"
-                            placeholder="🔍 Sohbet ara..."
+                            placeholder="Sohbet ara..."
                             value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
                         />
+                        <div className="flex items-center justify-between mt-2 px-1">
+                            <button
+                                onClick={() => setShowArchived(!showArchived)}
+                                className={`text-xs font-medium px-2 py-1 rounded transition-colors ${showArchived ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:bg-gray-100'}`}
+                            >
+                                {showArchived ? '← Aktif Sohbetler' : '📦 Arşivlenmişler'}
+                            </button>
+                            {showArchived && <span className="text-[10px] text-gray-400">Arşiv modundasınız</span>}
+                        </div>
                     </div>
 
                     <div className="flex-1 overflow-y-auto">
@@ -512,8 +529,9 @@ export default function WhatsAppPage() {
                                 onClick={() => loadMessages(chat)}
                                 className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-gray-50 hover:bg-gray-50 transition-colors ${selectedChat?.id === chat.id ? 'bg-green-50 border-l-4 border-l-green-500' : ''}`}
                             >
-                                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-sm shrink-0">
-                                    {(chat.name || chat.phone || '?')[0].toUpperCase()}
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0
+                      ${selectedChat?.id === chat.id ? 'bg-white text-green-500' : 'bg-green-500'}`}>
+                                    {chat.chatId.includes('@g.us') ? '👥' : (chat.name?.[0] || chat.phone?.[0] || '?')}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-center">
