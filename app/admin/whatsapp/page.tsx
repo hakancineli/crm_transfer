@@ -76,6 +76,12 @@ export default function WhatsAppPage() {
         try {
             const res = await fetch('/api/whatsapp/status', { headers: authHeaders });
             const data = await res.json();
+
+            if (data.error || !data.status) {
+                setSession(prev => ({ ...prev, status: 'SERVICE_UNAVAILABLE' }));
+                return;
+            }
+
             setSession(data);
 
             if (data.status === 'CONNECTED') {
