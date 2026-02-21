@@ -27,7 +27,7 @@ export default function AdminLoginClient() {
         setEmail('demo');
         setPassword('demo');
       }
-    } catch {}
+    } catch { }
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -71,6 +71,7 @@ export default function AdminLoginClient() {
                   name="email"
                   type="text"
                   required
+                  autoComplete="username"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
                   placeholder="Kullanıcı adınızı girin"
                   value={email}
@@ -84,6 +85,7 @@ export default function AdminLoginClient() {
                   name="password"
                   type="password"
                   required
+                  autoComplete="current-password"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
                   placeholder="Şifrenizi girin"
                   value={password}
