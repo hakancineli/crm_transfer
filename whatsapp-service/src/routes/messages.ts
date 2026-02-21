@@ -14,9 +14,11 @@ messagesRouter.get('/:chatId', async (req, res) => {
                 chatId,
                 ...(before ? { timestamp: { lt: new Date(before as string) } } : {}),
             },
-            orderBy: { timestamp: 'asc' },
+            orderBy: { timestamp: 'desc' },
             take: parseInt(limit as string),
         });
+
+        messages.reverse();
 
         return res.json(messages);
     } catch (err) {

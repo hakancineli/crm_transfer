@@ -26,9 +26,12 @@ export async function GET(
                 chatId,
                 ...(before ? { timestamp: { lt: new Date(before) } } : {}),
             },
-            orderBy: { timestamp: 'asc' },
-            take: 100,
+            orderBy: { timestamp: 'desc' },
+            take: 500,
         });
+
+        // Reverse to show in chronological order (oldest to newest)
+        messages.reverse();
 
         // Mark as read
         await prisma.whatsAppChat.update({
