@@ -48,6 +48,15 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         module: 'transfer',
         order: 1
       },
+      // 1.5 WhatsApp
+      {
+        name: t('admin.navigation.whatsapp'),
+        href: '/admin/whatsapp',
+        icon: '💬',
+        description: 'Mesajlar ve Rezervasyonlar',
+        module: 'system',
+        order: 1.5
+      },
       // 2. Yeni Rezervasyon - En sık kullanılan
       {
         name: t('admin.navigation.newReservation'),
@@ -148,15 +157,6 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         module: 'system',
         order: role === 'SUPERUSER' ? 12 : 999
       },
-      // 12.5 WhatsApp
-      {
-        name: 'WhatsApp',
-        href: '/admin/whatsapp',
-        icon: '💬',
-        description: 'Mesajlar ve Rezervasyonlar',
-        module: 'transfer',
-        order: 13
-      },
       // 14. Personel Performansı - Performans analizi
       {
         name: t('admin.navigation.performance'),
@@ -173,7 +173,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         icon: '🏨',
         description: t('admin.navigation.accommodationDesc'),
         module: 'accommodation',
-        order: 14
+        order: 14.1
       },
       // 15. Konaklama Rezervasyonları
       {
@@ -417,7 +417,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               shouldShow = user?.role === 'AGENCY_ADMIN' || user?.role === 'SUPERUSER';
             } else if (item.name === 'Modül Yönetimi') {
               shouldShow = user?.role === 'SUPERUSER';
-            } else if (item.href === '/admin/whatsapp' || item.name === 'WhatsApp') {
+            } else if (item.href === '/admin/whatsapp' || item.name === t('admin.navigation.whatsapp') || item.name === 'WhatsApp') {
               // AGENCY_ADMIN ve SUPERUSER her zaman görsün
               shouldShow = user?.role === 'AGENCY_ADMIN' || user?.role === 'SUPERUSER' || user?.permissions?.some(p =>
                 (p.permission === 'VIEW_OWN_SALES' || p.permission === 'MANAGE_CUSTOMERS') && p.isActive
