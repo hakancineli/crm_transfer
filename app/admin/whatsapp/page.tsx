@@ -481,7 +481,7 @@ export default function WhatsAppPage() {
             if (parsedReservation.passengerNames?.length) params.set('passengerNames', parsedReservation.passengerNames.join(','));
             if (parsedReservation.notes) params.set('notes', parsedReservation.notes);
 
-            router.push(`/admin/reservations/new?${params.toString()}`);
+            router.push(`/admin/new-reservation?${params.toString()}`);
         }
     };
 
