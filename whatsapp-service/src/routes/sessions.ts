@@ -102,11 +102,14 @@ sessionsRouter.post('/:userId/send-media', async (req, res) => {
 
         let mediaContent: any = {};
         const mime = fileName.split('.').pop()?.toLowerCase();
+        console.log(`📡 Preparing media for ${jid}. Ext: ${mime}, Buffer size: ${buffer.length} bytes`);
 
         if (['jpg', 'jpeg', 'png'].includes(mime || '')) {
             mediaContent = { image: buffer, caption };
-        } else if (['mp3', 'ogg', 'wav', 'm4a'].includes(mime || '')) {
-            mediaContent = { audio: buffer, mimetype: 'audio/mp4', ptt: true };
+        } else if (['mp3', 'm4a', 'wav'].includes(mime || '')) {
+            mediaContent = { audio: buffer, mimetype: `audio/${mime === 'mp3' ? 'mpeg' : mime}`, ptt: true };
+        } else if (mime === 'ogg' || mime === 'webm') {
+            mediaContent = { audio: buffer, mimetype: 'audio/ogg; codecs=opus', ptt: true };
         } else {
             mediaContent = { document: buffer, fileName, mimetype: mime === 'pdf' ? 'application/pdf' : 'application/octet-stream', caption };
         }

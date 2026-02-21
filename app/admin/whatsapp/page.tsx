@@ -356,22 +356,41 @@ export default function WhatsAppPage() {
     const startRecording = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const recorder = new MediaRecorder(stream);
+
+            // Check supported formats
+            const mimeType = MediaRecorder.isTypeSupported('audio/ogg; codecs=opus')
+                ? 'audio/ogg; codecs=opus'
+                : (MediaRecorder.isTypeSupported('audio/webm; codecs=opus')
+                    ? 'audio/webm; codecs=opus'
+                    : 'audio/mp4'); // Fallback to mp4 if webm/ogg not supported
+
+            console.log(`🎤 Starting recording with mimeType: ${mimeType}`);
+            const recorder = new MediaRecorder(stream, { mimeType });
             mediaRecorderRef.current = recorder;
             audioChunksRef.current = [];
 
             recorder.ondataavailable = (e) => {
-                if (e.data.size > 0) audioChunksRef.current.push(e.data);
+                if (e.data.size > 0) {
+                    audioChunksRef.current.push(e.data);
+                }
             };
 
             recorder.onstop = () => {
-                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/ogg; codecs=opus' });
-                const file = new File([audioBlob], `voice-message-${Date.now()}.ogg`, { type: 'audio/ogg' });
+                const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+                console.log(`⏹️ Recording stopped. Total chunks: ${audioChunksRef.current.length}, Size: ${audioBlob.size} bytes`);
+
+                if (audioBlob.size < 100) {
+                    console.warn('⚠️ Audio blob is too small, likely empty.');
+                    return;
+                }
+
+                const extension = mimeType.includes('ogg') ? 'ogg' : (mimeType.includes('webm') ? 'webm' : 'mp4');
+                const file = new File([audioBlob], `voice-message-${Date.now()}.${extension}`, { type: mimeType });
                 uploadFile(file);
                 stream.getTracks().forEach(track => track.stop());
             };
 
-            recorder.start();
+            recorder.start(1000); // Collect data every second
             setIsRecording(true);
             setRecordingDuration(0);
             timerRef.current = setInterval(() => {
@@ -810,7 +829,7 @@ export default function WhatsAppPage() {
                                                 <div className="mb-2 py-2 px-1 flex items-center gap-3 bg-gray-50 rounded-xl">
                                                     <span className="text-xl">🎤</span>
                                                     <audio controls className="h-8 max-w-[200px]">
-                                                        <source src={`/api/whatsapp/media${msg.mediaUrl.replace('/media', '')}`} type="audio/ogg" />
+                                                        <source src={`/api/whatsapp/media${msg.mediaUrl.replace('/media', '')}`} />
                                                         Tarayıcınız ses çalmayı desteklemiyor.
                                                     </audio>
                                                 </div>
