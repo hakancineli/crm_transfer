@@ -346,6 +346,12 @@ export async function reconnectAllSessions(): Promise<void> {
         if (fs.existsSync(authDir)) {
             console.log(`🔄 Reconnecting session for user ${session.userId}`);
             await createSession(session.userId, session.tenantId);
+        } else {
+            console.log(`⚠️ Auth data missing for ${session.userId}, resetting to DISCONNECTED`);
+            await prisma.whatsAppSession.update({
+                where: { userId: session.userId },
+                data: { status: 'DISCONNECTED', qrCode: null }
+            });
         }
     }
 }
