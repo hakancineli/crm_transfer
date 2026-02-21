@@ -27,8 +27,13 @@ app.get('/health', (req, res) => {
 // API Key auth middleware
 app.use((req, res, next) => {
     const apiKey = req.headers['x-api-key'];
-    if (!apiKey || apiKey !== process.env.WHATSAPP_SERVICE_API_KEY) {
-        return res.status(401).json({ error: 'Unauthorized' });
+    const serviceKey = (process.env.WHATSAPP_SERVICE_API_KEY || '').trim();
+
+    console.log(`[AUTH] Incoming request: ${req.method} ${req.path}`);
+
+    if (!apiKey || (apiKey as string).trim() !== serviceKey) {
+        console.warn(`[AUTH] Unauthorized access attempt: ${apiKey ? 'Invalid Key' : 'Missing Key'}`);
+        return res.status(401).json({ error: 'WA_API_KEY_MISMATCH' });
     }
     next();
 });

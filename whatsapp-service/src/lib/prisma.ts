@@ -9,5 +9,9 @@ if (!(global as any).__prisma) {
 }
 
 prisma = (global as any).__prisma;
+// Self-ping to keep connection alive every minute
+setInterval(() => {
+    prisma.tenant.findFirst({ select: { id: true } }).catch(() => { });
+}, 60000);
 
 export { prisma };
