@@ -66,6 +66,11 @@ export default function WhatsAppPage() {
     const [parsedReservation, setParsedReservation] = useState<ParsedReservation | null>(null);
     const [selectedMessages, setSelectedMessages] = useState<Set<string>>(new Set());
     const [selectMode, setSelectMode] = useState(false);
+    const [isRecording, setIsRecording] = useState(false);
+    const [recordingDuration, setRecordingDuration] = useState(0);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioChunksRef = useRef<Blob[]>([]);
+    const timerRef = useRef<NodeJS.Timeout | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const pollRef = useRef<NodeJS.Timeout | null>(null);
@@ -257,7 +262,7 @@ export default function WhatsAppPage() {
                 setMessages(prev => [...prev, {
                     id: tempId,
                     fromMe: true,
-                    body: `[Gövdeleşen Dosya: ${file.name}]`,
+                    body: msgType === 'audio' ? '[Sesli Mesaj]' : `[Dosya: ${file.name}]`,
                     timestamp: new Date().toISOString(),
                     msgType: msgType,
                     caption: file.name
@@ -287,6 +292,50 @@ export default function WhatsAppPage() {
             }
         };
         reader.readAsDataURL(file);
+    };
+
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const recorder = new MediaRecorder(stream);
+            mediaRecorderRef.current = recorder;
+            audioChunksRef.current = [];
+
+            recorder.ondataavailable = (e) => {
+                if (e.data.size > 0) audioChunksRef.current.push(e.data);
+            };
+
+            recorder.onstop = () => {
+                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/ogg; codecs=opus' });
+                const file = new File([audioBlob], `voice-message-${Date.now()}.ogg`, { type: 'audio/ogg' });
+                uploadFile(file);
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            recorder.start();
+            setIsRecording(true);
+            setRecordingDuration(0);
+            timerRef.current = setInterval(() => {
+                setRecordingDuration(prev => prev + 1);
+            }, 1000);
+        } catch (err) {
+            console.error('Microphone access error:', err);
+            alert('Mikrofon erişimi engellendi veya bulunamadı.');
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorderRef.current && isRecording) {
+            mediaRecorderRef.current.stop();
+            setIsRecording(false);
+            if (timerRef.current) clearInterval(timerRef.current);
+        }
+    };
+
+    const formatDuration = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
     const toggleMessageSelect = (msgId: string) => {
@@ -653,38 +702,63 @@ export default function WhatsAppPage() {
 
                         {/* Message input */}
                         <div className="bg-white border-t border-gray-200 px-4 py-3 flex items-center gap-3">
-                            <input
-                                type="file"
-                                id="fileInput"
-                                className="hidden"
-                                onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) uploadFile(file);
-                                }}
-                                accept="image/*,audio/*,application/pdf"
-                            />
-                            <button
-                                onClick={() => document.getElementById('fileInput')?.click()}
-                                className="text-gray-400 hover:text-green-500 transition-colors"
-                                title="Dosya Ekle"
-                            >
-                                <span className="text-2xl">📎</span>
-                            </button>
-                            <input
-                                type="text"
-                                value={newMessage}
-                                onChange={e => setNewMessage(e.target.value)}
-                                onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-                                placeholder="Mesaj yaz..."
-                                className="flex-1 px-4 py-2 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
-                            />
-                            <button
-                                onClick={sendMessage}
-                                disabled={(!newMessage.trim() && !sending) || sending}
-                                className="w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center transition-colors disabled:opacity-50"
-                            >
-                                {sending ? '⏳' : '➤'}
-                            </button>
+                            {isRecording ? (
+                                <div className="flex-1 flex items-center justify-between bg-red-50 px-4 py-2 rounded-full border border-red-100">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                                        <span className="text-red-600 text-sm font-medium">{formatDuration(recordingDuration)}</span>
+                                        <span className="text-gray-500 text-xs ml-2">Ses kaydediliyor...</span>
+                                    </div>
+                                    <button
+                                        onClick={stopRecording}
+                                        className="text-red-500 font-semibold text-sm hover:underline"
+                                    >
+                                        Gönder
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <input
+                                        type="file"
+                                        id="fileInput"
+                                        className="hidden"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) uploadFile(file);
+                                        }}
+                                        accept="image/*,audio/*,application/pdf"
+                                    />
+                                    <button
+                                        onClick={() => document.getElementById('fileInput')?.click()}
+                                        className="text-gray-400 hover:text-green-500 transition-colors"
+                                        title="Dosya Ekle"
+                                    >
+                                        <span className="text-2xl">📎</span>
+                                    </button>
+                                    <input
+                                        type="text"
+                                        value={newMessage}
+                                        onChange={e => setNewMessage(e.target.value)}
+                                        onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+                                        placeholder="Mesaj yaz..."
+                                        className="flex-1 px-4 py-2 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                                    />
+                                    <button
+                                        onClick={startRecording}
+                                        className="text-gray-400 hover:text-red-500 transition-colors"
+                                        title="Ses Kaydet"
+                                    >
+                                        <span className="text-2xl">🎙️</span>
+                                    </button>
+                                    <button
+                                        onClick={sendMessage}
+                                        disabled={(!newMessage.trim() && !sending) || sending}
+                                        className="w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center transition-colors disabled:opacity-50"
+                                    >
+                                        {sending ? '⏳' : '➤'}
+                                    </button>
+                                </>
+                            )}
                         </div>
                     </div>
                 ) : (
