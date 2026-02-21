@@ -427,9 +427,39 @@ export default function WhatsAppPage() {
         });
     };
 
+    const analyzeChat = async (type: 'transfer' | 'tour' = 'transfer') => {
+        if (!selectedChat || messages.length === 0) return;
+
+        // Take last 20 messages for context
+        const recentMsgs = messages.slice(-20);
+        const text = recentMsgs
+            .map(m => `${m.fromMe ? 'Biz' : (selectedChat.name || 'Müşteri')}: ${m.body}`)
+            .join('\n');
+
+        setParsing(true);
+        try {
+            const res = await fetch('/api/whatsapp/parse', {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ messageText: text, type }),
+            });
+            const data = await res.json();
+            setParsedReservation({ ...data, type });
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setParsing(false);
+            setSelectMode(false);
+            setSelectedMessages(new Set());
+        }
+    };
+
     const parseSelectedMessages = async (type: 'transfer' | 'tour' = 'transfer') => {
         const selectedMsgs = messages.filter(m => selectedMessages.has(m.id));
-        if (selectedMsgs.length === 0) return;
+        if (selectedMsgs.length === 0) {
+            // If no messages selected, fallback to recent chat analysis
+            return analyzeChat(type);
+        }
 
         const text = selectedMsgs
             .map(m => `${m.fromMe ? 'Biz' : (selectedChat?.name || 'Müşteri')}: ${m.body}`)
@@ -739,12 +769,29 @@ export default function WhatsAppPage() {
                                         </button>
                                     </>
                                 ) : (
-                                    <button
-                                        onClick={() => setSelectMode(true)}
-                                        className="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1.5 rounded-lg transition-colors"
-                                    >
-                                        📋 Rezervasyon Oluştur
-                                    </button>
+                                    <>
+                                        <button
+                                            onClick={() => analyzeChat('transfer')}
+                                            disabled={parsing}
+                                            className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                                        >
+                                            {parsing ? '⌛ Analiz...' : '🤖 Transferi Analiz Et'}
+                                        </button>
+                                        <button
+                                            onClick={() => analyzeChat('tour')}
+                                            disabled={parsing}
+                                            className="bg-purple-500 hover:bg-purple-600 text-white text-xs px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                                        >
+                                            {parsing ? '⌛ Analiz...' : '🎭 Turu Analiz Et'}
+                                        </button>
+                                        <button
+                                            onClick={() => setSelectMode(true)}
+                                            className="bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs px-3 py-1.5 rounded-lg transition-colors"
+                                            title="Mesajları manuel seç"
+                                        >
+                                            📋 Seç
+                                        </button>
+                                    </>
                                 )}
                             </div>
                         </div>
