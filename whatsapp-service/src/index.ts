@@ -23,6 +23,7 @@ app.use(cors({
     origin: process.env.ALLOWED_ORIGIN || '*',
     credentials: true
 }));
+app.use(express.json({ limit: '50mb' })); // Increased for audio/files
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
