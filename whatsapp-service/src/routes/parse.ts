@@ -51,7 +51,10 @@ parseRouter.post('/reservation', async (req, res) => {
 });
 
 function buildTransferPrompt(message: string): string {
+    const today = new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
     return `Sen bir transfer rezervasyon asistanısın. Aşağıdaki WhatsApp mesajından rezervasyon bilgilerini çıkar ve JSON formatında döndür.
+Bugünün tarihi: ${today} (Mesajdaki "yarın", "pazartesi" gibi ifadeleri buna göre çöz).
 
 MESAJ:
 ${message}
@@ -75,7 +78,10 @@ Sadece JSON döndür, başka bir şey yazma.`;
 }
 
 function buildTourPrompt(message: string): string {
+    const today = new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
     return `Sen bir tur rezervasyon asistanısın. Aşağıdaki WhatsApp mesajından tur rezervasyon bilgilerini çıkar ve JSON formatında döndür.
+Bugünün tarihi: ${today} (Mesajdaki "yarın", "pazartesi" gibi ifadeleri buna göre çöz).
 
 MESAJ:
 ${message}

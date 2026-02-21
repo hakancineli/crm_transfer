@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Calendar, MapPin, Users, Clock, X } from 'lucide-react';
 import GoogleMapsPlacesInput from '@/app/components/GoogleMapsPlacesInput';
 import { useGoogleMaps } from '@/app/hooks/useGoogleMaps';
+import { useSearchParams } from 'next/navigation';
 
 type Currency = 'TRY' | 'USD' | 'EUR';
 
@@ -15,6 +16,7 @@ interface ReservationFormProps {
 }
 
 export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm = false }: ReservationFormProps) {
+  const searchParams = useSearchParams();
   const { isLoaded: googleMapsLoaded, isLoading: googleMapsLoading, error: googleMapsError } = useGoogleMaps();
   const [formData, setFormData] = useState({
     type: 'transfer',
@@ -64,19 +66,19 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
   useEffect(() => {
     if (!isOpen) return;
 
-    const query = new URLSearchParams(window.location.search);
-    const date = query.get('date');
-    const time = query.get('time');
-    const from = query.get('from');
-    const to = query.get('to');
-    const flightCode = query.get('flightCode');
-    const price = query.get('price');
-    const currencyParam = query.get('currency') as Currency;
-    const phoneNumber = query.get('phoneNumber');
-    const passengerNames = query.get('passengerNames');
-    const notes = query.get('notes');
+    const date = searchParams.get('date');
+    const time = searchParams.get('time');
+    const from = searchParams.get('from');
+    const to = searchParams.get('to');
+    const flightCode = searchParams.get('flightCode');
+    const price = searchParams.get('price');
+    const currencyParam = searchParams.get('currency') as Currency;
+    const phoneNumber = searchParams.get('phoneNumber');
+    const passengerNames = searchParams.get('passengerNames');
+    const notes = searchParams.get('notes');
 
     if (date || time || from || to || flightCode || price || phoneNumber || passengerNames) {
+      console.log('📝 Populating form from URL params:', { date, time, from, to, price, phoneNumber });
       setFormData(prev => ({
         ...prev,
         date: date || prev.date,
@@ -93,7 +95,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
       if (price) setEstimatedPriceTRY(parseFloat(price));
       if (currencyParam) setCurrency(currencyParam);
     }
-  }, [isOpen]);
+  }, [isOpen, searchParams]);
 
   // Fiyat hesaplama
   function getPriceFromKm(km: number): number | null {
