@@ -139,13 +139,11 @@ export default function WhatsAppPage() {
     const disconnect = async () => {
         await fetch('/api/whatsapp/status', { method: 'DELETE', headers: getAuthHeaders() });
         setSession({ status: 'NOT_CONNECTED', qr: null, phone: null });
-        setChats([]);
-        setSelectedChat(null);
-        setMessages([]);
+        if (pollRef.current) clearInterval(pollRef.current);
     };
 
-    const loadChats = async () => {
-        setLoadingChats(true);
+    const loadChats = async (silent = false) => {
+        if (!silent) setLoadingChats(true);
         try {
             const res = await fetch('/api/whatsapp/chats', { headers: getAuthHeaders() });
             const data = await res.json();
@@ -153,43 +151,83 @@ export default function WhatsAppPage() {
         } catch (e) {
             console.error(e);
         } finally {
-            setLoadingChats(false);
+            if (!silent) setLoadingChats(false);
         }
     };
 
-    const loadMessages = async (chat: Chat) => {
+    const loadMessages = async (chat: Chat, silent = false) => {
+        if (!silent) {
+            setLoadingMsgs(true);
+            setMessages([]);
+            setParsedReservation(null);
+            setSelectMode(false);
+            setSelectedMessages(new Set());
+        }
         setSelectedChat(chat);
-        setMessages([]);
-        setLoadingMsgs(true);
-        setParsedReservation(null);
-        setSelectMode(false);
-        setSelectedMessages(new Set());
         try {
             const res = await fetch(`/api/whatsapp/chats/${chat.id}/messages`, { headers: getAuthHeaders() });
             const data = await res.json();
-            setMessages(data.messages || []);
-            // Update unread
+            const newMsgs = data.messages || [];
+
+            // Only update if messages changed to avoid scroll jumping if possible
+            if (JSON.stringify(newMsgs) !== JSON.stringify(messages)) {
+                setMessages(newMsgs);
+            }
+
+            // Update unread in chat list
             setChats(prev => prev.map(c => c.id === chat.id ? { ...c, unread: 0 } : c));
         } catch (e) {
             console.error(e);
         } finally {
-            setLoadingMsgs(false);
+            if (!silent) setLoadingMsgs(false);
         }
     };
 
+    // Background polling for new messages/chats
+    useEffect(() => {
+        if (session.status !== 'CONNECTED') return;
+
+        const chatInterval = setInterval(() => loadChats(true), 10000); // Poll chats every 10s
+
+        let msgInterval: NodeJS.Timeout | null = null;
+        if (selectedChat) {
+            msgInterval = setInterval(() => loadMessages(selectedChat, true), 3000); // Poll active chat every 3s
+        }
+
+        return () => {
+            clearInterval(chatInterval);
+            if (msgInterval) clearInterval(msgInterval);
+        };
+    }, [session.status, selectedChat?.id]);
+
     const sendMessage = async () => {
         if (!newMessage.trim() || !selectedChat) return;
+
+        const text = newMessage;
+        setNewMessage('');
+
+        // Optimistic UI update
+        const tempId = 'temp-' + Date.now();
+        setMessages(prev => [...prev, {
+            id: tempId,
+            fromMe: true,
+            body: text,
+            timestamp: new Date().toISOString()
+        }]);
+
         setSending(true);
         try {
             await fetch('/api/whatsapp/send', {
                 method: 'POST',
                 headers: getAuthHeaders(),
-                body: JSON.stringify({ to: selectedChat.chatId, message: newMessage }),
+                body: JSON.stringify({ to: selectedChat.chatId, message: text }),
             });
-            setNewMessage('');
-            await loadMessages(selectedChat);
+            await loadMessages(selectedChat, true);
         } catch (e) {
             console.error(e);
+            alert('Mesaj gönderilemedi.');
+            // Remove optimistic message on failure
+            setMessages(prev => prev.filter(m => m.id !== tempId));
         } finally {
             setSending(false);
         }
@@ -329,7 +367,7 @@ export default function WhatsAppPage() {
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button onClick={loadChats} className="text-sm bg-green-500 hover:bg-green-700 px-3 py-1 rounded-lg transition-colors">
+                    <button onClick={() => loadChats()} className="text-sm bg-green-500 hover:bg-green-700 px-3 py-1 rounded-lg transition-colors">
                         🔄 Yenile
                     </button>
                     <button onClick={disconnect} className="text-sm bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg transition-colors">
