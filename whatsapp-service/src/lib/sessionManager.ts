@@ -54,6 +54,13 @@ function getMessageText(message: proto.IMessage | null | undefined): string {
     if (message.imageMessage?.caption) return message.imageMessage.caption;
     if (message.videoMessage?.caption) return message.videoMessage.caption;
     if (message.documentMessage?.caption) return message.documentMessage.caption;
+    if (message.locationMessage) return '📍 [Konum]';
+    if (message.contactMessage) return `👤 [Kişi: ${message.contactMessage.displayName || ''}]`;
+    if (message.reactionMessage) return `👍 [Reaksiyon: ${message.reactionMessage.text || ''}]`;
+
+    // Call messages
+    if (message.callMessage) return '📞 [Sesli Arama]';
+    if (message.videoCallMessage) return '📹 [Video Arama]';
 
     // Handle nested messages (ephemeral, view once, edited)
     if (message.ephemeralMessage) return getMessageText(message.ephemeralMessage.message);
@@ -99,10 +106,15 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
         const msgId = message.key.id || '';
         const timestamp = new Date((message.messageTimestamp as number) * 1000);
 
+        // Name resolution
+        const session = sessions.get(userId);
+        const pushName = (message as any).pushName || '';
+        const senderJid = message.key.participant || message.key.remoteJid;
+        const senderName = fromMe ? 'Siz' : (pushName || senderJid?.split('@')[0] || '');
+
         // Download media if applicable
         if (['image', 'audio', 'document', 'video'].includes(msgType)) {
             try {
-                const session = sessions.get(userId);
                 if (session?.socket) {
                     const buffer = await downloadMediaMessage(message, 'buffer', {
                         // @ts-ignore
@@ -126,38 +138,36 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
         }
 
         // Upsert chat
-        const phone = chatId.replace('@s.whatsapp.net', '').replace('@g.us', '').replace('@lid', '');
-        const pushName = (message as any).pushName || '';
-        const senderJid = message.key.participant || message.key.remoteJid;
-        const senderName = fromMe ? 'Siz' : (pushName || senderJid?.split('@')[0] || '');
+        // Only update preview if it's the latest message
+        const existingChat = await prisma.whatsAppChat.findUnique({
+            where: { userId_chatId: { userId, chatId } }
+        });
 
-        const session = sessions.get(userId);
-        let avatarUrl = undefined;
-        if (session?.socket) {
-            avatarUrl = await session.socket.profilePictureUrl(chatId, 'image').catch(() => undefined);
-        }
+        const isNewer = !existingChat || !existingChat.lastMsgAt || timestamp >= new Date(existingChat.lastMsgAt);
 
         const chat = await prisma.whatsAppChat.upsert({
             where: {
                 userId_chatId: { userId, chatId }
             },
             update: {
-                lastMsg: body,
-                lastMsgAt: timestamp,
-                // Don't overwrite group names with participant pushnames
-                name: chatId.includes('@g.us') ? undefined : (fromMe ? undefined : (pushName || undefined)),
-                avatarUrl: avatarUrl || undefined,
+                ...(isNewer ? {
+                    lastMsg: body,
+                    lastMsgAt: timestamp,
+                } : {}),
+                // Only update name if we have a better one and it's not a group
+                name: (chatId.includes('@g.us'))
+                    ? undefined
+                    : (fromMe ? undefined : (pushName || undefined)),
             } as any,
             create: {
                 userId,
                 tenantId,
                 chatId,
-                phone,
-                name: chatId.includes('@g.us') ? 'Grup' : (pushName || phone),
+                phone: chatId.replace('@s.whatsapp.net', '').replace('@g.us', '').replace('@lid', ''),
+                name: chatId.includes('@g.us') ? 'Grup' : (pushName || chatId.split('@')[0]),
                 lastMsg: body,
                 lastMsgAt: timestamp,
                 unread: fromMe ? 0 : 1,
-                avatarUrl,
             } as any
         });
 
