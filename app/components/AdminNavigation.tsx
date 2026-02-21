@@ -238,32 +238,41 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         module: 'tour',
         order: 22
       },
-      // 23. U-ETDS - Ulaştırma sistemi
+      // 22.5 WhatsApp Inbox
+      {
+        name: 'WhatsApp',
+        href: '/admin/whatsapp',
+        icon: '💬',
+        description: 'Müşteri mesajları ve rezervasyon oluştur',
+        module: 'transfer',
+        order: 23
+      },
+      // 24. U-ETDS - Ulaştırma sistemi
       {
         name: t('admin.navigation.uetds'),
         href: '/admin/uetds',
         icon: '🚌',
         description: t('admin.navigation.uetdsDesc'),
         module: 'transfer',
-        order: 23
+        order: 24
       },
-      // 24. Modül Yönetimi - Sistem modülleri (sadece SUPERUSER)
+      // 25. Modül Yönetimi - Sistem modülleri (sadece SUPERUSER)
       {
         name: t('admin.navigation.modules'),
         href: '/admin/modules',
         icon: '🔧',
         description: t('admin.navigation.modulesDesc'),
         module: 'system',
-        order: role === 'SUPERUSER' ? 24 : 999
+        order: role === 'SUPERUSER' ? 25 : 999
       },
-      // 25. Ayarlar - Sistem ayarları (sadece SUPERUSER)
+      // 26. Ayarlar - Sistem ayarları (sadece SUPERUSER)
       {
         name: t('admin.navigation.settings'),
         href: '/admin/settings',
         icon: '⚙️',
         description: t('admin.navigation.settingsDesc'),
         module: 'transfer',
-        order: role === 'SUPERUSER' ? 25 : 999
+        order: role === 'SUPERUSER' ? 26 : 999
       },
       // 26. Acente Ayarları - Acente özel ayarları
       {
@@ -288,12 +297,12 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
   // Sıralamayı sabit tutmak için filter yerine map kullan
   const menuItems = allMenuItems.map(item => ({
     ...item,
-    visible: item.module === 'transfer' || 
-             item.module === 'system' ||
-             (item.module === 'accommodation' && accommodationEnabled) ||
-             (item.module === 'flight' && flightEnabled) ||
-             (item.module === 'tour' && tourEnabled) ||
-             (item.module === 'website' && websiteEnabled)
+    visible: item.module === 'transfer' ||
+      item.module === 'system' ||
+      (item.module === 'accommodation' && accommodationEnabled) ||
+      (item.module === 'flight' && flightEnabled) ||
+      (item.module === 'tour' && tourEnabled) ||
+      (item.module === 'website' && websiteEnabled)
   }));
 
   return (
@@ -335,8 +344,8 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         {menuItems.map((item) => {
           // Check if item should be shown based on user permissions
           let shouldShow = true;
-          
-          
+
+
           // SUPERUSER can see everything
           if (user?.role === 'SUPERUSER') {
             shouldShow = true;
@@ -347,12 +356,12 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               if (user?.role === 'AGENCY_ADMIN') {
                 shouldShow = true;
               } else {
-                shouldShow = user?.permissions?.some(p => 
+                shouldShow = user?.permissions?.some(p =>
                   p.permission === 'VIEW_OWN_SALES' && p.isActive
                 ) || false;
               }
             } else if (item.name === 'Son Aktiviteler') {
-              shouldShow = user?.permissions?.some(p => 
+              shouldShow = user?.permissions?.some(p =>
                 p.permission === 'MANAGE_ACTIVITIES' && p.isActive
               ) || false;
             } else if (item.name === 'Kullanıcılar') {
@@ -360,7 +369,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               if (user?.role === 'AGENCY_ADMIN') {
                 shouldShow = true;
               } else {
-                shouldShow = user?.permissions?.some(p => 
+                shouldShow = user?.permissions?.some(p =>
                   p.permission === 'MANAGE_USERS' && p.isActive
                 ) || false;
               }
@@ -369,7 +378,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               if (user?.role === 'AGENCY_ADMIN') {
                 shouldShow = true;
               } else {
-                shouldShow = user?.permissions?.some(p => 
+                shouldShow = user?.permissions?.some(p =>
                   p.permission === 'VIEW_REPORTS' && p.isActive
                 ) || false;
               }
@@ -378,7 +387,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               if (user?.role === 'AGENCY_ADMIN') {
                 shouldShow = true;
               } else {
-                shouldShow = user?.permissions?.some(p => 
+                shouldShow = user?.permissions?.some(p =>
                   p.permission === 'VIEW_ACCOUNTING' && p.isActive
                 ) || false;
               }
@@ -387,7 +396,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               if (user?.role === 'AGENCY_ADMIN') {
                 shouldShow = true;
               } else {
-                const hasExplicit = user?.permissions?.some(p => 
+                const hasExplicit = user?.permissions?.some(p =>
                   (p.permission === 'VIEW_CUSTOMER_DATA' || p.permission === 'MANAGE_CUSTOMERS') && p.isActive
                 ) || false;
                 shouldShow = hasExplicit;
@@ -413,18 +422,18 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               if (user?.role === 'AGENCY_ADMIN') {
                 shouldShow = true;
               } else {
-                shouldShow = user?.permissions?.some(p => 
+                shouldShow = user?.permissions?.some(p =>
                   p.permission === 'VIEW_TOUR_MODULE' && p.isActive
                 ) || false;
               }
             }
           }
-          
+
           // Hem modül durumu hem de izin kontrolü
           if (!item.visible || !shouldShow) {
             return null;
           }
-          
+
           // Özel component kullanılacak öğeler için
           if ((item as any).isSpecial && item.name === t('admin.navigation.newReservation')) {
             return (
@@ -434,7 +443,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               />
             );
           }
-          
+
           return (
             <Link
               key={item.name}
