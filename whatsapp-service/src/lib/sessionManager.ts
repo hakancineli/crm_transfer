@@ -110,6 +110,7 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
         } else if (message.message?.audioMessage) {
             msgType = 'audio';
             body = '[Sesli Mesaj]';
+            caption = 'Sesli Mesaj';
         } else if (message.message?.documentMessage) {
             msgType = 'document';
             body = `[Dosya: ${message.message.documentMessage.fileName || 'belge.pdf'}]`;
@@ -135,24 +136,28 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
         if (['image', 'audio', 'document', 'video'].includes(msgType)) {
             try {
                 if (session?.socket) {
-                    const buffer = await downloadMediaMessage(message, 'buffer', {
-                        // @ts-ignore
-                        rekey: session.socket.authState.creds.signedPreKey
-                    }) as Buffer;
+                    console.log(`📥 Downloading ${msgType} for message ${msgId}...`);
+                    const buffer = await downloadMediaMessage(message, 'buffer', {}) as Buffer;
 
-                    if (buffer) {
+                    if (buffer && buffer.length > 0) {
                         const fileName = `${msgId}_${Date.now()}`;
-                        const ext = msgType === 'audio' ? 'ogg' : (msgType === 'image' ? 'jpg' : 'bin');
+                        const ext = msgType === 'audio' ? 'ogg' : (msgType === 'image' ? 'jpg' : (msgType === 'video' ? 'mp4' : 'bin'));
                         const finalName = `${fileName}.${ext}`;
                         const publicPath = path.join(process.cwd(), 'public', 'media');
-                        if (!fs.existsSync(publicPath)) fs.mkdirSync(publicPath, { recursive: true });
+
+                        if (!fs.existsSync(publicPath)) {
+                            fs.mkdirSync(publicPath, { recursive: true });
+                        }
 
                         fs.writeFileSync(path.join(publicPath, finalName), buffer);
                         mediaUrl = `/media/${finalName}`;
+                        console.log(`✅ ${msgType} saved to ${mediaUrl}`);
+                    } else {
+                        console.warn(`⚠️ Downloaded buffer for ${msgId} is empty.`);
                     }
                 }
             } catch (mediaErr) {
-                console.error('Error downloading media:', mediaErr);
+                console.error(`❌ Error downloading media for ${msgId}:`, mediaErr);
             }
         }
 
