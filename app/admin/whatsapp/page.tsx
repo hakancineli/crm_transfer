@@ -68,7 +68,8 @@ export default function WhatsAppPage() {
     const pollRef = useRef<NodeJS.Timeout | null>(null);
 
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    const authHeaders = token ? { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+    const authHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) authHeaders['Authorization'] = `Bearer ${token}`;
 
     // Poll session status
     const pollStatus = useCallback(async () => {
@@ -241,7 +242,7 @@ export default function WhatsAppPage() {
     );
 
     // ── Render: Not connected ──────────────────────────────────────────────────
-    if (session.status === 'NOT_CONNECTED' || session.status === 'DISCONNECTED') {
+    if (session.status === 'NOT_CONNECTED' || session.status === 'DISCONNECTED' || session.status === 'SERVICE_UNAVAILABLE') {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="bg-white rounded-2xl shadow-xl p-10 max-w-md w-full text-center">
