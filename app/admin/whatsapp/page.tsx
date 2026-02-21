@@ -13,6 +13,8 @@ interface Chat {
     lastMsgAt: string | null;
     unread: number;
     archived: boolean;
+    pinned: boolean;
+    avatarUrl?: string | null;
 }
 
 interface WAMessage {
@@ -296,6 +298,30 @@ export default function WhatsAppPage() {
         reader.readAsDataURL(file);
     };
 
+    const togglePin = async (chat: Chat) => {
+        try {
+            // Optimistic UI
+            setChats(prev => prev.map(c =>
+                c.id === chat.id ? { ...c, pinned: !c.pinned } : c
+            ));
+
+            const res = await fetch(`/api/whatsapp/chats/${chat.chatId}/pin`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ pinned: !chat.pinned })
+            });
+
+            if (!res.ok) {
+                // Rollback
+                setChats(prev => prev.map(c =>
+                    c.id === chat.id ? { ...c, pinned: chat.pinned } : c
+                ));
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
     const startRecording = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -417,6 +443,14 @@ export default function WhatsAppPage() {
                 chat.phone?.toLowerCase().includes(searchLower) ||
                 chat.lastMsg?.toLowerCase().includes(searchLower)
             );
+        })
+        .sort((a, b) => {
+            if (a.pinned && !b.pinned) return -1;
+            if (!a.pinned && b.pinned) return 1;
+
+            const timeA = a.lastMsgAt ? new Date(a.lastMsgAt).getTime() : 0;
+            const timeB = b.lastMsgAt ? new Date(b.lastMsgAt).getTime() : 0;
+            return timeB - timeA;
         });
 
     // ── Render: Not connected ──────────────────────────────────────────────────
@@ -527,26 +561,45 @@ export default function WhatsAppPage() {
                             <div
                                 key={chat.id}
                                 onClick={() => loadMessages(chat)}
-                                className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-gray-50 hover:bg-gray-50 transition-colors ${selectedChat?.id === chat.id ? 'bg-green-50 border-l-4 border-l-green-500' : ''}`}
+                                className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-gray-50 hover:bg-gray-50 transition-colors group ${selectedChat?.id === chat.id ? 'bg-green-50 border-l-4 border-l-green-500' : ''}`}
                             >
-                                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0 overflow-hidden
                       ${selectedChat?.id === chat.id ? 'bg-white text-green-500' : 'bg-green-500'}`}>
-                                    {chat.chatId.includes('@g.us') ? '👥' : (chat.name?.[0] || chat.phone?.[0] || '?')}
+                                    {chat.avatarUrl ? (
+                                        <img src={chat.avatarUrl} alt="" className="w-full h-full object-cover" />
+                                    ) : (
+                                        chat.chatId.includes('@g.us') ? '👥' : (chat.name?.[0] || chat.phone?.[0] || '?')
+                                    )}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-center">
                                         <span className="font-medium text-sm text-gray-900 truncate">{chat.name || chat.phone}</span>
-                                        <span className="text-xs text-gray-400 shrink-0">
-                                            {chat.lastMsgAt ? new Date(chat.lastMsgAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : ''}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-xs text-gray-500 truncate">{chat.lastMsg}</span>
-                                        {chat.unread > 0 && (
-                                            <span className="bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shrink-0">
-                                                {chat.unread}
+                                        <div className="flex items-center gap-1">
+                                            {chat.pinned && <span className="text-gray-400 text-[10px]">📌</span>}
+                                            <span className="text-[10px] text-gray-400">
+                                                {chat.lastMsgAt ? new Date(chat.lastMsgAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : ''}
                                             </span>
-                                        )}
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between items-center gap-2 mt-0.5">
+                                        <p className="text-xs text-gray-500 truncate flex-1">{chat.lastMsg || '...'}</p>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    togglePin(chat);
+                                                }}
+                                                className={`hover:scale-110 transition-transform ${chat.pinned ? 'opacity-100' : 'opacity-0 group-hover:opacity-40'}`}
+                                                title={chat.pinned ? 'Baştan Kaldır' : 'Başa Tuttur'}
+                                            >
+                                                📌
+                                            </button>
+                                            {chat.unread > 0 && (
+                                                <span className="bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
+                                                    {chat.unread}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

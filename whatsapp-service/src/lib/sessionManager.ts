@@ -90,8 +90,7 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
                 const session = sessions.get(userId);
                 if (session?.socket) {
                     const buffer = await downloadMediaMessage(message, 'buffer', {
-                        logger,
-                        // @ts-ignore - rekey exists in some versions/contexts but TS might complain
+                        // @ts-ignore
                         rekey: session.socket.authState.creds.signedPreKey
                     }) as Buffer;
 
@@ -115,6 +114,12 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
         const phone = chatId.replace('@s.whatsapp.net', '').replace('@g.us', '');
         const pushName = (message as any).pushName || '';
 
+        const session = sessions.get(userId);
+        let avatarUrl = undefined;
+        if (session?.socket) {
+            avatarUrl = await session.socket.profilePictureUrl(chatId, 'image').catch(() => undefined);
+        }
+
         const chat = await prisma.whatsAppChat.upsert({
             where: {
                 userId_chatId: { userId, chatId }
@@ -123,7 +128,8 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
                 lastMsg: body,
                 lastMsgAt: timestamp,
                 name: fromMe ? undefined : (pushName || undefined),
-            },
+                avatarUrl,
+            } as any,
             create: {
                 userId,
                 tenantId,
@@ -133,7 +139,8 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
                 lastMsg: body,
                 lastMsgAt: timestamp,
                 unread: fromMe ? 0 : 1,
-            }
+                avatarUrl,
+            } as any
         });
 
         // Upsert message
@@ -169,10 +176,16 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
 
 async function syncChat(userId: string, tenantId: string, chat: any) {
     try {
-        const { id: chatId, name, archived, unreadCount } = chat;
+        const { id: chatId, name, archived, unreadCount, pin } = chat;
         if (!chatId) return;
 
         const phone = chatId.replace('@s.whatsapp.net', '').replace('@g.us', '');
+
+        const session = sessions.get(userId);
+        let avatarUrl = undefined;
+        if (session?.socket) {
+            avatarUrl = await session.socket.profilePictureUrl(chatId, 'image').catch(() => undefined);
+        }
 
         await prisma.whatsAppChat.upsert({
             where: { userId_chatId: { userId, chatId } },
@@ -180,7 +193,9 @@ async function syncChat(userId: string, tenantId: string, chat: any) {
                 name: name || undefined,
                 archived: archived !== undefined ? !!archived : undefined,
                 unread: unreadCount !== undefined ? unreadCount : undefined,
-            },
+                pinned: pin !== undefined ? !!pin : undefined,
+                avatarUrl,
+            } as any,
             create: {
                 userId,
                 tenantId,
@@ -188,8 +203,10 @@ async function syncChat(userId: string, tenantId: string, chat: any) {
                 name: name || phone,
                 phone: phone,
                 archived: !!archived,
+                pinned: !!pin,
                 unread: unreadCount || 0,
-            }
+                avatarUrl,
+            } as any
         });
     } catch (err) {
         console.error('Error syncing chat:', err);
@@ -350,9 +367,17 @@ export async function createSession(userId: string, tenantId: string, retryCount
         }
     });
 
-    sock.ev.on('chats.set', async ({ chats }) => {
+    // Initial history is already handled by messaging-history.set
+
+    sock.ev.on('chats.upsert', async (chats) => {
         for (const chat of chats) {
             await syncChat(userId, tenantId, chat);
+        }
+    });
+
+    sock.ev.on('chats.update', async (updates) => {
+        for (const update of updates) {
+            await syncChat(userId, tenantId, update);
         }
     });
 

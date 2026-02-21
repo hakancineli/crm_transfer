@@ -732,13 +732,15 @@ model WhatsAppChat {
   lastMsgAt DateTime?
   unread    Int               @default(0)
   archived  Boolean           @default(false)
+  pinned    Boolean           @default(false)
+  avatarUrl String?           @db.Text
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
   session   WhatsAppSession   @relation(fields: [userId], references: [userId])
   messages  WhatsAppMessage[]
 
   @@unique([userId, chatId])
-  @@index([userId, lastMsgAt])
+  @@index([userId, pinned, lastMsgAt])
   @@map("whatsapp_chats")
 }
 
