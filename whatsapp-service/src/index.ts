@@ -1,4 +1,9 @@
 // WhatsApp Service - Main Entry Point
+import { webcrypto } from 'node:crypto';
+if (!globalThis.crypto) {
+    (globalThis as any).crypto = webcrypto;
+}
+
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';

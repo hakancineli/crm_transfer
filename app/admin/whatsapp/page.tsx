@@ -184,7 +184,7 @@ export default function WhatsAppPage() {
             await fetch('/api/whatsapp/send', {
                 method: 'POST',
                 headers: getAuthHeaders(),
-                body: JSON.stringify({ to: selectedChat.phone, message: newMessage }),
+                body: JSON.stringify({ to: selectedChat.chatId, message: newMessage }),
             });
             setNewMessage('');
             await loadMessages(selectedChat);

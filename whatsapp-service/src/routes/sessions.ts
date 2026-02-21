@@ -77,8 +77,9 @@ sessionsRouter.post('/:userId/send', async (req, res) => {
 
     try {
         const jid = to.includes('@') ? to : `${to}@s.whatsapp.net`;
+        console.log(`📤 Sending message from ${userId} to ${jid}: ${message.substring(0, 20)}...`);
         await session.socket.sendMessage(jid, { text: message });
-        return res.json({ success: true });
+        return res.json({ success: true, jid });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: 'Failed to send message' });
