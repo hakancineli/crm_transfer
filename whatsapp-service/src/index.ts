@@ -7,6 +7,7 @@ if (!globalThis.crypto) {
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import { sessionsRouter } from './routes/sessions';
 import { chatsRouter } from './routes/chats';
 import { messagesRouter } from './routes/messages';
@@ -22,12 +23,12 @@ app.use(cors({
     origin: process.env.ALLOWED_ORIGIN || '*',
     credentials: true
 }));
-app.use(express.json({ limit: '10mb' }));
-
-// Health check (no auth needed) - must be before auth middleware
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// Serve static media files
+app.use('/media', express.static(path.join(process.cwd(), 'public', 'media')));
 
 // API Key auth middleware
 app.use((req, res, next) => {

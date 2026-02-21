@@ -750,6 +750,8 @@ model WhatsAppMessage {
   fromMe    Boolean  @default(false)
   body      String   @db.Text
   msgType   String   @default("text")
+  mediaUrl  String?  @db.Text
+  caption   String?  @db.Text
   timestamp DateTime
   createdAt DateTime @default(now())
   chat      WhatsAppChat @relation(fields: [chatId], references: [id], onDelete: Cascade)

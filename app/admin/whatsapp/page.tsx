@@ -19,6 +19,9 @@ interface WAMessage {
     fromMe: boolean;
     body: string;
     timestamp: string;
+    msgType?: string;
+    mediaUrl?: string | null;
+    caption?: string | null;
 }
 
 interface SessionStatus {
@@ -231,6 +234,59 @@ export default function WhatsAppPage() {
         } finally {
             setSending(false);
         }
+    };
+
+    const uploadFile = async (file: File) => {
+        if (!selectedChat) return;
+
+        // Check file size (max 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+            alert('Dosya çok büyük (Maksimum 10MB)');
+            return;
+        }
+
+        setSending(true);
+        const reader = new FileReader();
+        reader.onload = async () => {
+            const base64 = (reader.result as string).split(',')[1];
+            try {
+                // Optimistic UI for media
+                const tempId = 'temp-' + Date.now();
+                const msgType = file.type.startsWith('image/') ? 'image' : (file.type.startsWith('audio/') ? 'audio' : 'document');
+
+                setMessages(prev => [...prev, {
+                    id: tempId,
+                    fromMe: true,
+                    body: `[Gövdeleşen Dosya: ${file.name}]`,
+                    timestamp: new Date().toISOString(),
+                    msgType: msgType,
+                    caption: file.name
+                }]);
+
+                const res = await fetch('/api/whatsapp/send-media', {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        to: selectedChat.chatId,
+                        file: base64,
+                        fileName: file.name,
+                        caption: ''
+                    }),
+                });
+
+                if (res.ok) {
+                    await loadMessages(selectedChat, true);
+                } else {
+                    alert('Dosya gönderilemedi.');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Dosya gönderim hatası.');
+            } finally {
+                setSending(false);
+            }
+        };
+        reader.readAsDataURL(file);
     };
 
     const toggleMessageSelect = (msgId: string) => {
@@ -537,15 +593,55 @@ export default function WhatsAppPage() {
                                         </div>
                                     )}
                                     <div
-                                        className={`max-w-xs lg:max-w-md xl:max-w-lg px-4 py-2 rounded-2xl shadow-sm text-sm cursor-pointer
+                                        className={`max-w-xs lg:max-w-md xl:max-w-lg px-2 py-2 rounded-2xl shadow-sm cursor-pointer
                       ${msg.fromMe
                                                 ? 'bg-green-100 text-gray-800 rounded-tr-none'
                                                 : 'bg-white text-gray-800 rounded-tl-none'
                                             }
                       ${selectMode && selectedMessages.has(msg.id) ? 'ring-2 ring-blue-400' : ''}`}
                                     >
-                                        <p className="whitespace-pre-wrap break-words">{msg.body}</p>
-                                        <p className="text-xs text-gray-400 mt-1 text-right">
+                                        <div className="px-2 pt-1">
+                                            {msg.msgType === 'image' && msg.mediaUrl && (
+                                                <div className="mb-2 rounded-lg overflow-hidden border border-gray-100">
+                                                    <img
+                                                        src={`/api/whatsapp/media${msg.mediaUrl.replace('/media', '')}`}
+                                                        alt={msg.caption || 'Görsel'}
+                                                        className="w-full h-auto max-h-96 object-contain bg-gray-50"
+                                                    />
+                                                </div>
+                                            )}
+
+                                            {msg.msgType === 'audio' && msg.mediaUrl && (
+                                                <div className="mb-2 py-2 px-1 flex items-center gap-3 bg-gray-50 rounded-xl">
+                                                    <span className="text-xl">🎤</span>
+                                                    <audio controls className="h-8 max-w-[200px]">
+                                                        <source src={`/api/whatsapp/media${msg.mediaUrl.replace('/media', '')}`} type="audio/ogg" />
+                                                        Tarayıcınız ses çalmayı desteklemiyor.
+                                                    </audio>
+                                                </div>
+                                            )}
+
+                                            {msg.msgType === 'document' && msg.mediaUrl && (
+                                                <a
+                                                    href={`/api/whatsapp/media${msg.mediaUrl.replace('/media', '')}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="mb-2 flex items-center gap-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors border border-gray-100 group"
+                                                >
+                                                    <span className="text-2xl group-hover:scale-110 transition-transform">📄</span>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="text-sm font-medium text-gray-900 truncate">{msg.caption || 'Belge.pdf'}</div>
+                                                        <div className="text-xs text-blue-500">Görüntüle / İndir</div>
+                                                    </div>
+                                                </a>
+                                            )}
+
+                                            {msg.body && <p className="whitespace-pre-wrap break-words text-sm">{msg.body}</p>}
+                                            {msg.caption && msg.msgType !== 'document' && (
+                                                <p className="whitespace-pre-wrap break-words text-sm mt-1 italic text-gray-600">{msg.caption}</p>
+                                            )}
+                                        </div>
+                                        <p className="text-[10px] text-gray-400 mt-1 pr-2 text-right">
                                             {new Date(msg.timestamp).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
                                             {msg.fromMe && ' ✓✓'}
                                         </p>
@@ -558,6 +654,23 @@ export default function WhatsAppPage() {
                         {/* Message input */}
                         <div className="bg-white border-t border-gray-200 px-4 py-3 flex items-center gap-3">
                             <input
+                                type="file"
+                                id="fileInput"
+                                className="hidden"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) uploadFile(file);
+                                }}
+                                accept="image/*,audio/*,application/pdf"
+                            />
+                            <button
+                                onClick={() => document.getElementById('fileInput')?.click()}
+                                className="text-gray-400 hover:text-green-500 transition-colors"
+                                title="Dosya Ekle"
+                            >
+                                <span className="text-2xl">📎</span>
+                            </button>
+                            <input
                                 type="text"
                                 value={newMessage}
                                 onChange={e => setNewMessage(e.target.value)}
@@ -567,7 +680,7 @@ export default function WhatsAppPage() {
                             />
                             <button
                                 onClick={sendMessage}
-                                disabled={!newMessage.trim() || sending}
+                                disabled={(!newMessage.trim() && !sending) || sending}
                                 className="w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center transition-colors disabled:opacity-50"
                             >
                                 {sending ? '⏳' : '➤'}

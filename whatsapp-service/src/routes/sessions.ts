@@ -85,3 +85,36 @@ sessionsRouter.post('/:userId/send', async (req, res) => {
         return res.status(500).json({ error: 'Failed to send message' });
     }
 });
+
+// Send media
+sessionsRouter.post('/:userId/send-media', async (req, res) => {
+    const { userId } = req.params;
+    const { to, file, fileName, caption } = req.body;
+
+    const session = getSession(userId);
+    if (!session || session.status !== 'CONNECTED' || !session.socket) {
+        return res.status(400).json({ error: 'Session not connected' });
+    }
+
+    try {
+        const jid = to.includes('@') ? to : `${to}@s.whatsapp.net`;
+        const buffer = Buffer.from(file, 'base64');
+
+        let mediaContent: any = {};
+        const mime = fileName.split('.').pop()?.toLowerCase();
+
+        if (['jpg', 'jpeg', 'png'].includes(mime || '')) {
+            mediaContent = { image: buffer, caption };
+        } else if (['mp3', 'ogg', 'wav'].includes(mime || '')) {
+            mediaContent = { audio: buffer, mimetype: 'audio/mp4', ptt: true };
+        } else {
+            mediaContent = { document: buffer, fileName, mimetype: 'application/pdf', caption };
+        }
+
+        await session.socket.sendMessage(jid, mediaContent);
+        return res.json({ success: true, jid });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Failed to send media' });
+    }
+});

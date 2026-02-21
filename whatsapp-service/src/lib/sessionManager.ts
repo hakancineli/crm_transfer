@@ -45,21 +45,70 @@ export function getAllSessions() {
     return result;
 }
 
+import { downloadMediaMessage } from '@whiskeysockets/baileys';
+
 async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, tenantId: string) {
     try {
         const chatId = message.key.remoteJid;
-        if (!chatId || chatId.includes('@g.us')) return; // Skip group messages for now
+        if (!chatId || chatId.includes('@g.us')) return;
 
         const fromMe = message.key.fromMe || false;
-        const body = message.message?.conversation
-            || message.message?.extendedTextMessage?.text
-            || message.message?.imageMessage?.caption
-            || '';
 
-        if (!body) return; // Skip non-text messages
+        // Detect message type and content
+        let msgType = 'text';
+        let body = '';
+        let mediaUrl = null;
+        let caption = null;
+
+        if (message.message?.conversation) {
+            body = message.message.conversation;
+        } else if (message.message?.extendedTextMessage) {
+            body = message.message.extendedTextMessage.text || '';
+        } else if (message.message?.imageMessage) {
+            msgType = 'image';
+            body = '[Görsel]';
+            caption = message.message.imageMessage.caption || '';
+        } else if (message.message?.audioMessage) {
+            msgType = 'audio';
+            body = '[Sesli Mesaj]';
+        } else if (message.message?.documentMessage) {
+            msgType = 'document';
+            body = `[Dosya: ${message.message.documentMessage.fileName || 'belge.pdf'}]`;
+            caption = message.message.documentMessage.fileName || '';
+        } else if (message.message?.videoMessage) {
+            msgType = 'video';
+            body = '[Video]';
+            caption = message.message.videoMessage.caption || '';
+        }
 
         const msgId = message.key.id || '';
         const timestamp = new Date((message.messageTimestamp as number) * 1000);
+
+        // Download media if applicable
+        if (['image', 'audio', 'document', 'video'].includes(msgType)) {
+            try {
+                const session = sessions.get(userId);
+                if (session?.socket) {
+                    const buffer = await downloadMediaMessage(message, 'buffer', {}, {
+                        logger,
+                        rekey: session.socket.authState.creds.signedPreKey
+                    }) as Buffer;
+
+                    if (buffer) {
+                        const fileName = `${msgId}_${Date.now()}`;
+                        const ext = msgType === 'audio' ? 'ogg' : (msgType === 'image' ? 'jpg' : 'bin');
+                        const finalName = `${fileName}.${ext}`;
+                        const publicPath = path.join(process.cwd(), 'public', 'media');
+                        if (!fs.existsSync(publicPath)) fs.mkdirSync(publicPath, { recursive: true });
+
+                        fs.writeFileSync(path.join(publicPath, finalName), buffer);
+                        mediaUrl = `/media/${finalName}`;
+                    }
+                }
+            } catch (mediaErr) {
+                console.error('Error downloading media:', mediaErr);
+            }
+        }
 
         // Upsert chat
         const phone = chatId.replace('@s.whatsapp.net', '');
@@ -89,14 +138,19 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
         // Upsert message
         await prisma.whatsAppMessage.upsert({
             where: { msgId },
-            update: {},
+            update: {
+                mediaUrl,
+                caption,
+            },
             create: {
                 chatId: chat.id,
                 msgId,
                 fromMe,
                 body,
                 timestamp,
-                msgType: 'text',
+                msgType,
+                mediaUrl,
+                caption,
             }
         });
 
