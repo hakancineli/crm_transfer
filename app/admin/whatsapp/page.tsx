@@ -110,7 +110,14 @@ export default function WhatsAppPage() {
         alert('Bağlantı başlatılıyor, lütfen bekleyin...');
         setConnecting(true);
         try {
-            const res = await fetch('/api/whatsapp/status', { method: 'POST', headers: getAuthHeaders() });
+            console.log('🚀 Primary connect attempt (POST)...');
+            let res = await fetch('/api/whatsapp/status', { method: 'POST', headers: getAuthHeaders() });
+
+            if (!res.ok) {
+                console.warn('⚠️ Primary POST failed, trying secondary connect (GET)...');
+                res = await fetch('/api/whatsapp/status?connect=true', { headers: getAuthHeaders() });
+            }
+
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
                 console.error('Connect error:', data);
@@ -120,7 +127,7 @@ export default function WhatsAppPage() {
             // Start polling for QR/status
             if (pollRef.current) clearInterval(pollRef.current);
             pollRef.current = setInterval(pollStatus, 2000);
-            await pollStatus();
+            setTimeout(pollStatus, 500); // Immediate poll
         } catch (e) {
             console.error(e);
             alert('WhatsApp servisi ile iletişim kurulamadı. Lütfen internet bağlantınızı ve servis durumunu kontrol edin.');

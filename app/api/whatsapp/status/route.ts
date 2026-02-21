@@ -17,6 +17,19 @@ export async function GET(request: NextRequest) {
         const { userId } = await getRequestUserContext(request);
         if (!userId) return NextResponse.json({ error: 'X_CRM_AUTH_FAIL: Oturum Bulunamadı' }, { status: 401 });
 
+        // Extra debug: allow triggering connect via GET to bypass POST issues
+        const connect = request.nextUrl.searchParams.get('connect') === 'true';
+        if (connect) {
+            console.log(`[WA_CONNECT_ALT] Triggering connect via GET for ${userId}`);
+            // Fire and forget so we don't timeout the GET
+            fetch(`${WA_SERVICE_URL}/sessions/${userId}/connect`, {
+                method: 'POST',
+                headers: waHeaders(),
+                body: JSON.stringify({ tenantId: 'default_tenant' }),
+            }).catch(e => console.error('[WA_CONNECT_ALT_ERR]', e));
+            return NextResponse.json({ success: true, message: 'Connection started via GET' });
+        }
+
         const res = await fetch(`${WA_SERVICE_URL}/sessions/${userId}/status`, {
             headers: waHeaders(),
         });
