@@ -39,6 +39,12 @@ type ParsedReservation = {
     currency?: string;
     phoneNumber?: string;
     notes?: string;
+    // Tour fields
+    tourDate?: string;
+    tourTime?: string;
+    pickupLocation?: string;
+    routeName?: string;
+    type?: 'transfer' | 'tour';
 };
 
 export default function WhatsAppPage() {
@@ -185,7 +191,7 @@ export default function WhatsAppPage() {
                 body: JSON.stringify({ messageText: text, type }),
             });
             const data = await res.json();
-            setParsedReservation(data);
+            setParsedReservation({ ...data, type });
         } catch (e) {
             console.error(e);
         } finally {
@@ -196,18 +202,35 @@ export default function WhatsAppPage() {
     const goToCreateReservation = () => {
         if (!parsedReservation) return;
         const params = new URLSearchParams();
-        if (parsedReservation.date) params.set('date', parsedReservation.date);
-        if (parsedReservation.time) params.set('time', parsedReservation.time);
-        if (parsedReservation.from) params.set('from', parsedReservation.from);
-        if (parsedReservation.to) params.set('to', parsedReservation.to);
-        if (parsedReservation.flightCode) params.set('flightCode', parsedReservation.flightCode);
-        if (parsedReservation.price) params.set('price', String(parsedReservation.price));
-        if (parsedReservation.currency) params.set('currency', parsedReservation.currency);
-        if (parsedReservation.phoneNumber) params.set('phoneNumber', parsedReservation.phoneNumber);
-        if (parsedReservation.passengerNames?.length) params.set('passengerNames', parsedReservation.passengerNames.join(','));
-        if (parsedReservation.notes) params.set('notes', parsedReservation.notes);
-        if (selectedChat?.phone) params.set('whatsappPhone', selectedChat.phone);
-        router.push(`/admin/reservations/new?${params.toString()}`);
+
+        if (parsedReservation.type === 'tour') {
+            if (parsedReservation.tourDate) params.set('tourDate', parsedReservation.tourDate);
+            if (parsedReservation.tourTime) params.set('tourTime', parsedReservation.tourTime);
+            if (parsedReservation.pickupLocation) params.set('pickupLocation', parsedReservation.pickupLocation);
+            if (parsedReservation.routeName) params.set('routeName', parsedReservation.routeName);
+            if (parsedReservation.price) params.set('price', String(parsedReservation.price));
+            if (parsedReservation.currency) params.set('currency', parsedReservation.currency);
+            if (parsedReservation.passengerNames?.length) params.set('passengerNames', parsedReservation.passengerNames.join(','));
+            if (parsedReservation.notes) params.set('notes', parsedReservation.notes);
+            if (selectedChat?.phone) params.set('phoneNumber', selectedChat.phone);
+
+            router.push(`/admin/tour/reservations/new?${params.toString()}`);
+        } else {
+            if (parsedReservation.date) params.set('date', parsedReservation.date);
+            if (parsedReservation.time) params.set('time', parsedReservation.time);
+            if (parsedReservation.from) params.set('from', parsedReservation.from);
+            if (parsedReservation.to) params.set('to', parsedReservation.to);
+            if (parsedReservation.flightCode) params.set('flightCode', parsedReservation.flightCode);
+            if (parsedReservation.price) params.set('price', String(parsedReservation.price));
+            if (parsedReservation.currency) params.set('currency', parsedReservation.currency);
+            if (parsedReservation.phoneNumber || selectedChat?.phone) {
+                params.set('phoneNumber', parsedReservation.phoneNumber || selectedChat?.phone || '');
+            }
+            if (parsedReservation.passengerNames?.length) params.set('passengerNames', parsedReservation.passengerNames.join(','));
+            if (parsedReservation.notes) params.set('notes', parsedReservation.notes);
+
+            router.push(`/admin/reservations/new?${params.toString()}`);
+        }
     };
 
     const filteredChats = chats.filter(c =>
@@ -395,11 +418,21 @@ export default function WhatsAppPage() {
                                     <div className="flex-1">
                                         <p className="text-sm font-semibold text-blue-800 mb-2">🤖 AI Analiz Sonucu:</p>
                                         <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-blue-700">
-                                            {parsedReservation.date && <span>📅 {parsedReservation.date} {parsedReservation.time}</span>}
-                                            {parsedReservation.from && <span>📍 {parsedReservation.from} → {parsedReservation.to}</span>}
+                                            {parsedReservation.type === 'tour' ? (
+                                                <>
+                                                    {parsedReservation.tourDate && <span>📅 {parsedReservation.tourDate} {parsedReservation.tourTime}</span>}
+                                                    {parsedReservation.pickupLocation && <span>📍 {parsedReservation.pickupLocation}</span>}
+                                                    {parsedReservation.routeName && <span>🗺️ {parsedReservation.routeName}</span>}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {parsedReservation.date && <span>📅 {parsedReservation.date} {parsedReservation.time}</span>}
+                                                    {parsedReservation.from && <span>📍 {parsedReservation.from} → {parsedReservation.to}</span>}
+                                                    {parsedReservation.flightCode && <span>✈️ {parsedReservation.flightCode}</span>}
+                                                </>
+                                            )}
                                             {parsedReservation.passengerCount && <span>👥 {parsedReservation.passengerCount} kişi</span>}
                                             {parsedReservation.passengerNames?.length ? <span>🙋 {parsedReservation.passengerNames.join(', ')}</span> : null}
-                                            {parsedReservation.flightCode && <span>✈️ {parsedReservation.flightCode}</span>}
                                             {parsedReservation.price && <span>💰 {parsedReservation.price} {parsedReservation.currency}</span>}
                                         </div>
                                     </div>

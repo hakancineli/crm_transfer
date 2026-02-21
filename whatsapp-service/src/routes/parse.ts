@@ -85,7 +85,7 @@ Aşağıdaki JSON formatında döndür (değeri bilinmiyorsa null):
   "tourDate": "YYYY-MM-DD veya null",
   "tourTime": "HH:MM veya null",
   "routeName": "tur adı/güzergah veya null",
-  "groupSize": sayı veya null,
+  "passengerCount": sayı veya null,
   "passengerNames": ["isim1", "isim2"] veya [],
   "pickupLocation": "karşılama yeri veya null",
   "price": sayı veya null,
