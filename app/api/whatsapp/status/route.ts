@@ -44,17 +44,25 @@ export async function POST(request: NextRequest) {
 
         console.log(`[WA_CONNECT] Attempting for ${userId} with tenant ${tenantId} at ${WA_SERVICE_URL}`);
 
-        // Fire and forget - don't await the potentially slow Railway response
-        // This avoids Vercel's 10-15s function timeout while Baileys starts up
-        fetch(`${WA_SERVICE_URL}/sessions/${userId}/connect`, {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
+        const res = await fetch(`${WA_SERVICE_URL}/sessions/${userId}/connect`, {
             method: 'POST',
             headers: waHeaders(),
             body: JSON.stringify({ tenantId }),
-        }).catch(err => console.error('[WA_FIRE_AND_FORGET_ERR]', err));
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
 
-        console.log(`[WA_CONNECT] Request sent for ${userId}`);
+        console.log(`[WA_CONNECT] Result: ${res.status}`);
 
-        return NextResponse.json({ success: true, message: 'Connection initiated' });
+        if (res.status === 401) {
+            return NextResponse.json({ error: 'X_WA_SERVICE_KEY_FAIL: Railway API Key Hatalı' }, { status: 401 });
+        }
+
+        const data = await res.json().catch(() => ({}));
+        return NextResponse.json(data);
     } catch (err) {
         console.error('WA connect error:', err);
         return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
