@@ -44,11 +44,16 @@ export async function POST(request: NextRequest) {
 
         console.log(`[WA_CONNECT] Attempting for ${userId} with tenant ${tenantId} at ${WA_SERVICE_URL}`);
 
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
         const res = await fetch(`${WA_SERVICE_URL}/sessions/${userId}/connect`, {
             method: 'POST',
             headers: waHeaders(),
             body: JSON.stringify({ tenantId }),
+            signal: controller.signal
         });
+        clearTimeout(timeoutId);
 
         console.log(`[WA_CONNECT] Result: ${res.status}`);
 
