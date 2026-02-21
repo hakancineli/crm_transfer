@@ -706,6 +706,60 @@ model UetdsLog {
   @@map("uetds_logs")
 }
 
+// ─── WhatsApp Integration ────────────────────────────────────────────────────
+
+model WhatsAppSession {
+  id          String    @id @default(uuid())
+  userId      String    @unique
+  tenantId    String
+  phone       String?
+  status      String    @default("DISCONNECTED") // QR_PENDING | CONNECTED | DISCONNECTED
+  qrCode      String?   @db.Text
+  connectedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  chats       WhatsAppChat[]
+
+  @@map("whatsapp_sessions")
+}
+
+model WhatsAppChat {
+  id        String    @id @default(uuid())
+  userId    String
+  tenantId  String
+  chatId    String    // WA JID: 905321234567@s.whatsapp.net
+  name      String?
+  phone     String?
+  lastMsg   String?
+  lastMsgAt DateTime?
+  unread    Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  session   WhatsAppSession? @relation(fields: [userId], references: [userId])
+  messages  WhatsAppMessage[]
+
+  @@unique([userId, chatId])
+  @@index([userId, lastMsgAt])
+  @@map("whatsapp_chats")
+}
+
+model WhatsAppMessage {
+  id        String   @id @default(uuid())
+  chatId    String
+  msgId     String   @unique
+  fromMe    Boolean  @default(false)
+  body      String   @db.Text
+  msgType   String   @default("text")
+  timestamp DateTime
+  createdAt DateTime @default(now())
+  chat      WhatsAppChat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@index([chatId, timestamp])
+  @@map("whatsapp_messages")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 enum UserRole {
   SUPERUSER
   OPERATION
