@@ -25,6 +25,7 @@ interface WAMessage {
     msgType?: string;
     mediaUrl?: string | null;
     caption?: string | null;
+    senderName?: string | null;
 }
 
 interface SessionStatus {
@@ -159,7 +160,12 @@ export default function WhatsAppPage() {
         try {
             const res = await fetch('/api/whatsapp/chats', { headers: getAuthHeaders() });
             const data = await res.json();
-            setChats(Array.isArray(data) ? data : []);
+            const formattedChats = (Array.isArray(data) ? data : []).map((c: any) => ({
+                ...c,
+                archived: !!c.archived,
+                pinned: !!c.pinned
+            }));
+            setChats(formattedChats);
         } catch (e) {
             console.error(e);
         } finally {
@@ -546,6 +552,18 @@ export default function WhatsAppPage() {
                     </div>
 
                     <div className="flex-1 overflow-y-auto">
+                        {/* Archived Header (like mobile) */}
+                        {!showArchived && chats.some(c => c.archived) && (
+                            <div
+                                onClick={() => setShowArchived(true)}
+                                className="flex items-center gap-4 px-5 py-4 cursor-pointer hover:bg-gray-50 border-b border-gray-100 group transition-colors"
+                            >
+                                <div className="text-gray-400">🗳️</div>
+                                <div className="flex-1 font-medium text-sm text-gray-700">Arşivlenmiş</div>
+                                <div className="text-xs text-green-600 font-semibold">{chats.filter(c => c.archived).length}</div>
+                            </div>
+                        )}
+
                         {loadingChats && (
                             <div className="flex justify-center py-8">
                                 <div className="animate-spin w-6 h-6 border-2 border-green-500 border-t-transparent rounded-full" />
@@ -554,51 +572,58 @@ export default function WhatsAppPage() {
                         {filteredChats.length === 0 && !loadingChats && (
                             <div className="text-center py-10 text-gray-400 text-sm">
                                 <div className="text-3xl mb-2">📭</div>
-                                Henüz mesaj yok
+                                {showArchived ? 'Arşivlenmiş sohbet yok' : 'Henüz mesaj yok'}
                             </div>
                         )}
                         {filteredChats.map(chat => (
                             <div
                                 key={chat.id}
                                 onClick={() => loadMessages(chat)}
-                                className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-gray-50 hover:bg-gray-50 transition-colors group ${selectedChat?.id === chat.id ? 'bg-green-50 border-l-4 border-l-green-500' : ''}`}
+                                className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-gray-50 hover:bg-gray-50 transition-colors group ${selectedChat?.id === chat.id ? 'bg-gray-100' : ''}`}
                             >
-                                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0 overflow-hidden
-                      ${selectedChat?.id === chat.id ? 'bg-white text-green-500' : 'bg-green-500'}`}>
+                                {/* Avatar */}
+                                <div className={`w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-medium flex-shrink-0 overflow-hidden bg-gray-200 shadow-sm
+                      ${selectedChat?.id === chat.id ? '' : ''}`}>
                                     {chat.avatarUrl ? (
                                         <img src={chat.avatarUrl} alt="" className="w-full h-full object-cover" />
                                     ) : (
-                                        chat.chatId.includes('@g.us') ? '👥' : (chat.name?.[0] || chat.phone?.[0] || '?')
+                                        <div className="bg-blue-400 w-full h-full flex items-center justify-center">
+                                            {chat.chatId.includes('@g.us') ? '👥' : (chat.name && isNaN(parseInt(chat.name[0])) ? chat.name[0].toUpperCase() : '👤')}
+                                        </div>
                                     )}
                                 </div>
+
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-center">
-                                        <span className="font-medium text-sm text-gray-900 truncate">{chat.name || chat.phone}</span>
-                                        <div className="flex items-center gap-1">
-                                            {chat.pinned && <span className="text-gray-400 text-[10px]">📌</span>}
-                                            <span className="text-[10px] text-gray-400">
-                                                {chat.lastMsgAt ? new Date(chat.lastMsgAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : ''}
-                                            </span>
+                                        <span className="font-semibold text-sm text-gray-900 truncate">
+                                            {chat.name || (chat.phone ? `+${chat.phone}` : 'Bilinmeyen')}
+                                        </span>
+                                        <div className={`text-[11px] ${chat.unread > 0 ? 'text-green-600 font-semibold' : 'text-gray-400'}`}>
+                                            {chat.lastMsgAt ? new Date(chat.lastMsgAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : ''}
                                         </div>
                                     </div>
                                     <div className="flex justify-between items-center gap-2 mt-0.5">
-                                        <p className="text-xs text-gray-500 truncate flex-1">{chat.lastMsg || '...'}</p>
-                                        <div className="flex items-center gap-2">
+                                        <p className="text-xs text-gray-500 truncate flex-1 leading-tight">
+                                            {chat.lastMsg || '...'}
+                                        </p>
+                                        <div className="flex items-center gap-1.5 shrink-0">
+                                            {chat.pinned && <span className="text-[10px] grayscale opacity-60">📌</span>}
+                                            {chat.unread > 0 && (
+                                                <span className="bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                                                    {chat.unread}
+                                                </span>
+                                            )}
+                                            {/* Hidden Pin Action */}
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     togglePin(chat);
                                                 }}
-                                                className={`hover:scale-110 transition-transform ${chat.pinned ? 'opacity-100' : 'opacity-0 group-hover:opacity-40'}`}
+                                                className={`hover:scale-125 transition-all text-xs ${chat.pinned ? 'opacity-100' : 'opacity-0 group-hover:opacity-40'}`}
                                                 title={chat.pinned ? 'Baştan Kaldır' : 'Başa Tuttur'}
                                             >
                                                 📌
                                             </button>
-                                            {chat.unread > 0 && (
-                                                <span className="bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
-                                                    {chat.unread}
-                                                </span>
-                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -721,6 +746,9 @@ export default function WhatsAppPage() {
                       ${selectMode && selectedMessages.has(msg.id) ? 'ring-2 ring-blue-400' : ''}`}
                                     >
                                         <div className="px-2 pt-1">
+                                            {!msg.fromMe && selectedChat?.chatId.includes('@g.us') && msg.senderName && (
+                                                <div className="text-[11px] font-bold text-orange-600 mb-0.5">{msg.senderName}</div>
+                                            )}
                                             {msg.msgType === 'image' && msg.mediaUrl && (
                                                 <div className="mb-2 rounded-lg overflow-hidden border border-gray-100">
                                                     <img

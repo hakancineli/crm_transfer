@@ -111,8 +111,10 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
         }
 
         // Upsert chat
-        const phone = chatId.replace('@s.whatsapp.net', '').replace('@g.us', '');
+        const phone = chatId.replace('@s.whatsapp.net', '').replace('@g.us', '').replace('@lid', '');
         const pushName = (message as any).pushName || '';
+        const senderJid = message.key.participant || message.key.remoteJid;
+        const senderName = fromMe ? 'Siz' : (pushName || senderJid?.split('@')[0] || '');
 
         const session = sessions.get(userId);
         let avatarUrl = undefined;
@@ -127,15 +129,16 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
             update: {
                 lastMsg: body,
                 lastMsgAt: timestamp,
-                name: fromMe ? undefined : (pushName || undefined),
-                avatarUrl,
+                // Don't overwrite group names with participant pushnames
+                name: chatId.includes('@g.us') ? undefined : (fromMe ? undefined : (pushName || undefined)),
+                avatarUrl: avatarUrl || undefined,
             } as any,
             create: {
                 userId,
                 tenantId,
                 chatId,
                 phone,
-                name: pushName || phone,
+                name: chatId.includes('@g.us') ? 'Grup' : (pushName || phone),
                 lastMsg: body,
                 lastMsgAt: timestamp,
                 unread: fromMe ? 0 : 1,
@@ -143,12 +146,26 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
             } as any
         });
 
+        // Special case: if it's a group and we don't have a good name, try to get group metadata
+        if (chatId.includes('@g.us') && (chat.name === 'Grup' || !chat.name) && session?.socket) {
+            try {
+                const metadata = await session.socket.groupMetadata(chatId);
+                if (metadata.subject) {
+                    await prisma.whatsAppChat.update({
+                        where: { id: chat.id },
+                        data: { name: metadata.subject }
+                    });
+                }
+            } catch (e) { }
+        }
+
         // Upsert message
         await prisma.whatsAppMessage.upsert({
             where: { msgId },
             update: {
                 mediaUrl,
                 caption,
+                senderName,
             } as any,
             create: {
                 chatId: chat.id,
@@ -159,6 +176,7 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
                 msgType,
                 mediaUrl,
                 caption,
+                senderName,
             } as any
         });
 
@@ -179,7 +197,7 @@ async function syncChat(userId: string, tenantId: string, chat: any) {
         const { id: chatId, name, archived, unreadCount, pin } = chat;
         if (!chatId) return;
 
-        const phone = chatId.replace('@s.whatsapp.net', '').replace('@g.us', '');
+        const phone = chatId.replace('@s.whatsapp.net', '').replace('@g.us', '').replace('@lid', '');
 
         const session = sessions.get(userId);
         let avatarUrl = undefined;
@@ -187,23 +205,32 @@ async function syncChat(userId: string, tenantId: string, chat: any) {
             avatarUrl = await session.socket.profilePictureUrl(chatId, 'image').catch(() => undefined);
         }
 
+        // If it's a group and name is missing, try to fetch it
+        let resolvedName = name || undefined;
+        if (chatId.includes('@g.us') && !resolvedName && session?.socket) {
+            try {
+                const metadata = await session.socket.groupMetadata(chatId);
+                resolvedName = metadata.subject;
+            } catch (e) { }
+        }
+
         await prisma.whatsAppChat.upsert({
             where: { userId_chatId: { userId, chatId } },
             update: {
-                name: name || undefined,
+                name: resolvedName,
                 archived: archived !== undefined ? !!archived : undefined,
                 unread: unreadCount !== undefined ? unreadCount : undefined,
-                pinned: pin !== undefined ? !!pin : undefined,
-                avatarUrl,
+                pinned: (pin !== undefined && pin !== null && pin !== 0) ? true : undefined,
+                avatarUrl: avatarUrl || undefined,
             } as any,
             create: {
                 userId,
                 tenantId,
                 chatId,
-                name: name || phone,
+                name: resolvedName || phone,
                 phone: phone,
                 archived: !!archived,
-                pinned: !!pin,
+                pinned: (pin !== undefined && pin !== null && pin !== 0),
                 unread: unreadCount || 0,
                 avatarUrl,
             } as any
@@ -230,101 +257,56 @@ export async function createSession(userId: string, tenantId: string, retryCount
     }
 
     const authDir = getAuthDir(userId);
-    fs.mkdirSync(authDir, { recursive: true });
+    if (!fs.existsSync(authDir)) fs.mkdirSync(authDir, { recursive: true });
 
     const { state, saveCreds } = await useMultiFileAuthState(authDir);
-
-    // Use stable hardcoded version as fallback (fetchLatestBaileysVersion may fail in Railway)
-    let version: [number, number, number] = [2, 3000, 1023281120];
-    try {
-        const result = await Promise.race([
-            fetchLatestBaileysVersion(),
-            new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
-        ]) as { version: [number, number, number] };
-        version = result.version;
-        console.log(`📦 Using Baileys version: ${version.join('.')}`);
-    } catch (e) {
-        console.warn(`⚠️ Using fallback Baileys version: ${version.join('.')}`);
-    }
-
-    const store: SessionStore = {
-        socket: null,
-        qr: null,
-        status: 'CONNECTING',
-        phone: null,
-        qrRetries: 0,
-    };
-    sessions.set(userId, store);
+    const { version } = await fetchLatestBaileysVersion();
 
     const sock = makeWASocket({
         version,
-        logger,
         auth: {
             creds: state.creds,
             keys: makeCacheableSignalKeyStore(state.keys, logger),
         },
         printQRInTerminal: false,
-        browser: ['CRM Transfer', 'Chrome', '120.0.0'],
-        syncFullHistory: false,
-        connectTimeoutMs: 15000,
-        keepAliveIntervalMs: 10000,
-        retryRequestDelayMs: 2000,
+        logger,
+        browser: ['CRM Transfer', 'Chrome', '1.0.0'],
+        syncFullHistory: true,
     });
 
-    store.socket = sock;
-
-    sock.ev.on('creds.update', saveCreds);
+    const store: SessionStore = {
+        socket: sock,
+        qr: null,
+        status: 'CONNECTING',
+        phone: null,
+        qrRetries: 0
+    };
+    sessions.set(userId, store);
 
     sock.ev.on('connection.update', async (update) => {
         const { connection, lastDisconnect, qr } = update;
 
         if (qr) {
-            const qrImage = await QRCode.toDataURL(qr);
-            store.qr = qrImage;
+            store.qr = await QRCode.toDataURL(qr);
             store.status = 'QR_PENDING';
-            store.qrRetries++;
-            console.log(`📱 QR generated for user ${userId} (attempt #${store.qrRetries})`);
-
-            // Save QR to DB for polling
             await prisma.whatsAppSession.upsert({
                 where: { userId },
-                update: { qrCode: qrImage, status: 'QR_PENDING' },
-                create: {
-                    userId,
-                    tenantId,
-                    qrCode: qrImage,
-                    status: 'QR_PENDING',
-                }
+                update: { status: 'QR_PENDING', qrCode: store.qr },
+                create: { userId, tenantId, status: 'QR_PENDING', qrCode: store.qr }
             });
-
-            // Auto-disconnect after too many QR retries
-            if (store.qrRetries >= 5) {
-                await disconnectSession(userId);
-            }
         }
 
         if (connection === 'close') {
-            const errCode = (lastDisconnect?.error as Boom)?.output?.statusCode;
-            const shouldReconnect = errCode !== DisconnectReason.loggedOut;
-            console.log(`⚠️ Connection closed for ${userId}, code: ${errCode}, reconnect: ${shouldReconnect}`);
-            if (!errCode) {
-                console.dir(lastDisconnect?.error, { depth: null });
-            }
+            const shouldReconnect = (lastDisconnect?.error as Boom)?.output?.statusCode !== DisconnectReason.loggedOut;
+            console.log(`❌ Connection closed for ${userId}. Reconnecting: ${shouldReconnect}`);
+            store.status = 'DISCONNECTED';
+            store.socket = null;
 
             if (shouldReconnect) {
-                store.status = 'DISCONNECTED';
-                await prisma.whatsAppSession.upsert({
-                    where: { userId },
-                    update: { status: 'DISCONNECTED', qrCode: null },
-                    create: { userId, tenantId, status: 'DISCONNECTED' }
-                }).catch(console.error);
-                // Auto-reconnect after delay, with retry count to prevent infinite loops
-                const delay = Math.min(5000 * (retryCount + 1), 30000);
-                setTimeout(() => createSession(userId, tenantId, retryCount + 1), delay);
+                createSession(userId, tenantId, retryCount + 1);
             } else {
-                // Logged out
                 await disconnectSession(userId);
-                fs.rmSync(authDir, { recursive: true, force: true });
+                if (fs.existsSync(authDir)) fs.rmSync(authDir, { recursive: true, force: true });
             }
         }
 
@@ -340,11 +322,10 @@ export async function createSession(userId: string, tenantId: string, retryCount
                 update: { status: 'CONNECTED', phone, qrCode: null, connectedAt: new Date() },
                 create: { userId, tenantId, status: 'CONNECTED', phone, connectedAt: new Date() }
             });
-
-            // Historical messages are synced via 'messaging-history.set' event
-            // triggered by syncFullHistory: true option
         }
     });
+
+    sock.ev.on('creds.update', saveCreds);
 
     // Listen to new messages
     sock.ev.on('messages.upsert', async ({ messages, type }) => {
@@ -367,8 +348,6 @@ export async function createSession(userId: string, tenantId: string, retryCount
         }
     });
 
-    // Initial history is already handled by messaging-history.set
-
     sock.ev.on('chats.upsert', async (chats) => {
         for (const chat of chats) {
             await syncChat(userId, tenantId, chat);
@@ -381,15 +360,25 @@ export async function createSession(userId: string, tenantId: string, retryCount
         }
     });
 
-    sock.ev.on('chats.upsert', async (chats) => {
-        for (const chat of chats) {
-            await syncChat(userId, tenantId, chat);
+    sock.ev.on('contacts.upsert', async (contacts) => {
+        for (const contact of contacts) {
+            if (contact.id && (contact.name || contact.verifiedName)) {
+                await prisma.whatsAppChat.updateMany({
+                    where: { userId, chatId: contact.id },
+                    data: { name: contact.name || contact.verifiedName }
+                }).catch(() => { });
+            }
         }
     });
 
-    sock.ev.on('chats.update', async (updates) => {
+    sock.ev.on('contacts.update', async (updates) => {
         for (const update of updates) {
-            await syncChat(userId, tenantId, update as any);
+            if (update.id && (update.name || update.verifiedName)) {
+                await prisma.whatsAppChat.updateMany({
+                    where: { userId, chatId: update.id },
+                    data: { name: update.name || update.verifiedName }
+                }).catch(() => { });
+            }
         }
     });
 }

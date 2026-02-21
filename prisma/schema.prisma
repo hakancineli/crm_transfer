@@ -755,6 +755,7 @@ model WhatsAppMessage {
   createdAt DateTime     @default(now())
   caption   String?
   mediaUrl  String?
+  senderName String?
   chat      WhatsAppChat @relation(fields: [chatId], references: [id], onDelete: Cascade)
 
   @@index([chatId, timestamp])
