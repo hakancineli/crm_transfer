@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getRequestUserContext } from '@/app/lib/requestContext';
 
-const WA_SERVICE_URL = process.env.WHATSAPP_SERVICE_URL || 'http://localhost:3001';
-const WA_SERVICE_KEY = process.env.WHATSAPP_SERVICE_API_KEY || '';
+const WA_SERVICE_URL = (process.env.WHATSAPP_SERVICE_URL || 'http://localhost:3001').trim();
+const WA_SERVICE_KEY = (process.env.WHATSAPP_SERVICE_API_KEY || '').trim();
 
 function waHeaders() {
     return {
