@@ -104,12 +104,17 @@ sessionsRouter.post('/:userId/send-media', async (req, res) => {
         const mime = fileName.split('.').pop()?.toLowerCase();
         console.log(`📡 Preparing media for ${jid}. Ext: ${mime}, Buffer size: ${buffer.length} bytes`);
 
-        if (['jpg', 'jpeg', 'png'].includes(mime || '')) {
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(mime || '')) {
             mediaContent = { image: buffer, caption };
-        } else if (['mp3', 'm4a', 'wav'].includes(mime || '')) {
-            mediaContent = { audio: buffer, mimetype: `audio/${mime === 'mp3' ? 'mpeg' : mime}`, ptt: true };
-        } else if (mime === 'ogg' || mime === 'webm') {
-            mediaContent = { audio: buffer, mimetype: 'audio/ogg; codecs=opus', ptt: true };
+        } else if (['mp3', 'm4a', 'wav', 'ogg', 'webm', 'mp4'].includes(mime || '') || fileName.startsWith('voice-message')) {
+            // Standard PTT (Push-To-Talk) voice note
+            const audioMime = (mime === 'ogg' || mime === 'webm') ? 'audio/ogg; codecs=opus' : 'audio/mp4';
+            mediaContent = {
+                audio: buffer,
+                mimetype: audioMime,
+                ptt: true
+            };
+            console.log(`🎤 Sending as Voice Note (PTT) with mime: ${audioMime}`);
         } else {
             mediaContent = { document: buffer, fileName, mimetype: mime === 'pdf' ? 'application/pdf' : 'application/octet-stream', caption };
         }

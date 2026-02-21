@@ -268,7 +268,9 @@ export default function WhatsAppPage() {
             try {
                 // Optimistic UI for media
                 const tempId = 'temp-' + Date.now();
-                const msgType = file.type.startsWith('image/') ? 'image' : (file.type.startsWith('audio/') ? 'audio' : 'document');
+                const isImage = file.type.startsWith('image/') || /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name);
+                const isAudio = file.type.startsWith('audio/') || /\.(mp3|wav|ogg|webm|m4a|mp4)$/i.test(file.name) || file.name.startsWith('voice-message');
+                const msgType = isImage ? 'image' : (isAudio ? 'audio' : 'document');
 
                 setMessages(prev => [...prev, {
                     id: tempId,
@@ -647,7 +649,9 @@ export default function WhatsAppPage() {
                                         </div>
                                     </div>
                                     <div className="flex justify-between items-center gap-2 mt-0.5">
-                                        <p className="text-xs text-gray-500 truncate flex-1 leading-tight">
+                                        <p className="text-xs text-gray-500 truncate flex-1 leading-tight flex items-center gap-1">
+                                            {chat.lastMsg?.includes('[Sesli Mesaj]') && <span className="text-blue-500">🎤</span>}
+                                            {chat.lastMsg?.includes('[Görsel]') && <span className="text-gray-400">📷</span>}
                                             {chat.lastMsg || '...'}
                                         </p>
                                         <div className="flex items-center gap-1.5 shrink-0">
