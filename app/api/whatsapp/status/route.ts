@@ -15,14 +15,14 @@ function waHeaders() {
 export async function GET(request: NextRequest) {
     try {
         const { userId } = await getRequestUserContext(request);
-        if (!userId) return NextResponse.json({ error: 'CRM_AUTH_ERROR: Oturum geçersiz' }, { status: 401 });
+        if (!userId) return NextResponse.json({ error: 'X_CRM_AUTH_FAIL: Oturum Bulunamadı' }, { status: 401 });
 
         const res = await fetch(`${WA_SERVICE_URL}/sessions/${userId}/status`, {
             headers: waHeaders(),
         });
 
         if (res.status === 401) {
-            return NextResponse.json({ error: 'WA_SERVICE_AUTH_ERROR: Railway API Key geçersiz' }, { status: 401 });
+            return NextResponse.json({ error: 'X_WA_SERVICE_KEY_FAIL: Railway API Key Hatalı' }, { status: 401 });
         }
 
         const data = await res.json();
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const { userId, tenantIds } = await getRequestUserContext(request);
-        if (!userId) return NextResponse.json({ error: 'CRM_AUTH_ERROR: Oturum geçersiz' }, { status: 401 });
+        if (!userId) return NextResponse.json({ error: 'X_CRM_AUTH_FAIL: Oturum Bulunamadı' }, { status: 401 });
         const tenantId = tenantIds?.[0] || '';
 
         const res = await fetch(`${WA_SERVICE_URL}/sessions/${userId}/connect`, {
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
         });
 
         if (res.status === 401) {
-            return NextResponse.json({ error: 'WA_SERVICE_AUTH_ERROR: Railway API Key geçersiz' }, { status: 401 });
+            return NextResponse.json({ error: 'X_WA_SERVICE_KEY_FAIL: Railway API Key Hatalı' }, { status: 401 });
         }
 
         const data = await res.json();
