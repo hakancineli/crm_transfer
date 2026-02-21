@@ -47,6 +47,23 @@ export function getAllSessions() {
 
 import { downloadMediaMessage } from '@whiskeysockets/baileys';
 
+function getMessageText(message: proto.IMessage | null | undefined): string {
+    if (!message) return '';
+    if (message.conversation) return message.conversation;
+    if (message.extendedTextMessage?.text) return message.extendedTextMessage.text;
+    if (message.imageMessage?.caption) return message.imageMessage.caption;
+    if (message.videoMessage?.caption) return message.videoMessage.caption;
+    if (message.documentMessage?.caption) return message.documentMessage.caption;
+
+    // Handle nested messages (ephemeral, view once, edited)
+    if (message.ephemeralMessage) return getMessageText(message.ephemeralMessage.message);
+    if (message.viewOnceMessageV2) return getMessageText(message.viewOnceMessageV2.message);
+    if (message.viewOnceMessageV2Extension) return getMessageText(message.viewOnceMessageV2Extension.message);
+    if (message.editedMessage) return getMessageText(message.editedMessage.message?.protocolMessage?.editedMessage);
+
+    return '';
+}
+
 async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, tenantId: string) {
     try {
         const chatId = message.key.remoteJid;
@@ -56,17 +73,13 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
 
         // Detect message type and content
         let msgType = 'text';
-        let body = '';
+        let body = getMessageText(message.message);
         let mediaUrl = null;
         let caption = null;
 
-        if (message.message?.conversation) {
-            body = message.message.conversation;
-        } else if (message.message?.extendedTextMessage) {
-            body = message.message.extendedTextMessage.text || '';
-        } else if (message.message?.imageMessage) {
+        if (message.message?.imageMessage) {
             msgType = 'image';
-            body = '[Görsel]';
+            if (!body) body = '[Görsel]';
             caption = message.message.imageMessage.caption || '';
         } else if (message.message?.audioMessage) {
             msgType = 'audio';
@@ -77,8 +90,10 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
             caption = message.message.documentMessage.fileName || '';
         } else if (message.message?.videoMessage) {
             msgType = 'video';
-            body = '[Video]';
+            if (!body) body = '[Video]';
             caption = message.message.videoMessage.caption || '';
+        } else if (!body) {
+            body = '...'; // Final fallback
         }
 
         const msgId = message.key.id || '';
@@ -214,13 +229,21 @@ async function syncChat(userId: string, tenantId: string, chat: any) {
             } catch (e) { }
         }
 
+        // Detect archive status reliably
         const isArchived = chat.archive !== undefined ? !!chat.archive : (chat.archived !== undefined ? !!chat.archived : undefined);
         const isPinned = (chat.pin !== undefined && chat.pin !== null && chat.pin !== 0);
+
+        // Name resolution improvement
+        let finalName = resolvedName;
+        if (!finalName || finalName.includes('@lid') || /^\d+$/.test(finalName)) {
+            // Try pushName if available in the object
+            if ((chat as any).pushName) finalName = (chat as any).pushName;
+        }
 
         await prisma.whatsAppChat.upsert({
             where: { userId_chatId: { userId, chatId } },
             update: {
-                name: resolvedName,
+                name: finalName,
                 archived: isArchived,
                 unread: unreadCount !== undefined ? unreadCount : undefined,
                 pinned: isPinned || undefined,
@@ -230,7 +253,7 @@ async function syncChat(userId: string, tenantId: string, chat: any) {
                 userId,
                 tenantId,
                 chatId,
-                name: resolvedName || phone,
+                name: finalName || phone,
                 phone: phone,
                 archived: !!isArchived,
                 pinned: !!isPinned,

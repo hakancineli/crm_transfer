@@ -71,3 +71,21 @@ chatsRouter.post('/:userId/:chatId/pin', async (req, res) => {
         return res.status(500).json({ error: 'Failed to toggle pin' });
     }
 });
+// Toggle archive
+chatsRouter.post('/:userId/:chatId/archive', async (req, res) => {
+    const { userId, chatId } = req.params;
+    const { archived } = req.body;
+
+    try {
+        await prisma.whatsAppChat.update({
+            where: {
+                userId_chatId: { userId, chatId }
+            },
+            data: { archived: !!archived }
+        });
+        return res.json({ success: true, archived: !!archived });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Failed to toggle archive' });
+    }
+});

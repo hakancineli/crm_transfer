@@ -10,7 +10,10 @@ export async function GET(request: NextRequest) {
 
         const chats = await prisma.whatsAppChat.findMany({
             where: { userId },
-            orderBy: { lastMsgAt: 'desc' },
+            orderBy: [
+                { pinned: 'desc' },
+                { lastMsgAt: 'desc' }
+            ],
             take: 100,
             select: {
                 id: true,
@@ -20,6 +23,9 @@ export async function GET(request: NextRequest) {
                 lastMsg: true,
                 lastMsgAt: true,
                 unread: true,
+                archived: true,
+                pinned: true,
+                avatarUrl: true,
             }
         });
 

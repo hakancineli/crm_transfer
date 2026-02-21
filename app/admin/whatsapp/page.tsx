@@ -328,6 +328,30 @@ export default function WhatsAppPage() {
         }
     };
 
+    const toggleArchive = async (chat: Chat) => {
+        try {
+            // Optimistic UI
+            setChats(prev => prev.map(c =>
+                c.id === chat.id ? { ...c, archived: !c.archived } : c
+            ));
+
+            const res = await fetch(`/api/whatsapp/chats/${chat.chatId}/archive`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ archived: !chat.archived })
+            });
+
+            if (!res.ok) {
+                // Rollback
+                setChats(prev => prev.map(c =>
+                    c.id === chat.id ? { ...c, archived: chat.archived } : c
+                ));
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
     const startRecording = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -607,23 +631,35 @@ export default function WhatsAppPage() {
                                             {chat.lastMsg || '...'}
                                         </p>
                                         <div className="flex items-center gap-1.5 shrink-0">
-                                            {chat.pinned && <span className="text-[10px] grayscale opacity-60">📌</span>}
-                                            {chat.unread > 0 && (
-                                                <span className="bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
-                                                    {chat.unread}
-                                                </span>
-                                            )}
-                                            {/* Hidden Pin Action */}
+                                            {/* Pin Button */}
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     togglePin(chat);
                                                 }}
-                                                className={`hover:scale-125 transition-all text-sm p-1 rounded-full hover:bg-gray-200 ${chat.pinned ? 'opacity-100 text-blue-500' : 'opacity-0 group-hover:opacity-100'}`}
+                                                className={`hover:scale-125 transition-all text-sm p-1 rounded-full hover:bg-gray-200 ${chat.pinned ? 'opacity-100 text-blue-500 font-bold' : 'opacity-0 group-hover:opacity-100 text-gray-400'}`}
                                                 title={chat.pinned ? 'Baştan Kaldır' : 'Başa Tuttur'}
                                             >
                                                 📌
                                             </button>
+
+                                            {/* Archive Button */}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleArchive(chat);
+                                                }}
+                                                className={`hover:scale-125 transition-all text-sm p-1 rounded-full hover:bg-gray-200 opacity-0 group-hover:opacity-100 text-gray-400`}
+                                                title={showArchived ? 'Arşivden Çıkar' : 'Arşivle'}
+                                            >
+                                                {showArchived ? '📥' : '📦'}
+                                            </button>
+
+                                            {chat.unread > 0 && (
+                                                <span className="bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                                                    {chat.unread}
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
