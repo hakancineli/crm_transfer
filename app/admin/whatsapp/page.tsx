@@ -619,7 +619,7 @@ export default function WhatsAppPage() {
                                                     e.stopPropagation();
                                                     togglePin(chat);
                                                 }}
-                                                className={`hover:scale-125 transition-all text-xs ${chat.pinned ? 'opacity-100' : 'opacity-0 group-hover:opacity-40'}`}
+                                                className={`hover:scale-125 transition-all text-sm p-1 rounded-full hover:bg-gray-200 ${chat.pinned ? 'opacity-100 text-blue-500' : 'opacity-0 group-hover:opacity-100'}`}
                                                 title={chat.pinned ? 'Baştan Kaldır' : 'Başa Tuttur'}
                                             >
                                                 📌

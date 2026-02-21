@@ -214,13 +214,16 @@ async function syncChat(userId: string, tenantId: string, chat: any) {
             } catch (e) { }
         }
 
+        const isArchived = chat.archive !== undefined ? !!chat.archive : (chat.archived !== undefined ? !!chat.archived : undefined);
+        const isPinned = (chat.pin !== undefined && chat.pin !== null && chat.pin !== 0);
+
         await prisma.whatsAppChat.upsert({
             where: { userId_chatId: { userId, chatId } },
             update: {
                 name: resolvedName,
-                archived: archived !== undefined ? !!archived : undefined,
+                archived: isArchived,
                 unread: unreadCount !== undefined ? unreadCount : undefined,
-                pinned: (pin !== undefined && pin !== null && pin !== 0) ? true : undefined,
+                pinned: isPinned || undefined,
                 avatarUrl: avatarUrl || undefined,
             } as any,
             create: {
@@ -229,8 +232,8 @@ async function syncChat(userId: string, tenantId: string, chat: any) {
                 chatId,
                 name: resolvedName || phone,
                 phone: phone,
-                archived: !!archived,
-                pinned: (pin !== undefined && pin !== null && pin !== 0),
+                archived: !!isArchived,
+                pinned: !!isPinned,
                 unread: unreadCount || 0,
                 avatarUrl,
             } as any
