@@ -206,6 +206,9 @@ export async function createSession(userId: string, tenantId: string, retryCount
             const errCode = (lastDisconnect?.error as Boom)?.output?.statusCode;
             const shouldReconnect = errCode !== DisconnectReason.loggedOut;
             console.log(`⚠️ Connection closed for ${userId}, code: ${errCode}, reconnect: ${shouldReconnect}`);
+            if (!errCode) {
+                console.dir(lastDisconnect?.error, { depth: null });
+            }
 
             if (shouldReconnect) {
                 store.status = 'DISCONNECTED';
