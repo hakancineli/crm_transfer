@@ -7,10 +7,13 @@ export const sessionsRouter = Router();
 // Start/create session → returns QR code via polling
 sessionsRouter.post('/:userId/connect', async (req, res) => {
     const { userId } = req.params;
-    const { tenantId } = req.body;
+    let { tenantId } = req.body;
 
     if (!tenantId) {
-        return res.status(400).json({ error: 'tenantId required' });
+        // Find any existing tenant as fallback or use a placeholder
+        const firstTenant = await prisma.tenant.findFirst({ select: { id: true } });
+        tenantId = firstTenant?.id || 'default_tenant';
+        console.log(`ℹ️ No tenantId provided for user ${userId}, using fallback: ${tenantId}`);
     }
 
     try {

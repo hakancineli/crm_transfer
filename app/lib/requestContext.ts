@@ -20,13 +20,19 @@ export async function getRequestUserContext(request: NextRequest): Promise<Reque
       const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
       userId = decoded.userId || null;
       role = decoded.role || null;
-      
+
       if (decoded?.userId) {
         const links = await prisma.tenantUser.findMany({
           where: { userId: decoded.userId, isActive: true },
           select: { tenantId: true }
         });
         tenantIds = links.map((l) => l.tenantId);
+
+        // For Super Users, if no tenant is explicitly linked, give them the first one found in the system
+        if (role === 'SUPERUSER' && tenantIds.length === 0) {
+          const firstTenant = await prisma.tenant.findFirst({ select: { id: true } });
+          if (firstTenant) tenantIds = [firstTenant.id];
+        }
       }
     } catch (e) {
       // Token verification failed - ignore
