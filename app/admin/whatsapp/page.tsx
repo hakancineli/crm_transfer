@@ -67,14 +67,18 @@ export default function WhatsAppPage() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const pollRef = useRef<NodeJS.Timeout | null>(null);
 
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    const authHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (token) authHeaders['Authorization'] = `Bearer ${token}`;
+    // Always read token fresh to avoid stale closure capturing null token on first render
+    const getAuthHeaders = (): Record<string, string> => {
+        const t = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (t) headers['Authorization'] = `Bearer ${t}`;
+        return headers;
+    };
 
     // Poll session status
     const pollStatus = useCallback(async () => {
         try {
-            const res = await fetch('/api/whatsapp/status', { headers: authHeaders });
+            const res = await fetch('/api/whatsapp/status', { headers: getAuthHeaders() });
             const data = await res.json();
 
             if (data.error || !data.status) {
@@ -104,7 +108,7 @@ export default function WhatsAppPage() {
     const startConnection = async () => {
         setConnecting(true);
         try {
-            const res = await fetch('/api/whatsapp/status', { method: 'POST', headers: authHeaders });
+            const res = await fetch('/api/whatsapp/status', { method: 'POST', headers: getAuthHeaders() });
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
                 console.error('Connect error:', data);
@@ -124,7 +128,7 @@ export default function WhatsAppPage() {
     };
 
     const disconnect = async () => {
-        await fetch('/api/whatsapp/status', { method: 'DELETE', headers: authHeaders });
+        await fetch('/api/whatsapp/status', { method: 'DELETE', headers: getAuthHeaders() });
         setSession({ status: 'NOT_CONNECTED', qr: null, phone: null });
         setChats([]);
         setSelectedChat(null);
@@ -134,7 +138,7 @@ export default function WhatsAppPage() {
     const loadChats = async () => {
         setLoadingChats(true);
         try {
-            const res = await fetch('/api/whatsapp/chats', { headers: authHeaders });
+            const res = await fetch('/api/whatsapp/chats', { headers: getAuthHeaders() });
             const data = await res.json();
             setChats(Array.isArray(data) ? data : []);
         } catch (e) {
@@ -152,7 +156,7 @@ export default function WhatsAppPage() {
         setSelectMode(false);
         setSelectedMessages(new Set());
         try {
-            const res = await fetch(`/api/whatsapp/chats/${chat.id}/messages`, { headers: authHeaders });
+            const res = await fetch(`/api/whatsapp/chats/${chat.id}/messages`, { headers: getAuthHeaders() });
             const data = await res.json();
             setMessages(data.messages || []);
             // Update unread
@@ -170,7 +174,7 @@ export default function WhatsAppPage() {
         try {
             await fetch('/api/whatsapp/send', {
                 method: 'POST',
-                headers: authHeaders,
+                headers: getAuthHeaders(),
                 body: JSON.stringify({ to: selectedChat.phone, message: newMessage }),
             });
             setNewMessage('');
@@ -203,7 +207,7 @@ export default function WhatsAppPage() {
         try {
             const res = await fetch('/api/whatsapp/parse', {
                 method: 'POST',
-                headers: authHeaders,
+                headers: getAuthHeaders(),
                 body: JSON.stringify({ messageText: text, type }),
             });
             const data = await res.json();
@@ -536,4 +540,4 @@ export default function WhatsAppPage() {
         </div>
     );
 }
- 
+
