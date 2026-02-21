@@ -116,6 +116,45 @@ export default function NewTourReservationPage() {
     }
   }, [tourEnabled]);
 
+  // URL Query'den verileri çek (WhatsApp yönlendirmesi için)
+  useEffect(() => {
+    if (!tourEnabled) return;
+
+    const query = new URLSearchParams(window.location.search);
+    const tourDate = query.get('tourDate');
+    const tourTime = query.get('tourTime');
+    const pickupLocation = query.get('pickupLocation');
+    const price = query.get('price');
+    const currencyParam = query.get('currency') as Currency;
+    const phoneNumber = query.get('phoneNumber');
+    const passengerNames = query.get('passengerNames');
+    const notes = query.get('notes');
+    const routeName = query.get('routeName');
+
+    if (tourDate || tourTime || pickupLocation || price || passengerNames || routeName) {
+      const pNames = passengerNames ? passengerNames.split(',') : [];
+
+      setFormData(prev => ({
+        ...prev,
+        tourDate: tourDate || prev.tourDate,
+        tourTime: tourTime || prev.tourTime,
+        pickupLocation: pickupLocation || prev.pickupLocation,
+        price: price ? parseFloat(price) : prev.price,
+        currency: currencyParam || prev.currency,
+        notes: notes || prev.notes,
+        newCustomerPhone: phoneNumber || prev.newCustomerPhone,
+        customRouteName: routeName || prev.customRouteName,
+        passengerNames: pNames.length > 0 ? pNames : prev.passengerNames,
+        newCustomerName: pNames.length > 0 ? pNames[0].split(' ')[0] : prev.newCustomerName,
+        newCustomerSurname: pNames.length > 0 ? pNames[0].split(' ').slice(1).join(' ') : prev.newCustomerSurname,
+      }));
+
+      if (routeName) {
+        setFormData(prev => ({ ...prev, routeId: 'custom' }));
+      }
+    }
+  }, [tourEnabled]);
+
   // Fetch Scheduled Tours when Route or Date changes
   useEffect(() => {
     if (formData.routeId && formData.tourDate) {

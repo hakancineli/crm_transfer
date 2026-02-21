@@ -19,6 +19,11 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '10mb' }));
 
+// Health check (no auth needed) - must be before auth middleware
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // API Key auth middleware
 app.use((req, res, next) => {
     const apiKey = req.headers['x-api-key'];
@@ -26,11 +31,6 @@ app.use((req, res, next) => {
         return res.status(401).json({ error: 'Unauthorized' });
     }
     next();
-});
-
-// Health check (no auth needed)
-app.get('/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Routes

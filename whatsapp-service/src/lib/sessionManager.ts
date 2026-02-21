@@ -209,12 +209,8 @@ export async function createSession(userId: string, tenantId: string): Promise<v
                 create: { userId, tenantId, status: 'CONNECTED', phone, connectedAt: new Date() }
             });
 
-            // Fetch message history (last 90 days)
-            try {
-                await sock.fetchMessagesFromWA();
-            } catch (e) {
-                // Not always available
-            }
+            // Historical messages are synced via 'messaging-history.set' event
+            // triggered by syncFullHistory: true option
         }
     });
 

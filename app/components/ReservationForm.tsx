@@ -23,7 +23,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
     date: new Date().toISOString().split('T')[0],
     time: '12:00',
     passengers: [''],
-        luggageCount: 0,
+    luggageCount: 0,
     name: '',
     phone: '',
     email: '',
@@ -60,6 +60,41 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
     fetchFx();
   }, []);
 
+  // URL Query'den verileri çek (WhatsApp yönlendirmesi için)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const query = new URLSearchParams(window.location.search);
+    const date = query.get('date');
+    const time = query.get('time');
+    const from = query.get('from');
+    const to = query.get('to');
+    const flightCode = query.get('flightCode');
+    const price = query.get('price');
+    const currencyParam = query.get('currency') as Currency;
+    const phoneNumber = query.get('phoneNumber');
+    const passengerNames = query.get('passengerNames');
+    const notes = query.get('notes');
+
+    if (date || time || from || to || flightCode || price || phoneNumber || passengerNames) {
+      setFormData(prev => ({
+        ...prev,
+        date: date || prev.date,
+        time: time || prev.time,
+        from: from || prev.from,
+        to: to || prev.to,
+        flightCode: flightCode || prev.flightCode,
+        phone: phoneNumber || prev.phone,
+        notes: notes || prev.notes,
+        passengers: passengerNames ? passengerNames.split(',') : prev.passengers,
+        name: passengerNames ? passengerNames.split(',')[0] : prev.name
+      }));
+
+      if (price) setEstimatedPriceTRY(parseFloat(price));
+      if (currencyParam) setCurrency(currencyParam);
+    }
+  }, [isOpen]);
+
   // Fiyat hesaplama
   function getPriceFromKm(km: number): number | null {
     if (km <= 0) return 800;
@@ -81,17 +116,17 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
   useEffect(() => {
     // Admin formunda fiyat hesaplama yapma
     if (isAdminForm) return;
-    
+
     const g = (window as any).google;
     if (!formData.from || !formData.to || !googleMapsLoaded) return;
-    
+
     let cancelled = false;
     setEstimating(true);
-    
+
     // Önce Directions API dene
     if (g?.maps?.DirectionsService) {
       const directionsService = new g.maps.DirectionsService();
-      
+
       directionsService.route({
         origin: formData.from,
         destination: formData.to,
@@ -101,7 +136,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
         region: 'TR'
       }, (result: any, status: string) => {
         if (cancelled) return;
-        
+
         try {
           if (status === 'OK' && result?.routes?.[0]?.legs?.[0]) {
             const leg = result.routes[0].legs[0];
@@ -121,7 +156,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
       // Google Maps yoksa fallback
       estimateDistanceFallback();
     }
-    
+
     function estimateDistanceFallback() {
       // Basit mesafe tahmini (İstanbul içi için)
       const estimatedKm = 25; // Varsayılan mesafe
@@ -129,7 +164,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
       setEstimatedPriceTRY(getPriceFromKm(estimatedKm));
       setEstimating(false);
     }
-    
+
     return () => { cancelled = true; };
   }, [formData.from, formData.to, googleMapsLoaded, isAdminForm]);
 
@@ -137,21 +172,21 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
 
   // Yolcu yönetimi
   const addPassenger = () => setFormData(prev => ({ ...prev, passengers: [...prev.passengers, ''] }));
-  const updatePassenger = (i: number, v: string) => setFormData(prev => ({ 
-    ...prev, 
-    passengers: prev.passengers.map((p, idx) => (idx === i ? v : p)) 
+  const updatePassenger = (i: number, v: string) => setFormData(prev => ({
+    ...prev,
+    passengers: prev.passengers.map((p, idx) => (idx === i ? v : p))
   }));
-  const removePassenger = (i: number) => setFormData(prev => ({ 
-    ...prev, 
-    passengers: prev.passengers.filter((_, idx) => idx !== i) 
+  const removePassenger = (i: number) => setFormData(prev => ({
+    ...prev,
+    passengers: prev.passengers.filter((_, idx) => idx !== i)
   }));
 
   if (!isOpen) return null;
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsSubmitting(true);
-        setError('');
+    setError('');
 
     try {
       const priceToSubmit = (() => {
@@ -167,7 +202,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
         }
       })();
 
-            const response = await fetch('/api/reservations', {
+      const response = await fetch('/api/reservations', {
         method: 'POST',
         headers: (() => {
           const base: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -181,8 +216,8 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
           type: formData.type,
           from: formData.from,
           to: formData.to,
-                    date: formData.date,
-                    time: formData.time,
+          date: formData.date,
+          time: formData.time,
           passengerNames: formData.passengers,
           luggageCount: formData.luggageCount,
           price: priceToSubmit,
@@ -190,16 +225,16 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
           phoneNumber: formData.phone,
           name: formData.name,
           notes: formData.notes,
-                    flightCode: formData.flightCode,
+          flightCode: formData.flightCode,
           distanceKm: distanceKm || null,
           tenantId,
           source: isAdminForm ? 'admin' : 'website'
-                }),
-            });
+        }),
+      });
 
       if (response.ok) {
         const result = await response.json();
-        
+
         if (isAdminForm) {
           // Admin form için voucher sayfasına yönlendir
           window.location.href = `/admin/reservations/${result.voucherNumber}/customer-voucher`;
@@ -207,7 +242,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
           alert('Rezervasyon talebiniz başarıyla gönderildi! En kısa sürede sizinle iletişime geçeceğiz.');
           onClose();
         }
-        
+
         // Reset form
         setFormData({
           type: 'transfer',
@@ -232,17 +267,17 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
     } catch (error: any) {
       console.error('Error submitting reservation:', error);
       setError(error?.message || 'Rezervasyon talebi gönderilirken bir hata oluştu. Lütfen tekrar deneyin.');
-        } finally {
+    } finally {
       setIsSubmitting(false);
-        }
-    };
+    }
+  };
 
   const handleInputChange = (field: string, value: string | number) => {
-        setFormData(prev => ({
-            ...prev,
+    setFormData(prev => ({
+      ...prev,
       [field]: value
-        }));
-    };
+    }));
+  };
 
   const convertFromTRY = (amountTRY: number | null, to: Currency): number | null => {
     if (amountTRY == null) return null;
@@ -250,9 +285,9 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
     const rate = fxRates[to];
     if (!rate || rate <= 0) return null;
     return amountTRY * rate;
-    };
+  };
 
-    return (
+  return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
@@ -268,7 +303,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                    {error && (
+          {error && (
             <div className="bg-red-50 border border-red-200 rounded-md p-2 text-sm text-red-700">{error}</div>
           )}
 
@@ -321,7 +356,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
                 name="to-address"
               />
             </div>
-                            </div>
+          </div>
 
           {/* Distance and Price Display - Sadece müşteri formunda göster */}
           {!isAdminForm && (formData.from && formData.to) && (
@@ -354,29 +389,29 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
                 <Calendar className="inline h-4 w-4 mr-1" />
                 Tarih
               </label>
-                                <input
-                                    type="date"
-                                    value={formData.date}
+              <input
+                type="date"
+                value={formData.date}
                 onChange={(e) => handleInputChange('date', e.target.value)}
-                                    required
+                required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                                />
-                            </div>
+              />
+            </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Clock className="inline h-4 w-4 mr-1" />
                 Saat
               </label>
-                                <input
-                                    type="time"
-                                    value={formData.time}
+              <input
+                type="time"
+                value={formData.time}
                 onChange={(e) => handleInputChange('time', e.target.value)}
-                                    required
+                required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                                />
-                        </div>
-                    </div>
+              />
+            </div>
+          </div>
 
           {/* Flight Code and Currency */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -438,46 +473,46 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Users className="inline h-4 w-4 mr-1" />
-                            Yolcu Bilgileri
+              Yolcu Bilgileri
             </label>
-                        <div className="space-y-2">
+            <div className="space-y-2">
               {formData.passengers.map((passenger, i) => (
                 <div key={i} className="flex gap-2">
-                                    <input
-                                        type="text"
+                  <input
+                    type="text"
                     value={passenger}
                     onChange={(e) => updatePassenger(i, e.target.value)}
                     placeholder={`Yolcu ${i + 1} adı`}
-                                        required
+                    required
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    />
+                  />
                   {formData.passengers.length > 1 && (
-                                        <button
-                                            type="button"
+                    <button
+                      type="button"
                       onClick={() => removePassenger(i)}
                       className="px-3 py-2 border border-red-300 text-red-600 rounded-md hover:bg-red-50"
-                                        >
+                    >
                       Sil
-                                        </button>
-                                    )}
-                                </div>
-                            ))}
-                            <button
-                                type="button"
-                                onClick={addPassenger}
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addPassenger}
                 className="px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
-                            >
+              >
                 + Yolcu Ekle
-                            </button>
+              </button>
               <p className="text-xs text-gray-600">Yolcu bilgilerini eksiksiz giriniz.</p>
             </div>
-                        </div>
+          </div>
 
           {/* Luggage Count */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Bagaj Sayısı
-                            </label>
+            </label>
             <input
               type="number"
               min={0}
@@ -489,7 +524,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
               }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
             />
-                                </div>
+          </div>
 
           {/* Contact Information */}
           <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
@@ -497,21 +532,21 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Telefon
               </label>
-                                    <input
+              <input
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
-                                        required
+                required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    />
-                                </div>
-                            </div>
+              />
+            </div>
+          </div>
 
           {/* Email alanı kaldırıldı */}
 
           {/* Notes removed per request */}
 
-          
+
 
           {/* Submit Button */}
           <div className="flex justify-end space-x-4">
@@ -522,8 +557,8 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
             >
               İptal
             </button>
-                        <button
-                            type="submit"
+            <button
+              type="submit"
               disabled={isSubmitting}
               className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-6 py-2 rounded-md transition-colors flex items-center"
             >
@@ -531,14 +566,14 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Gönderiliyor...
-                                </>
-                            ) : (
+                </>
+              ) : (
                 'Rezervasyon oluştur'
-                            )}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    );
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 } 
