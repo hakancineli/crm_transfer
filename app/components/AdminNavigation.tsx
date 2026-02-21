@@ -55,7 +55,8 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         icon: '💬',
         description: 'Mesajlar ve Rezervasyonlar',
         module: 'system',
-        order: 1.5
+        order: 1.5,
+        visible: true
       },
       // 2. Yeni Rezervasyon - En sık kullanılan
       {
@@ -509,4 +510,4 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
 };
 
 export default AdminNavigation;
- 
+
