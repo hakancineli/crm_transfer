@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
                 { pinned: 'desc' },
                 { lastMsgAt: 'desc' }
             ],
-            take: 100,
+            take: 500,
             select: {
                 id: true,
                 chatId: true,

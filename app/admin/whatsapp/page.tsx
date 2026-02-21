@@ -205,7 +205,7 @@ export default function WhatsAppPage() {
     useEffect(() => {
         if (session.status !== 'CONNECTED') return;
 
-        const chatInterval = setInterval(() => loadChats(true), 10000); // Poll chats every 10s
+        const chatInterval = setInterval(() => loadChats(true), 5000); // Poll chats every 5s
 
         let msgInterval: NodeJS.Timeout | null = null;
         if (selectedChat) {

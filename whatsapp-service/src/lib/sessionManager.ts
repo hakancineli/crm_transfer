@@ -49,18 +49,35 @@ import { downloadMediaMessage } from '@whiskeysockets/baileys';
 
 function getMessageText(message: proto.IMessage | null | undefined): string {
     if (!message) return '';
+
+    // Core text types
     if (message.conversation) return message.conversation;
     if (message.extendedTextMessage?.text) return message.extendedTextMessage.text;
+
+    // Media captions
     if (message.imageMessage?.caption) return message.imageMessage.caption;
     if (message.videoMessage?.caption) return message.videoMessage.caption;
     if (message.documentMessage?.caption) return message.documentMessage.caption;
+    if (message.imageMessage) return '[Görsel]';
+    if (message.videoMessage) return '[Video]';
+    if (message.audioMessage) return '[Sesli Mesaj]';
+    if (message.documentMessage) return `[Dosya: ${message.documentMessage.fileName || 'belge.pdf'}]`;
+
+    // Location & Contact
     if (message.locationMessage) return '📍 [Konum]';
+    if (message.liveLocationMessage) return '📍 [Canlı Konum]';
     if (message.contactMessage) return `👤 [Kişi: ${message.contactMessage.displayName || ''}]`;
-    if (message.reactionMessage) return `👍 [Reaksiyon: ${message.reactionMessage.text || ''}]`;
+    if (message.contactsArrayMessage) return '👥 [Kişiler]';
+
+    // Reactions and system
+    if (message.reactionMessage) return `${message.reactionMessage.text || '👍'} [Reaksiyon]`;
+    if (message.pollCreationMessage) return `📊 [Anket: ${message.pollCreationMessage.name}]`;
+    if (message.stickerMessage) return '[Sticker]';
 
     // Call messages
     if (message.callMessage) return '📞 [Sesli Arama]';
     if (message.videoCallMessage) return '📹 [Video Arama]';
+    if (message.protocolMessage?.type === proto.Message.ProtocolMessage.Type.REVOKE) return '🗑️ [Mesaj silindi]';
 
     // Handle nested messages (ephemeral, view once, edited)
     if (message.ephemeralMessage) return getMessageText(message.ephemeralMessage.message);
@@ -74,7 +91,9 @@ function getMessageText(message: proto.IMessage | null | undefined): string {
 async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, tenantId: string) {
     try {
         const chatId = message.key.remoteJid;
-        if (!chatId) return;
+        if (!chatId || chatId === 'status@broadcast') return;
+
+        console.log(`📩 New message from ${chatId} for user ${userId}`);
 
         const fromMe = message.key.fromMe || false;
 
@@ -185,7 +204,7 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
         }
 
         // Upsert message
-        await prisma.whatsAppMessage.upsert({
+        const savedMsg = await prisma.whatsAppMessage.upsert({
             where: { msgId },
             update: {
                 mediaUrl,
