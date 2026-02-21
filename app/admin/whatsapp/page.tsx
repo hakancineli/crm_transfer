@@ -98,11 +98,20 @@ export default function WhatsAppPage() {
     const startConnection = async () => {
         setConnecting(true);
         try {
-            await fetch('/api/whatsapp/status', { method: 'POST', headers: authHeaders });
+            const res = await fetch('/api/whatsapp/status', { method: 'POST', headers: authHeaders });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                console.error('Connect error:', data);
+                alert(`Hata: ${data.error || 'Bağlantı başlatılamadı'}`);
+                return;
+            }
             // Start polling for QR/status
+            if (pollRef.current) clearInterval(pollRef.current);
             pollRef.current = setInterval(pollStatus, 2000);
+            await pollStatus();
         } catch (e) {
             console.error(e);
+            alert('WhatsApp servisi ile iletişim kurulamadı. Lütfen internet bağlantınızı ve servis durumunu kontrol edin.');
         } finally {
             setConnecting(false);
         }
