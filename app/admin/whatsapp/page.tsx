@@ -106,6 +106,8 @@ export default function WhatsAppPage() {
     }, [messages]);
 
     const startConnection = async () => {
+        console.log('🚀 Sending WA connect request...');
+        alert('Bağlantı başlatılıyor, lütfen bekleyin...');
         setConnecting(true);
         try {
             const res = await fetch('/api/whatsapp/status', { method: 'POST', headers: getAuthHeaders() });
@@ -541,5 +543,5 @@ export default function WhatsAppPage() {
     );
 }
 
- 
+
 // Build trigger: Sat Feb 21 16:25:32 +03 2026
