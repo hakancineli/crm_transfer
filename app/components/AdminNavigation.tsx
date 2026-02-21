@@ -148,14 +148,23 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         module: 'system',
         order: role === 'SUPERUSER' ? 12 : 999
       },
-      // 13. Personel Performansı - Performans analizi
+      // 12.5 WhatsApp
+      {
+        name: 'WhatsApp',
+        href: '/admin/whatsapp',
+        icon: '💬',
+        description: 'Mesajlar ve Rezervasyonlar',
+        module: 'transfer',
+        order: 13
+      },
+      // 14. Personel Performansı - Performans analizi
       {
         name: t('admin.navigation.performance'),
         href: '/admin/performance',
         icon: '📊',
         description: t('admin.navigation.performanceDesc'),
         module: 'system',
-        order: role === 'SUPERUSER' ? 13 : (role === 'AGENCY_ADMIN' ? 13 : 999)
+        order: role === 'SUPERUSER' ? 14 : (role === 'AGENCY_ADMIN' ? 14 : 999)
       },
       // 14. Konaklama - Otel rezervasyon yönetimi
       {
@@ -237,15 +246,6 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         description: t('admin.navigation.tourVehiclesDesc'),
         module: 'tour',
         order: 22
-      },
-      // 22.5 WhatsApp Inbox
-      {
-        name: 'WhatsApp',
-        href: '/admin/whatsapp',
-        icon: '💬',
-        description: 'Müşteri mesajları ve rezervasyon oluştur',
-        module: 'transfer',
-        order: 23
       },
       // 24. U-ETDS - Ulaştırma sistemi
       {
@@ -417,6 +417,11 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               shouldShow = user?.role === 'AGENCY_ADMIN' || user?.role === 'SUPERUSER';
             } else if (item.name === 'Modül Yönetimi') {
               shouldShow = user?.role === 'SUPERUSER';
+            } else if (item.href === '/admin/whatsapp' || item.name === 'WhatsApp') {
+              // AGENCY_ADMIN ve SUPERUSER her zaman görsün
+              shouldShow = user?.role === 'AGENCY_ADMIN' || user?.role === 'SUPERUSER' || user?.permissions?.some(p =>
+                (p.permission === 'VIEW_OWN_SALES' || p.permission === 'MANAGE_CUSTOMERS') && p.isActive
+              ) || false;
             } else if (item.module === 'tour') {
               // AGENCY_ADMIN her zaman görsün; diğer roller izinle görsün
               if (user?.role === 'AGENCY_ADMIN') {
