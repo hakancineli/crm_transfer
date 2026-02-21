@@ -51,7 +51,22 @@ app.use((req, res) => {
 
 app.listen(PORT, () => {
     console.log(`✅ WhatsApp Service running on port ${PORT}`);
+
+    // Self-ping every 4 minutes to prevent Railway from sleeping the service.
+    // Railway free plan sleeps inactive services, which causes Prisma to restart
+    // on every single request — breaking the WS session and QR code generation.
+    const serviceUrl = process.env.RAILWAY_PUBLIC_DOMAIN
+        ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}/health`
+        : `http://localhost:${PORT}/health`;
+
+    setInterval(async () => {
+        try {
+            const res = await fetch(serviceUrl);
+            console.log(`[KEEPALIVE] Ping OK: ${res.status}`);
+        } catch (e) {
+            console.warn(`[KEEPALIVE] Ping failed:`, e);
+        }
+    }, 4 * 60 * 1000); // every 4 minutes
 });
 
 export default app;
- 
