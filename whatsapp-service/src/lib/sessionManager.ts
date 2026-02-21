@@ -112,16 +112,39 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
     }
 }
 
-export async function createSession(userId: string, tenantId: string): Promise<void> {
+export async function createSession(userId: string, tenantId: string, retryCount = 0): Promise<void> {
     // If already connected, skip
     const existing = sessions.get(userId);
     if (existing?.status === 'CONNECTED') return;
+
+    // Max 3 retries to avoid infinite loop
+    if (retryCount >= 3) {
+        console.error(`❌ Max retries reached for ${userId}, giving up`);
+        await prisma.whatsAppSession.upsert({
+            where: { userId },
+            update: { status: 'DISCONNECTED', qrCode: null },
+            create: { userId, tenantId, status: 'DISCONNECTED' }
+        }).catch(() => { });
+        return;
+    }
 
     const authDir = getAuthDir(userId);
     fs.mkdirSync(authDir, { recursive: true });
 
     const { state, saveCreds } = await useMultiFileAuthState(authDir);
-    const { version } = await fetchLatestBaileysVersion();
+
+    // Use stable hardcoded version as fallback (fetchLatestBaileysVersion may fail in Railway)
+    let version: [number, number, number] = [2, 3000, 1023281120];
+    try {
+        const result = await Promise.race([
+            fetchLatestBaileysVersion(),
+            new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+        ]) as { version: [number, number, number] };
+        version = result.version;
+        console.log(`📦 Using Baileys version: ${version.join('.')}`);
+    } catch (e) {
+        console.warn(`⚠️ Using fallback Baileys version: ${version.join('.')}`);
+    }
 
     const store: SessionStore = {
         socket: null,
@@ -141,7 +164,10 @@ export async function createSession(userId: string, tenantId: string): Promise<v
         },
         printQRInTerminal: false,
         browser: ['CRM Transfer', 'Chrome', '120.0.0'],
-        syncFullHistory: true, // Fetch message history
+        syncFullHistory: false,
+        connectTimeoutMs: 15000,
+        keepAliveIntervalMs: 10000,
+        retryRequestDelayMs: 2000,
     });
 
     store.socket = sock;
@@ -177,8 +203,9 @@ export async function createSession(userId: string, tenantId: string): Promise<v
         }
 
         if (connection === 'close') {
-            const shouldReconnect = (lastDisconnect?.error as Boom)?.output?.statusCode !== DisconnectReason.loggedOut;
-            console.log(`⚠️ Connection closed for ${userId}, reconnect: ${shouldReconnect}`);
+            const errCode = (lastDisconnect?.error as Boom)?.output?.statusCode;
+            const shouldReconnect = errCode !== DisconnectReason.loggedOut;
+            console.log(`⚠️ Connection closed for ${userId}, code: ${errCode}, reconnect: ${shouldReconnect}`);
 
             if (shouldReconnect) {
                 store.status = 'DISCONNECTED';
@@ -186,9 +213,10 @@ export async function createSession(userId: string, tenantId: string): Promise<v
                     where: { userId },
                     update: { status: 'DISCONNECTED', qrCode: null },
                     create: { userId, tenantId, status: 'DISCONNECTED' }
-                });
-                // Auto-reconnect after 5s
-                setTimeout(() => createSession(userId, tenantId), 5000);
+                }).catch(console.error);
+                // Auto-reconnect after delay, with retry count to prevent infinite loops
+                const delay = Math.min(5000 * (retryCount + 1), 30000);
+                setTimeout(() => createSession(userId, tenantId, retryCount + 1), delay);
             } else {
                 // Logged out
                 await disconnectSession(userId);
