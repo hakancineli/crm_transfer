@@ -105,10 +105,10 @@ sessionsRouter.post('/:userId/send-media', async (req, res) => {
 
         if (['jpg', 'jpeg', 'png'].includes(mime || '')) {
             mediaContent = { image: buffer, caption };
-        } else if (['mp3', 'ogg', 'wav'].includes(mime || '')) {
-            mediaContent = { audio: buffer, mimetype: 'audio/mp4', ptt: true };
+        } else if (['mp3', 'ogg', 'wav', 'm4a'].includes(mime || '')) {
+            mediaContent = { audio: buffer, mimetype: 'audio/ogg; codecs=opus', ptt: true };
         } else {
-            mediaContent = { document: buffer, fileName, mimetype: 'application/pdf', caption };
+            mediaContent = { document: buffer, fileName, mimetype: mime === 'pdf' ? 'application/pdf' : 'application/octet-stream', caption };
         }
 
         await session.socket.sendMessage(jid, mediaContent);
