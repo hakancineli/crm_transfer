@@ -51,3 +51,6 @@ Thumbs.db
 # Temporary files
 tmp/
 temp/
+
+# Microservices (deployed separately)
+whatsapp-service/
