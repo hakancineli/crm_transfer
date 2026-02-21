@@ -155,7 +155,7 @@ export default function WhatsAppPage() {
         if (pollRef.current) clearInterval(pollRef.current);
     };
 
-    const loadChats = async (silent = false) => {
+    const loadChats = useCallback(async (silent = false) => {
         if (!silent) setLoadingChats(true);
         try {
             const res = await fetch('/api/whatsapp/chats', { headers: getAuthHeaders() });
@@ -171,9 +171,9 @@ export default function WhatsAppPage() {
         } finally {
             if (!silent) setLoadingChats(false);
         }
-    };
+    }, []);
 
-    const loadMessages = async (chat: Chat, silent = false) => {
+    const loadMessages = useCallback(async (chat: Chat, silent = false) => {
         if (!silent) {
             setLoadingMsgs(true);
             setMessages([]);
@@ -187,10 +187,11 @@ export default function WhatsAppPage() {
             const data = await res.json();
             const newMsgs = data.messages || [];
 
-            // Only update if messages changed to avoid scroll jumping if possible
-            if (JSON.stringify(newMsgs) !== JSON.stringify(messages)) {
-                setMessages(newMsgs);
-            }
+            setMessages(prev => {
+                // Return same reference if nothing changed to prevent unnecessary re-renders
+                if (JSON.stringify(prev) === JSON.stringify(newMsgs)) return prev;
+                return newMsgs;
+            });
 
             // Update unread in chat list
             setChats(prev => prev.map(c => c.id === chat.id ? { ...c, unread: 0 } : c));
@@ -199,13 +200,13 @@ export default function WhatsAppPage() {
         } finally {
             if (!silent) setLoadingMsgs(false);
         }
-    };
+    }, []);
 
     // Background polling for new messages/chats
     useEffect(() => {
         if (session.status !== 'CONNECTED') return;
 
-        const chatInterval = setInterval(() => loadChats(true), 5000); // Poll chats every 5s
+        const chatInterval = setInterval(() => loadChats(true), 10000); // Poll chats every 10s
 
         let msgInterval: NodeJS.Timeout | null = null;
         if (selectedChat) {
@@ -216,7 +217,7 @@ export default function WhatsAppPage() {
             clearInterval(chatInterval);
             if (msgInterval) clearInterval(msgInterval);
         };
-    }, [session.status, selectedChat?.id]);
+    }, [session.status, selectedChat?.id, loadChats, loadMessages]);
 
     const sendMessage = async () => {
         if (!newMessage.trim() || !selectedChat) return;
@@ -674,12 +675,22 @@ export default function WhatsAppPage() {
                         {/* Chat header */}
                         <div className="bg-white px-5 py-3 border-b border-gray-200 flex items-center justify-between shadow-sm">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold">
-                                    {(selectedChat.name || selectedChat.phone || '?')[0].toUpperCase()}
+                                <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 overflow-hidden bg-gray-200">
+                                    {selectedChat.avatarUrl ? (
+                                        <img src={selectedChat.avatarUrl} alt="" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="bg-blue-400 w-full h-full flex items-center justify-center">
+                                            {selectedChat.chatId.includes('@g.us') ? '👥' : (selectedChat.name && isNaN(parseInt(selectedChat.name[0])) ? selectedChat.name[0].toUpperCase() : '👤')}
+                                        </div>
+                                    )}
                                 </div>
                                 <div>
-                                    <div className="font-semibold text-gray-900">{selectedChat.name || selectedChat.phone}</div>
-                                    <div className="text-xs text-gray-400">{selectedChat.phone}</div>
+                                    <div className="font-semibold text-gray-900 leading-tight truncate max-w-[200px] md:max-w-md">
+                                        {selectedChat.name || selectedChat.phone}
+                                    </div>
+                                    <div className="text-[10px] text-gray-400">
+                                        {selectedChat.phone ? `+${selectedChat.phone}` : ''}
+                                    </div>
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
