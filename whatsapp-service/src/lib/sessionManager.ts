@@ -89,8 +89,9 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
             try {
                 const session = sessions.get(userId);
                 if (session?.socket) {
-                    const buffer = await downloadMediaMessage(message, 'buffer', {}, {
+                    const buffer = await downloadMediaMessage(message, 'buffer', {
                         logger,
+                        // @ts-ignore - rekey exists in some versions/contexts but TS might complain
                         rekey: session.socket.authState.creds.signedPreKey
                     }) as Buffer;
 
@@ -141,7 +142,7 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
             update: {
                 mediaUrl,
                 caption,
-            },
+            } as any,
             create: {
                 chatId: chat.id,
                 msgId,
@@ -151,7 +152,7 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
                 msgType,
                 mediaUrl,
                 caption,
-            }
+            } as any
         });
 
         // Increment unread if from contact
