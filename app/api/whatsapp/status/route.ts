@@ -21,6 +21,8 @@ export async function GET(request: NextRequest) {
             headers: waHeaders(),
         });
 
+        console.log(`[WA_STATUS] ${userId} response: ${res.status}`);
+
         if (res.status === 401) {
             return NextResponse.json({ error: 'X_WA_SERVICE_KEY_FAIL: Railway API Key Hatalı' }, { status: 401 });
         }
@@ -40,11 +42,15 @@ export async function POST(request: NextRequest) {
         if (!userId) return NextResponse.json({ error: 'X_CRM_AUTH_FAIL: Oturum Bulunamadı' }, { status: 401 });
         const tenantId = tenantIds?.[0] || '';
 
+        console.log(`[WA_CONNECT] Attempting for ${userId} with tenant ${tenantId} at ${WA_SERVICE_URL}`);
+
         const res = await fetch(`${WA_SERVICE_URL}/sessions/${userId}/connect`, {
             method: 'POST',
             headers: waHeaders(),
             body: JSON.stringify({ tenantId }),
         });
+
+        console.log(`[WA_CONNECT] Result: ${res.status}`);
 
         if (res.status === 401) {
             return NextResponse.json({ error: 'X_WA_SERVICE_KEY_FAIL: Railway API Key Hatalı' }, { status: 401 });
