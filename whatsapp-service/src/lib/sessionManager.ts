@@ -173,10 +173,8 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
                     lastMsg: body,
                     lastMsgAt: timestamp,
                 } : {}),
-                // Only update name if we have a better one and it's not a group
-                name: (chatId.includes('@g.us'))
-                    ? undefined
-                    : (fromMe ? undefined : (pushName || undefined)),
+                // Proactively update name if we get a pushName and it's not a group
+                name: (!chatId.includes('@g.us') && pushName) ? pushName : undefined,
             } as any,
             create: {
                 userId,
@@ -239,7 +237,7 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
 async function syncChat(userId: string, tenantId: string, chat: any) {
     try {
         const { id: chatId, name, archived, unreadCount, pin } = chat;
-        if (!chatId) return;
+        if (!chatId || chatId === 'status@broadcast' || chatId.includes('broadcast')) return;
 
         const phone = chatId.replace('@s.whatsapp.net', '').replace('@g.us', '').replace('@lid', '');
 
