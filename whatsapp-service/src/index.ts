@@ -25,7 +25,7 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '50mb' })); // Increased for audio/files
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+    res.json({ status: 'ok', version: 'v2-debug', timestamp: new Date().toISOString() });
 });
 
 // Serve static media files
