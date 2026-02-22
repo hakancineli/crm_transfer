@@ -13,6 +13,7 @@
         "@hapi/boom": "^10.0.1",
         "@prisma/client": "^6.0.0",
         "@whiskeysockets/baileys": "^6.17.16",
+        "axios": "^1.13.5",
         "cors": "^2.8.6",
         "dotenv": "^16.6.1",
         "express": "^4.22.1",

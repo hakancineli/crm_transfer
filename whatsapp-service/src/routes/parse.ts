@@ -1,17 +1,9 @@
 import { Router } from 'express';
+import { AIService } from '../utils/aiService';
 
 export const parseRouter = Router();
 
-const getGeminiKeys = () => {
-    const keys = process.env.GEMINI_API_KEYS ? process.env.GEMINI_API_KEYS.split(',').map(k => k.trim()) : [];
-    if (process.env.GEMINI_API_KEY) {
-        const primary = process.env.GEMINI_API_KEY.trim();
-        if (!keys.includes(primary)) keys.unshift(primary);
-    }
-    return keys.filter(k => k.length > 0);
-};
-
-// Parse WhatsApp message text into reservation fields using Gemini
+// Parse WhatsApp message text into reservation fields using Gemini/Groq
 parseRouter.post('/reservation', async (req, res) => {
     const { messageText, type = 'transfer' } = req.body;
 
@@ -19,82 +11,28 @@ parseRouter.post('/reservation', async (req, res) => {
         return res.status(400).json({ error: 'messageText required' });
     }
 
-    const keys = getGeminiKeys();
-    if (keys.length === 0) {
-        return res.status(500).json({ error: 'GEMINI_API_KEY not configured' });
-    }
-
     const prompt = type === 'tour'
         ? buildTourPrompt(messageText)
         : buildTransferPrompt(messageText);
 
     try {
-        res.setHeader('X-Debug-Start', 'true');
-        console.log('🤖 Starting reservation parse with type:', type);
+        console.log('🤖 Parsing reservation with AI Service. Type:', type);
+        const aiResponse = await AIService.generateContent(prompt, true);
 
-        const MAX_RETRIES = 3;
-        const RETRY_DELAYS = [2000, 5000, 10000]; // ms
-
-        let keyIndex = 0;
-
-        for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-            const currentKey = keys[keyIndex % keys.length];
-
-            const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${currentKey}`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: {
-                            responseMimeType: 'application/json',
-                            temperature: 0.1,
-                        }
-                    })
-                }
-            );
-
-            const data = await response.json() as any;
-            res.setHeader(`X-Debug-Status-${attempt}`, String(response.status));
-            res.setHeader(`X-Debug-KeyIndex-${attempt}`, String(keyIndex));
-
-            if (response.status === 429) {
-                lastError = data?.error?.message || 'Rate limited';
-                console.warn(`⚠️ Key ${keyIndex} rate limited, trying next key...`);
-                keyIndex++; // Try next key
-                if (keyIndex < keys.length) {
-                    attempt--; // Don't count as a retry attempt if we have more keys to try
-                } else {
-                    // All keys tried, now wait for retry delay
-                }
-                continue;
-            }
-
-            if (!response.ok) {
-                return res.status(500).json({ error: `Gemini API error: ${data?.error?.message || 'Unknown'}` });
-            }
-
-            const candidate = data?.candidates?.[0];
-            const text = candidate?.content?.parts?.[0]?.text;
-
-            res.setHeader(`X-Debug-HasText-${attempt}`, text ? 'true' : 'false');
-
-            if (!text) {
-                return res.status(500).json({ error: 'AI returned no response', debug: JSON.stringify(data).substring(0, 200) });
-            }
-
-            const parsed = JSON.parse(text.trim());
-            return res.json(parsed);
-        }
-
-        return res.status(429).json({ error: `AI kota limiti aşıldı. Lütfen birkaç dakika sonra tekrar deneyin.` });
+        console.log(`✅ AI Response from ${aiResponse.provider} (${aiResponse.model})`);
+        const parsed = JSON.parse(aiResponse.text.trim());
+        return res.json(parsed);
     } catch (err: any) {
-        return res.status(500).json({ error: 'Failed to parse message', debug: err.message });
+        console.error('❌ Parse error:', err.message);
+        const status = err.message.includes('exhausted') ? 429 : 500;
+        return res.status(status).json({
+            error: err.message.includes('exhausted') ? 'Tüm AI kotaları doldu. Lütfen 1 dakika bekleyin.' : 'AI analizi başarısız oldu.',
+            debug: err.message
+        });
     }
 });
 
-// Translate WhatsApp messages using Gemini
+// Translate WhatsApp messages using Gemini/Groq
 parseRouter.post('/translate', async (req, res) => {
     const { text, targetLang = 'tr', context = '' } = req.body;
 
@@ -102,13 +40,7 @@ parseRouter.post('/translate', async (req, res) => {
         return res.status(400).json({ error: 'text required' });
     }
 
-    const keys = getGeminiKeys();
-    if (keys.length === 0) {
-        return res.status(500).json({ error: 'GEMINI_API_KEY not configured' });
-    }
-
     let prompt = '';
-    // ... rest of prompt logic ...
     if (targetLang === 'tr') {
         prompt = `Translate the following message to Turkish. Keep the tone natural and professional. If it's already in Turkish, return it as is.
         
@@ -125,43 +57,18 @@ parseRouter.post('/translate', async (req, res) => {
     }
 
     try {
-        let lastError = '';
-        for (let kIndex = 0; kIndex < keys.length; kIndex++) {
-            const currentKey = keys[kIndex];
-            const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${currentKey}`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: {
-                            temperature: 0.1,
-                        }
-                    })
-                }
-            );
+        console.log('🌐 Translating with AI Service...');
+        const aiResponse = await AIService.generateContent(prompt, false);
+        console.log(`✅ Translation from ${aiResponse.provider} (${aiResponse.model})`);
 
-            const data = await response.json() as any;
-            if (response.status === 429) {
-                lastError = data?.error?.message || 'Rate limited';
-                continue; // Try next key
-            }
-
-            if (!response.ok) {
-                return res.status(500).json({ error: `Gemini API error: ${data?.error?.message || 'Unknown'}` });
-            }
-
-            const translatedText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (!translatedText) {
-                return res.status(500).json({ error: 'AI returned no translation' });
-            }
-
-            return res.json({ translatedText: translatedText.trim() });
-        }
-        return res.status(429).json({ error: 'Tüm AI kotaları doldu. Lütfen bekleyin.', detail: lastError });
+        return res.json({ translatedText: aiResponse.text.trim() });
     } catch (err: any) {
-        return res.status(500).json({ error: 'Translation failed', debug: err.message });
+        console.error('❌ Translation error:', err.message);
+        const status = err.message.includes('exhausted') ? 429 : 500;
+        return res.status(status).json({
+            error: err.message.includes('exhausted') ? 'Çeviri kotası doldu. Lütfen bekleyin.' : 'Çeviri başarısız oldu.',
+            debug: err.message
+        });
     }
 });
 
@@ -231,4 +138,3 @@ Aşağıdaki JSON formatında döndür (değer bulunamazsa null veya []):
 
 Sadece JSON döndür.`;
 }
-
