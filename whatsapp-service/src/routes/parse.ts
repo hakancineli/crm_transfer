@@ -78,18 +78,23 @@ parseRouter.post('/reservation', async (req, res) => {
 function buildTransferPrompt(message: string): string {
     const today = new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-    return `Sen bir transfer rezervasyon asistanısın. Aşağıdaki WhatsApp mesajından rezervasyon bilgilerini çıkar ve JSON formatında döndür.
-Bugünün tarihi: ${today} (Mesajdaki "yarın", "pazartesi" gibi ifadeleri buna göre çöz).
+    return `Sen profesyonel bir transfer rezervasyon asistanısın. Aşağıdaki WhatsApp sohbet geçmişinden rezervasyon bilgilerini çıkar ve JSON formatında döndür.
+Bugünün tarihi: ${today}.
 
-MESAJ:
+ÖNEMLİ KURALLAR:
+1. Eğer mesajda açıkça bir "yolcu ismi" yoksa, mesajı gönderen kişinin (örn: "Müşteri:" veya sohbet geçmişindeki isim) ismini "passengerNames" içine ekle.
+2. Fiyat gördüğünde para birimiyle birlikte (örn: "500 TL", "20 Euro") "price" ve "currency" kısımlarını doldur.
+3. Lokasyon bilgilerinde (Nereden/Nereye) otel isimleri veya havalimanı kodlarını (IST, SAW) kaçırma.
+
+MESAJ GEÇMİŞİ:
 ${message}
 
-Aşağıdaki JSON formatında döndür (değeri bilinmiyorsa null):
+Aşağıdaki JSON formatında döndür (değer bulunamazsa null veya []):
 {
   "date": "YYYY-MM-DD veya null",
   "time": "HH:MM veya null", 
-  "from": "nereden (konum adı) veya null",
-  "to": "nereye (konum adı) veya null",
+  "from": "nereden (konum/otel adı) veya null",
+  "to": "nereye (konum/otel adı) veya null",
   "passengerCount": sayı veya null,
   "passengerNames": ["isim1", "isim2"] veya [],
   "flightCode": "uçuş kodu veya null",
@@ -99,19 +104,24 @@ Aşağıdaki JSON formatında döndür (değeri bilinmiyorsa null):
   "notes": "ek notlar veya null"
 }
 
-Sadece JSON döndür, başka bir şey yazma.`;
+Sadece JSON döndür.`;
 }
 
 function buildTourPrompt(message: string): string {
     const today = new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-    return `Sen bir tur rezervasyon asistanısın. Aşağıdaki WhatsApp mesajından tur rezervasyon bilgilerini çıkar ve JSON formatında döndür.
-Bugünün tarihi: ${today} (Mesajdaki "yarın", "pazartesi" gibi ifadeleri buna göre çöz).
+    return `Sen profesyonel bir tur rezervasyon asistanısın. Aşağıdaki WhatsApp mesajından tur rezervasyon bilgilerini çıkar ve JSON formatında döndür.
+Bugünün tarihi: ${today}.
 
-MESAJ:
+ÖNEMLİ KURALLAR:
+1. Eğer mesajda açıkça bir isim yoksa, mesajı yazan kişinin ismini "passengerNames" içine al.
+2. "200 Euro", "1500 TL" gibi fiyat ifadelerini "price" ve "currency" olarak ayır.
+3. Tur adı veya güzergahı "routeName" kısmına yaz.
+
+MESAJ GEÇMİŞİ:
 ${message}
 
-Aşağıdaki JSON formatında döndür (değeri bilinmiyorsa null):
+Aşağıdaki JSON formatında döndür (değer bulunamazsa null veya []):
 {
   "tourDate": "YYYY-MM-DD veya null",
   "tourTime": "HH:MM veya null",
@@ -125,5 +135,5 @@ Aşağıdaki JSON formatında döndür (değeri bilinmiyorsa null):
   "notes": "ek notlar veya null"
 }
 
-Sadece JSON döndür, başka bir şey yazma.`;
+Sadece JSON döndür.`;
 }
