@@ -151,10 +151,25 @@ export default function WhatsAppPage() {
         setIsTranslatingInput(true);
         try {
             const recentContext = messages.slice(-15).map(m => `${m.fromMe ? 'Biz' : 'Müşteri'}: ${m.body}`).join('\n');
-            const prompt = `Aşağıdaki WhatsApp konuşmasına uygun, nazik ve profesyonel bir cevap önerisi yaz. Cevap kısa ve öz olsun. Eğer müşteri farklı bir dilde (İngilizce, Rusça vb.) yazdıysa, ona o dilde cevap ver. Sadece cevap metnini döndür, tırnak işareti olmasın.
+            const prompt = `Sen bir transfer rezervasyon asistanısın. Aşağıdaki konuşmaya göre müşteriye profesyonel bir cevap yaz.
             
-            KONUŞMA:
-            ${recentContext}`;
+KURALLAR:
+1. Müşterinin dilinde cevap ver (İngilizce ise İngilizce, Arapça ise Arapça vb.).
+2. Fiyat verirken şu mantığı kullan:
+   - İstanbul Havalimanı (IST) <-> Şehir Merkezi/Otel: 40 USD
+   - Sabiha Gökçen (SAW) <-> Şehir Merkezi/Otel: 45 USD
+   - İSTİSNA: Esenyurt veya Beylikdüzü bölgeleri ise; IST: 45 USD, SAW: 60 USD.
+3. Fiyat bilgisinden sonra şu bilgileri listele:
+   - Uçuş Bileti / Flight Ticket (net saat ve tarih için)
+   - Varış Saati / Arrival Time
+   - Yolcu Sayısı / Number of Passengers
+   - Bagaj Sayısı / Number of Bags
+   - Otel veya Gidilecek Adres / Hotel or Destination Address
+4. Sonunda "Bilgileri ilettiğinizde fiyatı ve müsaitliği hemen konfirme edeceğim" minvalinde nazik bir kapanış yap.
+5. Sadece cevap metnini döndür, tırnak işareti olmasın.
+
+KONUŞMA:
+${recentContext}`;
 
             const res = await fetch('/api/whatsapp/translate', {
                 method: 'POST',
