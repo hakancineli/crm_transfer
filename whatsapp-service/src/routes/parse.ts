@@ -20,6 +20,9 @@ parseRouter.post('/reservation', async (req, res) => {
         : buildTransferPrompt(messageText);
 
     try {
+        console.log('🤖 Starting reservation parse with type:', type);
+        console.log('📝 Message text length:', messageText.length);
+
         const MAX_RETRIES = 3;
         const RETRY_DELAYS = [2000, 5000, 10000]; // ms
 
@@ -32,8 +35,10 @@ parseRouter.post('/reservation', async (req, res) => {
                 await new Promise(resolve => setTimeout(resolve, delay));
             }
 
+            console.log(`📡 Sending request to Gemini (attempt ${attempt + 1})...`);
+
             const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -47,6 +52,7 @@ parseRouter.post('/reservation', async (req, res) => {
                 }
             );
 
+            console.log(`📥 Gemini response status: ${response.status} ${response.statusText}`);
             const data = await response.json() as any;
 
             if (response.status === 429) {
@@ -69,16 +75,23 @@ parseRouter.post('/reservation', async (req, res) => {
                 return res.status(500).json({ error: 'AI returned no response' });
             }
 
-            console.log('✅ AI parsed reservation successfully');
-            const parsed = JSON.parse(text);
-            return res.json(parsed);
+            console.log('✅ AI text received, length:', text.length);
+
+            try {
+                const parsed = JSON.parse(text.trim());
+                console.log('✅ Successfully parsed AI response to JSON');
+                return res.json(parsed);
+            } catch (jsonErr) {
+                console.error('❌ JSON parse error for text:', text);
+                return res.status(500).json({ error: 'AI returned invalid JSON' });
+            }
         }
 
         // All retries exhausted
         console.error('❌ All Gemini retries exhausted:', lastError);
         return res.status(429).json({ error: `AI kota limiti aşıldı. Lütfen birkaç dakika sonra tekrar deneyin.` });
     } catch (err) {
-        console.error('Parse error:', err);
+        console.error('❌ Critical parse engine error:', err);
         return res.status(500).json({ error: 'Failed to parse message' });
     }
 });
