@@ -2,6 +2,15 @@ import { Router } from 'express';
 
 export const parseRouter = Router();
 
+const getGeminiKeys = () => {
+    const keys = process.env.GEMINI_API_KEYS ? process.env.GEMINI_API_KEYS.split(',').map(k => k.trim()) : [];
+    if (process.env.GEMINI_API_KEY) {
+        const primary = process.env.GEMINI_API_KEY.trim();
+        if (!keys.includes(primary)) keys.unshift(primary);
+    }
+    return keys.filter(k => k.length > 0);
+};
+
 // Parse WhatsApp message text into reservation fields using Gemini
 parseRouter.post('/reservation', async (req, res) => {
     const { messageText, type = 'transfer' } = req.body;
@@ -10,8 +19,8 @@ parseRouter.post('/reservation', async (req, res) => {
         return res.status(400).json({ error: 'messageText required' });
     }
 
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-    if (!GEMINI_API_KEY) {
+    const keys = getGeminiKeys();
+    if (keys.length === 0) {
         return res.status(500).json({ error: 'GEMINI_API_KEY not configured' });
     }
 
@@ -26,11 +35,13 @@ parseRouter.post('/reservation', async (req, res) => {
         const MAX_RETRIES = 3;
         const RETRY_DELAYS = [2000, 5000, 10000]; // ms
 
-        let lastError: any = null;
+        let keyIndex = 0;
 
         for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+            const currentKey = keys[keyIndex % keys.length];
+
             const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`,
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${currentKey}`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -46,10 +57,18 @@ parseRouter.post('/reservation', async (req, res) => {
 
             const data = await response.json() as any;
             res.setHeader(`X-Debug-Status-${attempt}`, String(response.status));
+            res.setHeader(`X-Debug-KeyIndex-${attempt}`, String(keyIndex));
 
             if (response.status === 429) {
                 lastError = data?.error?.message || 'Rate limited';
-                continue; // Retry
+                console.warn(`⚠️ Key ${keyIndex} rate limited, trying next key...`);
+                keyIndex++; // Try next key
+                if (keyIndex < keys.length) {
+                    attempt--; // Don't count as a retry attempt if we have more keys to try
+                } else {
+                    // All keys tried, now wait for retry delay
+                }
+                continue;
             }
 
             if (!response.ok) {
@@ -83,12 +102,13 @@ parseRouter.post('/translate', async (req, res) => {
         return res.status(400).json({ error: 'text required' });
     }
 
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-    if (!GEMINI_API_KEY) {
+    const keys = getGeminiKeys();
+    if (keys.length === 0) {
         return res.status(500).json({ error: 'GEMINI_API_KEY not configured' });
     }
 
     let prompt = '';
+    // ... rest of prompt logic ...
     if (targetLang === 'tr') {
         prompt = `Translate the following message to Turkish. Keep the tone natural and professional. If it's already in Turkish, return it as is.
         
@@ -105,31 +125,41 @@ parseRouter.post('/translate', async (req, res) => {
     }
 
     try {
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: {
-                        temperature: 0.1,
-                    }
-                })
+        let lastError = '';
+        for (let kIndex = 0; kIndex < keys.length; kIndex++) {
+            const currentKey = keys[kIndex];
+            const response = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${currentKey}`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: {
+                            temperature: 0.1,
+                        }
+                    })
+                }
+            );
+
+            const data = await response.json() as any;
+            if (response.status === 429) {
+                lastError = data?.error?.message || 'Rate limited';
+                continue; // Try next key
             }
-        );
 
-        const data = await response.json() as any;
-        if (!response.ok) {
-            return res.status(500).json({ error: `Gemini API error: ${data?.error?.message || 'Unknown'}` });
+            if (!response.ok) {
+                return res.status(500).json({ error: `Gemini API error: ${data?.error?.message || 'Unknown'}` });
+            }
+
+            const translatedText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!translatedText) {
+                return res.status(500).json({ error: 'AI returned no translation' });
+            }
+
+            return res.json({ translatedText: translatedText.trim() });
         }
-
-        const translatedText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!translatedText) {
-            return res.status(500).json({ error: 'AI returned no translation' });
-        }
-
-        return res.json({ translatedText: translatedText.trim() });
+        return res.status(429).json({ error: 'Tüm AI kotaları doldu. Lütfen bekleyin.', detail: lastError });
     } catch (err: any) {
         return res.status(500).json({ error: 'Translation failed', debug: err.message });
     }
