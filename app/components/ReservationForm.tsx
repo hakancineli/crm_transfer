@@ -78,7 +78,9 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
     const notes = searchParams.get('notes');
 
     if (date || time || from || to || flightCode || price || phoneNumber || passengerNames) {
-      console.log('📝 Populating form from URL params:', { date, time, from, to, price, phoneNumber });
+      console.log('📝 Populating ReservationForm from URL params:', {
+        date, time, from, to, price, phoneNumber, passengerNames
+      });
       setFormData(prev => ({
         ...prev,
         date: date || prev.date,
