@@ -75,8 +75,8 @@ function getMessageText(message: proto.IMessage | null | undefined): string {
     if (message.stickerMessage) return '[Sticker]';
 
     // Call messages
-    if (message.callMessage) return '📞 [Sesli Arama]';
-    if (message.videoCallMessage) return '📹 [Video Arama]';
+    if ((message as any).callMessage) return '📞 [Sesli Arama]';
+    if ((message as any).videoCallMessage) return '📹 [Video Arama]';
     if (message.protocolMessage?.type === proto.Message.ProtocolMessage.Type.REVOKE) return '🗑️ [Mesaj silindi]';
 
     // Handle nested messages (ephemeral, view once, edited)
