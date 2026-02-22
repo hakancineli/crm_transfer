@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useModule } from '@/app/hooks/useModule';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Currency, CURRENCIES } from '@/app/types';
 import { apiPost } from '@/app/lib/api';
 import { canViewTourModule } from '@/app/lib/permissions';
@@ -40,6 +40,7 @@ export default function NewTourReservationPage() {
   const { user } = useAuth();
   const { isEnabled: tourEnabled, isLoading } = useModule('tour');
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Bugünün tarihini YYYY-MM-DD formatında al
   const today = new Date().toISOString().split('T')[0];
@@ -120,18 +121,18 @@ export default function NewTourReservationPage() {
   useEffect(() => {
     if (!tourEnabled) return;
 
-    const query = new URLSearchParams(window.location.search);
-    const tourDate = query.get('tourDate');
-    const tourTime = query.get('tourTime');
-    const pickupLocation = query.get('pickupLocation');
-    const price = query.get('price');
-    const currencyParam = query.get('currency') as Currency;
-    const phoneNumber = query.get('phoneNumber');
-    const passengerNames = query.get('passengerNames');
-    const notes = query.get('notes');
-    const routeName = query.get('routeName');
+    const tourDate = searchParams.get('tourDate');
+    const tourTime = searchParams.get('tourTime');
+    const pickupLocation = searchParams.get('pickupLocation');
+    const price = searchParams.get('price');
+    const currencyParam = searchParams.get('currency') as Currency;
+    const phoneNumber = searchParams.get('phoneNumber');
+    const passengerNames = searchParams.get('passengerNames');
+    const notes = searchParams.get('notes');
+    const routeName = searchParams.get('routeName');
 
     if (tourDate || tourTime || pickupLocation || price || passengerNames || routeName) {
+      console.log('📝 Populating tour form from URL params:', { tourDate, routeName, phoneNumber });
       const pNames = passengerNames ? passengerNames.split(',') : [];
 
       setFormData(prev => ({
@@ -153,7 +154,7 @@ export default function NewTourReservationPage() {
         setFormData(prev => ({ ...prev, routeId: 'custom' }));
       }
     }
-  }, [tourEnabled]);
+  }, [tourEnabled, searchParams]);
 
   // Fetch Scheduled Tours when Route or Date changes
   useEffect(() => {
