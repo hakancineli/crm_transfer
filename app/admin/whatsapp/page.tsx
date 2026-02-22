@@ -80,6 +80,68 @@ export default function WhatsAppPage() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const pollRef = useRef<NodeJS.Timeout | null>(null);
 
+    const [translations, setTranslations] = useState<Record<string, string>>({});
+    const [translatingId, setTranslatingId] = useState<string | null>(null);
+    const [isTranslatingInput, setIsTranslatingInput] = useState(false);
+
+    const translateMsg = async (text: string, msgId: string, toTr: boolean = true) => {
+        if (!text) return;
+        setTranslatingId(msgId);
+        try {
+            // Context from recent messages to help AI detect target language
+            const recentContext = messages.slice(-5).map(m => `${m.fromMe ? 'Biz' : 'Müşteri'}: ${m.body}`).join('\n');
+
+            const res = await fetch('/api/whatsapp/translate', {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({
+                    text,
+                    targetLang: toTr ? 'tr' : 'auto',
+                    context: recentContext
+                }),
+            });
+            const data = await res.json();
+            if (data.translatedText) {
+                setTranslations(prev => ({ ...prev, [msgId]: data.translatedText }));
+            } else if (data.error) {
+                alert(`Çeviri hatası: ${data.error}`);
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Çeviri yapılırken bir hata oluştu.');
+        } finally {
+            setTranslatingId(null);
+        }
+    };
+
+    const translateInput = async () => {
+        if (!newMessage.trim()) return;
+        setIsTranslatingInput(true);
+        try {
+            const recentContext = messages.slice(-10).map(m => `${m.fromMe ? 'Biz' : 'Müşteri'}: ${m.body}`).join('\n');
+            const res = await fetch('/api/whatsapp/translate', {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({
+                    text: newMessage,
+                    targetLang: 'auto', // Detect from context
+                    context: recentContext
+                }),
+            });
+            const data = await res.json();
+            if (data.translatedText) {
+                setNewMessage(data.translatedText);
+            } else if (data.error) {
+                alert(`Çeviri hatası: ${data.error}`);
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Mesaj çevrilemedi.');
+        } finally {
+            setIsTranslatingInput(false);
+        }
+    };
+
     // Always read token fresh to avoid stale closure capturing null token on first render
     const getAuthHeaders = (): Record<string, string> => {
         const t = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -922,15 +984,45 @@ export default function WhatsAppPage() {
                                                 </a>
                                             )}
 
-                                            {msg.body && <p className="whitespace-pre-wrap break-words text-sm">{msg.body}</p>}
+                                            {msg.body && (
+                                                <div className="relative group">
+                                                    <p className="whitespace-pre-wrap break-words text-sm">{msg.body}</p>
+                                                    {translations[msg.id] && (
+                                                        <div className="mt-2 pt-2 border-t border-gray-200/50 text-sm text-blue-700 italic bg-blue-50/30 px-2 py-1 rounded-md">
+                                                            <div className="text-[10px] font-bold text-blue-400 mb-1 flex items-center gap-1 uppercase tracking-wider">
+                                                                <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse" /> AI Çeviri (TR)
+                                                            </div>
+                                                            {translations[msg.id]}
+                                                        </div>
+                                                    )}
+
+                                                    {/* Translation trigger button */}
+                                                    {!msg.fromMe && !translations[msg.id] && (
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); translateMsg(msg.body, msg.id, true); }}
+                                                            disabled={translatingId === msg.id}
+                                                            className="absolute -right-12 top-0 bg-white shadow-sm border border-gray-100 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-blue-50 text-blue-500 disabled:opacity-50"
+                                                            title="Türkçeye Çevir"
+                                                        >
+                                                            {translatingId === msg.id ? (
+                                                                <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                                                            ) : (
+                                                                <span className="text-xs">🌐</span>
+                                                            )}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            )}
                                             {msg.caption && msg.msgType !== 'document' && (
                                                 <p className="whitespace-pre-wrap break-words text-sm mt-1 italic text-gray-600">{msg.caption}</p>
                                             )}
                                         </div>
-                                        <p className="text-[10px] text-gray-400 mt-1 pr-2 text-right">
-                                            {new Date(msg.timestamp).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
-                                            {msg.fromMe && ' ✓✓'}
-                                        </p>
+                                        <div className="flex items-center justify-end gap-1 mt-1 pr-2">
+                                            <p className="text-[10px] text-gray-400">
+                                                {new Date(msg.timestamp).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                                            </p>
+                                            {msg.fromMe && <span className="text-[10px] text-blue-400">✓✓</span>}
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -988,9 +1080,22 @@ export default function WhatsAppPage() {
                                         <span className="text-2xl">🎙️</span>
                                     </button>
                                     <button
+                                        onClick={translateInput}
+                                        disabled={!newMessage.trim() || isTranslatingInput}
+                                        className={`w-10 h-10 border transition-all flex items-center justify-center rounded-full
+                                            ${isTranslatingInput ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-200 hover:border-blue-400 text-blue-500'}`}
+                                        title="Mesajı karşı tarafın diline çevir"
+                                    >
+                                        {isTranslatingInput ? (
+                                            <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                                        ) : (
+                                            <span className="text-xl">🌐</span>
+                                        )}
+                                    </button>
+                                    <button
                                         onClick={sendMessage}
                                         disabled={(!newMessage.trim() && !sending) || sending}
-                                        className="w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center transition-colors disabled:opacity-50"
+                                        className="w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center transition-colors disabled:opacity-50 shadow-md active:scale-95"
                                     >
                                         {sending ? '⏳' : '➤'}
                                     </button>

@@ -75,6 +75,66 @@ parseRouter.post('/reservation', async (req, res) => {
     }
 });
 
+// Translate WhatsApp messages using Gemini
+parseRouter.post('/translate', async (req, res) => {
+    const { text, targetLang = 'tr', context = '' } = req.body;
+
+    if (!text) {
+        return res.status(400).json({ error: 'text required' });
+    }
+
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    if (!GEMINI_API_KEY) {
+        return res.status(500).json({ error: 'GEMINI_API_KEY not configured' });
+    }
+
+    let prompt = '';
+    if (targetLang === 'tr') {
+        prompt = `Translate the following message to Turkish. Keep the tone natural and professional. If it's already in Turkish, return it as is.
+        
+        MESSAGE:
+        ${text}`;
+    } else {
+        prompt = `Translate the following Turkish message into the language of the customer in this context. 
+        Context (previous messages): ${context}
+        If no clear language is detected in context, translate to English.
+        Only return the translated text, nothing else.
+        
+        MESSAGE TO TRANSLATE:
+        ${text}`;
+    }
+
+    try {
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        temperature: 0.1,
+                    }
+                })
+            }
+        );
+
+        const data = await response.json() as any;
+        if (!response.ok) {
+            return res.status(500).json({ error: `Gemini API error: ${data?.error?.message || 'Unknown'}` });
+        }
+
+        const translatedText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!translatedText) {
+            return res.status(500).json({ error: 'AI returned no translation' });
+        }
+
+        return res.json({ translatedText: translatedText.trim() });
+    } catch (err: any) {
+        return res.status(500).json({ error: 'Translation failed', debug: err.message });
+    }
+});
+
 function buildTransferPrompt(message: string): string {
     const today = new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
@@ -137,3 +197,4 @@ Aşağıdaki JSON formatında döndür (değer bulunamazsa null veya []):
 
 Sadece JSON döndür.`;
 }
+
