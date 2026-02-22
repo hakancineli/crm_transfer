@@ -58,10 +58,11 @@ function getMessageText(message: proto.IMessage | null | undefined): string {
     if (message.imageMessage?.caption) return message.imageMessage.caption;
     if (message.videoMessage?.caption) return message.videoMessage.caption;
     if (message.documentMessage?.caption) return message.documentMessage.caption;
+
     if (message.imageMessage) return '[Görsel]';
     if (message.videoMessage) return '[Video]';
     if (message.audioMessage) return '[Sesli Mesaj]';
-    if (message.documentMessage) return `[Dosya: ${message.documentMessage.fileName || 'belge.pdf'}]`;
+    if (message.documentMessage) return `[Dosya: ${message.documentMessage.fileName || 'belge'}]`;
 
     // Location & Contact
     if (message.locationMessage) return '📍 [Konum]';
@@ -100,27 +101,39 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
         // Detect message type and content
         let msgType = 'text';
         let body = getMessageText(message.message);
+
+        // Helper to extract media message from any structure (view once, ephemeral, etc.)
+        const getMediaMessage = (m: proto.IMessage | null | undefined): { type: string, msg: any } | null => {
+            if (!m) return null;
+            if (m.imageMessage) return { type: 'image', msg: m.imageMessage };
+            if (m.audioMessage) return { type: 'audio', msg: m.audioMessage };
+            if (m.videoMessage) return { type: 'video', msg: m.videoMessage };
+            if (m.documentMessage) return { type: 'document', msg: m.documentMessage };
+
+            // Nested
+            if (m.viewOnceMessageV2?.message) return getMediaMessage(m.viewOnceMessageV2.message);
+            if (m.viewOnceMessageV2Extension?.message) return getMediaMessage(m.viewOnceMessageV2Extension.message);
+            if (m.ephemeralMessage?.message) return getMediaMessage(m.ephemeralMessage.message);
+            if (m.editedMessage?.message?.protocolMessage?.editedMessage) return getMediaMessage(m.editedMessage.message.protocolMessage.editedMessage);
+
+            return null;
+        };
+
+        const mediaInfo = getMediaMessage(message.message);
         let mediaUrl = null;
         let caption = null;
 
-        if (message.message?.imageMessage) {
-            msgType = 'image';
-            if (!body) body = '[Görsel]';
-            caption = message.message.imageMessage.caption || '';
-        } else if (message.message?.audioMessage) {
-            msgType = 'audio';
-            body = '[Sesli Mesaj]';
-            caption = 'Sesli Mesaj';
-        } else if (message.message?.documentMessage) {
-            msgType = 'document';
-            body = `[Dosya: ${message.message.documentMessage.fileName || 'belge.pdf'}]`;
-            caption = message.message.documentMessage.fileName || '';
-        } else if (message.message?.videoMessage) {
-            msgType = 'video';
-            if (!body) body = '[Video]';
-            caption = message.message.videoMessage.caption || '';
+        if (mediaInfo) {
+            msgType = mediaInfo.type;
+            caption = mediaInfo.msg.caption || (msgType === 'document' ? mediaInfo.msg.fileName : null);
+            if (!body || body === '...') {
+                if (msgType === 'image') body = '[Görsel]';
+                else if (msgType === 'audio') body = '[Sesli Mesaj]';
+                else if (msgType === 'video') body = '[Video]';
+                else if (msgType === 'document') body = `[Dosya: ${mediaInfo.msg.fileName || 'belge'}]`;
+            }
         } else if (!body) {
-            body = '...'; // Final fallback
+            body = '...';
         }
 
         const msgId = message.key.id || '';
@@ -133,28 +146,35 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
         const senderName = fromMe ? 'Siz' : (pushName || senderJid?.split('@')[0] || '');
 
         // Download media if applicable
-        if (['image', 'audio', 'document', 'video'].includes(msgType)) {
+        if (mediaInfo && session?.socket) {
             try {
-                if (session?.socket) {
-                    console.log(`📥 Downloading ${msgType} for message ${msgId}...`);
-                    const buffer = await downloadMediaMessage(message, 'buffer', {}) as Buffer;
+                console.log(`📥 Downloading ${msgType} for message ${msgId}... (Mime: ${mediaInfo.msg.mimetype})`);
+                const buffer = await downloadMediaMessage(message, 'buffer', {}) as Buffer;
 
-                    if (buffer && buffer.length > 0) {
-                        const fileName = `${msgId}_${Date.now()}`;
-                        const ext = msgType === 'audio' ? 'ogg' : (msgType === 'image' ? 'jpg' : (msgType === 'video' ? 'mp4' : 'bin'));
-                        const finalName = `${fileName}.${ext}`;
-                        const publicPath = path.join(process.cwd(), 'public', 'media');
+                if (buffer && buffer.length > 0) {
+                    const mime = mediaInfo.msg.mimetype || '';
+                    let ext = 'bin';
+                    if (mime.includes('image/jpeg') || mime.includes('image/jpg')) ext = 'jpg';
+                    else if (mime.includes('image/png')) ext = 'png';
+                    else if (mime.includes('image/webp')) ext = 'webp';
+                    else if (mime.includes('audio/ogg')) ext = 'ogg';
+                    else if (mime.includes('audio/mpeg')) ext = 'mp3';
+                    else if (mime.includes('audio/mp4')) ext = 'm4a';
+                    else if (mime.includes('video/mp4')) ext = 'mp4';
+                    else if (mime.includes('application/pdf')) ext = 'pdf';
+                    else if (msgType === 'image') ext = 'jpg'; // fallback
+                    else if (msgType === 'audio') ext = 'ogg'; // fallback
 
-                        if (!fs.existsSync(publicPath)) {
-                            fs.mkdirSync(publicPath, { recursive: true });
-                        }
+                    const fileName = `${msgId}_${Date.now()}.${ext}`;
+                    const publicPath = path.join(process.cwd(), 'public', 'media');
 
-                        fs.writeFileSync(path.join(publicPath, finalName), buffer);
-                        mediaUrl = `/media/${finalName}`;
-                        console.log(`✅ ${msgType} saved to ${mediaUrl}`);
-                    } else {
-                        console.warn(`⚠️ Downloaded buffer for ${msgId} is empty.`);
+                    if (!fs.existsSync(publicPath)) {
+                        fs.mkdirSync(publicPath, { recursive: true });
                     }
+
+                    fs.writeFileSync(path.join(publicPath, fileName), buffer);
+                    mediaUrl = `/media/${fileName}`;
+                    console.log(`✅ ${msgType} saved to ${mediaUrl} (${buffer.length} bytes)`);
                 }
             } catch (mediaErr) {
                 console.error(`❌ Error downloading media for ${msgId}:`, mediaErr);

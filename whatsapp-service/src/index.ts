@@ -23,7 +23,8 @@ app.use(cors({
     origin: process.env.ALLOWED_ORIGIN || '*',
     credentials: true
 }));
-app.use(express.json({ limit: '50mb' })); // Increased for audio/files
+app.use(express.json({ limit: '100mb' })); // Increased for large files/media
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 app.get('/health', (req, res) => {
     res.json({
         status: 'ok',
