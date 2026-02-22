@@ -85,6 +85,9 @@ export default function WhatsAppPage() {
     const [translations, setTranslations] = useState<Record<string, string>>({});
     const [translatingId, setTranslatingId] = useState<string | null>(null);
     const [isTranslatingInput, setIsTranslatingInput] = useState(false);
+    const [customerReservations, setCustomerReservations] = useState<any[]>([]);
+    const [loadingCustomerRes, setLoadingCustomerRes] = useState(false);
+    const [showCustomerInsights, setShowCustomerInsights] = useState(false);
 
     const translateMsg = async (text: string, msgId: string, toTr: boolean = true) => {
         if (!text) return;
@@ -139,6 +142,34 @@ export default function WhatsAppPage() {
         } catch (e) {
             console.error(e);
             alert('Mesaj çevrilemedi.');
+        } finally {
+            setIsTranslatingInput(false);
+        }
+    };
+    const suggestReply = async () => {
+        if (!selectedChat || messages.length === 0) return;
+        setIsTranslatingInput(true);
+        try {
+            const recentContext = messages.slice(-15).map(m => `${m.fromMe ? 'Biz' : 'Müşteri'}: ${m.body}`).join('\n');
+            const prompt = `Aşağıdaki WhatsApp konuşmasına uygun, nazik ve profesyonel bir cevap önerisi yaz. Cevap kısa ve öz olsun. Eğer müşteri farklı bir dilde (İngilizce, Rusça vb.) yazdıysa, ona o dilde cevap ver. Sadece cevap metnini döndür, tırnak işareti olmasın.
+            
+            KONUŞMA:
+            ${recentContext}`;
+
+            const res = await fetch('/api/whatsapp/translate', {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({
+                    text: prompt,
+                    targetLang: 'auto',
+                }),
+            });
+            const data = await res.json();
+            if (data.translatedText) {
+                setNewMessage(data.translatedText.replace(/^"|"$/g, '').trim());
+            }
+        } catch (e) {
+            console.error(e);
         } finally {
             setIsTranslatingInput(false);
         }
@@ -266,6 +297,28 @@ export default function WhatsAppPage() {
             if (!silent) setLoadingMsgs(false);
         }
     }, []);
+
+    const loadCustomerContext = useCallback(async (phone: string) => {
+        if (!phone) return;
+        setLoadingCustomerRes(true);
+        try {
+            const res = await fetch(`/api/customer-reservations?phone=${phone.replace(/\D/g, '')}`, { headers: getAuthHeaders() });
+            const data = await res.json();
+            setCustomerReservations(Array.isArray(data) ? data : []);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoadingCustomerRes(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (selectedChat?.phone) {
+            loadCustomerContext(selectedChat.phone);
+        } else {
+            setCustomerReservations([]);
+        }
+    }, [selectedChat?.id]);
 
     // Background polling for new messages/chats
     useEffect(() => {
@@ -885,6 +938,13 @@ export default function WhatsAppPage() {
                                         >
                                             📋
                                         </button>
+                                        <button
+                                            onClick={() => setShowCustomerInsights(!showCustomerInsights)}
+                                            className={`p-1.5 rounded-lg transition-colors ${showCustomerInsights ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-400 hover:text-gray-600'}`}
+                                            title="Müşteri Geçmişi"
+                                        >
+                                            👤
+                                        </button>
                                     </>
                                 )}
                             </div>
@@ -926,6 +986,44 @@ export default function WhatsAppPage() {
                                         <button onClick={() => setParsedReservation(null)} className="text-blue-400 hover:text-blue-600 text-xs">✕</button>
                                     </div>
                                 </div>
+                            </div>
+                        )}
+
+                        {/* Customer Insights Panel */}
+                        {showCustomerInsights && (
+                            <div className="bg-orange-50/50 border-b border-orange-100 p-4 animate-in slide-in-from-top duration-300">
+                                <div className="flex items-center justify-between mb-3">
+                                    <h3 className="text-sm font-bold text-orange-800 flex items-center gap-2">
+                                        📜 Müşteri Geçmişi {customerReservations.length > 0 && <span className="bg-orange-100 text-orange-600 text-[10px] px-1.5 py-0.5 rounded-full">{customerReservations.length} Kayıt</span>}
+                                    </h3>
+                                    <button onClick={() => setShowCustomerInsights(false)} className="text-orange-400 hover:text-orange-600 text-xs text-lg px-2">✕</button>
+                                </div>
+                                {loadingCustomerRes ? (
+                                    <div className="flex items-center gap-2 py-2">
+                                        <div className="animate-spin w-3 h-3 border-2 border-orange-500 border-t-transparent rounded-full" />
+                                        <span className="text-xs text-gray-500">Geçmiş sorgulanıyor...</span>
+                                    </div>
+                                ) : customerReservations.length > 0 ? (
+                                    <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                                        {customerReservations.map(res => (
+                                            <div key={res.id} className="min-w-[220px] bg-white border border-orange-100 rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <span className="text-[10px] bg-gray-50 px-1.5 py-0.5 rounded font-mono text-gray-500 border border-gray-100">#{res.voucherNumber || 'VN'}</span>
+                                                    <span className="text-[10px] text-gray-400 font-medium">{res.date}</span>
+                                                </div>
+                                                <p className="text-xs font-bold text-gray-800 truncate mb-1">{res.from} → {res.to}</p>
+                                                <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-50">
+                                                    <span className="text-[10px] text-gray-500">{res.time}</span>
+                                                    <span className="text-xs font-black text-green-600">{res.price} {res.currency}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-6 bg-white/50 rounded-xl border border-dashed border-orange-200 text-gray-400 text-xs">
+                                        Bu numara ile kayıtlı geçmiş rezervasyon bulunamadı.
+                                    </div>
+                                )}
                             </div>
                         )}
 
@@ -1038,6 +1136,18 @@ export default function WhatsAppPage() {
                                     </div>
                                 </div>
                             ))}
+                            {(parsing || translatingId) && (
+                                <div className="flex justify-start animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                    <div className="bg-white/80 backdrop-blur-sm text-gray-500 px-4 py-2 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-3 border border-gray-100 mb-2">
+                                        <div className="flex gap-1">
+                                            <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                                            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                                            <span className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce"></span>
+                                        </div>
+                                        <span className="text-[10px] font-bold tracking-wider uppercase text-blue-500/70">AI {parsing ? 'Analiz Ediyor' : 'Çeviriyor'}</span>
+                                    </div>
+                                </div>
+                            )}
                             <div ref={messagesEndRef} />
                         </div>
 
@@ -1090,6 +1200,19 @@ export default function WhatsAppPage() {
                                         title="Ses Kaydet"
                                     >
                                         <span className="text-2xl">🎙️</span>
+                                    </button>
+                                    <button
+                                        onClick={suggestReply}
+                                        disabled={isTranslatingInput}
+                                        className={`w-10 h-10 border transition-all flex items-center justify-center rounded-full
+                                            ${isTranslatingInput ? 'bg-purple-50 border-purple-200' : 'bg-white border-gray-200 hover:border-purple-400 text-purple-500'}`}
+                                        title="Yapay zeka ile cevap önerisi al"
+                                    >
+                                        {isTranslatingInput ? (
+                                            <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                                        ) : (
+                                            <span className="text-xl">🪄</span>
+                                        )}
                                     </button>
                                     <button
                                         onClick={translateInput}
