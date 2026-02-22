@@ -61,6 +61,7 @@ export default function WhatsAppPage() {
     const [session, setSession] = useState<SessionStatus>({ status: 'NOT_CONNECTED', qr: null, phone: null });
     const [chats, setChats] = useState<Chat[]>([]);
     const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
+    const [showSidebar, setShowSidebar] = useState(true);
     const [messages, setMessages] = useState<WAMessage[]>([]);
     const [loadingChats, setLoadingChats] = useState(false);
     const [loadingMsgs, setLoadingMsgs] = useState(false);
@@ -245,6 +246,7 @@ export default function WhatsAppPage() {
             setSelectedMessages(new Set());
         }
         setSelectedChat(chat);
+        setShowSidebar(false);
         try {
             const res = await fetch(`/api/whatsapp/chats/${chat.id}/messages`, { headers: getAuthHeaders() });
             const data = await res.json();
@@ -689,9 +691,9 @@ export default function WhatsAppPage() {
                 </div>
             </div>
 
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 overflow-hidden relative">
                 {/* ── Chat List Sidebar ────────────────────────────────────────── */}
-                <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+                <div className={`${showSidebar ? 'flex' : 'hidden md:flex'} w-full md:w-80 bg-white border-r border-gray-200 flex-col z-20`}>
                     {/* Search and Toggle */}
                     <div className="p-4 bg-gray-50 border-b border-gray-200">
                         <input
@@ -809,11 +811,18 @@ export default function WhatsAppPage() {
 
                 {/* ── Message Area ─────────────────────────────────────────────── */}
                 {selectedChat ? (
-                    <div className="flex-1 flex flex-col">
+                    <div className={`${!showSidebar ? 'flex' : 'hidden md:flex'} flex-1 flex flex-col z-10 bg-white`}>
                         {/* Chat header */}
-                        <div className="bg-white px-5 py-3 border-b border-gray-200 flex items-center justify-between shadow-sm">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 overflow-hidden bg-gray-200">
+                        <div className="bg-white px-3 md:px-5 py-2 md:py-3 border-b border-gray-200 flex items-center justify-between shadow-sm">
+                            <div className="flex items-center gap-2 md:gap-3 lg:gap-4 overflow-hidden">
+                                {/* Back button for mobile */}
+                                <button
+                                    onClick={() => setShowSidebar(true)}
+                                    className="md:hidden p-2 -ml-1 text-gray-500 hover:bg-gray-100 rounded-full"
+                                >
+                                    <span className="text-xl">←</span>
+                                </button>
+                                <div className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 overflow-hidden bg-gray-200">
                                     {selectedChat.avatarUrl ? (
                                         <img src={selectedChat.avatarUrl} alt="" className="w-full h-full object-cover" />
                                     ) : (
@@ -831,26 +840,26 @@ export default function WhatsAppPage() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1 md:gap-2">
                                 {selectMode ? (
                                     <>
-                                        <span className="text-xs text-gray-500">{selectedMessages.size} mesaj seçildi</span>
+                                        <span className="hidden lg:inline text-xs text-gray-500">{selectedMessages.size} seçildi</span>
                                         <button
                                             onClick={() => parseSelectedMessages('transfer')}
                                             disabled={selectedMessages.size === 0 || parsing}
-                                            className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                                            className="bg-blue-500 hover:bg-blue-600 text-white text-[10px] md:text-xs px-2 md:px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
                                         >
-                                            {parsing ? '⏳ Analiz ediliyor...' : '🚌 Transfer Rezervasyonu'}
+                                            {parsing ? '⏳' : '🚌 Rez.'}
                                         </button>
                                         <button
                                             onClick={() => parseSelectedMessages('tour')}
                                             disabled={selectedMessages.size === 0 || parsing}
-                                            className="bg-purple-500 hover:bg-purple-600 text-white text-xs px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                                            className="bg-purple-500 hover:bg-purple-600 text-white text-[10px] md:text-xs px-2 md:px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
                                         >
-                                            {parsing ? '...' : '🗺️ Tur Rezervasyonu'}
+                                            {parsing ? '...' : '🗺️ Tur'}
                                         </button>
-                                        <button onClick={() => { setSelectMode(false); setSelectedMessages(new Set()); }} className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1.5">
-                                            İptal
+                                        <button onClick={() => { setSelectMode(false); setSelectedMessages(new Set()); }} className="text-[10px] md:text-xs text-gray-400 hover:text-gray-600 px-1 md:px-2 py-1.5">
+                                            X
                                         </button>
                                     </>
                                 ) : (
@@ -858,23 +867,23 @@ export default function WhatsAppPage() {
                                         <button
                                             onClick={() => analyzeChat('transfer')}
                                             disabled={parsing}
-                                            className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                                            className="bg-blue-500 hover:bg-blue-600 text-white text-[10px] md:text-xs px-2 md:px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 disabled:opacity-50"
                                         >
-                                            {parsing ? '⌛ Analiz...' : '🤖 Transferi Analiz Et'}
+                                            {parsing ? '⌛' : '🤖 Trans.'}
                                         </button>
                                         <button
                                             onClick={() => analyzeChat('tour')}
                                             disabled={parsing}
-                                            className="bg-purple-500 hover:bg-purple-600 text-white text-xs px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                                            className="bg-purple-500 hover:bg-purple-600 text-white text-[10px] md:text-xs px-2 md:px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 disabled:opacity-50"
                                         >
-                                            {parsing ? '⌛ Analiz...' : '🎭 Turu Analiz Et'}
+                                            {parsing ? '⌛' : '🎭 Tur'}
                                         </button>
                                         <button
                                             onClick={() => setSelectMode(true)}
-                                            className="bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs px-3 py-1.5 rounded-lg transition-colors"
-                                            title="Mesajları manuel seç"
+                                            className="bg-gray-100 hover:bg-gray-200 text-gray-600 text-[10px] md:text-xs px-2 md:px-3 py-1.5 rounded-lg transition-colors"
+                                            title="Seç"
                                         >
-                                            📋 Seç
+                                            📋
                                         </button>
                                     </>
                                 )}
@@ -941,7 +950,7 @@ export default function WhatsAppPage() {
                                         </div>
                                     )}
                                     <div
-                                        className={`max-w-xs lg:max-w-md xl:max-w-lg px-2 py-2 rounded-2xl shadow-sm cursor-pointer
+                                        className={`max-w-[85%] md:max-w-md xl:max-w-lg px-2 py-2 rounded-2xl shadow-sm cursor-pointer
                       ${msg.fromMe
                                                 ? 'bg-green-100 text-gray-800 rounded-tr-none'
                                                 : 'bg-white text-gray-800 rounded-tl-none'
@@ -1098,7 +1107,7 @@ export default function WhatsAppPage() {
                                     <button
                                         onClick={sendMessage}
                                         disabled={(!newMessage.trim() && !sending) || sending}
-                                        className="w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center transition-colors disabled:opacity-50 shadow-md active:scale-95"
+                                        className="w-10 h-10 min-w-[40px] bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center transition-colors disabled:opacity-50 shadow-md active:scale-95 flex-shrink-0"
                                     >
                                         {sending ? '⏳' : '➤'}
                                     </button>
