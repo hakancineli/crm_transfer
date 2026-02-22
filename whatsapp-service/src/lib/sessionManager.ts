@@ -27,7 +27,8 @@ interface SessionStore {
 }
 
 const sessions = new Map<string, SessionStore>();
-const AUTH_DIR = process.env.AUTH_DIR || '/tmp/wa-auth';
+// Moving to a directory that can be mounted as a Volume in Railway
+const AUTH_DIR = process.env.AUTH_DIR || '/data/wa-auth';
 
 function getAuthDir(userId: string) {
     return path.join(AUTH_DIR, userId);
@@ -349,7 +350,13 @@ export async function createSession(userId: string, tenantId: string, retryCount
         printQRInTerminal: false,
         logger,
         browser: ['CRM Transfer', 'Chrome', '1.0.0'],
-        syncFullHistory: true,
+        // Optimization for performance and stability
+        syncFullHistory: false,
+        shouldSyncHistoryMessage: () => false,
+        connectTimeoutMs: 60000,
+        defaultQueryTimeoutMs: 0,
+        keepAliveIntervalMs: 15000, // Frequent pings to keep connection alive
+        generateHighQualityLinkPreview: false,
     });
 
     const store: SessionStore = {
@@ -375,16 +382,24 @@ export async function createSession(userId: string, tenantId: string, retryCount
         }
 
         if (connection === 'close') {
-            const shouldReconnect = (lastDisconnect?.error as Boom)?.output?.statusCode !== DisconnectReason.loggedOut;
-            console.log(`❌ Connection closed for ${userId}. Reconnecting: ${shouldReconnect}`);
+            const statusCode = (lastDisconnect?.error as Boom)?.output?.statusCode;
+            const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
+
+            console.log(`❌ Connection closed for ${userId}. Reason: ${statusCode}. Reconnecting: ${shouldReconnect}`);
             store.status = 'DISCONNECTED';
             store.socket = null;
 
             if (shouldReconnect) {
-                createSession(userId, tenantId, retryCount + 1);
+                // Wait 5 seconds before reconnect to avoid spamming
+                setTimeout(() => {
+                    createSession(userId, tenantId, retryCount + 1).catch(console.error);
+                }, 5000);
             } else {
                 await disconnectSession(userId);
-                if (fs.existsSync(authDir)) fs.rmSync(authDir, { recursive: true, force: true });
+                // If logged out, we should clear the folder to be safe
+                if (fs.existsSync(authDir)) {
+                    try { fs.rmSync(authDir, { recursive: true, force: true }); } catch (e) { }
+                }
             }
         }
 

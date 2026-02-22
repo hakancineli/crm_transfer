@@ -79,7 +79,7 @@ app.listen(PORT, () => {
         } catch (e) {
             console.warn(`[KEEPALIVE] Ping failed:`, e);
         }
-    }, 4 * 60 * 1000); // every 4 minutes
+    }, 2 * 60 * 1000); // every 2 minutes for better activity signaling
 });
 
 export default app;
