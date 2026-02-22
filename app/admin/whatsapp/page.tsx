@@ -430,11 +430,23 @@ export default function WhatsAppPage() {
     const analyzeChat = async (type: 'transfer' | 'tour' = 'transfer') => {
         if (!selectedChat || messages.length === 0) return;
 
-        // Take last 20 messages for context
-        const recentMsgs = messages.slice(-20);
+        // Take last 30 messages for context, filter out empty/media-only
+        const recentMsgs = messages.slice(-30).filter(m =>
+            m.body && m.body.trim() !== '' && m.body !== '...' &&
+            !m.body.startsWith('[Görsel]') && !m.body.startsWith('[Sesli Mesaj]') &&
+            !m.body.startsWith('[Video]') && !m.body.startsWith('[Sticker]')
+        );
+
+        if (recentMsgs.length === 0) {
+            alert('Bu sohbette analiz edilecek metin mesajı bulunamadı.');
+            return;
+        }
+
         const text = recentMsgs
             .map(m => `${m.fromMe ? 'Biz' : (selectedChat.name || 'Müşteri')}: ${m.body}`)
             .join('\n');
+
+        console.log('📤 Sending for AI analysis:', text.substring(0, 200) + '...');
 
         setParsing(true);
         try {
@@ -444,9 +456,18 @@ export default function WhatsAppPage() {
                 body: JSON.stringify({ messageText: text, type }),
             });
             const data = await res.json();
+
+            if (!res.ok || data.error) {
+                console.error('❌ AI parse error:', data);
+                alert(`AI analiz hatası: ${data.error || 'Bilinmeyen hata'}`);
+                return;
+            }
+
+            console.log('✅ AI parse result:', data);
             setParsedReservation({ ...data, type });
         } catch (e) {
             console.error(e);
+            alert('AI analiz sırasında bir hata oluştu.');
         } finally {
             setParsing(false);
             setSelectMode(false);

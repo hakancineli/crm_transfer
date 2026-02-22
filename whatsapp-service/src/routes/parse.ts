@@ -36,11 +36,20 @@ parseRouter.post('/reservation', async (req, res) => {
         );
 
         const data = await response.json() as any;
+
+        if (!response.ok) {
+            console.error('❌ Gemini API error:', JSON.stringify(data));
+            return res.status(500).json({ error: `Gemini API error: ${data?.error?.message || 'Unknown'}` });
+        }
+
         const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (!text) {
+            console.error('❌ AI returned no text. Full response:', JSON.stringify(data).substring(0, 500));
             return res.status(500).json({ error: 'AI returned no response' });
         }
+
+        console.log('✅ AI parsed reservation successfully');
 
         const parsed = JSON.parse(text);
         return res.json(parsed);
