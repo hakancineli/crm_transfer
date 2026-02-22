@@ -75,11 +75,12 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
     const currencyParam = searchParams.get('currency') as Currency;
     const phoneNumber = searchParams.get('phoneNumber');
     const passengerNames = searchParams.get('passengerNames');
+    const luggageCount = searchParams.get('luggageCount');
     const notes = searchParams.get('notes');
 
-    if (date || time || from || to || flightCode || price || phoneNumber || passengerNames) {
+    if (date || time || from || to || flightCode || price || phoneNumber || passengerNames || luggageCount) {
       console.log('📝 Populating ReservationForm from URL params:', {
-        date, time, from, to, price, phoneNumber, passengerNames
+        date, time, from, to, price, phoneNumber, passengerNames, luggageCount
       });
       setFormData(prev => ({
         ...prev,
@@ -91,7 +92,8 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
         phone: phoneNumber || prev.phone,
         notes: notes || prev.notes,
         passengers: passengerNames ? passengerNames.split(',') : prev.passengers,
-        name: passengerNames ? passengerNames.split(',')[0] : prev.name
+        name: passengerNames ? passengerNames.split(',')[0] : prev.name,
+        luggageCount: luggageCount ? parseInt(luggageCount) || 0 : prev.luggageCount
       }));
 
       if (price) setEstimatedPriceTRY(parseFloat(price));

@@ -138,13 +138,16 @@ parseRouter.post('/translate', async (req, res) => {
 function buildTransferPrompt(message: string): string {
     const today = new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-    return `Sen profesyonel bir transfer rezervasyon asistanısın. Aşağıdaki WhatsApp sohbet geçmişinden rezervasyon bilgilerini çıkar ve JSON formatında döndür.
+    return `Sen profesyonel bir transfer rezervasyon asistanısın. Aşağıdaki WhatsApp sohbet geçmişini analiz ederek rezervasyon bilgilerini çıkar ve JSON formatında döndür.
 Bugünün tarihi: ${today}.
 
 ÖNEMLİ KURALLAR:
-1. Eğer mesajda açıkça bir "yolcu ismi" yoksa, mesajı gönderen kişinin (örn: "Müşteri:" veya sohbet geçmişindeki isim) ismini "passengerNames" içine ekle.
-2. Fiyat gördüğünde para birimiyle birlikte (örn: "500 TL", "20 Euro") "price" ve "currency" kısımlarını doldur.
-3. Lokasyon bilgilerinde (Nereden/Nereye) otel isimleri veya havalimanı kodlarını (IST, SAW) kaçırma.
+1. **FİYAT ANALİZİ:** Sohbet içinde fiyat pazarlığı olabilir. Eğer birden fazla fiyat telaffuz edildiyse, her zaman **en son üzerinde anlaşılan (konfirme edilen)** fiyatı ve para birimini (EUR, USD, TRY) al. 
+   Örn: "50 USD olur mu?" -> "Tamam 40 USD olsun" -> "Tamam anlaştık" -> Fiyat: 40, Para Birimi: USD.
+2. **YOLCU İSMİ:** Eğer mesajda açıkça isim verilmemişse, "Müşteri:" etiketli kişinin ismini veya sohbet akışındaki kullanıcı adını "passengerNames" listesine ekle.
+3. **BAGAJ:** Mesajda valiz, bagaj, büyük/küçük çanta sayısı geçiyorsa "luggageCount" alanına sayı olarak yaz.
+4. **LOKASYON:** Havalimanı transferlerinde IST, SAW kodlarını veya otel isimleri geçiyorsa bunları "from" (nereden) ve "to" (nereye) alanlarına tam olarak yaz.
+5. **TARİH/SAAT:** "Yarın", "Pazartesi" gibi ifadeleri bugünün tarihine (${today}) göre net tarihe (YYYY-MM-DD) çevir.
 
 MESAJ GEÇMİŞİ:
 ${message}
@@ -156,6 +159,7 @@ Aşağıdaki JSON formatında döndür (değer bulunamazsa null veya []):
   "from": "nereden (konum/otel adı) veya null",
   "to": "nereye (konum/otel adı) veya null",
   "passengerCount": sayı veya null,
+  "luggageCount": sayı veya null,
   "passengerNames": ["isim1", "isim2"] veya [],
   "flightCode": "uçuş kodu veya null",
   "price": sayı veya null,

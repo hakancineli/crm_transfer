@@ -45,6 +45,7 @@ type ParsedReservation = {
     price?: number;
     currency?: string;
     phoneNumber?: string;
+    luggageCount?: number;
     notes?: string;
     // Tour fields
     tourDate?: string;
@@ -592,6 +593,7 @@ export default function WhatsAppPage() {
                 params.set('phoneNumber', parsedReservation.phoneNumber || selectedChat?.phone || '');
             }
             if (parsedReservation.passengerNames?.length) params.set('passengerNames', parsedReservation.passengerNames.join(','));
+            if (parsedReservation.luggageCount) params.set('luggageCount', String(parsedReservation.luggageCount));
             if (parsedReservation.notes) params.set('notes', parsedReservation.notes);
 
             router.push(`/admin/new-reservation?${params.toString()}`);
@@ -901,6 +903,7 @@ export default function WhatsAppPage() {
                                             )}
                                             {parsedReservation.passengerCount && <span>👥 {parsedReservation.passengerCount} kişi</span>}
                                             {parsedReservation.passengerNames?.length ? <span>🙋 {parsedReservation.passengerNames.join(', ')}</span> : null}
+                                            {parsedReservation.luggageCount && <span>🧳 {parsedReservation.luggageCount} bagaj</span>}
                                             {parsedReservation.price && <span>💰 {parsedReservation.price} {parsedReservation.currency}</span>}
                                         </div>
                                     </div>
