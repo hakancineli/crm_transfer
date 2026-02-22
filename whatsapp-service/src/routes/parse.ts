@@ -33,7 +33,7 @@ parseRouter.post('/reservation', async (req, res) => {
             }
 
             const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -60,10 +60,12 @@ parseRouter.post('/reservation', async (req, res) => {
                 return res.status(500).json({ error: `Gemini API error: ${data?.error?.message || 'Unknown'}` });
             }
 
-            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+            const candidate = data?.candidates?.[0];
+            const text = candidate?.content?.parts?.[0]?.text;
 
             if (!text) {
-                console.error('❌ AI returned no text. Full response:', JSON.stringify(data).substring(0, 500));
+                console.error('❌ AI returned no text. FinishReason:', candidate?.finishReason);
+                console.error('❌ Full response snapshot:', JSON.stringify(data).substring(0, 500));
                 return res.status(500).json({ error: 'AI returned no response' });
             }
 
