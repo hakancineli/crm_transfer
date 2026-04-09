@@ -66,8 +66,8 @@ export default function AdminDashboard() {
   // Loading state - authentication henüz tamamlanmadıysa loading göster
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 transition-colors duration-200">
+        <div className="text-center text-gray-900 dark:text-slate-100">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600 dark:text-slate-400">Yükleniyor...</p>
         </div>
@@ -77,9 +77,9 @@ export default function AdminDashboard() {
 
   if (!canViewDashboard) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Yetkisiz Erişim</h1>
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 transition-colors duration-200">
+        <div className="max-w-2xl mx-auto p-6 bg-white dark:bg-slate-900 rounded-lg shadow dark:shadow-none border border-gray-200 dark:border-slate-800 transition-colors duration-200">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-slate-100 mb-4">Yetkisiz Erişim</h1>
           <p className="text-gray-600 dark:text-slate-400">Bu sayfaya erişim yetkiniz bulunmamaktadır.</p>
         </div>
       </div>
@@ -145,7 +145,7 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center transition-colors duration-200">
         <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div>
       </div>
     );
@@ -305,7 +305,7 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-2 gap-4">
               <Link
                 href="/admin/new-reservation"
-                className="flex items-center justify-center p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
+                className="flex items-center justify-center p-4 bg-green-50 dark:bg-emerald-500/10 border border-green-200 dark:border-emerald-500/20 rounded-lg hover:bg-green-100 dark:hover:bg-emerald-500/15 transition-colors"
               >
                 <div className="text-center">
                   <div className="text-2xl mb-2">{emojisEnabled ? '➕' : '+'}</div>
@@ -315,7 +315,7 @@ export default function AdminDashboard() {
               
               <Link
                 href="/admin/reservations"
-                className="flex items-center justify-center p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+                className="flex items-center justify-center p-4 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/15 transition-colors"
               >
                 <div className="text-center">
                   <div className="text-2xl mb-2">{isClient && emojisEnabled ? '📋' : '📄'}</div>
@@ -326,16 +326,16 @@ export default function AdminDashboard() {
               {user?.role === 'SUPERUSER' || flightEnabled ? (
                 <Link
                   href="/admin/flight-status"
-                  className="flex items-center justify-center p-4 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
+                  className="flex items-center justify-center p-4 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-500/15 transition-colors"
                 >
                   <div className="text-center">
                     <div className="text-2xl mb-2">{emojisEnabled ? '✈️' : '🛫'}</div>
-                    <div className="text-sm font-medium text-orange-800">{t('admin.dashboard.quickActions.flightStatus')}</div>
+                    <div className="text-sm font-medium text-orange-800 dark:text-orange-300">{t('admin.dashboard.quickActions.flightStatus')}</div>
                   </div>
                 </Link>
               ) : (
                 <div
-                  className="flex items-center justify-center p-4 bg-gray-50 border border-gray-200 rounded-lg opacity-50 cursor-not-allowed"
+                  className="flex items-center justify-center p-4 bg-gray-50 dark:bg-slate-800/70 border border-gray-200 dark:border-slate-700 rounded-lg opacity-50 cursor-not-allowed transition-colors duration-200"
                   title="Uçuş modülü kapalı - Modül Yönetimi'nden aktifleştirin"
                 >
                   <div className="text-center">
@@ -347,11 +347,11 @@ export default function AdminDashboard() {
               
               <Link
                 href="/admin/reports"
-                className="flex items-center justify-center p-4 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors"
+                className="flex items-center justify-center p-4 bg-purple-50 dark:bg-violet-500/10 border border-purple-200 dark:border-violet-500/20 rounded-lg hover:bg-purple-100 dark:hover:bg-violet-500/15 transition-colors"
               >
                 <div className="text-center">
                   <div className="text-2xl mb-2">{isClient && emojisEnabled ? '📊' : '📈'}</div>
-                  <div className="text-sm font-medium text-purple-800">{t('admin.dashboard.quickActions.reports')}</div>
+                  <div className="text-sm font-medium text-purple-800 dark:text-violet-300">{t('admin.dashboard.quickActions.reports')}</div>
                 </div>
               </Link>
             </div>
@@ -364,52 +364,52 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-2 gap-4">
               <Link
                 href="/admin/accommodation"
-                className="flex items-center justify-center p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+                className="flex items-center justify-center p-4 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/15 transition-colors"
               >
                 <div className="text-center">
                   <div className="text-2xl mb-2">{emojisEnabled ? '🏨' : '🏢'}</div>
-                  <div className="text-sm font-medium text-blue-800">{t('admin.dashboard.quickActions.hotelReservation')}</div>
+                  <div className="text-sm font-medium text-blue-800 dark:text-blue-300">{t('admin.dashboard.quickActions.hotelReservation')}</div>
                 </div>
               </Link>
-              
+
               <Link
                 href="/admin/accommodation/price-pool"
-                className="flex items-center justify-center p-4 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
+                className="flex items-center justify-center p-4 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-500/15 transition-colors"
               >
                 <div className="text-center">
                   <div className="text-2xl mb-2">{emojisEnabled ? '💰' : '$'}</div>
-                  <div className="text-sm font-medium text-orange-800">{t('admin.dashboard.quickActions.pricePool')}</div>
+                  <div className="text-sm font-medium text-orange-800 dark:text-orange-300">{t('admin.dashboard.quickActions.pricePool')}</div>
                 </div>
               </Link>
-              
+
               <Link
                 href="/admin/accommodation/reservations"
-                className="flex items-center justify-center p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
+                className="flex items-center justify-center p-4 bg-green-50 dark:bg-emerald-500/10 border border-green-200 dark:border-emerald-500/20 rounded-lg hover:bg-green-100 dark:hover:bg-emerald-500/15 transition-colors"
               >
                 <div className="text-center">
                   <div className="text-2xl mb-2">{isClient && emojisEnabled ? '📋' : '📄'}</div>
-                  <div className="text-sm font-medium text-green-800">{t('admin.dashboard.quickActions.hotelReservations')}</div>
+                  <div className="text-sm font-medium text-green-800 dark:text-emerald-300">{t('admin.dashboard.quickActions.hotelReservations')}</div>
                 </div>
               </Link>
-              
+
               <Link
                 href="/admin/accommodation/reports"
-                className="flex items-center justify-center p-4 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors"
+                className="flex items-center justify-center p-4 bg-purple-50 dark:bg-violet-500/10 border border-purple-200 dark:border-violet-500/20 rounded-lg hover:bg-purple-100 dark:hover:bg-violet-500/15 transition-colors"
               >
                 <div className="text-center">
                   <div className="text-2xl mb-2">{isClient && emojisEnabled ? '📊' : '📈'}</div>
-                  <div className="text-sm font-medium text-purple-800">{t('admin.dashboard.quickActions.accommodationReports')}</div>
+                  <div className="text-sm font-medium text-purple-800 dark:text-violet-300">{t('admin.dashboard.quickActions.accommodationReports')}</div>
                 </div>
               </Link>
             </div>
           </div>
           ) : (
-            <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-6 opacity-50">
-              <h3 className="text-lg font-semibold text-gray-500 mb-4">{t('admin.dashboard.quickActions.accommodationOperations')}</h3>
+            <div className="bg-gray-50 dark:bg-slate-800/70 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6 opacity-50 transition-colors duration-200">
+              <h3 className="text-lg font-semibold text-gray-500 dark:text-slate-400 mb-4">{t('admin.dashboard.quickActions.accommodationOperations')}</h3>
               <div className="text-center py-8">
                 <div className="text-4xl mb-4">{emojisEnabled ? '🏨' : '🏢'}</div>
-                <p className="text-gray-500">Konaklama modülü kapalı</p>
-                <p className="text-sm text-gray-400 mt-2">Modül Yönetimi'nden aktifleştirin</p>
+                <p className="text-gray-500 dark:text-slate-400">Konaklama modülü kapalı</p>
+                <p className="text-sm text-gray-400 dark:text-slate-500 mt-2">Modül Yönetimi'nden aktifleştirin</p>
               </div>
             </div>
           )}
@@ -422,16 +422,16 @@ export default function AdminDashboard() {
                 {canManageTourBookings(user?.role || '', user?.permissions) ? (
                   <Link
                     href="/admin/tour/reservations/new"
-                    className="flex items-center justify-center p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
+                    className="flex items-center justify-center p-4 bg-green-50 dark:bg-emerald-500/10 border border-green-200 dark:border-emerald-500/20 rounded-lg hover:bg-green-100 dark:hover:bg-emerald-500/15 transition-colors"
                   >
                     <div className="text-center">
                       <div className="text-2xl mb-2">{emojisEnabled ? '🚌' : '🚐'}</div>
-                      <div className="text-sm font-medium text-green-800">Yeni Tur Rezervasyonu</div>
+                      <div className="text-sm font-medium text-green-800 dark:text-emerald-300">Yeni Tur Rezervasyonu</div>
                     </div>
                   </Link>
                 ) : (
                   <div
-                    className="flex items-center justify-center p-4 bg-gray-50 border border-gray-200 rounded-lg opacity-50 cursor-not-allowed"
+                    className="flex items-center justify-center p-4 bg-gray-50 dark:bg-slate-800/70 border border-gray-200 dark:border-slate-700 rounded-lg opacity-50 cursor-not-allowed transition-colors duration-200"
                     title="Tur rezervasyonu oluşturma yetkiniz yok"
                   >
                     <div className="text-center">
@@ -444,16 +444,16 @@ export default function AdminDashboard() {
                 {canViewTourModule(user?.role || '', user?.permissions) ? (
                   <Link
                     href="/admin/tour/reservations"
-                    className="flex items-center justify-center p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+                    className="flex items-center justify-center p-4 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/15 transition-colors"
                   >
                     <div className="text-center">
                       <div className="text-2xl mb-2">{isClient && emojisEnabled ? '📋' : '📄'}</div>
-                      <div className="text-sm font-medium text-blue-800">Tur Rezervasyonları</div>
+                      <div className="text-sm font-medium text-blue-800 dark:text-blue-300">Tur Rezervasyonları</div>
                     </div>
                   </Link>
                 ) : (
                   <div
-                    className="flex items-center justify-center p-4 bg-gray-50 border border-gray-200 rounded-lg opacity-50 cursor-not-allowed"
+                    className="flex items-center justify-center p-4 bg-gray-50 dark:bg-slate-800/70 border border-gray-200 dark:border-slate-700 rounded-lg opacity-50 cursor-not-allowed transition-colors duration-200"
                     title="Tur rezervasyonlarını görme yetkiniz yok"
                   >
                     <div className="text-center">
@@ -466,16 +466,16 @@ export default function AdminDashboard() {
                 {canManageTourRoutes(user?.role || '', user?.permissions) ? (
                   <Link
                     href="/admin/tour/routes"
-                    className="flex items-center justify-center p-4 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
+                    className="flex items-center justify-center p-4 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-500/15 transition-colors"
                   >
                     <div className="text-center">
                       <div className="text-2xl mb-2">{emojisEnabled ? '🗺️' : '📍'}</div>
-                      <div className="text-sm font-medium text-orange-800">Tur Rotaları</div>
+                      <div className="text-sm font-medium text-orange-800 dark:text-orange-300">Tur Rotaları</div>
                     </div>
                   </Link>
                 ) : (
                   <div
-                    className="flex items-center justify-center p-4 bg-gray-50 border border-gray-200 rounded-lg opacity-50 cursor-not-allowed"
+                    className="flex items-center justify-center p-4 bg-gray-50 dark:bg-slate-800/70 border border-gray-200 dark:border-slate-700 rounded-lg opacity-50 cursor-not-allowed transition-colors duration-200"
                     title="Tur rotalarını yönetme yetkiniz yok"
                   >
                     <div className="text-center">
@@ -488,16 +488,16 @@ export default function AdminDashboard() {
                 {canManageTourVehicles(user?.role || '', user?.permissions) ? (
                   <Link
                     href="/admin/tour/vehicles"
-                    className="flex items-center justify-center p-4 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors"
+                    className="flex items-center justify-center p-4 bg-purple-50 dark:bg-violet-500/10 border border-purple-200 dark:border-violet-500/20 rounded-lg hover:bg-purple-100 dark:hover:bg-violet-500/15 transition-colors"
                   >
                     <div className="text-center">
                       <div className="text-2xl mb-2">{emojisEnabled ? '🚐' : '🚗'}</div>
-                      <div className="text-sm font-medium text-purple-800">Araç Yönetimi</div>
+                      <div className="text-sm font-medium text-purple-800 dark:text-violet-300">Araç Yönetimi</div>
                     </div>
                   </Link>
                 ) : (
                   <div
-                    className="flex items-center justify-center p-4 bg-gray-50 border border-gray-200 rounded-lg opacity-50 cursor-not-allowed"
+                    className="flex items-center justify-center p-4 bg-gray-50 dark:bg-slate-800/70 border border-gray-200 dark:border-slate-700 rounded-lg opacity-50 cursor-not-allowed transition-colors duration-200"
                     title="Araç yönetimi yetkiniz yok"
                   >
                     <div className="text-center">
@@ -509,12 +509,12 @@ export default function AdminDashboard() {
               </div>
             </div>
           ) : (
-            <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-6 opacity-50">
-              <h3 className="text-lg font-semibold text-gray-500 mb-4">Tur İşlemleri</h3>
+            <div className="bg-gray-50 dark:bg-slate-800/70 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6 opacity-50 transition-colors duration-200">
+              <h3 className="text-lg font-semibold text-gray-500 dark:text-slate-400 mb-4">Tur İşlemleri</h3>
               <div className="text-center py-8">
                 <div className="text-4xl mb-4">{emojisEnabled ? '🚌' : '🚐'}</div>
-                <p className="text-gray-500">Tur modülü kapalı</p>
-                <p className="text-sm text-gray-400 mt-2">Modül Yönetimi'nden aktifleştirin</p>
+                <p className="text-gray-500 dark:text-slate-400">Tur modülü kapalı</p>
+                <p className="text-sm text-gray-400 dark:text-slate-500 mt-2">Modül Yönetimi'nden aktifleştirin</p>
               </div>
             </div>
           )}
