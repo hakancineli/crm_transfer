@@ -24,6 +24,7 @@ interface SessionStore {
     status: 'CONNECTING' | 'QR_PENDING' | 'CONNECTED' | 'DISCONNECTED';
     phone: string | null;
     qrRetries: number;
+    tenantId?: string;
 }
 
 const sessions = new Map<string, SessionStore>();
@@ -44,6 +45,10 @@ export function getAllSessions() {
         result[userId] = { status: session.status, phone: session.phone };
     }
     return result;
+}
+
+export function getSessionSocket(userId: string): WASocket | null {
+    return sessions.get(userId)?.socket || null;
 }
 
 import { downloadMediaMessage } from '@whiskeysockets/baileys';
@@ -260,46 +265,68 @@ async function saveMessageToDB(userId: string, message: proto.IWebMessageInfo, t
     }
 }
 
+function normalizePhone(chatId: string): string {
+    return chatId
+        .replace('@s.whatsapp.net', '')
+        .replace('@g.us', '')
+        .replace('@lid', '')
+        .replace(/[^\d]/g, '');
+}
+
+function pickDisplayName(chat: any, fallbackPhone: string): string {
+    const candidates = [chat?.name, chat?.verifiedName, chat?.notify, chat?.pushName, chat?.subject, fallbackPhone];
+    for (const candidate of candidates) {
+        if (typeof candidate !== 'string') continue;
+        const value = candidate.trim();
+        if (!value) continue;
+        if (value.includes('@lid')) continue;
+        return value;
+    }
+    return fallbackPhone;
+}
+
+async function syncContactToChat(userId: string, contact: any) {
+    if (!contact?.id) return;
+    const phone = normalizePhone(contact.id);
+    const displayName = pickDisplayName(contact, phone);
+    await prisma.whatsAppChat.updateMany({
+        where: { userId, chatId: contact.id },
+        data: { name: displayName, phone }
+    }).catch(() => {});
+}
+
 async function syncChat(userId: string, tenantId: string, chat: any) {
     try {
-        const { id: chatId, name, archived, unreadCount, pin } = chat;
+        const { id: chatId, name, unreadCount } = chat;
         if (!chatId || chatId === 'status@broadcast' || chatId.includes('broadcast')) return;
 
-        const phone = chatId.replace('@s.whatsapp.net', '').replace('@g.us', '').replace('@lid', '');
-
+        const phone = normalizePhone(chatId);
         const session = sessions.get(userId);
         let avatarUrl = undefined;
         if (session?.socket) {
             avatarUrl = await session.socket.profilePictureUrl(chatId, 'image').catch(() => undefined);
         }
 
-        // If it's a group and name is missing, try to fetch it
         let resolvedName = name || undefined;
         if (chatId.includes('@g.us') && !resolvedName && session?.socket) {
             try {
                 const metadata = await session.socket.groupMetadata(chatId);
                 resolvedName = metadata.subject;
-            } catch (e) { }
+            } catch (e) {}
         }
 
-        // Detect archive status reliably
-        const isArchived = chat.archive !== undefined ? !!chat.archive : (chat.archived !== undefined ? !!chat.archived : undefined);
-        const isPinned = (chat.pin !== undefined && chat.pin !== null && chat.pin !== 0);
-
-        // Name resolution improvement
-        let finalName = resolvedName;
-        if (!finalName || finalName.includes('@lid') || /^\d+$/.test(finalName)) {
-            // Try pushName if available in the object
-            if ((chat as any).pushName) finalName = (chat as any).pushName;
-        }
+        const isArchived = chat.archive !== undefined ? !!chat.archive : (chat.archived !== undefined ? !!chat.archived : false);
+        const isPinned = chat.pin !== undefined && chat.pin !== null ? !!chat.pin && chat.pin !== 0 : !!chat.pinned;
+        const finalName = pickDisplayName({ ...chat, name: resolvedName }, phone);
 
         await prisma.whatsAppChat.upsert({
             where: { userId_chatId: { userId, chatId } },
             update: {
                 name: finalName,
+                phone,
                 archived: isArchived,
                 unread: unreadCount !== undefined ? unreadCount : undefined,
-                pinned: isPinned || undefined,
+                pinned: isPinned,
                 avatarUrl: avatarUrl || undefined,
             } as any,
             create: {
@@ -307,9 +334,9 @@ async function syncChat(userId: string, tenantId: string, chat: any) {
                 tenantId,
                 chatId,
                 name: finalName || phone,
-                phone: phone,
-                archived: !!isArchived,
-                pinned: !!isPinned,
+                phone,
+                archived: isArchived,
+                pinned: isPinned,
                 unread: unreadCount || 0,
                 avatarUrl,
             } as any
@@ -364,7 +391,8 @@ export async function createSession(userId: string, tenantId: string, retryCount
         qr: null,
         status: 'CONNECTING',
         phone: null,
-        qrRetries: 0
+        qrRetries: 0,
+        tenantId
     };
     sessions.set(userId, store);
 
@@ -415,6 +443,17 @@ export async function createSession(userId: string, tenantId: string, retryCount
                 update: { status: 'CONNECTED', phone, qrCode: null, connectedAt: new Date() },
                 create: { userId, tenantId, status: 'CONNECTED', phone, connectedAt: new Date() }
             });
+            await prisma.whatsAppChat.findMany({ where: { userId } }).then(async (dbChats) => {
+                for (const dbChat of dbChats) {
+                    await syncChat(userId, tenantId, {
+                        id: dbChat.chatId,
+                        name: dbChat.name,
+                        archived: dbChat.archived,
+                        pin: dbChat.pinned ? 1 : 0,
+                        unreadCount: dbChat.unread,
+                    });
+                }
+            });
         }
     });
 
@@ -455,23 +494,13 @@ export async function createSession(userId: string, tenantId: string, retryCount
 
     sock.ev.on('contacts.upsert', async (contacts) => {
         for (const contact of contacts) {
-            if (contact.id && (contact.name || contact.verifiedName)) {
-                await prisma.whatsAppChat.updateMany({
-                    where: { userId, chatId: contact.id },
-                    data: { name: contact.name || contact.verifiedName }
-                }).catch(() => { });
-            }
+            await syncContactToChat(userId, contact);
         }
     });
 
     sock.ev.on('contacts.update', async (updates) => {
         for (const update of updates) {
-            if (update.id && (update.name || update.verifiedName)) {
-                await prisma.whatsAppChat.updateMany({
-                    where: { userId, chatId: update.id },
-                    data: { name: update.name || update.verifiedName }
-                }).catch(() => { });
-            }
+            await syncContactToChat(userId, update);
         }
     });
 }

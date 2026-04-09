@@ -3,34 +3,34 @@ import { Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import Header from "./components/ui/Header";
+import GoogleAnalytics from "./components/GoogleAnalytics";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { EmojiProvider } from "./contexts/EmojiContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://protransfer.com"),
+  metadataBase: new URL("https://www.proacente.com"),
   title: {
-    default: "Pro Transfer - İstanbul Havalimanı Transfer Hizmeti",
-    template: "%s | Pro Transfer",
+    default: "Pro Acente | Turizm Acente Yönetim Sistemi, Transfer ve Tur Operasyon Yazılımı",
+    template: "%s | Pro Acente",
   },
   description:
-    "Pro Transfer ile İstanbul Havalimanı (IST) ve Sabiha Gökçen (SAW) VIP transfer. 7/24 Mercedes Vito, sabit fiyat, uçuş takibi ve karşılama hizmeti.",
+    "Pro Acente; turizm acenteleri için transfer, tur, operasyon, muhasebe, WhatsApp, yapay zeka ve website modüllerini tek platformda birleştiren yönetim sistemidir.",
   keywords: [
-    "İstanbul transfer",
-    "havalimanı transfer",
-    "IST transfer",
-    "SAW transfer",
-    "Sabiha Gökçen transfer",
-    "İstanbul Havalimanı transfer",
-    "VIP transfer",
-    "Mercedes Vito",
-    "şehirler arası transfer",
-    "transfer hizmeti",
-    "rezervasyon",
-    "chauffeur service",
-    "airport transfer",
+    "turizm acente yönetim sistemi",
+    "acente otomasyonu",
+    "transfer yönetim yazılımı",
+    "tur operatörü yazılımı",
+    "tur rezervasyon sistemi",
+    "transfer ve tur yazılımı",
+    "whatsapp entegrasyonlu crm",
+    "yapay zeka destekli acente yazılımı",
+    "online rezervasyon yazılımı",
+    "operasyon ve muhasebe yazılımı",
+    "acente crm",
   ],
   alternates: {
     canonical: "/",
@@ -38,21 +38,21 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    url: "https://protransfer.com/",
-    siteName: "Pro Transfer",
-    title: "Pro Transfer - İstanbul Havalimanı Transfer Hizmeti",
+    url: "https://www.proacente.com/",
+    siteName: "Pro Acente",
+    title: "Pro Acente | Turizm Acente Yönetim Sistemi",
     description:
-      "Pro Transfer ile IST ve SAW VIP transfer. Sabit fiyat, uçuş takibi, karşılama.",
+      "Transfer, tur, operasyon, muhasebe, WhatsApp ve yapay zeka destekli süreçleri tek panelden yönetin.",
     images: [
-      { url: "/seref-vural-tours/vito-1.jpg", width: 1200, height: 630, alt: "Pro Transfer Vito" },
+      { url: "/screenshots/dashboard.png", width: 1200, height: 630, alt: "Pro Acente dashboard" },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pro Transfer - İstanbul Havalimanı Transfer",
+    title: "Pro Acente | Turizm Acente Yönetim Sistemi",
     description:
-      "Pro Transfer ile IST ve SAW VIP transfer. Sabit fiyat, uçuş takibi, karşılama.",
-    images: ["/seref-vural-tours/vito-1.jpg"],
+      "Transfer, tur, muhasebe, website, WhatsApp ve yapay zeka modüllerini tek platformda yönetin.",
+    images: ["/screenshots/dashboard.png"],
   },
   robots: { index: true, follow: true },
 };
@@ -154,6 +154,19 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
+        <GoogleAnalytics />
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var theme = localStorage.getItem('crm-theme') || 'light';
+                if (theme === 'dark') document.documentElement.classList.add('dark');
+              } catch (e) {}
+            `,
+          }}
+        />
         <Script
           id="google-maps-script"
           src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&language=tr&v=weekly&loading=async`}
@@ -161,12 +174,14 @@ export default function RootLayout({
         />
         <AuthProvider>
           <LanguageProvider>
-            <EmojiProvider>
-              <Header />
-              <main className="w-full pt-16 pb-6 px-4 sm:px-6 lg:px-8 print:p-0">
-                {children}
-              </main>
-            </EmojiProvider>
+            <ThemeProvider>
+              <EmojiProvider>
+                <Header />
+                <main className="w-full pt-16 pb-6 px-4 sm:px-6 lg:px-8 print:p-0 bg-white text-gray-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200">
+                  {children}
+                </main>
+              </EmojiProvider>
+            </ThemeProvider>
           </LanguageProvider>
         </AuthProvider>
       </body>

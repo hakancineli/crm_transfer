@@ -95,10 +95,10 @@ export default function ReservationsPage() {
     };
 
     return (
-        <div className="p-4 lg:p-6 space-y-6">
+        <div className="px-4 pb-6 pt-0 lg:px-6 lg:pb-6 lg:pt-0 space-y-6 -mt-4 text-gray-900 dark:text-slate-100 transition-colors duration-200 rounded-3xl bg-white/70 dark:bg-slate-950/55 backdrop-blur-sm border border-white/60 dark:border-slate-800/80 p-4 lg:p-6">
             <div>
-                <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
-                <p className="mt-2 text-sm text-gray-600">
+                <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">{title}</h1>
+                <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">
                     {description}
                 </p>
             </div>

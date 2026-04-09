@@ -282,11 +282,11 @@
       "demo": "Demoyu İncele"
     },
     "hero": {
-      "title": "Acenteler için iş yönetimi CRM — Pro Acente",
-      "subtitle": "Back ofis ağırlıklı, en az iş yükü ile operasyon yönetimi. Rezervasyonları tek ekrandan atayın, sürücüye iletin, müşteriye paylaşın. Uçtan uca: rezervasyon → atama → operasyon → muhasebe → rapor.",
+      "title": "Turizm acenteleri için yönetim sistemi",
+      "subtitle": "Transfer, tur, operasyon, muhasebe, WhatsApp ve yapay zeka destekli süreçleri tek platformda yönetin. Rezervasyon alın, sürücü atayın, voucher paylaşın, tahsilat ve raporlamayı aynı ekrandan takip edin.",
       "ctaStart": "Hemen Başlayın",
       "ctaFeatures": "Özellikleri Gör",
-      "note": "TR/EN/FR/RU ve TRY/USD/EUR destekli"
+      "note": "WhatsApp, yapay zeka, tur operasyonu, çok dil ve çok para birimi desteği"
     },
     "sections": {
       "screenshots": "Ekran Görüntüleri",

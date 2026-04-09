@@ -292,7 +292,7 @@ export default function AccountingPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Yükleniyor...</p>
+          <p className="mt-4 text-gray-600 dark:text-slate-400">Yükleniyor...</p>
         </div>
       </div>
     );
@@ -349,13 +349,13 @@ export default function AccountingPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-6 text-gray-900 dark:text-white dark:text-slate-100 transition-colors duration-200 rounded-3xl bg-white/70 dark:bg-slate-950/55 backdrop-blur-sm border border-white/60 dark:border-slate-800/80">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center space-x-4">
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
           >
             <option value="all">{t('admin.accounting.filters.all')}</option>
             <option value="PAID">{t('admin.accounting.filters.paid')}</option>
@@ -380,86 +380,86 @@ export default function AccountingPage() {
 
       {/* Özet Kartları - Raporlar sayfasındaki mantığa göre */}
       <div className="grid grid-cols-1 md:grid-cols-7 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
           <div className="flex items-center">
             <div className="p-2 bg-green-100 rounded-lg">
               <span className="text-green-600 text-2xl">💰</span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">{t('admin.accounting.stats.usdSalesTotal')}</p>
-              <p className="text-2xl font-bold text-gray-900">${totalRevenueUSD.toFixed(2)}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-slate-400">{t('admin.accounting.stats.usdSalesTotal')}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">${totalRevenueUSD.toFixed(2)}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
           <div className="flex items-center">
             <div className="p-2 bg-blue-100 rounded-lg">
               <span className="text-blue-600 text-2xl">💱</span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">{t('admin.accounting.stats.usdTlRate')}</p>
-              <p className="text-2xl font-bold text-gray-900">{usdRate.toFixed(2)} TL</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-slate-400">{t('admin.accounting.stats.usdTlRate')}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{usdRate.toFixed(2)} TL</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
           <div className="flex items-center">
             <div className="p-2 bg-yellow-100 rounded-lg">
               <span className="text-yellow-600 text-2xl">🇪🇺</span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">EUR Satış Toplamı</p>
-              <p className="text-2xl font-bold text-gray-900">€{totalRevenueEUR.toFixed(2)}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-slate-400">EUR Satış Toplamı</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">€{totalRevenueEUR.toFixed(2)}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
           <div className="flex items-center">
             <div className="p-2 bg-purple-100 rounded-lg">
               <span className="text-purple-600 text-2xl">🏦</span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">{t('admin.accounting.stats.tlEquivalent')}</p>
-              <p className="text-2xl font-bold text-gray-900">{totalRevenueTL.toFixed(2)} TL</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-slate-400">{t('admin.accounting.stats.tlEquivalent')}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalRevenueTL.toFixed(2)} TL</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
           <div className="flex items-center">
             <div className="p-2 bg-orange-100 rounded-lg">
               <span className="text-orange-600 text-2xl">🚗</span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">{t('admin.accounting.stats.driverCommission')}</p>
-              <p className="text-2xl font-bold text-gray-900">{totalDriverCommissionTL.toFixed(2)} TL</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-slate-400">{t('admin.accounting.stats.driverCommission')}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalDriverCommissionTL.toFixed(2)} TL</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
           <div className="flex items-center">
             <div className="p-2 bg-green-100 rounded-lg">
               <span className="text-green-600 text-2xl">🏢</span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">{t('admin.accounting.stats.companyProfit')}</p>
-              <p className="text-2xl font-bold text-gray-900">{totalCompanyProfitTL.toFixed(2)} TL</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-slate-400">{t('admin.accounting.stats.companyProfit')}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalCompanyProfitTL.toFixed(2)} TL</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
           <div className="flex items-center">
             <div className="p-2 bg-yellow-100 rounded-lg">
               <span className="text-yellow-600 text-2xl">📊</span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">{t('admin.accounting.stats.profitMargin')}</p>
-              <p className="text-2xl font-bold text-gray-900">{profitMargin.toFixed(1)}%</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-slate-400">{t('admin.accounting.stats.profitMargin')}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{profitMargin.toFixed(1)}%</p>
             </div>
           </div>
         </div>
@@ -467,47 +467,47 @@ export default function AccountingPage() {
 
       {/* Onay Durumu Kartları */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
           <div className="flex items-center">
             <div className="p-2 bg-yellow-100 rounded-lg">
               <span className="text-yellow-600 text-2xl">⏳</span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">{t('admin.accounting.stats.pendingCommission')}</p>
-              <p className="text-2xl font-bold text-gray-900">{pendingCompanyCommission.toFixed(2)} TL</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-slate-400">{t('admin.accounting.stats.pendingCommission')}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{pendingCompanyCommission.toFixed(2)} TL</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
           <div className="flex items-center">
             <div className="p-2 bg-green-100 rounded-lg">
               <span className="text-green-600 text-2xl">✅</span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">{t('admin.accounting.stats.approvedCommission')}</p>
-              <p className="text-2xl font-bold text-gray-900">{approvedCompanyCommission.toFixed(2)} TL</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-slate-400">{t('admin.accounting.stats.approvedCommission')}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{approvedCompanyCommission.toFixed(2)} TL</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
           <div className="flex items-center">
             <div className="p-2 bg-red-100 rounded-lg">
               <span className="text-red-600 text-2xl">❌</span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">{t('admin.accounting.stats.unpaid')}</p>
-              <p className="text-2xl font-bold text-gray-900">{unpaidAmount.toFixed(2)} TL</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-slate-400">{t('admin.accounting.stats.unpaid')}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{unpaidAmount.toFixed(2)} TL</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Rezervasyon Listesi */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
+      <div className="bg-white dark:bg-slate-900/90 shadow rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700 transition-colors duration-200">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-white">
             Rezervasyonlar ({filteredReservations.length})
           </h2>
         </div>
@@ -552,7 +552,7 @@ export default function AccountingPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">İşlem</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-slate-900/90 divide-y divide-gray-200 dark:divide-slate-800 transition-colors duration-200">
               {filteredReservations.map((reservation) => {
                 // Şoför hakedişi hesaplama (TL cinsinden) - sadece şoför atanmışsa hesapla
                 const driverCommissionTL = reservation.driverFee !== undefined && reservation.driverFee !== null 
@@ -577,7 +577,7 @@ export default function AccountingPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm text-gray-900 dark:text-white">
                         {new Date(reservation.date).toLocaleDateString('tr-TR')}
                       </div>
                       <div className="text-sm text-gray-500">
@@ -585,12 +585,12 @@ export default function AccountingPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm text-gray-900 dark:text-white">
                         {reservation.from} → {reservation.to}
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm text-gray-900 dark:text-white">
                         {Array.isArray(reservation.passengerNames) 
                           ? reservation.passengerNames.join(', ')
                           : 'N/A'
@@ -598,7 +598,7 @@ export default function AccountingPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">
                         ${reservation.price.toFixed(2)} {reservation.currency}
                       </div>
                       <div className="text-xs text-gray-500">
@@ -665,7 +665,7 @@ export default function AccountingPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm text-gray-900 dark:text-white">
                         {reservation.user?.name || 'N/A'}
                       </div>
                       <div className="text-sm text-gray-500">
@@ -691,7 +691,7 @@ export default function AccountingPage() {
         {filteredReservations.length === 0 && (
           <div className="px-6 py-12 text-center">
             <div className="text-gray-400 text-6xl mb-4">💰</div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Rezervasyon Bulunamadı</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Rezervasyon Bulunamadı</h3>
             <p className="text-gray-500">
               Bu filtre için rezervasyon bulunamadı.
             </p>

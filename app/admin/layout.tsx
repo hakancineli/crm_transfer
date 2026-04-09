@@ -21,7 +21,7 @@ export default function AdminLayout({
 
   return (
     <TenantProvider>
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-200">
       {/* Global Header with sidebar toggle */}
       <Header 
         showSidebarToggle={true}
@@ -37,7 +37,7 @@ export default function AdminLayout({
       )}
 
       {/* Sidebar */}
-      <div className={`fixed left-0 w-64 bg-white shadow-2xl transform transition-all duration-700 ease-out will-change-transform z-30 print:hidden ${
+      <div className={`fixed left-0 w-64 bg-white dark:bg-slate-900 shadow-2xl transform transition-all duration-700 ease-out will-change-transform z-30 print:hidden border-r border-gray-200 dark:border-slate-800 ${
         sidebarOpen ? 'translate-x-0 shadow-xl' : '-translate-x-full shadow-none'
       }`} style={{ top: '64px', height: 'calc(100vh - 64px)' }}>
         <AdminNavigation onClose={() => setSidebarOpen(false)} />

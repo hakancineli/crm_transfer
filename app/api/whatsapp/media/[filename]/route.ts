@@ -9,7 +9,23 @@ export async function GET(
     { params }: { params: { filename: string } }
 ) {
     try {
-        const { userId } = await getRequestUserContext(request);
+        const { searchParams } = new URL(request.url);
+        const tokenFromQuery = searchParams.get('token');
+
+        let userId: string | null = null;
+        if (tokenFromQuery) {
+            const authReq = new NextRequest(request.url, {
+                headers: {
+                    authorization: `Bearer ${tokenFromQuery}`,
+                },
+            });
+            const ctx = await getRequestUserContext(authReq);
+            userId = ctx.userId;
+        } else {
+            const ctx = await getRequestUserContext(request);
+            userId = ctx.userId;
+        }
+
         if (!userId) return new NextResponse('Unauthorized', { status: 401 });
 
         const { filename } = params;

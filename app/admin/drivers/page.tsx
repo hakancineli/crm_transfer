@@ -125,7 +125,7 @@ export default function DriversPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-white shadow-sm border-b border-gray-200 dark:bg-slate-900/70 dark:border-slate-800 transition-colors duration-200">
         <div className="px-6 py-4">
           <div className="flex justify-between items-center">
             <div>
@@ -146,11 +146,11 @@ export default function DriversPage() {
         </div>
       </div>
 
-      <div className="p-6">
+      <div className="p-6 text-gray-900 dark:text-slate-100 transition-colors duration-200 rounded-3xl bg-white/70 dark:bg-slate-950/55 backdrop-blur-sm border border-white/60 dark:border-slate-800/80">
         {/* Add Driver Modal */}
         {showAddForm && canManageDrivers && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <div className="bg-white dark:bg-slate-900/90 rounded-lg p-6 w-full max-w-md border border-gray-200 dark:border-slate-700 transition-colors duration-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Yeni Şoför Ekle</h3>
               <form onSubmit={handleAddDriver}>
                 <div className="mb-4">

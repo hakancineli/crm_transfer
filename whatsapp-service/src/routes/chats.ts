@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
+import { getSessionSocket } from '../lib/sessionManager';
 
 export const chatsRouter = Router();
 
@@ -59,6 +60,10 @@ chatsRouter.post('/:userId/:chatId/pin', async (req, res) => {
     const { pinned } = req.body;
 
     try {
+        const socket = getSessionSocket(userId);
+        if (socket) {
+            await socket.chatModify({ pin: !!pinned }, chatId);
+        }
         await prisma.whatsAppChat.update({
             where: {
                 userId_chatId: { userId, chatId }
@@ -77,6 +82,10 @@ chatsRouter.post('/:userId/:chatId/archive', async (req, res) => {
     const { archived } = req.body;
 
     try {
+        const socket = getSessionSocket(userId);
+        if (socket) {
+            await socket.chatModify({ archive: !!archived, lastMessages: [] }, chatId);
+        }
         await prisma.whatsAppChat.update({
             where: {
                 userId_chatId: { userId, chatId }

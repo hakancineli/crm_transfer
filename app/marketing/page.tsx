@@ -1,11 +1,76 @@
 'use client';
 
 import Link from 'next/link';
+import Script from 'next/script';
 import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export default function MarketingPage() {
   const { language, setLanguage, t } = useLanguage();
+  const faqItems = [
+    {
+      q: 'Pro Acente hangi işletmeler için uygundur?',
+      a: 'Transfer şirketleri, tur operatörleri, incoming/outgoing acenteler ve operasyon + muhasebe süreçlerini tek panelde toplamak isteyen ekipler için uygundur.',
+    },
+    {
+      q: 'WhatsApp entegrasyonu ne sağlar?',
+      a: 'Müşteri mesajlarını tek panelde toplar, çoklu oturum yönetimi sunar, operasyon ekibinin mesajlardan hızlı rezervasyon oluşturmasını kolaylaştırır.',
+    },
+    {
+      q: 'Yapay zeka tarafında neler var?',
+      a: 'Mesaj çevirisi, rezervasyon bilgisini ayıklama, müşteri talebini operasyon akışına çevirme ve ekip için hızlı aksiyon önerileri sağlar.',
+    },
+    {
+      q: 'Tur ve koltuklama süreçleri destekleniyor mu?',
+      a: 'Tur rezervasyonları, rota, araç, sürücü ve grup operasyonu desteklenir; tur koltuklama/yerleşim gibi akışlar için genişlemeye uygun altyapı mevcuttur.',
+    },
+    {
+      q: 'Website ve online rezervasyon var mı?',
+      a: 'Evet. Website modülü, içerik yönetimi, domain eşleme ve rezervasyon toplama akışı ile birlikte gelir.',
+    },
+    {
+      q: 'Muhasebe ve raporlama tarafı ne kadar güçlü?',
+      a: 'Komisyon, hakediş, ödeme, kur desteği, fatura ön-dolum ve operasyon kârlılığını izleyen raporlar aynı sistemde yer alır.',
+    },
+  ];
+  const softwareApplicationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Pro Acente',
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web',
+    url: 'https://www.proacente.com/',
+    description: 'Turizm acenteleri için transfer, tur, operasyon, muhasebe, WhatsApp ve yapay zeka destekli yönetim sistemi.',
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'TRY',
+      availability: 'https://schema.org/InStock'
+    },
+    featureList: [
+      'WhatsApp operasyon paneli',
+      'Yapay zeka destekli mesaj ve rezervasyon akışı',
+      'Transfer ve tur yönetimi',
+      'Muhasebe ve komisyon takibi',
+      'Website ve online rezervasyon',
+      'B2B API ve webhook entegrasyonları'
+    ],
+    publisher: {
+      '@type': 'Organization',
+      name: 'Pro Acente'
+    }
+  };
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqItems.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.a,
+      },
+    })),
+  };
   const [open, setOpen] = useState(false);
   const languages = [
     { code: 'en', label: 'English' },
@@ -47,38 +112,60 @@ export default function MarketingPage() {
   }, [isHover]);
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
+      <Script id="software-application-schema" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationSchema) }} />
+      <Script id="faq-schema" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <div className="min-h-screen bg-white">
+      {/* Top Bar */}
+      <div className="bg-slate-950 text-white text-sm border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-between gap-4">
+          <div className="hidden md:flex items-center gap-6 text-slate-300">
+            <a href="tel:+905545812034" className="hover:text-white transition-colors">+90 554 581 20 34</a>
+            <a href="mailto:hakancinelii@gmail.com" className="hover:text-white transition-colors">hakancinelii@gmail.com</a>
+          </div>
+          <div className="ml-auto flex items-center gap-3">
+            <a href="https://wa.me/905545812034" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 px-4 py-2 text-emerald-300 hover:bg-emerald-500/25 hover:text-emerald-200 font-medium transition-colors border border-emerald-400/20">
+              <span aria-hidden="true">💬</span>
+              <span>WhatsApp'tan Mesaj At</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Header */}
-  <header className="border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+  <header className="sticky top-0 bg-white/92 backdrop-blur-xl z-40 border-b border-slate-200/80 shadow-[0_12px_40px_rgba(15,23,42,0.05)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">P</span>
             </div>
             <span className="text-xl font-bold text-gray-900">Pro Acente</span>
           </Link>
-          <div className="space-x-4 text-sm flex items-center">
+          <div className="flex items-center gap-3 lg:gap-5 text-sm">
+            <nav className="hidden xl:flex items-center gap-6 text-[15px] text-gray-600">
+              <Link href="#features" className="hover:text-gray-900 transition-colors">Özellikler</Link>
+              <Link href="#pricing" className="hover:text-gray-900 transition-colors">Fiyatlandırma</Link>
+              <Link href="#faq" className="hover:text-gray-900 transition-colors">SSS</Link>
+            </nav>
             <div className="relative">
               <button
                 type="button"
-                aria-haspopup="menu"
-                aria-expanded={open ? 'true' : 'false'}
+                aria-haspopup="listbox"
                 aria-controls="language-menu"
                 onClick={() => setOpen((v) => !v)}
-                className="inline-flex items-center px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                className="inline-flex items-center px-4 py-2 rounded-xl border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 shadow-sm"
                 title="Language"
               >
                 <span className="hidden sm:block text-sm font-medium text-gray-700">{current.label}</span>
                 <span className="sm:ml-2">▾</span>
               </button>
               {open && (
-                <div id="language-menu" role="menu" aria-label="Language" className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                  <ul className="py-1">
+                <div id="language-menu" className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <ul className="py-1" aria-label="Language options">
                     {languages.map((l) => (
                       <li key={l.code}>
                         <button
                           type="button"
-                          role="menuitem"
                           onClick={() => {
                             setLanguage(l.code as any);
                             setOpen(false);
@@ -94,39 +181,81 @@ export default function MarketingPage() {
                 </div>
               )}
             </div>
-            <Link href="/admin-login" className="text-gray-600 hover:text-gray-900">{t('marketing.nav.admin')}</Link>
-            <Link href="/admin-login?demo=1" className="inline-flex items-center px-3 py-1.5 rounded-lg bg-green-600 text-white hover:bg-green-700">{t('marketing.nav.demo')}</Link>
+            <Link href="/admin-login" className="hidden sm:inline-flex text-gray-600 hover:text-gray-900 transition-colors">{t('marketing.nav.admin')}</Link>
+            <Link href="/admin-login?demo=1" className="inline-flex items-center px-5 py-2.5 rounded-xl bg-green-600 text-white hover:bg-green-700 shadow-sm font-semibold">{t('marketing.nav.demo')}</Link>
           </div>
         </div>
       </header>
 
       {/* Hero */}
-      <section className="bg-gradient-to-b from-white to-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 grid lg:grid-cols-2 gap-10 items-center">
+      <section className="bg-[radial-gradient(circle_at_top_left,_rgba(22,163,74,0.10),_transparent_28%),linear-gradient(to_bottom,_#ffffff,_#f8fafc)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-16 lg:pt-20 lg:pb-24 grid lg:grid-cols-[1.08fr_0.92fr] gap-14 items-center">
           <div>
-            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900">{t('marketing.hero.title')}</h1>
-            <p className="mt-6 text-lg text-gray-600">{t('marketing.hero.subtitle')}</p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-4">
-              <Link href="/admin-login" className="inline-flex items-center px-6 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700 font-semibold">{t('marketing.hero.ctaStart')}</Link>
-              <Link href="#features" className="inline-flex items-center px-6 py-3 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold">{t('marketing.hero.ctaFeatures')}</Link>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 text-emerald-700 text-sm font-semibold border border-emerald-100 shadow-sm">Turizm acenteleri için operasyon, WhatsApp ve muhasebe tek panelde</div>
+            <h1 className="mt-5 max-w-5xl text-5xl sm:text-6xl lg:text-[5.25rem] xl:text-[5.75rem] leading-[0.92] font-black tracking-[-0.04em] text-slate-950">{t('marketing.hero.title')}</h1>
+            <p className="mt-7 text-lg sm:text-xl text-slate-600 max-w-3xl leading-9">{t('marketing.hero.subtitle')}</p>
+            <div className="mt-9 flex flex-col sm:flex-row gap-4">
+              <Link href="/admin-login?demo=1" className="inline-flex items-center justify-center px-7 py-3.5 rounded-xl bg-green-600 text-white hover:bg-green-700 font-semibold shadow-lg shadow-green-200/70">{t('marketing.hero.ctaStart')}</Link>
+              <Link href="#features" className="inline-flex items-center justify-center px-7 py-3.5 rounded-xl border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 font-semibold shadow-sm">{t('marketing.hero.ctaFeatures')}</Link>
             </div>
-            <div className="mt-6 text-sm text-gray-500">{t('marketing.hero.note')}</div>
+            <div className="mt-7 flex flex-wrap gap-3 text-sm text-slate-500">
+              <span className="px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm">WhatsApp entegrasyonu</span>
+              <span className="px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm">Yapay zeka destekli akışlar</span>
+              <span className="px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm">Tur operasyonu ve koltuklama</span>
+              <span className="px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm">Muhasebe ve raporlama</span>
+            </div>
+            <div className="mt-7 text-sm text-slate-500">{t('marketing.hero.note')}</div>
           </div>
-          <div className="lg:pl-8">
-            <div className="rounded-2xl border border-gray-200 shadow-sm p-6 bg-white">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                {[
-                  { t: 'Hızlı kurulum', d: 'Aynı gün yayında; veri aktarım desteği' },
-                  { t: 'Online talep', d: 'Website + form ile 7/24 rezervasyon' },
-                  { t: 'Tek tık paylaşım', d: 'Voucher ve konumu WhatsApp ile gönderin' },
-                  { t: 'Canlı takip', d: 'Uçuş, rota ve sürücü durumu' },
-                ].map((c) => (
-                  <div key={c.t} className="p-4 rounded-lg border bg-white">
-                    <div className="font-semibold text-gray-900">{c.t}</div>
-                    <div className="text-gray-600 mt-1">{c.d}</div>
+          <div className="lg:pl-2">
+            <div className="rounded-[2rem] border border-slate-200/80 shadow-[0_35px_90px_rgba(15,23,42,0.10)] p-6 sm:p-7 bg-white/95 backdrop-blur-sm overflow-hidden relative">
+              <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-r from-emerald-50 via-transparent to-sky-50" />
+              <div className="relative">
+                <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-5 mb-5">
+                  <div>
+                    <div className="text-sm uppercase tracking-[0.18em] text-slate-400 font-semibold">Canlı operasyon özeti</div>
+                    <div className="mt-2 text-2xl font-bold text-slate-900">Rezervasyon → Atama → Operasyon</div>
+                    <div className="mt-2 text-sm text-slate-500">Tek panel üzerinden gelen talebi operasyon akışına çevirin.</div>
                   </div>
-                ))}
+                  <div className="rounded-2xl bg-emerald-50 text-emerald-700 px-4 py-2 text-sm font-semibold border border-emerald-100">7/24 erişim</div>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-4 text-sm">
+                  {[
+                    { t: 'Hızlı kurulum', d: 'Aynı gün yayında, veri aktarımı ve ekip geçiş desteği.', stat: '1 gün' },
+                    { t: 'Online talep', d: 'Website ve formlarla günün her saati rezervasyon toplayın.', stat: '7/24' },
+                    { t: 'Tek tık paylaşım', d: 'Voucher, konum ve iletişim bilgisini WhatsApp ile paylaşın.', stat: '1 tık' },
+                    { t: 'Canlı takip', d: 'Uçuş, rota, sürücü ve operasyon durumunu tek panelde izleyin.', stat: 'canlı' },
+                  ].map((c, index) => (
+                    <div key={c.t} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                      <div className="flex items-start justify-between gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-2xl bg-slate-950 text-white flex items-center justify-center font-semibold">{index + 1}</div>
+                        <div className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">{c.stat}</div>
+                      </div>
+                      <div className="font-semibold text-slate-900 text-base mb-2">{c.t}</div>
+                      <div className="text-slate-600 leading-6">{c.d}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Kısa Tanıtım Videosu */}
+      <section className="py-16" id="video">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-[1.1fr_0.9fr] gap-8 items-center">
+          <div>
+            <h2 className="text-3xl font-extrabold text-gray-900 mb-4">Sistemi 1 dakikada görün</h2>
+            <p className="text-gray-600 mb-6 max-w-2xl">Rezervasyon, operasyon, WhatsApp, sürücü atama, voucher ve rapor akışlarını kısa tanıtım videosunda tek bakışta görün.</p>
+            <div className="flex flex-wrap gap-3 text-sm text-gray-500">
+              <span className="px-3 py-1 rounded-full bg-gray-50 border border-gray-200">Transfer ve tur operasyonu</span>
+              <span className="px-3 py-1 rounded-full bg-gray-50 border border-gray-200">WhatsApp ve müşteri iletişimi</span>
+              <span className="px-3 py-1 rounded-full bg-gray-50 border border-gray-200">Muhasebe ve rapor görünürlüğü</span>
+            </div>
+          </div>
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-4">
+            <div className="aspect-video rounded-lg overflow-hidden bg-black">
+              <video className="w-full h-full" controls preload="metadata" src="/tanıtım-video.mp4">Tarayıcınız video etiketini desteklemiyor.</video>
             </div>
           </div>
         </div>
@@ -188,10 +317,10 @@ export default function MarketingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-extrabold text-gray-900 mb-8">{t('marketing.sections.valueProps')}</h2>
           <div className="grid md:grid-cols-3 gap-6">
-            {[ 
-              { title: 'Geliri ve operasyonu yönetin', desc: 'Canlı raporlar; komisyon, hakediş ve ödeme görünürlüğü.' },
-              { title: 'Modüler mimari', desc: 'Transfer, Tur, Konaklama, Uçuş, Website — ihtiyacın kadar öde.' },
-              { title: 'Sahada hız', desc: 'Sürücü voucher’ı, navigasyon ve WhatsApp paylaşımı.' },
+            {[
+              { title: 'Turizm acente yönetim sistemi', desc: 'Transfer, tur, rezervasyon, muhasebe ve operasyon akışlarını tek panelde birleştirin.' },
+              { title: 'WhatsApp ve yapay zeka destekli akışlar', desc: 'Müşteri mesajlarını yönetin, çevirin, rezervasyon bilgilerini çıkarın ve operasyonu hızlandırın.' },
+              { title: 'Modüler ama tek sistem', desc: 'Transfer, Tur, Konaklama, Uçuş, Website ve raporlama modülleri birlikte çalışır.' },
             ].map((v) => (
               <div key={v.title} className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm">
                 <div className="text-lg font-semibold text-gray-900">{v.title}</div>
@@ -225,7 +354,6 @@ export default function MarketingPage() {
                 'Dönüş transferi ekleme',
                 'Rezervasyon düzenleme/silme',
                 'Voucher ile rezervasyon sorgulama (lookup)',
-                'Harici sistemlerden rezervasyon push (API)',
                 'Voucher numarası otomatik üretimi',
                 'Tarih/saat filtreleme',
                 'Şoför atama durumu filtreleme',
@@ -489,11 +617,9 @@ export default function MarketingPage() {
                   { k: 'Müşteri Yönetimi', cols: [true, true, true, true, false] },
                   { k: 'Ödeme Takibi', cols: [true, true, true, true, false] },
                   { k: 'Excel Export/Import', cols: [true, true, true, true, false] },
-                  { k: 'API Entegrasyonu', cols: [true, true, true, true, true] },
                   { k: 'UETDS Entegrasyonu', cols: [true, false, false, false, false] },
                   { k: 'Fatura Ön-Dolum (Prefill)', cols: [true, true, true, true, false] },
                   { k: 'Rezervasyon Lookup (Voucher)', cols: [true, true, true, true, false] },
-                  { k: 'Harici Rezervasyon Push (Webhook/API)', cols: [true, true, true, true, true] },
                   { k: 'Kur Oranları Otomatik Güncelleme', cols: [true, true, true, true, true] },
                   { k: 'Yedekleme ve Geri Yükleme', cols: [true, true, true, true, true] },
                   { k: 'Audit Log', cols: [true, true, true, true, true] },
@@ -543,25 +669,6 @@ export default function MarketingPage() {
 
       
 
-      {/* Kısa Tanıtım Videosu */}
-      <section className="py-16" id="video">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">{t('marketing.sections.video')}</h2>
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-4">
-            <div className="aspect-video rounded-lg overflow-hidden bg-black">
-              <video
-                className="w-full h-full"
-                controls
-                preload="metadata"
-                src="/tanıtım-video.mp4"
-              >
-                Tarayıcınız video etiketini desteklemiyor.
-              </video>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* İletişim Formu (hafif) */}
       <section className="py-16 bg-gray-50" id="contact">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -574,7 +681,7 @@ export default function MarketingPage() {
               const email = fd.get('email');
               const message = fd.get('message');
               const body = encodeURIComponent(`İsim: ${name}\nE-posta: ${email}\n\nMesaj:\n${message}`);
-              window.location.href = `mailto:info@proacente.com?subject=Pro%20Acente%20Bilgi%20Talebi&body=${body}`;
+              window.location.href = `mailto:hakancinelii@gmail.com?subject=Pro%20Acente%20Bilgi%20Talebi&body=${body}`;
             }}
             className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 rounded-xl border border-gray-200 shadow-sm"
           >
@@ -601,6 +708,26 @@ export default function MarketingPage() {
               <div className="text-gray-600 mt-2 text-sm">{v.desc}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Neden Pro Acente */}
+      <section className="py-16 bg-gray-50" id="why-pro-acente">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">Turizm acenteleri neden Pro Acente kullanıyor?</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { title: 'WhatsApp merkezi', desc: 'Tek panelden müşteri konuşmaları, QR oturumu, mesaj geçmişi ve operasyon akışı.' },
+              { title: 'Yapay zeka destekli rezervasyon akışı', desc: 'Mesajdan transfer veya tur rezervasyonu bilgisi çıkarma, çeviri ve hızlı aksiyon oluşturma.' },
+              { title: 'Tur operasyonu ve koltuklama altyapısı', desc: 'Tur rezervasyonları, rota, araç, sürücü ve grup operasyonunu tek ekranda toparlayan yapı.' },
+              { title: 'Muhasebe ve rapor görünürlüğü', desc: 'Komisyon, hakediş, ödeme, fatura ön-dolum ve performans raporları aynı ürün içinde.' },
+            ].map((item) => (
+              <div key={item.title} className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div className="text-lg font-semibold text-gray-900">{item.title}</div>
+                <div className="text-gray-600 mt-2 text-sm">{item.desc}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -647,10 +774,14 @@ export default function MarketingPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               { title: 'Online Rezervasyon & Website', desc: 'Beyaz etiket website + içerik yönetimi + domain eşleme.' },
+              { title: 'WhatsApp Operasyon Paneli', desc: 'QR ile bağlanan çoklu WhatsApp oturumu, sohbet yönetimi ve rezervasyon akışı.' },
+              { title: 'Yapay Zeka Destekli İş Akışları', desc: 'Mesaj çevirisi, rezervasyon çıkarımı ve müşteri talebini operasyon kaydına dönüştürme.' },
+              { title: 'Tur Yönetimi & Koltuklama Altyapısı', desc: 'Tur rezervasyonları, rota, araç, sürücü ve grup organizasyonu için merkez panel.' },
               { title: 'Atama & Bildirim', desc: 'WhatsApp ile müşteriye ve şoföre tek tıkla voucher/rota paylaşımı.' },
               { title: 'Uçuş & Rota Takibi', desc: 'Uçuş kodu, ETA, trafik ve rota bilgileri tek yerde.' },
               { title: 'Muhasebe & Komisyon', desc: 'TL/USD/EUR; komisyon onay, hakediş ve ödeme durumları.' },
               { title: 'Raporlar & Performans', desc: 'Kârlılık, sürücü performansı, popüler rotalar, kanal kırılımı.' },
+              { title: 'Website ve Online Rezervasyon Toplama', desc: 'Domain eşleme, içerik yönetimi ve rezervasyon akışını tek platformdan yönetin.' },
               { title: 'Çoklu Marka/Şube', desc: 'Aynı hesap altında birden çok marka/tenant yönetimi.' },
               { title: 'Çok Dilli Voucher', desc: 'TR/EN/FR/RU/AR dahil 5+ dilde müşteri voucher’ı.' },
               { title: 'Sürücü Navigasyon', desc: 'Yandex / Apple / Google’a derin link ile tek dokunuş.' },
@@ -690,16 +821,38 @@ export default function MarketingPage() {
         </div>
       </section>
 
+      {/* Ürün Modülleri */}
+      <section className="py-16 bg-gray-50" id="module-clusters">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">Tek ürün içinde çalışan ana modüller</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { title: 'Transfer Yönetimi', desc: 'Rezervasyon, sürücü atama, voucher, navigasyon ve uçuş takibi.' },
+              { title: 'Tur Operasyonu', desc: 'Tur rezervasyonları, rota, araç, grup organizasyonu ve koltuklama altyapısı.' },
+              { title: 'WhatsApp CRM', desc: 'Sohbet yönetimi, medya paylaşımı, QR oturumu ve operasyon akışı.' },
+              { title: 'Yapay Zeka Desteği', desc: 'Mesaj çevirisi, rezervasyon ayrıştırma ve hızlı aksiyon önerileri.' },
+              { title: 'Muhasebe ve Komisyon', desc: 'Hakediş, ödeme, komisyon, kur desteği ve fatura ön-dolum süreçleri.' },
+              { title: 'Website ve Rezervasyon Toplama', desc: 'Domain eşleme, içerik yönetimi ve online rezervasyon akışı.' },
+            ].map((item) => (
+              <div key={item.title} className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div className="text-lg font-semibold text-gray-900">{item.title}</div>
+                <div className="text-gray-600 mt-2 text-sm">{item.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Somut Sonuçlar */}
       <section className="py-16" id="outcomes">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-extrabold text-gray-900 mb-8">Somut Sonuçlar</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[ 
-              { k: '%50 daha hızlı atama', d: 'Voucher ve navigasyon paylaşımıyla anında başlangıç' },
-              { k: '%30 daha az iletişim trafiği', d: 'Tek ekran ve otomasyonlar ile' },
-              { k: '%20 daha yüksek dönüşüm', d: 'Online form ve website ile 7/24 talep' },
-              { k: 'Sıfır IT yükü', d: 'Kurulum, barındırma ve güncellemeler bize ait' },
+              { k: '%50 daha hızlı atama', d: 'Voucher, navigasyon ve WhatsApp paylaşımıyla daha hızlı saha başlangıcı.' },
+              { k: '%30 daha az iletişim trafiği', d: 'Tek ekran ve operasyon otomasyonlarıyla ekip içi yük azalır.' },
+              { k: '%20 daha yüksek dönüşüm', d: 'Website ve online rezervasyon akışıyla talep toplama güçlenir.' },
+              { k: 'Sıfır IT yükü', d: 'Kurulum, barındırma, güncelleme ve teknik bakım tarafı merkezi yönetilir.' },
             ].map((s) => (
               <div key={s.k} className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm text-center">
                 <div className="text-2xl font-extrabold text-gray-900">{s.k}</div>
@@ -716,47 +869,60 @@ export default function MarketingPage() {
           <h2 className="text-3xl font-extrabold text-gray-900 mb-8">{t('marketing.sections.pricing')}</h2>
           
           <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6">
-            {[ 
-              { name: 'Professional', price: '₺50.000', features: [
+            {[
+              { name: 'Professional', upfront: 50000, monthly: 5000, features: [
                 'Transfer Modülü', 'Şoför Atama', 'Voucher gönderimi (5 dil, WhatsApp müşteri + şoför)', 'Sürücü için navigasyon',
                 'Rol bazlı erişim kontrolü', 'Kullanıcı Yönetimi', 'Muhasebe', 'Raporlama', 'İş saatine 1 saat kala kırmızı alarm'
               ] },
-              { name: 'Enterprise', price: '₺60.000', features: [
+              { name: 'Enterprise', upfront: 60000, monthly: 6000, features: [
                 'Transfer Modülü', 'Tur Yönetimi', 'Konaklama Yönetimi',
-                'Profesyonel paketteki tüm özellikler', 'Uçuş Yönetimi', 'API Erişimi', 'Tek Oturum Açma',
-                'Rezervasyon lookup & push (API)', 'Fatura ön‑dolum (prefill)', 'Gelişmiş Raporlama', 'Öncelikli Destek'
+                'Profesyonel paketteki tüm özellikler', 'Uçuş Yönetimi', 'Tek Oturum Açma',
+                'Rezervasyon lookup', 'Fatura ön‑dolum (prefill)', 'Gelişmiş Raporlama', 'Öncelikli Destek'
               ] },
-              { name: 'Premium', price: '₺70.000', features: [
+              { name: 'Premium', upfront: 70000, monthly: 7000, features: [
                 'Enterprise paketteki tüm özellikler', 'Website (çoklu tenant)', 'UETDS Entegrasyonu',
                 'Kur oranlarını otomatik güncelleme', 'Yedekleme & geri yükleme', 'Özel Domain & İçerik',
                 'Çoklu marka/tenant yönetimi', 'Özel SLA ve eğitim', 'Özelleştirilmiş raporlar'
               ] },
-            ].map((p) => (
-              <div key={p.name} className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm flex flex-col">
-                <div className="text-lg font-semibold text-gray-900">{p.name}</div>
-                <div className="mt-2 text-2xl font-extrabold text-gray-900">{p.price}</div>
-                <ul className="mt-4 space-y-2 text-sm text-gray-600 flex-1">
-                  {p.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2">
-                      <span className="mr-1 flex-shrink-0">✅</span>
-                      <span className="leading-5">{f}</span>
-                      {p.name === 'Premium' && typeof f === 'string' && f.startsWith('Website') && (
-                        <a
-                          href="https://www.proacente.com/protransfer"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="ml-1 inline-flex items-center px-2 py-0.5 rounded bg-gray-100 text-gray-700 hover:bg-gray-200"
-                          title={t('marketing.buttons.themePreview')}
-                        >
-                          {t('marketing.buttons.themePreview')}
-                        </a>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-                <a href="#cta" className="mt-6 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-black">{t('marketing.pricing.cta')}</a>
-              </div>
-            ))}
+            ].map((p) => {
+              const monthlyWithInstallment = Math.round((p.upfront * 1.2) / 12);
+              return (
+                <div key={p.name} className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm flex flex-col">
+                  <div className="text-lg font-semibold text-gray-900">{p.name}</div>
+                  <div className="mt-4 space-y-3">
+                    <div className="rounded-lg bg-gray-50 border border-gray-200 p-3">
+                      <div className="text-xs uppercase tracking-wide text-gray-500 font-semibold">Peşin ödeme</div>
+                      <div className="mt-1 text-2xl font-extrabold text-gray-900">₺{p.upfront.toLocaleString('tr-TR')}</div>
+                    </div>
+                    <div className="rounded-lg bg-green-50 border border-green-200 p-3">
+                      <div className="text-xs uppercase tracking-wide text-green-700 font-semibold">Aylık abonelik</div>
+                      <div className="mt-1 text-2xl font-extrabold text-green-700">₺{monthlyWithInstallment.toLocaleString('tr-TR')}<span className="text-sm font-semibold text-green-600"> / ay</span></div>
+                      <div className="text-xs text-green-700 mt-1">Peşin fiyatın %20 fazlası üzerinden 12 aya bölünmüş taksitli model</div>
+                    </div>
+                  </div>
+                  <ul className="mt-4 space-y-2 text-sm text-gray-600 flex-1">
+                    {p.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2">
+                        <span className="mr-1 flex-shrink-0">✅</span>
+                        <span className="leading-5">{f}</span>
+                        {p.name === 'Premium' && typeof f === 'string' && f.startsWith('Website') && (
+                          <a
+                            href="https://www.proacente.com/protransfer"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-1 inline-flex items-center px-2 py-0.5 rounded bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            title={t('marketing.buttons.themePreview')}
+                          >
+                            {t('marketing.buttons.themePreview')}
+                          </a>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                  <a href="#cta" className="mt-6 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-black">{t('marketing.pricing.cta')}</a>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -777,10 +943,31 @@ export default function MarketingPage() {
         </div>
       </section>
 
+      {/* Kullanım Senaryoları */}
+      <section className="py-16 bg-gray-50" id="use-cases">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">Hangi acenteler için uygun?</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { title: 'Transfer Acenteleri', desc: 'Uçuş takibi, sürücü atama, voucher ve müşteri iletişimi tek akışta.' },
+              { title: 'Tur Operatörleri', desc: 'Tur rezervasyonları, rota, araç, sürücü ve operasyon takibi için.' },
+              { title: 'Incoming / DMC Ekipleri', desc: 'Yabancı müşteri iletişimi, çok dilli voucher ve saha organizasyonu için.' },
+              { title: 'Büyüyen Çok Şubeli Yapılar', desc: 'Çoklu marka, kullanıcı rolleri, raporlama ve website modülüyle ölçeklenir.' },
+            ].map((item) => (
+              <div key={item.title} className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div className="text-lg font-semibold text-gray-900">{item.title}</div>
+                <div className="text-gray-600 mt-2 text-sm">{item.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Entegrasyonlar */}
       <section className="py-16 bg-gray-50" id="integrations">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-extrabold text-gray-900 mb-8">Entegrasyonlar</h2>
+          <p className="text-gray-600 mb-8 max-w-3xl">Google Maps, navigasyon, WhatsApp, e-posta ve website odaklı rezervasyon akışları; turizm acentelerinin sahadaki operasyonunu hızlandırmak için aynı platformda birleşir.</p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm">
               <div className="text-lg font-semibold text-gray-900">Google Maps</div>
@@ -815,11 +1002,7 @@ export default function MarketingPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-extrabold text-gray-900 mb-8">Sık Sorulan Sorular</h2>
           <div className="space-y-4">
-            {[
-              { q: 'Kurulum ne kadar sürer?', a: 'Standart kurulum 1 gün içerisinde tamamlanır. Domain/website eşlemeleri hazır.' },
-              { q: 'Fiyatlandırma nasıl?', a: 'Modüler yapı: sadece ihtiyaç duyduğunuz modüller için ödeme yaparsınız.' },
-              { q: 'Veriler kimde?', a: 'Tenant başına izole veritabanı ve düzenli yedekleme stratejisi uygulanır.' },
-            ].map((item, idx) => (
+            {faqItems.map((item, idx) => (
               <div key={idx} className="p-5 rounded-xl border border-gray-200 bg-white shadow-sm">
                 <div className="font-semibold text-gray-900">{item.q}</div>
                 <div className="mt-1 text-gray-600 text-sm">{item.a}</div>
@@ -837,7 +1020,7 @@ export default function MarketingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/admin-login" className="inline-flex items-center px-6 py-3 rounded-lg bg-white text-gray-900 hover:bg-gray-100 font-semibold">{t('marketing.sections.cta.start')}</Link>
             <Link href="/protransfer" className="inline-flex items-center px-6 py-3 rounded-lg border border-white text-white hover:bg-white hover:text-gray-900 font-semibold">{t('marketing.sections.cta.demo')}</Link>
-            <a href="mailto:info@proacente.com" className="inline-flex items-center px-6 py-3 rounded-lg border border-white text-white hover:bg-white hover:text-gray-900 font-semibold">{t('marketing.sections.cta.contact')}</a>
+            <a href="https://wa.me/905545812034" target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-6 py-3 rounded-lg border border-white text-white hover:bg-white hover:text-gray-900 font-semibold">{t('marketing.sections.cta.contact')}</a>
           </div>
         </div>
       </section>
@@ -848,7 +1031,8 @@ export default function MarketingPage() {
           © {new Date().getFullYear()} Pro Acente. Tüm hakları saklıdır.
         </div>
       </footer>
-    </div>
+      </div>
+    </>
   );
 }
 

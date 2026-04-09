@@ -14,7 +14,7 @@ export default function robots(): MetadataRoute.Robots {
         "/customer-panel",
       ],
     },
-    sitemap: "https://www.protransfer.com.tr/sitemap.xml",
+    sitemap: "https://www.proacente.com/sitemap.xml",
   };
 }
 

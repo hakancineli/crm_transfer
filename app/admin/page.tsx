@@ -69,7 +69,7 @@ export default function AdminDashboard() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Yükleniyor...</p>
+          <p className="mt-4 text-gray-600 dark:text-slate-400">Yükleniyor...</p>
         </div>
       </div>
     );
@@ -80,7 +80,7 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">Yetkisiz Erişim</h1>
-          <p className="text-gray-600">Bu sayfaya erişim yetkiniz bulunmamaktadır.</p>
+          <p className="text-gray-600 dark:text-slate-400">Bu sayfaya erişim yetkiniz bulunmamaktadır.</p>
         </div>
       </div>
     );
@@ -152,13 +152,14 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 bg-[linear-gradient(rgba(248,250,252,0.88),rgba(248,250,252,0.92)),url('/seref-vural-tours/istanbul/istanbul.jpeg')] bg-cover bg-center bg-fixed dark:bg-[linear-gradient(rgba(2,6,23,0.88),rgba(2,6,23,0.94)),url('/seref-vural-tours/istanbul/istanbul.jpeg')] transition-colors duration-200">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-white shadow-sm border-b border-gray-200 dark:bg-slate-900/70 dark:border-slate-800 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex space-x-3">
               <button
+                type="button"
                 onClick={fetchDashboardStats}
                 className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
               >
@@ -169,11 +170,11 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-gray-900 dark:text-white dark:text-slate-100 transition-colors duration-200">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
           {/* Toplam Rezervasyonlar */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -181,14 +182,14 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-                <p className="text-xs lg:text-sm font-medium text-gray-600 truncate">{t('admin.dashboard.stats.totalReservations')}</p>
-                <p className="text-xl lg:text-2xl font-bold text-gray-900">{stats.totalReservations}</p>
+                <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-slate-400 dark:text-slate-400 truncate">{t('admin.dashboard.stats.totalReservations')}</p>
+                <p className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white dark:text-white">{stats.totalReservations}</p>
               </div>
             </div>
           </div>
 
           {/* Bugünkü Rezervasyonlar */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
@@ -196,14 +197,14 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-                <p className="text-xs lg:text-sm font-medium text-gray-600 truncate">{t('admin.dashboard.stats.todayReservations')}</p>
-                <p className="text-xl lg:text-2xl font-bold text-gray-900">{stats.todayReservations}</p>
+                <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-slate-400 truncate">{t('admin.dashboard.stats.todayReservations')}</p>
+                <p className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">{stats.todayReservations}</p>
               </div>
             </div>
           </div>
 
           {/* Toplam Gelir */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
@@ -211,14 +212,14 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-                <p className="text-xs lg:text-sm font-medium text-gray-600 truncate">{t('admin.dashboard.stats.totalRevenue')}</p>
-                <p className="text-xl lg:text-2xl font-bold text-gray-900">${stats.totalRevenue.toFixed(2)}</p>
+                <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-slate-400 truncate">{t('admin.dashboard.stats.totalRevenue')}</p>
+                <p className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">${stats.totalRevenue.toFixed(2)}</p>
               </div>
             </div>
           </div>
 
           {/* Bugünkü Gelir */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -226,8 +227,8 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-                <p className="text-xs lg:text-sm font-medium text-gray-600 truncate">{t('admin.dashboard.stats.todayRevenue')}</p>
-                <p className="text-xl lg:text-2xl font-bold text-gray-900">${stats.todayRevenue.toFixed(2)}</p>
+                <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-slate-400 truncate">{t('admin.dashboard.stats.todayRevenue')}</p>
+                <p className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">${stats.todayRevenue.toFixed(2)}</p>
               </div>
             </div>
           </div>
@@ -236,7 +237,7 @@ export default function AdminDashboard() {
         {/* Secondary Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
           {/* Toplam Şoförler */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
@@ -244,14 +245,14 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-                <p className="text-xs lg:text-sm font-medium text-gray-600 truncate">{t('admin.dashboard.stats.totalDrivers')}</p>
-                <p className="text-xl lg:text-2xl font-bold text-gray-900">{stats.totalDrivers}</p>
+                <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-slate-400 truncate">{t('admin.dashboard.stats.totalDrivers')}</p>
+                <p className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">{stats.totalDrivers}</p>
               </div>
             </div>
           </div>
 
           {/* Aktif Şoförler */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
@@ -259,14 +260,14 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">{t('admin.dashboard.stats.activeDrivers')}</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.activeDrivers}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-slate-400 dark:text-slate-400">{t('admin.dashboard.stats.activeDrivers')}</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white dark:text-white">{stats.activeDrivers}</p>
               </div>
             </div>
           </div>
 
           {/* Bekleyen Ödemeler */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
@@ -274,14 +275,14 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">{t('admin.dashboard.stats.pendingPayments')}</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.pendingPayments}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-slate-400 dark:text-slate-400">{t('admin.dashboard.stats.pendingPayments')}</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white dark:text-white">{stats.pendingPayments}</p>
               </div>
             </div>
           </div>
 
           {/* Tamamlanan Transferler */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
@@ -289,8 +290,8 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">{t('admin.dashboard.stats.completedTransfers')}</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.completedTransfers}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-slate-400">{t('admin.dashboard.stats.completedTransfers')}</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.completedTransfers}</p>
               </div>
             </div>
           </div>
@@ -299,8 +300,8 @@ export default function AdminDashboard() {
         {/* Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Hızlı İşlemler - Transfer */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.dashboard.quickActions.transferOperations')}</h3>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-white mb-4">{t('admin.dashboard.quickActions.transferOperations')}</h3>
             <div className="grid grid-cols-2 gap-4">
               <Link
                 href="/admin/new-reservation"
@@ -308,7 +309,7 @@ export default function AdminDashboard() {
               >
                 <div className="text-center">
                   <div className="text-2xl mb-2">{emojisEnabled ? '➕' : '+'}</div>
-                  <div className="text-sm font-medium text-green-800">{t('admin.dashboard.quickActions.newReservation')}</div>
+                  <div className="text-sm font-medium text-green-800 dark:text-green-300">{t('admin.dashboard.quickActions.newReservation')}</div>
                 </div>
               </Link>
               
@@ -318,7 +319,7 @@ export default function AdminDashboard() {
               >
                 <div className="text-center">
                   <div className="text-2xl mb-2">{isClient && emojisEnabled ? '📋' : '📄'}</div>
-                  <div className="text-sm font-medium text-blue-800">{t('admin.dashboard.quickActions.reservations')}</div>
+                  <div className="text-sm font-medium text-blue-800 dark:text-blue-300">{t('admin.dashboard.quickActions.reservations')}</div>
                 </div>
               </Link>
               
@@ -358,8 +359,8 @@ export default function AdminDashboard() {
 
           {/* Hızlı İşlemler - Konaklama */}
           {user?.role === 'SUPERUSER' || accommodationEnabled ? (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.dashboard.quickActions.accommodationOperations')}</h3>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('admin.dashboard.quickActions.accommodationOperations')}</h3>
             <div className="grid grid-cols-2 gap-4">
               <Link
                 href="/admin/accommodation"
@@ -415,8 +416,8 @@ export default function AdminDashboard() {
 
           {/* Hızlı İşlemler - Tur */}
           {(user?.role === 'SUPERUSER' || (tourEnabled && canViewTourModule(user?.role || '', user?.permissions))) ? (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Tur İşlemleri</h3>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Tur İşlemleri</h3>
               <div className="grid grid-cols-2 gap-4">
                 {canManageTourBookings(user?.role || '', user?.permissions) ? (
                   <Link
@@ -519,38 +520,38 @@ export default function AdminDashboard() {
           )}
 
           {/* Son Aktiviteler */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.dashboard.recentActivities')}</h3>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('admin.dashboard.recentActivities')}</h3>
             <div className="space-y-3">
-              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-slate-800 rounded-lg transition-colors duration-200">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-900">Yeni rezervasyon oluşturuldu</p>
-                  <p className="text-xs text-gray-500">2 dakika önce</p>
+                  <p className="text-sm text-gray-900 dark:text-white">Yeni rezervasyon oluşturuldu</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400">2 dakika önce</p>
                 </div>
               </div>
-              
-              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+
+              <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-slate-800 rounded-lg transition-colors duration-200">
                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-900">Ödeme onaylandı</p>
-                  <p className="text-xs text-gray-500">5 dakika önce</p>
+                  <p className="text-sm text-gray-900 dark:text-white">Ödeme onaylandı</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400">5 dakika önce</p>
                 </div>
               </div>
-              
-              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+
+              <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-slate-800 rounded-lg transition-colors duration-200">
                 <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-900">Şoför atandı</p>
-                  <p className="text-xs text-gray-500">10 dakika önce</p>
+                  <p className="text-sm text-gray-900 dark:text-white">Şoför atandı</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400">10 dakika önce</p>
                 </div>
               </div>
-              
-              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+
+              <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-slate-800 rounded-lg transition-colors duration-200">
                 <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-900">Uçuş durumu güncellendi</p>
-                  <p className="text-xs text-gray-500">15 dakika önce</p>
+                  <p className="text-sm text-gray-900 dark:text-white">Uçuş durumu güncellendi</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400">15 dakika önce</p>
                 </div>
               </div>
             </div>
