@@ -864,16 +864,16 @@ ${recentContext}`;
                                             <div className="font-semibold text-sm text-gray-900 dark:text-white truncate">
                                                 {chat.name || (chat.phone ? `+${chat.phone}` : 'Bilinmeyen')}
                                             </div>
-                                            <div className="text-[11px] text-gray-400 truncate mt-0.5">
+                                            <div className="text-[11px] text-gray-400 dark:text-slate-500 truncate mt-0.5">
                                                 {chat.chatId.includes('@g.us') ? 'Grup sohbeti' : (chat.phone && chat.phone.length >= 10 ? `+${chat.phone}` : 'Telefon bilgisi yok')}
                                             </div>
                                         </div>
-                                        <div className={`text-[11px] ${chat.unread > 0 ? 'text-green-600 font-semibold' : 'text-gray-400'}`}>
+                                        <div className={`text-[11px] ${chat.unread > 0 ? 'text-green-600 dark:text-emerald-400 font-semibold' : 'text-gray-400 dark:text-slate-500'}`}>
                                             {chat.lastMsgAt ? new Date(chat.lastMsgAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : ''}
                                         </div>
                                     </div>
                                     <div className="flex justify-between items-center gap-2 mt-1">
-                                        <p className="text-xs text-gray-500 truncate flex-1 leading-tight flex items-center gap-1">
+                                        <p className="text-xs text-gray-500 dark:text-slate-400 truncate flex-1 leading-tight flex items-center gap-1">
                                             {chat.lastMsg?.includes('[Sesli Mesaj]') && <span className="text-blue-500">🎤</span>}
                                             {chat.lastMsg?.includes('[Görsel]') && <span className="text-gray-400">📷</span>}
                                             {chat.lastMsg || '...'}
@@ -885,7 +885,7 @@ ${recentContext}`;
                                                     e.stopPropagation();
                                                     togglePin(chat);
                                                 }}
-                                                className={`hover:scale-125 transition-all text-sm p-1 rounded-full hover:bg-gray-200 ${chat.pinned ? 'opacity-100 text-blue-500 font-bold' : 'opacity-0 group-hover:opacity-100 text-gray-400'}`}
+                                                className={`hover:scale-125 transition-all text-sm p-1 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700 ${chat.pinned ? 'opacity-100 text-blue-500 dark:text-blue-400 font-bold' : 'opacity-0 group-hover:opacity-100 text-gray-400 dark:text-slate-500'}`}
                                                 title={chat.pinned ? 'Baştan Kaldır' : 'Başa Tuttur'}
                                             >
                                                 📌
@@ -897,7 +897,7 @@ ${recentContext}`;
                                                     e.stopPropagation();
                                                     toggleArchive(chat);
                                                 }}
-                                                className={`hover:scale-125 transition-all text-sm p-1 rounded-full hover:bg-gray-200 opacity-0 group-hover:opacity-100 text-gray-400`}
+                                                className={`hover:scale-125 transition-all text-sm p-1 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700 opacity-0 group-hover:opacity-100 text-gray-400 dark:text-slate-500`}
                                                 title={showArchived ? 'Arşivden Çıkar' : 'Arşivle'}
                                             >
                                                 {showArchived ? '📥' : '📦'}
@@ -1006,11 +1006,11 @@ ${recentContext}`;
 
                         {/* Parsed reservation preview */}
                         {parsedReservation && (
-                            <div className="bg-blue-50 border-b border-blue-200 px-5 py-3">
+                            <div className="bg-blue-50 dark:bg-blue-500/10 border-b border-blue-200 dark:border-blue-500/20 px-5 py-3 transition-colors duration-200">
                                 <div className="flex justify-between items-start">
                                     <div className="flex-1">
-                                        <p className="text-sm font-semibold text-blue-800 mb-2">🤖 AI Analiz Sonucu:</p>
-                                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-blue-700">
+                                        <p className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-2">🤖 AI Analiz Sonucu:</p>
+                                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-blue-700 dark:text-blue-300">
                                             {parsedReservation.type === 'tour' ? (
                                                 <>
                                                     {parsedReservation.tourDate && <span>📅 {parsedReservation.tourDate} {parsedReservation.tourTime}</span>}
@@ -1037,7 +1037,7 @@ ${recentContext}`;
                                         >
                                             ✅ Formu Aç
                                         </button>
-                                        <button onClick={() => setParsedReservation(null)} className="text-blue-400 hover:text-blue-600 text-xs">✕</button>
+                                        <button onClick={() => setParsedReservation(null)} className="text-blue-400 dark:text-blue-300 hover:text-blue-600 dark:hover:text-blue-200 text-xs transition-colors">✕</button>
                                     </div>
                                 </div>
                             </div>
