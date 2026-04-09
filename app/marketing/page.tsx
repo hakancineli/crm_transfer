@@ -115,7 +115,7 @@ export default function MarketingPage() {
     <>
       <Script id="software-application-schema" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationSchema) }} />
       <Script id="faq-schema" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white dark:bg-slate-950 transition-colors duration-200 text-gray-900 dark:text-slate-100">
       {/* Top Bar */}
       <div className="bg-slate-950 text-white text-sm border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-between gap-4">
@@ -133,13 +133,13 @@ export default function MarketingPage() {
       </div>
 
       {/* Header */}
-  <header className="sticky top-0 bg-white/92 backdrop-blur-xl z-40 border-b border-slate-200/80 shadow-[0_12px_40px_rgba(15,23,42,0.05)]">
+  <header className="sticky top-0 bg-white/92 dark:bg-slate-950/92 backdrop-blur-xl z-40 border-b border-slate-200/80 dark:border-slate-800 shadow-[0_12px_40px_rgba(15,23,42,0.05)] dark:shadow-none transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">P</span>
             </div>
-            <span className="text-xl font-bold text-gray-900">Pro Acente</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-slate-100">Pro Acente</span>
           </Link>
           <div className="flex items-center gap-3 lg:gap-5 text-sm">
             <nav className="hidden xl:flex items-center gap-6 text-[15px] text-gray-600">
@@ -153,14 +153,14 @@ export default function MarketingPage() {
                 aria-haspopup="listbox"
                 aria-controls="language-menu"
                 onClick={() => setOpen((v) => !v)}
-                className="inline-flex items-center px-4 py-2 rounded-xl border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 shadow-sm"
+                className="inline-flex items-center px-4 py-2 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 shadow-sm dark:shadow-none transition-colors duration-200"
                 title="Language"
               >
-                <span className="hidden sm:block text-sm font-medium text-gray-700">{current.label}</span>
+                <span className="hidden sm:block text-sm font-medium text-gray-700 dark:text-slate-200">{current.label}</span>
                 <span className="sm:ml-2">▾</span>
               </button>
               {open && (
-                <div id="language-menu" className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                <div id="language-menu" className="absolute right-0 mt-2 w-44 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg dark:shadow-none z-50 transition-colors duration-200">
                   <ul className="py-1" aria-label="Language options">
                     {languages.map((l) => (
                       <li key={l.code}>
@@ -170,7 +170,7 @@ export default function MarketingPage() {
                             setLanguage(l.code as any);
                             setOpen(false);
                           }}
-                          className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${language === l.code ? 'text-gray-900 font-medium' : 'text-gray-700'}`}
+                          className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-slate-800 ${language === l.code ? 'text-gray-900 dark:text-slate-100 font-medium' : 'text-gray-700 dark:text-slate-300'}`}
                           title={l.label}
                         >
                           {l.label}
@@ -181,30 +181,30 @@ export default function MarketingPage() {
                 </div>
               )}
             </div>
-            <Link href="/admin-login" className="hidden sm:inline-flex text-gray-600 hover:text-gray-900 transition-colors">{t('marketing.nav.admin')}</Link>
+            <Link href="/admin-login" className="hidden sm:inline-flex text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-slate-100 transition-colors">{t('marketing.nav.admin')}</Link>
             <Link href="/admin-login?demo=1" className="inline-flex items-center px-5 py-2.5 rounded-xl bg-green-600 text-white hover:bg-green-700 shadow-sm font-semibold">{t('marketing.nav.demo')}</Link>
           </div>
         </div>
       </header>
 
       {/* Hero */}
-      <section className="bg-[radial-gradient(circle_at_top_left,_rgba(22,163,74,0.10),_transparent_28%),linear-gradient(to_bottom,_#ffffff,_#f8fafc)]">
+      <section className="bg-[radial-gradient(circle_at_top_left,_rgba(22,163,74,0.10),_transparent_28%),linear-gradient(to_bottom,_#ffffff,_#f8fafc)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(22,163,74,0.16),_transparent_28%),linear-gradient(to_bottom,_#020617,_#0f172a)] transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-16 lg:pt-20 lg:pb-24 grid lg:grid-cols-[1.08fr_0.92fr] gap-14 items-center">
           <div>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 text-emerald-700 text-sm font-semibold border border-emerald-100 shadow-sm">Turizm acenteleri için operasyon, WhatsApp ve muhasebe tek panelde</div>
-            <h1 className="mt-5 max-w-5xl text-5xl sm:text-6xl lg:text-[5.25rem] xl:text-[5.75rem] leading-[0.92] font-black tracking-[-0.04em] text-slate-950">{t('marketing.hero.title')}</h1>
-            <p className="mt-7 text-lg sm:text-xl text-slate-600 max-w-3xl leading-9">{t('marketing.hero.subtitle')}</p>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-sm font-semibold border border-emerald-100 dark:border-emerald-500/20 shadow-sm dark:shadow-none transition-colors duration-200">Turizm acenteleri için operasyon, WhatsApp ve muhasebe tek panelde</div>
+            <h1 className="mt-5 max-w-5xl text-5xl sm:text-6xl lg:text-[5.25rem] xl:text-[5.75rem] leading-[0.92] font-black tracking-[-0.04em] text-slate-950 dark:text-slate-100">{t('marketing.hero.title')}</h1>
+            <p className="mt-7 text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-3xl leading-9">{t('marketing.hero.subtitle')}</p>
             <div className="mt-9 flex flex-col sm:flex-row gap-4">
-              <Link href="/admin-login?demo=1" className="inline-flex items-center justify-center px-7 py-3.5 rounded-xl bg-green-600 text-white hover:bg-green-700 font-semibold shadow-lg shadow-green-200/70">{t('marketing.hero.ctaStart')}</Link>
-              <Link href="#features" className="inline-flex items-center justify-center px-7 py-3.5 rounded-xl border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 font-semibold shadow-sm">{t('marketing.hero.ctaFeatures')}</Link>
+              <Link href="/admin-login?demo=1" className="inline-flex items-center justify-center px-7 py-3.5 rounded-xl bg-green-600 text-white hover:bg-green-700 font-semibold shadow-lg shadow-green-200/70 dark:shadow-none">{t('marketing.hero.ctaStart')}</Link>
+              <Link href="#features" className="inline-flex items-center justify-center px-7 py-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold shadow-sm dark:shadow-none transition-colors duration-200">{t('marketing.hero.ctaFeatures')}</Link>
             </div>
-            <div className="mt-7 flex flex-wrap gap-3 text-sm text-slate-500">
-              <span className="px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm">WhatsApp entegrasyonu</span>
-              <span className="px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm">Yapay zeka destekli akışlar</span>
-              <span className="px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm">Tur operasyonu ve koltuklama</span>
-              <span className="px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm">Muhasebe ve raporlama</span>
+            <div className="mt-7 flex flex-wrap gap-3 text-sm text-slate-500 dark:text-slate-400">
+              <span className="px-4 py-2 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none transition-colors duration-200">WhatsApp entegrasyonu</span>
+              <span className="px-4 py-2 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none transition-colors duration-200">Yapay zeka destekli akışlar</span>
+              <span className="px-4 py-2 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none transition-colors duration-200">Tur operasyonu ve koltuklama</span>
+              <span className="px-4 py-2 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none transition-colors duration-200">Muhasebe ve raporlama</span>
             </div>
-            <div className="mt-7 text-sm text-slate-500">{t('marketing.hero.note')}</div>
+            <div className="mt-7 text-sm text-slate-500 dark:text-slate-400">{t('marketing.hero.note')}</div>
           </div>
           <div className="lg:pl-2">
             <div className="rounded-[2rem] border border-slate-200/80 shadow-[0_35px_90px_rgba(15,23,42,0.10)] p-6 sm:p-7 bg-white/95 backdrop-blur-sm overflow-hidden relative">

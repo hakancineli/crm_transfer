@@ -43,21 +43,21 @@ export default function AdminLoginClient() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-950 dark:to-slate-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
       <div className="max-w-md w-full space-y-8">
-        <div className="bg-white p-8 rounded-lg shadow-xl">
+        <div className="bg-white dark:bg-slate-900 p-8 rounded-lg shadow-xl dark:shadow-none border border-gray-200 dark:border-slate-800 transition-colors duration-200">
           <div className="text-center mb-8">
             <div className="mx-auto h-12 w-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
               <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900">ProAcente CRM</h2>
-            <p className="mt-2 text-sm text-gray-600">Acente Yönetim Sistemi</p>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-slate-100">ProAcente CRM</h2>
+            <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">Acente Yönetim Sistemi</p>
           </div>
           {/* Demo info banner */}
           {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('demo') === '1' && (
-            <div className="mb-4 rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">
+            <div className="mb-4 rounded-md border border-blue-200 dark:border-blue-500/20 bg-blue-50 dark:bg-blue-500/10 p-3 text-sm text-blue-800 dark:text-blue-300 transition-colors duration-200">
               Demo kullanıcı bilgileri: <span className="font-semibold">demo</span> / <span className="font-semibold">demo</span>
             </div>
           )}
@@ -65,28 +65,28 @@ export default function AdminLoginClient() {
           <form className="space-y-6" onSubmit={handleLogin}>
             <div className="space-y-4">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Kullanıcı Adı</label>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Kullanıcı Adı</label>
                 <input
                   id="email"
                   name="email"
                   type="text"
                   required
                   autoComplete="username"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
                   placeholder="Kullanıcı adınızı girin"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">Şifre</label>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Şifre</label>
                 <input
                   id="password"
                   name="password"
                   type="password"
                   required
                   autoComplete="current-password"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
                   placeholder="Şifrenizi girin"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -95,7 +95,7 @@ export default function AdminLoginClient() {
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">{error}</div>
+              <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-300 px-4 py-3 rounded-lg text-sm transition-colors duration-200">{error}</div>
             )}
 
             <button
