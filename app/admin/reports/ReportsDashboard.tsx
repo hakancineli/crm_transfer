@@ -139,24 +139,24 @@ export default function ReportsDashboard() {
 
     if (error) {
         return (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-lg p-4 transition-colors duration-200">
                 <div className="flex">
                     <div className="flex-shrink-0">
-                        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                        <svg className="h-5 w-5 text-red-400 dark:text-red-300" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                         </svg>
                     </div>
                     <div className="ml-3">
-                        <h3 className="text-sm font-medium text-red-800">
+                        <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
                             {t('crm.reports.errorTitle')}
                         </h3>
-                        <div className="mt-2 text-sm text-red-700">
+                        <div className="mt-2 text-sm text-red-700 dark:text-red-300">
                             <p>{error}</p>
                         </div>
                         <div className="mt-4">
                             <button
                                 onClick={fetchReportData}
-                                className="bg-red-100 text-red-800 px-3 py-2 rounded-md text-sm font-medium hover:bg-red-200"
+                                className="bg-red-100 dark:bg-red-500/15 text-red-800 dark:text-red-200 px-3 py-2 rounded-md text-sm font-medium hover:bg-red-200 dark:hover:bg-red-500/25 transition-colors"
                             >
                                 {t('crm.reports.retry')}
                             </button>
@@ -170,37 +170,37 @@ export default function ReportsDashboard() {
     if (!reportData) {
         return (
             <div className="text-center py-12">
-                <p className="text-gray-500">{t('crm.reports.noData')}</p>
+                <p className="text-gray-500 dark:text-slate-400">{t('crm.reports.noData')}</p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 text-gray-900 dark:text-slate-100 transition-colors duration-200">
             {/* Tarih Filtreleri */}
-            <div className="bg-white p-6 rounded-lg shadow">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('crm.reports.dateRange')}</h2>
+            <div className="bg-white dark:bg-slate-900/90 p-6 rounded-lg shadow dark:shadow-none border border-gray-200 dark:border-slate-700 transition-colors duration-200">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">{t('crm.reports.dateRange')}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                             {t('crm.reports.startDate')}
                         </label>
                         <input
                             type="date"
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                             {t('crm.reports.endDate')}
                         </label>
                         <input
                             type="date"
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                         />
                     </div>
                     <div className="flex items-end">
@@ -217,7 +217,7 @@ export default function ReportsDashboard() {
 
             {/* Özet Kartları */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <div className="bg-white p-5 rounded-lg shadow">
+                <div className="bg-white dark:bg-slate-900/90 p-5 rounded-lg shadow dark:shadow-none border border-gray-200 dark:border-slate-700 transition-colors duration-200">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -225,15 +225,15 @@ export default function ReportsDashboard() {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-xs font-medium text-gray-500 uppercase">Toplam (TL)</p>
-                            <p className="text-lg font-bold text-gray-900">
+                            <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Toplam (TL)</p>
+                            <p className="text-lg font-bold text-gray-900 dark:text-slate-100">
                                 {formatCurrency(reportData.totalRevenueTL)}
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white p-5 rounded-lg shadow border-l-4 border-blue-400">
+                <div className="bg-white dark:bg-slate-900/90 p-5 rounded-lg shadow dark:shadow-none border border-gray-200 dark:border-slate-700 border-l-4 border-blue-400 transition-colors duration-200">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -241,15 +241,15 @@ export default function ReportsDashboard() {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-xs font-medium text-gray-500 uppercase">Dolar Satış</p>
-                            <p className="text-lg font-bold text-gray-900">
+                            <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Dolar Satış</p>
+                            <p className="text-lg font-bold text-gray-900 dark:text-slate-100">
                                 {formatCurrency(reportData.totalRevenueUSD, 'USD')}
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white p-5 rounded-lg shadow border-l-4 border-indigo-400">
+                <div className="bg-white dark:bg-slate-900/90 p-5 rounded-lg shadow dark:shadow-none border border-gray-200 dark:border-slate-700 border-l-4 border-indigo-400 transition-colors duration-200">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -257,15 +257,15 @@ export default function ReportsDashboard() {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-xs font-medium text-gray-500 uppercase">Euro Satış</p>
-                            <p className="text-lg font-bold text-gray-900">
+                            <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Euro Satış</p>
+                            <p className="text-lg font-bold text-gray-900 dark:text-slate-100">
                                 {formatCurrency(reportData.totalRevenueEUR, 'EUR')}
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white p-5 rounded-lg shadow border-l-4 border-purple-400">
+                <div className="bg-white dark:bg-slate-900/90 p-5 rounded-lg shadow dark:shadow-none border border-gray-200 dark:border-slate-700 border-l-4 border-purple-400 transition-colors duration-200">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
@@ -273,18 +273,18 @@ export default function ReportsDashboard() {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-xs font-medium text-gray-500 uppercase">Toplam İşlem</p>
-                            <p className="text-lg font-bold text-gray-900">
+                            <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Toplam İşlem</p>
+                            <p className="text-lg font-bold text-gray-900 dark:text-slate-100">
                                 {reportData.totalTransfers + reportData.totalTours}
                             </p>
-                            <p className="text-[10px] text-gray-400">
+                            <p className="text-[10px] text-gray-400 dark:text-slate-500">
                                 {reportData.totalTransfers} Trf / {reportData.totalTours} Tur
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white p-5 rounded-lg shadow border-l-4 border-yellow-400">
+                <div className="bg-white dark:bg-slate-900/90 p-5 rounded-lg shadow dark:shadow-none border border-gray-200 dark:border-slate-700 border-l-4 border-yellow-400 transition-colors duration-200">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
@@ -292,8 +292,8 @@ export default function ReportsDashboard() {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-xs font-medium text-gray-500 uppercase">Net Kar (TL)</p>
-                            <p className="text-lg font-bold text-gray-900">
+                            <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Net Kar (TL)</p>
+                            <p className="text-lg font-bold text-gray-900 dark:text-slate-100">
                                 {formatCurrency(reportData.netIncome)}
                             </p>
                         </div>
@@ -304,43 +304,43 @@ export default function ReportsDashboard() {
             {/* Detaylı İstatistikler */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Ödeme Durumu */}
-                <div className="bg-white p-6 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('crm.reports.payment.title')}</h3>
+                <div className="bg-white dark:bg-slate-900/90 p-6 rounded-lg shadow dark:shadow-none border border-gray-200 dark:border-slate-700 transition-colors duration-200">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">{t('crm.reports.payment.title')}</h3>
                     <div className="space-y-4">
                         <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">{t('crm.reports.payment.paid')}</span>
+                            <span className="text-sm text-gray-600 dark:text-slate-400">{t('crm.reports.payment.paid')}</span>
                             <span className="font-semibold text-green-600">{reportData.paidItems}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">{t('crm.reports.payment.unpaid')}</span>
+                            <span className="text-sm text-gray-600 dark:text-slate-400">{t('crm.reports.payment.unpaid')}</span>
                             <span className="font-semibold text-red-600">{reportData.unpaidItems}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">{t('crm.reports.payment.driverPayments')}</span>
-                            <span className="font-semibold text-gray-900">{formatCurrency(reportData.driverPayments)}</span>
+                            <span className="text-sm text-gray-600 dark:text-slate-400">{t('crm.reports.payment.driverPayments')}</span>
+                            <span className="font-semibold text-gray-900 dark:text-slate-100">{formatCurrency(reportData.driverPayments)}</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Transfer Tipleri */}
-                <div className="bg-white p-6 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('crm.reports.types.title')}</h3>
+                <div className="bg-white dark:bg-slate-900/90 p-6 rounded-lg shadow dark:shadow-none border border-gray-200 dark:border-slate-700 transition-colors duration-200">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">{t('crm.reports.types.title')}</h3>
                     <div className="space-y-4">
                         <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">{t('crm.reports.types.pickup')}</span>
-                            <span className="font-semibold text-blue-600">{reportData.transfersByType.pickup}</span>
+                            <span className="text-sm text-gray-600 dark:text-slate-400">{t('crm.reports.types.pickup')}</span>
+                            <span className="font-semibold text-blue-600 dark:text-blue-400">{reportData.transfersByType.pickup}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">{t('crm.reports.types.dropoff')}</span>
-                            <span className="font-semibold text-green-600">{reportData.transfersByType.dropoff}</span>
+                            <span className="text-sm text-gray-600 dark:text-slate-400">{t('crm.reports.types.dropoff')}</span>
+                            <span className="font-semibold text-green-600 dark:text-emerald-400">{reportData.transfersByType.dropoff}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">{t('crm.reports.types.transfer')}</span>
-                            <span className="font-semibold text-purple-600">{reportData.transfersByType.transfer}</span>
+                            <span className="text-sm text-gray-600 dark:text-slate-400">{t('crm.reports.types.transfer')}</span>
+                            <span className="font-semibold text-purple-600 dark:text-violet-400">{reportData.transfersByType.transfer}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">Tur</span>
-                            <span className="font-semibold text-indigo-600">{reportData.transfersByType.tour}</span>
+                            <span className="text-sm text-gray-600 dark:text-slate-400">Tur</span>
+                            <span className="font-semibold text-indigo-600 dark:text-indigo-400">{reportData.transfersByType.tour}</span>
                         </div>
                     </div>
                 </div>
@@ -348,23 +348,23 @@ export default function ReportsDashboard() {
 
             {/* Popüler Rotalar */}
             {reportData.popularRoutes.length > 0 && (
-                <div className="bg-white p-6 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('crm.reports.popularRoutes.title')}</h3>
+                <div className="bg-white dark:bg-slate-900/90 p-6 rounded-lg shadow dark:shadow-none border border-gray-200 dark:border-slate-700 transition-colors duration-200">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">{t('crm.reports.popularRoutes.title')}</h3>
                     <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                        <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800 transition-colors duration-200">
+                            <thead className="bg-gray-50 dark:bg-slate-950/70 transition-colors duration-200">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('crm.reports.popularRoutes.route')}</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('crm.reports.popularRoutes.count')}</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('crm.reports.popularRoutes.route')}</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('crm.reports.popularRoutes.count')}</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
+                            <tbody className="bg-white dark:bg-slate-900/90 divide-y divide-gray-200 dark:divide-slate-800 transition-colors duration-200">
                                 {reportData.popularRoutes.map((route, index) => (
-                                    <tr key={index}>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    <tr key={index} className="hover:bg-gray-50 dark:hover:bg-slate-800/70 transition-colors duration-150">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-slate-100">
                                             {route.route}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                                             {route.count}
                                         </td>
                                     </tr>
@@ -376,14 +376,14 @@ export default function ReportsDashboard() {
             )}
 
             {/* USD Kuru */}
-            <div className="bg-white p-6 rounded-lg shadow">
+            <div className="bg-white dark:bg-slate-900/90 p-6 rounded-lg shadow dark:shadow-none border border-gray-200 dark:border-slate-700 transition-colors duration-200">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-900">{t('crm.reports.usdRate.title')}</h3>
-                        <p className="text-sm text-gray-600">{t('crm.reports.usdRate.subtitle')}</p>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{t('crm.reports.usdRate.title')}</h3>
+                        <p className="text-sm text-gray-600 dark:text-slate-400">{t('crm.reports.usdRate.subtitle')}</p>
                     </div>
                     <div className="text-right">
-                        <p className="text-lg font-bold text-gray-900">
+                        <p className="text-lg font-bold text-gray-900 dark:text-slate-100">
                             USD: {reportData.usdRate.toFixed(2)} ₺ / EUR: {reportData.eurRate.toFixed(2)} ₺
                         </p>
                     </div>

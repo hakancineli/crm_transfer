@@ -290,7 +290,7 @@ export default function GoogleMapsPlacesInput({
         onBlur={handleBlur}
         onFocus={handleFocus}
         placeholder={placeholder}
-        className={`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm ${className}`}
+        className={`mt-1 block w-full border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm transition-colors duration-200 ${className}`}
         required={required}
         autoComplete="off"
         id={id}
@@ -300,12 +300,12 @@ export default function GoogleMapsPlacesInput({
       {showPredictions && predictions.length > 0 && typeof window !== 'undefined' && portalRect && createPortal(
         <div
           style={{ position: 'absolute', top: portalRect.top, left: portalRect.left, width: portalRect.width, zIndex: 10000 }}
-          className="mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
+          className="mt-1 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-md shadow-lg max-h-60 overflow-y-auto transition-colors duration-200"
         >
           {predictions.map((prediction, index) => (
             <div
               key={index}
-              className={`px-3 py-2 cursor-pointer text-sm ${index === activeIndex ? 'bg-gray-100' : 'hover:bg-gray-100'}`}
+              className={`px-3 py-2 cursor-pointer text-sm text-gray-900 dark:text-slate-100 ${index === activeIndex ? 'bg-gray-100 dark:bg-slate-800' : 'hover:bg-gray-100 dark:hover:bg-slate-800'}`}
               onMouseEnter={() => setActiveIndex(index)}
               onMouseLeave={() => setActiveIndex((prev) => (prev === index ? -1 : prev))}
               onClick={() => handleSuggestionClick(prediction)}

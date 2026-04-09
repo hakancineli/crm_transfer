@@ -294,34 +294,34 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-slate-900 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-slate-700 transition-colors duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-2xl font-bold text-gray-900">Rezervasyon Talebi</h2>
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-slate-700 transition-colors duration-200">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Rezervasyon Talebi</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-200 transition-colors"
           >
             <X className="h-6 w-6" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-6 space-y-6 text-gray-900 dark:text-slate-100 transition-colors duration-200">
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-2 text-sm text-red-700">{error}</div>
+            <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-md p-2 text-sm text-red-700 dark:text-red-300 transition-colors duration-200">{error}</div>
           )}
 
           {/* Service Type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
               Hizmet Türü
             </label>
             <select
               value={formData.type}
               onChange={(e) => handleInputChange('type', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors duration-200"
             >
               <option value="transfer">Transfer</option>
               <option value="tour">Tur</option>
@@ -332,7 +332,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
           {/* Location Fields with Google Maps */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 <MapPin className="inline h-4 w-4 mr-1" />
                 Nereden
               </label>
@@ -348,7 +348,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 <MapPin className="inline h-4 w-4 mr-1" />
                 Nereye
               </label>
@@ -366,17 +366,17 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
 
           {/* Distance and Price Display - Sadece müşteri formunda göster */}
           {!isAdminForm && (formData.from && formData.to) && (
-            <div className="text-sm text-gray-700 flex items-center gap-3">
-              <span className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-2 py-1">
+            <div className="text-sm text-gray-700 dark:text-slate-300 flex items-center gap-3">
+              <span className="inline-flex items-center rounded-md border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 px-2 py-1 transition-colors duration-200">
                 {googleMapsError ? 'Hesaplama hatası' : !googleMapsLoaded ? 'Google Maps yükleniyor…' : estimating || distanceKm === null ? 'Hesaplanıyor…' : `${distanceKm.toFixed(1)} km`}
               </span>
               {estimatedPriceTRY !== null && (
                 <>
-                  <span className="inline-flex items-center rounded-md border border-green-200 bg-green-50 px-2 py-1 font-medium text-green-700">
+                  <span className="inline-flex items-center rounded-md border border-green-200 dark:border-emerald-500/20 bg-green-50 dark:bg-emerald-500/10 px-2 py-1 font-medium text-green-700 dark:text-emerald-300 transition-colors duration-200">
                     Tahmini Fiyat: {estimatedPriceTRY.toLocaleString('tr-TR')} TRY
                   </span>
                   {currency !== 'TRY' && (
-                    <span className="inline-flex items-center rounded-md border border-blue-200 bg-blue-50 px-2 py-1 font-medium text-blue-700">
+                    <span className="inline-flex items-center rounded-md border border-blue-200 dark:border-blue-500/20 bg-blue-50 dark:bg-blue-500/10 px-2 py-1 font-medium text-blue-700 dark:text-blue-300 transition-colors duration-200">
                       ≈ {(() => {
                         const converted = convertFromTRY(estimatedPriceTRY, currency);
                         return converted != null ? converted.toLocaleString('tr-TR', { maximumFractionDigits: 2 }) : '-';
@@ -391,7 +391,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
           {/* Date and Time */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 <Calendar className="inline h-4 w-4 mr-1" />
                 Tarih
               </label>
@@ -400,12 +400,12 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
                 value={formData.date}
                 onChange={(e) => handleInputChange('date', e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors duration-200"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 <Clock className="inline h-4 w-4 mr-1" />
                 Saat
               </label>
@@ -414,7 +414,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
                 value={formData.time}
                 onChange={(e) => handleInputChange('time', e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors duration-200"
               />
             </div>
           </div>
@@ -422,7 +422,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
           {/* Flight Code and Currency */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 Uçuş Kodu (Opsiyonel)
               </label>
               <input
@@ -430,17 +430,17 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
                 value={formData.flightCode}
                 onChange={(e) => handleInputChange('flightCode', e.target.value)}
                 placeholder="TK1234"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors duration-200"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 Para Birimi
               </label>
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value as Currency)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors duration-200"
               >
                 <option value="TRY">TRY</option>
                 <option value="USD">USD</option>
@@ -452,7 +452,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
           {/* Admin Form - Manuel Fiyat Girişi */}
           {isAdminForm && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 Fiyat (Manuel Giriş)
               </label>
               <div className="flex">
@@ -463,13 +463,13 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
                   placeholder="Fiyat girin"
                   min="0"
                   step="0.01"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-l-md focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors duration-200"
                 />
-                <span className="px-3 py-2 border border-l-0 border-gray-300 rounded-r-md bg-gray-50 text-gray-700">
+                <span className="px-3 py-2 border border-l-0 border-gray-300 dark:border-slate-700 rounded-r-md bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-slate-200 transition-colors duration-200">
                   {currency}
                 </span>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                 Admin panelinde fiyat manuel olarak girilir
               </p>
             </div>
@@ -477,7 +477,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
 
           {/* Multi-Passenger Management */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
               <Users className="inline h-4 w-4 mr-1" />
               Yolcu Bilgileri
             </label>
@@ -490,13 +490,13 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
                     onChange={(e) => updatePassenger(i, e.target.value)}
                     placeholder={`Yolcu ${i + 1} adı`}
                     required
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors duration-200"
                   />
                   {formData.passengers.length > 1 && (
                     <button
                       type="button"
                       onClick={() => removePassenger(i)}
-                      className="px-3 py-2 border border-red-300 text-red-600 rounded-md hover:bg-red-50"
+                      className="px-3 py-2 border border-red-300 dark:border-red-500/30 text-red-600 dark:text-red-300 rounded-md hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors duration-200"
                     >
                       Sil
                     </button>
@@ -506,17 +506,17 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
               <button
                 type="button"
                 onClick={addPassenger}
-                className="px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
+                className="px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-md text-sm text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200"
               >
                 + Yolcu Ekle
               </button>
-              <p className="text-xs text-gray-600">Yolcu bilgilerini eksiksiz giriniz.</p>
+              <p className="text-xs text-gray-600 dark:text-slate-400">Yolcu bilgilerini eksiksiz giriniz.</p>
             </div>
           </div>
 
           {/* Luggage Count */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
               Bagaj Sayısı
             </label>
             <input
@@ -528,14 +528,14 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
                 const numValue = value === '' ? 0 : parseInt(value, 10);
                 handleInputChange('luggageCount', Number.isNaN(numValue) ? 0 : numValue);
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors duration-200"
             />
           </div>
 
           {/* Contact Information */}
           <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 Telefon
               </label>
               <input
@@ -543,7 +543,7 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
                 value={formData.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors duration-200"
               />
             </div>
           </div>
@@ -559,14 +559,14 @@ export default function ReservationForm({ isOpen, onClose, tenantId, isAdminForm
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+              className="px-6 py-2 border border-gray-300 dark:border-slate-700 rounded-md text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
             >
               İptal
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-6 py-2 rounded-md transition-colors flex items-center"
+              className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 dark:disabled:bg-slate-700 text-white px-6 py-2 rounded-md transition-colors flex items-center"
             >
               {isSubmitting ? (
                 <>

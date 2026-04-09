@@ -118,7 +118,7 @@ const ReservationTypeSelector = ({ onClose, variant = 'default' }: ReservationTy
         <Link
           href={availableTypes[0].href}
           onClick={handleTypeSelect}
-          className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+          className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium border-transparent text-gray-500 dark:text-slate-300 hover:border-gray-300 dark:hover:border-slate-700 hover:text-gray-700 dark:hover:text-slate-100 transition-colors"
         >
           Yeni Rezervasyon
         </Link>
@@ -149,13 +149,13 @@ const ReservationTypeSelector = ({ onClose, variant = 'default' }: ReservationTy
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+          className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium border-transparent text-gray-500 dark:text-slate-300 hover:border-gray-300 dark:hover:border-slate-700 hover:text-gray-700 dark:hover:text-slate-100 transition-colors"
         >
           Yeni Rezervasyon
-          <svg 
-            className={`ml-1 w-3 h-3 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            className={`ml-1 w-3 h-3 text-gray-400 dark:text-slate-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -163,21 +163,21 @@ const ReservationTypeSelector = ({ onClose, variant = 'default' }: ReservationTy
         </button>
 
         {isOpen && (
-          <div className="absolute left-0 top-full mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+          <div className="absolute left-0 top-full mt-1 w-64 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg z-50 transition-colors duration-200">
             <div className="py-1">
               {availableTypes.map((type, index) => (
                 <Link
                   key={type.name}
                   href={type.href}
                   onClick={handleTypeSelect}
-                  className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
+                  className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors group"
                 >
                   <span className="text-xl">{emojisEnabled ? type.icon : '📋'}</span>
                   <div className="flex-1">
-                    <div className="text-sm font-medium text-gray-900 group-hover:text-gray-700">
+                    <div className="text-sm font-medium text-gray-900 dark:text-slate-100 group-hover:text-gray-700 dark:group-hover:text-slate-200">
                       {type.name}
                     </div>
-                    <div className="text-xs text-gray-500 group-hover:text-gray-400">
+                    <div className="text-xs text-gray-500 dark:text-slate-400 group-hover:text-gray-400 dark:group-hover:text-slate-500">
                       {type.description}
                     </div>
                   </div>
@@ -216,21 +216,21 @@ const ReservationTypeSelector = ({ onClose, variant = 'default' }: ReservationTy
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 top-full mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+        <div className="absolute left-0 top-full mt-1 w-64 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg z-50 transition-colors duration-200">
           <div className="py-1">
             {availableTypes.map((type, index) => (
               <Link
                 key={type.name}
                 href={type.href}
                 onClick={handleTypeSelect}
-                className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
+                className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors group"
               >
                 <span className="text-xl">{emojisEnabled ? type.icon : '📋'}</span>
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-gray-900 group-hover:text-gray-700">
+                  <div className="text-sm font-medium text-gray-900 dark:text-slate-100 group-hover:text-gray-700 dark:group-hover:text-slate-200">
                     {type.name}
                   </div>
-                  <div className="text-xs text-gray-500 group-hover:text-gray-400">
+                  <div className="text-xs text-gray-500 dark:text-slate-400 group-hover:text-gray-400 dark:group-hover:text-slate-500">
                     {type.description}
                   </div>
                 </div>
