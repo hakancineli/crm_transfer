@@ -785,19 +785,26 @@ ${recentContext}`;
     return (
         <div className="h-[calc(100vh-37px)] flex flex-col bg-gray-100 dark:bg-slate-950 overflow-hidden -mt-9 transition-colors duration-200 text-gray-900 dark:text-slate-100">
             <div className="flex flex-1 overflow-hidden relative pt-0 -translate-y-4">
-                <div className="absolute top-0 right-4 z-30 flex items-center gap-2 pr-2">
-                    <button onClick={() => loadChats()} className="text-xs md:text-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-3 py-2 rounded-xl transition-colors shadow-sm whitespace-nowrap dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-slate-100 dark:border-slate-700">
-                        🔄 Yenile
-                    </button>
-                    <button onClick={disconnect} className="text-xs md:text-sm bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl transition-colors shadow-sm whitespace-nowrap dark:bg-red-600 dark:hover:bg-red-700">
-                        Bağlantıyı Kes
-                    </button>
-                </div>
-
                 {/* ── Chat List Sidebar ────────────────────────────────────────── */}
                 <div className={`${showSidebar ? 'flex' : 'hidden md:flex'} w-full md:w-80 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex-col z-20 transition-colors duration-200`}>
                     {/* Search and Toggle */}
                     <div className="p-4 bg-gray-50 dark:bg-slate-950/80 border-b border-gray-200 dark:border-slate-800 transition-colors duration-200">
+                        <div className="mb-3 flex items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={() => loadChats()}
+                                className="flex-1 text-xs md:text-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-3 py-2 rounded-xl transition-colors shadow-sm whitespace-nowrap dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-slate-100 dark:border-slate-700"
+                            >
+                                🔄 Yenile
+                            </button>
+                            <button
+                                type="button"
+                                onClick={disconnect}
+                                className="flex-1 text-xs md:text-sm bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl transition-colors shadow-sm whitespace-nowrap dark:bg-red-600 dark:hover:bg-red-700"
+                            >
+                                Bağlantıyı Kes
+                            </button>
+                        </div>
                         <input
                             type="text"
                             placeholder="Sohbet ara..."
