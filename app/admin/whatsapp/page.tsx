@@ -32,6 +32,8 @@ interface SessionStatus {
     status: 'NOT_CONNECTED' | 'QR_PENDING' | 'CONNECTED' | 'DISCONNECTED' | 'SERVICE_UNAVAILABLE';
     qr: string | null;
     phone: string | null;
+    error?: string;
+    details?: unknown;
 }
 
 type ParsedReservation = {
@@ -75,6 +77,11 @@ export default function WhatsAppPage() {
     const [isRecording, setIsRecording] = useState(false);
     const [recordingDuration, setRecordingDuration] = useState(0);
     const [showArchived, setShowArchived] = useState(false);
+    const mediaToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const getMediaSrc = (mediaUrl: string) => {
+        const base = `/api/whatsapp/media${mediaUrl.replace('/media', '')}`;
+        return mediaToken ? `${base}?token=${encodeURIComponent(mediaToken)}` : base;
+    };
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -88,6 +95,21 @@ export default function WhatsAppPage() {
     const [customerReservations, setCustomerReservations] = useState<any[]>([]);
     const [loadingCustomerRes, setLoadingCustomerRes] = useState(false);
     const [showCustomerInsights, setShowCustomerInsights] = useState(false);
+
+    const getSessionErrorMessage = (session: SessionStatus) => {
+        switch (session.error) {
+            case 'X_WA_SERVICE_URL_NOT_FOUND':
+                return 'WhatsApp servis adresi hatalı veya servis şu anda yayında değil.';
+            case 'X_WA_SERVICE_KEY_FAIL':
+                return 'WhatsApp servis API anahtarı geçersiz görünüyor.';
+            case 'X_WA_SERVICE_BAD_RESPONSE':
+                return 'WhatsApp servisi beklenmeyen bir yanıt verdi.';
+            case 'X_WA_SERVICE_UNAVAILABLE':
+                return 'WhatsApp servisine şu anda ulaşılamıyor.';
+            default:
+                return 'WhatsApp servisi şu an ulaşılamıyor.';
+        }
+    };
 
     const translateMsg = async (text: string, msgId: string, toTr: boolean = true) => {
         if (!text) return;
@@ -204,8 +226,25 @@ ${recentContext}`;
             const res = await fetch('/api/whatsapp/status', { headers: getAuthHeaders() });
             const data = await res.json();
 
-            if (data.error || !data.status) {
-                setSession(prev => ({ ...prev, status: 'SERVICE_UNAVAILABLE' }));
+            if (!res.ok) {
+                setSession({
+                    status: 'SERVICE_UNAVAILABLE',
+                    qr: null,
+                    phone: null,
+                    error: data?.error,
+                    details: data?.details,
+                });
+                return;
+            }
+
+            if (!data.status) {
+                setSession({
+                    status: 'SERVICE_UNAVAILABLE',
+                    qr: null,
+                    phone: null,
+                    error: 'X_WA_SERVICE_BAD_RESPONSE',
+                    details: data,
+                });
                 return;
             }
 
@@ -216,7 +255,12 @@ ${recentContext}`;
                 loadChats();
             }
         } catch (e) {
-            setSession(prev => ({ ...prev, status: 'SERVICE_UNAVAILABLE' }));
+            setSession({
+                status: 'SERVICE_UNAVAILABLE',
+                qr: null,
+                phone: null,
+                error: 'X_WA_SERVICE_UNAVAILABLE',
+            });
         }
     }, []);
 
@@ -693,11 +737,11 @@ ${recentContext}`;
     // ── Render: Not connected ──────────────────────────────────────────────────
     if (session.status === 'NOT_CONNECTED' || session.status === 'DISCONNECTED' || session.status === 'SERVICE_UNAVAILABLE') {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="bg-white rounded-2xl shadow-xl p-10 max-w-md w-full text-center">
+            <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center transition-colors duration-200">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl dark:shadow-none border border-gray-200 dark:border-slate-800 p-10 max-w-md w-full text-center transition-colors duration-200">
                     <div className="text-6xl mb-4">💬</div>
-                    <h1 className="text-2xl font-bold text-gray-900 mb-2">WhatsApp Bağla</h1>
-                    <p className="text-gray-500 mb-8">Kişisel WhatsApp hesabını CRM'e bağla. Müşteri mesajlarını buradan yönet ve tek tıkla rezervasyon oluştur.</p>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-2">WhatsApp Bağla</h1>
+                    <p className="text-gray-500 dark:text-slate-400 mb-8">Kişisel WhatsApp hesabını CRM'e bağla. Müşteri mesajlarını buradan yönet ve tek tıkla rezervasyon oluştur.</p>
                     <button
                         onClick={startConnection}
                         disabled={connecting}
@@ -709,7 +753,7 @@ ${recentContext}`;
                         <p className="mt-4 text-sm text-red-500">Bağlantı kesildi. Tekrar bağlan.</p>
                     )}
                     {session.status === 'SERVICE_UNAVAILABLE' && (
-                        <p className="mt-4 text-sm text-orange-500">⚠️ WhatsApp servisi şu an ulaşılamıyor.</p>
+                        <p className="mt-4 text-sm text-orange-500">⚠️ {getSessionErrorMessage(session)}</p>
                     )}
                 </div>
             </div>
@@ -739,46 +783,36 @@ ${recentContext}`;
 
     // ── Render: Connected — Inbox ──────────────────────────────────────────────
     return (
-        <div className="h-screen flex flex-col bg-gray-100">
-            {/* Header */}
-            <div className="bg-green-600 text-white px-6 py-3 flex items-center justify-between shadow-md">
-                <div className="flex items-center gap-3">
-                    <span className="text-2xl">💬</span>
-                    <div>
-                        <h1 className="font-bold text-lg">WhatsApp</h1>
-                        <span className="text-xs text-green-200">📱 {session.phone}</span>
-                    </div>
-                </div>
-                <div className="flex items-center gap-3">
-                    <button onClick={() => loadChats()} className="text-sm bg-green-500 hover:bg-green-700 px-3 py-1 rounded-lg transition-colors">
+        <div className="h-[calc(100vh-37px)] flex flex-col bg-gray-100 dark:bg-slate-950 overflow-hidden -mt-9 transition-colors duration-200 text-gray-900 dark:text-slate-100">
+            <div className="flex flex-1 overflow-hidden relative pt-0 -translate-y-4">
+                <div className="absolute top-0 right-4 z-30 flex items-center gap-2 pr-2">
+                    <button onClick={() => loadChats()} className="text-xs md:text-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-3 py-2 rounded-xl transition-colors shadow-sm whitespace-nowrap dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-slate-100 dark:border-slate-700">
                         🔄 Yenile
                     </button>
-                    <button onClick={disconnect} className="text-sm bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg transition-colors">
+                    <button onClick={disconnect} className="text-xs md:text-sm bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl transition-colors shadow-sm whitespace-nowrap dark:bg-red-600 dark:hover:bg-red-700">
                         Bağlantıyı Kes
                     </button>
                 </div>
-            </div>
 
-            <div className="flex flex-1 overflow-hidden relative">
                 {/* ── Chat List Sidebar ────────────────────────────────────────── */}
-                <div className={`${showSidebar ? 'flex' : 'hidden md:flex'} w-full md:w-80 bg-white border-r border-gray-200 flex-col z-20`}>
+                <div className={`${showSidebar ? 'flex' : 'hidden md:flex'} w-full md:w-80 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex-col z-20 transition-colors duration-200`}>
                     {/* Search and Toggle */}
-                    <div className="p-4 bg-gray-50 border-b border-gray-200">
+                    <div className="p-4 bg-gray-50 dark:bg-slate-950/80 border-b border-gray-200 dark:border-slate-800 transition-colors duration-200">
                         <input
                             type="text"
                             placeholder="Sohbet ara..."
                             value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                            className="w-full px-4 py-2 border border-gray-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors duration-200"
                         />
                         <div className="flex items-center justify-between mt-2 px-1">
                             <button
                                 onClick={() => setShowArchived(!showArchived)}
-                                className={`text-xs font-medium px-2 py-1 rounded transition-colors ${showArchived ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:bg-gray-100'}`}
+                                className={`text-xs font-medium px-2 py-1 rounded transition-colors ${showArchived ? 'bg-green-100 text-green-700 dark:bg-emerald-500/15 dark:text-emerald-300' : 'text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800'}`}
                             >
                                 {showArchived ? '← Aktif Sohbetler' : '📦 Arşivlenmişler'}
                             </button>
-                            {showArchived && <span className="text-[10px] text-gray-400">Arşiv modundasınız</span>}
+                            {showArchived && <span className="text-[10px] text-gray-400 dark:text-slate-500">Arşiv modundasınız</span>}
                         </div>
                     </div>
 
@@ -787,11 +821,11 @@ ${recentContext}`;
                         {!showArchived && chats.some(c => c.archived) && (
                             <div
                                 onClick={() => setShowArchived(true)}
-                                className="flex items-center gap-4 px-5 py-4 cursor-pointer hover:bg-gray-50 border-b border-gray-100 group transition-colors"
+                                className="flex items-center gap-4 px-5 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800 border-b border-gray-100 dark:border-slate-800 group transition-colors"
                             >
-                                <div className="text-gray-400">🗳️</div>
-                                <div className="flex-1 font-medium text-sm text-gray-700">Arşivlenmiş</div>
-                                <div className="text-xs text-green-600 font-semibold">{chats.filter(c => c.archived).length}</div>
+                                <div className="text-gray-400 dark:text-slate-500">🗳️</div>
+                                <div className="flex-1 font-medium text-sm text-gray-700 dark:text-slate-200">Arşivlenmiş</div>
+                                <div className="text-xs text-green-600 dark:text-emerald-400 font-semibold">{chats.filter(c => c.archived).length}</div>
                             </div>
                         )}
 
@@ -801,7 +835,7 @@ ${recentContext}`;
                             </div>
                         )}
                         {filteredChats.length === 0 && !loadingChats && (
-                            <div className="text-center py-10 text-gray-400 text-sm">
+                            <div className="text-center py-10 text-gray-400 dark:text-slate-500 text-sm">
                                 <div className="text-3xl mb-2">📭</div>
                                 {showArchived ? 'Arşivlenmiş sohbet yok' : 'Henüz mesaj yok'}
                             </div>
@@ -810,7 +844,7 @@ ${recentContext}`;
                             <div
                                 key={chat.id}
                                 onClick={() => loadMessages(chat)}
-                                className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-gray-50 hover:bg-gray-50 transition-colors group ${selectedChat?.id === chat.id ? 'bg-gray-100' : ''}`}
+                                className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-gray-50 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors group ${selectedChat?.id === chat.id ? 'bg-gray-100 dark:bg-slate-800' : ''}`}
                             >
                                 {/* Avatar */}
                                 <div className={`w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-medium flex-shrink-0 overflow-hidden bg-gray-200 shadow-sm
@@ -825,15 +859,20 @@ ${recentContext}`;
                                 </div>
 
                                 <div className="flex-1 min-w-0">
-                                    <div className="flex justify-between items-center">
-                                        <span className="font-semibold text-sm text-gray-900 truncate">
-                                            {chat.name || (chat.phone ? `+${chat.phone}` : 'Bilinmeyen')}
-                                        </span>
+                                    <div className="flex justify-between items-start gap-2">
+                                        <div className="min-w-0">
+                                            <div className="font-semibold text-sm text-gray-900 dark:text-white truncate">
+                                                {chat.name || (chat.phone ? `+${chat.phone}` : 'Bilinmeyen')}
+                                            </div>
+                                            <div className="text-[11px] text-gray-400 truncate mt-0.5">
+                                                {chat.chatId.includes('@g.us') ? 'Grup sohbeti' : (chat.phone && chat.phone.length >= 10 ? `+${chat.phone}` : 'Telefon bilgisi yok')}
+                                            </div>
+                                        </div>
                                         <div className={`text-[11px] ${chat.unread > 0 ? 'text-green-600 font-semibold' : 'text-gray-400'}`}>
                                             {chat.lastMsgAt ? new Date(chat.lastMsgAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : ''}
                                         </div>
                                     </div>
-                                    <div className="flex justify-between items-center gap-2 mt-0.5">
+                                    <div className="flex justify-between items-center gap-2 mt-1">
                                         <p className="text-xs text-gray-500 truncate flex-1 leading-tight flex items-center gap-1">
                                             {chat.lastMsg?.includes('[Sesli Mesaj]') && <span className="text-blue-500">🎤</span>}
                                             {chat.lastMsg?.includes('[Görsel]') && <span className="text-gray-400">📷</span>}
@@ -879,14 +918,14 @@ ${recentContext}`;
 
                 {/* ── Message Area ─────────────────────────────────────────────── */}
                 {selectedChat ? (
-                    <div className={`${!showSidebar ? 'flex' : 'hidden md:flex'} flex-1 flex flex-col z-10 bg-white`}>
+                    <div className={`${!showSidebar ? 'flex' : 'hidden md:flex'} flex-1 flex flex-col z-10 bg-white dark:bg-slate-900 transition-colors duration-200`}>
                         {/* Chat header */}
-                        <div className="bg-white px-3 md:px-5 py-2 md:py-3 border-b border-gray-200 flex items-center justify-between shadow-sm">
+                        <div className="bg-white dark:bg-slate-900 px-3 md:px-5 py-2 md:py-3 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between shadow-sm transition-colors duration-200">
                             <div className="flex items-center gap-2 md:gap-3 lg:gap-4 overflow-hidden">
                                 {/* Back button for mobile */}
                                 <button
                                     onClick={() => setShowSidebar(true)}
-                                    className="md:hidden p-2 -ml-1 text-gray-500 hover:bg-gray-100 rounded-full"
+                                    className="md:hidden p-2 -ml-1 text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors"
                                 >
                                     <span className="text-xl">←</span>
                                 </button>
@@ -900,10 +939,10 @@ ${recentContext}`;
                                     )}
                                 </div>
                                 <div>
-                                    <div className="font-semibold text-gray-900 leading-tight truncate max-w-[200px] md:max-w-md">
+                                    <div className="font-semibold text-gray-900 dark:text-slate-100 leading-tight truncate max-w-[200px] md:max-w-md">
                                         {selectedChat.name || selectedChat.phone}
                                     </div>
-                                    <div className="text-[10px] text-gray-400">
+                                    <div className="text-[10px] text-gray-400 dark:text-slate-500">
                                         {selectedChat.phone ? `+${selectedChat.phone}` : ''}
                                     </div>
                                 </div>
@@ -948,14 +987,14 @@ ${recentContext}`;
                                         </button>
                                         <button
                                             onClick={() => setSelectMode(true)}
-                                            className="bg-gray-100 hover:bg-gray-200 text-gray-600 text-[10px] md:text-xs px-2 md:px-3 py-1.5 rounded-lg transition-colors"
+                                            className="bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-600 dark:text-slate-300 text-[10px] md:text-xs px-2 md:px-3 py-1.5 rounded-lg transition-colors"
                                             title="Seç"
                                         >
                                             📋
                                         </button>
                                         <button
                                             onClick={() => setShowCustomerInsights(!showCustomerInsights)}
-                                            className={`p-1.5 rounded-lg transition-colors ${showCustomerInsights ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-400 hover:text-gray-600'}`}
+                                            className={`p-1.5 rounded-lg transition-colors ${showCustomerInsights ? 'bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-300' : 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-200'}`}
                                             title="Müşteri Geçmişi"
                                         >
                                             👤
@@ -1006,12 +1045,12 @@ ${recentContext}`;
 
                         {/* Customer Insights Panel */}
                         {showCustomerInsights && (
-                            <div className="bg-orange-50/50 border-b border-orange-100 p-4 animate-in slide-in-from-top duration-300">
+                            <div className="bg-orange-50/50 dark:bg-orange-500/10 border-b border-orange-100 dark:border-orange-500/20 p-4 animate-in slide-in-from-top duration-300 transition-colors duration-200">
                                 <div className="flex items-center justify-between mb-3">
-                                    <h3 className="text-sm font-bold text-orange-800 flex items-center gap-2">
-                                        📜 Müşteri Geçmişi {customerReservations.length > 0 && <span className="bg-orange-100 text-orange-600 text-[10px] px-1.5 py-0.5 rounded-full">{customerReservations.length} Kayıt</span>}
+                                    <h3 className="text-sm font-bold text-orange-800 dark:text-orange-200 flex items-center gap-2">
+                                        📜 Müşteri Geçmişi {customerReservations.length > 0 && <span className="bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-300 text-[10px] px-1.5 py-0.5 rounded-full">{customerReservations.length} Kayıt</span>}
                                     </h3>
-                                    <button onClick={() => setShowCustomerInsights(false)} className="text-orange-400 hover:text-orange-600 text-xs text-lg px-2">✕</button>
+                                    <button onClick={() => setShowCustomerInsights(false)} className="text-orange-400 hover:text-orange-600 dark:text-orange-300 dark:hover:text-orange-200 text-xs text-lg px-2 transition-colors">✕</button>
                                 </div>
                                 {loadingCustomerRes ? (
                                     <div className="flex items-center gap-2 py-2">
@@ -1043,8 +1082,8 @@ ${recentContext}`;
                         )}
 
                         {/* Messages */}
-                        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3"
-                            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3C/svg%3E")', backgroundColor: '#e5ddd5' }}>
+                        <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4 space-y-3 bg-cover bg-center bg-no-repeat"
+                            style={{ backgroundImage: 'url("/whatsapp/wallpaper-world-map.jpg")', backgroundColor: '#e5ddd5' }}>
                             {loadingMsgs && (
                                 <div className="flex justify-center py-8">
                                     <div className="animate-spin w-6 h-6 border-2 border-green-500 border-t-transparent rounded-full" />
@@ -1057,38 +1096,46 @@ ${recentContext}`;
                                     onClick={() => selectMode && toggleMessageSelect(msg.id)}
                                 >
                                     {selectMode && (
-                                        <div className={`self-center mr-2 w-5 h-5 rounded-full border-2 flex items-center justify-center
-                      ${selectedMessages.has(msg.id) ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-300'}`}>
+                                        <div className={`self-center mr-2 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors
+                      ${selectedMessages.has(msg.id) ? 'bg-blue-500 border-blue-500' : 'bg-white dark:bg-slate-900 border-gray-300 dark:border-slate-600'}`}>
                                             {selectedMessages.has(msg.id) && <span className="text-white text-xs">✓</span>}
                                         </div>
                                     )}
                                     <div
-                                        className={`max-w-[85%] md:max-w-md xl:max-w-lg px-2 py-2 rounded-2xl shadow-sm cursor-pointer
+                                        className={`max-w-[85%] md:max-w-md xl:max-w-lg px-2 py-2 rounded-2xl shadow-sm cursor-pointer border transition-colors
                       ${msg.fromMe
-                                                ? 'bg-green-100 text-gray-800 rounded-tr-none'
-                                                : 'bg-white text-gray-800 rounded-tl-none'
+                                                ? 'bg-green-100 dark:bg-emerald-500/20 text-gray-800 dark:text-slate-100 border-green-200 dark:border-emerald-500/20 rounded-tr-none'
+                                                : 'bg-white dark:bg-slate-900 text-gray-800 dark:text-slate-100 border-gray-200 dark:border-slate-700 rounded-tl-none'
                                             }
                       ${selectMode && selectedMessages.has(msg.id) ? 'ring-2 ring-blue-400' : ''}`}
                                     >
                                         <div className="px-2 pt-1">
                                             {!msg.fromMe && selectedChat?.chatId.includes('@g.us') && msg.senderName && (
-                                                <div className="text-[11px] font-bold text-orange-600 mb-0.5">{msg.senderName}</div>
+                                                <div className="text-[11px] font-bold text-orange-600 dark:text-orange-300 mb-0.5">{msg.senderName}</div>
                                             )}
                                             {msg.msgType === 'image' && msg.mediaUrl && (
-                                                <div className="mb-2 rounded-lg overflow-hidden border border-gray-100">
+                                                <div className="mb-2 overflow-hidden rounded-2xl">
                                                     <img
-                                                        src={`/api/whatsapp/media${msg.mediaUrl.replace('/media', '')}`}
+                                                        src={getMediaSrc(msg.mediaUrl)}
                                                         alt={msg.caption || 'Görsel'}
-                                                        className="w-full h-auto max-h-96 object-contain bg-gray-50"
+                                                        className="w-full h-auto max-h-96 object-contain"
                                                     />
                                                 </div>
                                             )}
 
+                                            {(msg.msgType === 'video' || msg.msgType === 'gif') && msg.mediaUrl && (
+                                                <div className="mb-2 overflow-hidden rounded-2xl bg-black">
+                                                    <video controls playsInline className="w-full h-auto max-h-96 object-contain bg-black">
+                                                        <source src={getMediaSrc(msg.mediaUrl)} />
+                                                        Tarayıcınız video oynatmayı desteklemiyor.
+                                                    </video>
+                                                </div>
+                                            )}
+
                                             {msg.msgType === 'audio' && msg.mediaUrl && (
-                                                <div className="mb-2 py-2 px-1 flex items-center gap-3 bg-gray-50 rounded-xl">
-                                                    <span className="text-xl">🎤</span>
-                                                    <audio controls className="h-8 max-w-[200px]">
-                                                        <source src={`/api/whatsapp/media${msg.mediaUrl.replace('/media', '')}`} />
+                                                <div className="mb-2 px-1">
+                                                    <audio controls className="h-8 max-w-[220px]">
+                                                        <source src={getMediaSrc(msg.mediaUrl)} />
                                                         Tarayıcınız ses çalmayı desteklemiyor.
                                                     </audio>
                                                 </div>
@@ -1096,26 +1143,26 @@ ${recentContext}`;
 
                                             {msg.msgType === 'document' && msg.mediaUrl && (
                                                 <a
-                                                    href={`/api/whatsapp/media${msg.mediaUrl.replace('/media', '')}`}
+                                                    href={getMediaSrc(msg.mediaUrl)}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="mb-2 flex items-center gap-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors border border-gray-100 group"
+                                                    className="mb-2 flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-800/80 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition-colors border border-gray-100 dark:border-slate-700 group"
                                                 >
                                                     <span className="text-2xl group-hover:scale-110 transition-transform">📄</span>
                                                     <div className="flex-1 min-w-0">
-                                                        <div className="text-sm font-medium text-gray-900 truncate">{msg.caption || 'Belge.pdf'}</div>
-                                                        <div className="text-xs text-blue-500">Görüntüle / İndir</div>
+                                                        <div className="text-sm font-medium text-gray-900 dark:text-slate-100 truncate">{msg.caption || 'Belge.pdf'}</div>
+                                                        <div className="text-xs text-blue-500 dark:text-blue-400">Görüntüle / İndir</div>
                                                     </div>
                                                 </a>
                                             )}
 
-                                            {msg.body && (
+                                            {msg.body && !(['[Görsel]', '[Video]', '[Sesli Mesaj]'].includes(msg.body) && !!msg.mediaUrl) && (
                                                 <div className="relative group">
                                                     <p className="whitespace-pre-wrap break-words text-sm">{msg.body}</p>
                                                     {translations[msg.id] && (
-                                                        <div className="mt-2 pt-2 border-t border-gray-200/50 text-sm text-blue-700 italic bg-blue-50/30 px-2 py-1 rounded-md">
-                                                            <div className="text-[10px] font-bold text-blue-400 mb-1 flex items-center gap-1 uppercase tracking-wider">
-                                                                <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse" /> AI Çeviri (TR)
+                                                        <div className="mt-2 pt-2 border-t border-gray-200/50 dark:border-slate-700 text-sm text-blue-700 dark:text-blue-300 italic bg-blue-50/30 dark:bg-blue-500/10 px-2 py-1 rounded-md transition-colors duration-200">
+                                                            <div className="text-[10px] font-bold text-blue-400 dark:text-blue-300 mb-1 flex items-center gap-1 uppercase tracking-wider">
+                                                                <span className="w-1.5 h-1.5 bg-blue-400 dark:bg-blue-300 rounded-full animate-pulse" /> AI Çeviri (TR)
                                                             </div>
                                                             {translations[msg.id]}
                                                         </div>
@@ -1126,7 +1173,7 @@ ${recentContext}`;
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); translateMsg(msg.body, msg.id, true); }}
                                                             disabled={translatingId === msg.id}
-                                                            className="absolute -right-12 top-0 bg-white shadow-sm border border-gray-100 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-blue-50 text-blue-500 disabled:opacity-50"
+                                                            className="absolute -right-12 top-0 bg-white dark:bg-slate-900 shadow-sm border border-gray-100 dark:border-slate-700 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-blue-50 dark:hover:bg-slate-800 text-blue-500 dark:text-blue-400 disabled:opacity-50"
                                                             title="Türkçeye Çevir"
                                                         >
                                                             {translatingId === msg.id ? (
@@ -1153,7 +1200,7 @@ ${recentContext}`;
                             ))}
                             {(parsing || translatingId) && (
                                 <div className="flex justify-start animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                    <div className="bg-white/80 backdrop-blur-sm text-gray-500 px-4 py-2 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-3 border border-gray-100 mb-2">
+                                    <div className="bg-white/80 dark:bg-slate-900/90 backdrop-blur-sm text-gray-500 dark:text-slate-400 px-4 py-2 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-3 border border-gray-100 dark:border-slate-700 mb-2 transition-colors duration-200">
                                         <div className="flex gap-1">
                                             <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
                                             <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
@@ -1167,17 +1214,17 @@ ${recentContext}`;
                         </div>
 
                         {/* Message input */}
-                        <div className="bg-white border-t border-gray-200 px-4 py-3 flex items-center gap-3">
+                        <div className="bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 px-4 py-3 flex items-center gap-3 transition-colors duration-200">
                             {isRecording ? (
-                                <div className="flex-1 flex items-center justify-between bg-red-50 px-4 py-2 rounded-full border border-red-100">
+                                <div className="flex-1 flex items-center justify-between bg-red-50 dark:bg-red-500/10 px-4 py-2 rounded-full border border-red-100 dark:border-red-500/20 transition-colors duration-200">
                                     <div className="flex items-center gap-2">
                                         <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                                        <span className="text-red-600 text-sm font-medium">{formatDuration(recordingDuration)}</span>
-                                        <span className="text-gray-500 text-xs ml-2">Ses kaydediliyor...</span>
+                                        <span className="text-red-600 dark:text-red-300 text-sm font-medium">{formatDuration(recordingDuration)}</span>
+                                        <span className="text-gray-500 dark:text-slate-400 text-xs ml-2">Ses kaydediliyor...</span>
                                     </div>
                                     <button
                                         onClick={stopRecording}
-                                        className="text-red-500 font-semibold text-sm hover:underline"
+                                        className="text-red-500 dark:text-red-300 font-semibold text-sm hover:underline"
                                     >
                                         Gönder
                                     </button>
@@ -1196,7 +1243,7 @@ ${recentContext}`;
                                     />
                                     <button
                                         onClick={() => document.getElementById('fileInput')?.click()}
-                                        className="text-gray-400 hover:text-green-500 transition-colors"
+                                        className="text-gray-400 dark:text-slate-400 hover:text-green-500 dark:hover:text-emerald-400 transition-colors"
                                         title="Dosya Ekle"
                                     >
                                         <span className="text-2xl">📎</span>
@@ -1207,11 +1254,11 @@ ${recentContext}`;
                                         onChange={e => setNewMessage(e.target.value)}
                                         onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
                                         placeholder="Mesaj yaz..."
-                                        className="flex-1 px-4 py-2 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                                        className="flex-1 px-4 py-2 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors duration-200"
                                     />
                                     <button
                                         onClick={startRecording}
-                                        className="text-gray-400 hover:text-red-500 transition-colors"
+                                        className="text-gray-400 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
                                         title="Ses Kaydet"
                                     >
                                         <span className="text-2xl">🎙️</span>
@@ -1220,7 +1267,7 @@ ${recentContext}`;
                                         onClick={suggestReply}
                                         disabled={isTranslatingInput}
                                         className={`w-10 h-10 border transition-all flex items-center justify-center rounded-full
-                                            ${isTranslatingInput ? 'bg-purple-50 border-purple-200' : 'bg-white border-gray-200 hover:border-purple-400 text-purple-500'}`}
+                                            ${isTranslatingInput ? 'bg-purple-50 dark:bg-purple-500/10 border-purple-200 dark:border-purple-500/20' : 'bg-white dark:bg-slate-950 border-gray-200 dark:border-slate-700 hover:border-purple-400 dark:hover:border-purple-400 text-purple-500 dark:text-purple-300'}`}
                                         title="Yapay zeka ile cevap önerisi al"
                                     >
                                         {isTranslatingInput ? (
@@ -1233,7 +1280,7 @@ ${recentContext}`;
                                         onClick={translateInput}
                                         disabled={!newMessage.trim() || isTranslatingInput}
                                         className={`w-10 h-10 border transition-all flex items-center justify-center rounded-full
-                                            ${isTranslatingInput ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-200 hover:border-blue-400 text-blue-500'}`}
+                                            ${isTranslatingInput ? 'bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/20' : 'bg-white dark:bg-slate-950 border-gray-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-400 text-blue-500 dark:text-blue-300'}`}
                                         title="Mesajı karşı tarafın diline çevir"
                                     >
                                         {isTranslatingInput ? (
@@ -1254,10 +1301,10 @@ ${recentContext}`;
                         </div>
                     </div>
                 ) : (
-                    <div className="flex-1 flex items-center justify-center bg-gray-50">
-                        <div className="text-center text-gray-400">
+                    <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-slate-950 transition-colors duration-200">
+                        <div className="text-center text-gray-400 dark:text-slate-500">
                             <div className="text-5xl mb-3">💬</div>
-                            <p className="text-lg font-medium">Bir sohbet seç</p>
+                            <p className="text-lg font-medium text-gray-700 dark:text-slate-200">Bir sohbet seç</p>
                             <p className="text-sm mt-1">Sol taraftan bir sohbet seçerek mesajları görüntüle</p>
                         </div>
                     </div>

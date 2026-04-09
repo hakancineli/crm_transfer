@@ -394,8 +394,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
     return (<>
         <div className="w-full">
             {/* Transfer Özeti (sticky) */}
-            <div className="bg-white p-4 rounded-lg shadow mb-6 sticky top-4 z-10 border border-gray-200">
-                <div className="text-sm text-gray-600">
+            <div className="bg-white dark:bg-slate-900/90 p-4 rounded-lg shadow mb-6 sticky top-4 z-10 border border-gray-200 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
+                <div className="text-sm text-gray-600 dark:text-slate-300">
                     <span className="font-medium">Toplam {filteredReservations.length} Rezervasyon</span>
                     <div className="text-xs text-red-500 mt-1">
                     </div>
@@ -405,7 +405,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 onClick={() => handleFilter('karsilama')}
                                 className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${activeFilter === 'karsilama'
                                         ? 'bg-green-600 text-white border-green-600'
-                                        : 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200'
+                                        : 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30 dark:hover:bg-emerald-500/25'
                                     }`}
                             >
                                 {karsilamaCount} Karşılama
@@ -414,7 +414,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 onClick={() => handleFilter('cikis')}
                                 className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${activeFilter === 'cikis'
                                         ? 'bg-orange-600 text-white border-orange-600'
-                                        : 'bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200'
+                                        : 'bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200 dark:bg-orange-500/15 dark:text-orange-300 dark:border-orange-500/30 dark:hover:bg-orange-500/25'
                                     }`}
                             >
                                 {cikisCount} Çıkış
@@ -423,7 +423,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 onClick={() => handleFilter('araTransfer')}
                                 className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors whitespace-nowrap ${activeFilter === 'araTransfer'
                                         ? 'bg-purple-600 text-white border-purple-600'
-                                        : 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200'
+                                        : 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200 dark:bg-violet-500/15 dark:text-violet-300 dark:border-violet-500/30 dark:hover:bg-violet-500/25'
                                     }`}
                             >
                                 {araTransferCount} Ara Transfer
@@ -441,7 +441,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 onClick={() => handleFilter('all')}
                                 className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${activeFilter === 'all'
                                         ? 'bg-green-600 text-white border-green-600'
-                                        : 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200'
+                                        : 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30 dark:hover:bg-emerald-500/25'
                                     }`}
                             >
                                 Tümü
@@ -454,16 +454,16 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             {/* Acente Filtreleme - Sadece Superuser için */}
             {user?.role === 'SUPERUSER' && tenants.length > 0 && (
                 <div className="mb-4">
-                    <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+                    <div className="bg-white dark:bg-slate-900/90 p-4 rounded-lg shadow border border-gray-200 dark:border-slate-700 dark:shadow-none transition-colors duration-200 text-gray-900 dark:text-slate-100">
                         <div className="flex items-center gap-4">
-                            <label className="text-sm font-medium text-gray-700">
+                            <label className="text-sm font-medium text-gray-700 dark:text-slate-300">
                                 Acente Filtresi:
                             </label>
                             <select
                                 value={selectedTenant}
                                 onChange={(e) => setSelectedTenant(e.target.value)}
                                 title="Acente filtresi"
-                                className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-100 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                             >
                                 <option value="all">Tüm Acenteler</option>
                                 {tenants.map((tenant) => (
@@ -475,7 +475,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                             {selectedTenant !== 'all' && (
                                 <button
                                     onClick={() => setSelectedTenant('all')}
-                                    className="text-sm text-blue-600 hover:text-blue-800 underline"
+                                    className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
                                 >
                                     Filtreyi Temizle
                                 </button>
@@ -493,8 +493,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                     pageSizeControl={
                         <div className="flex items-end gap-2">
                             <div>
-                                <label className="block text-xs text-gray-500 mb-1">Sayfa Boyutu</label>
-                                <select value={pageSize} onChange={(e) => setPageSize(parseInt(e.target.value))} title="Sayfa boyutu" className="px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">Sayfa Boyutu</label>
+                                <select value={pageSize} onChange={(e) => setPageSize(parseInt(e.target.value))} title="Sayfa boyutu" className="px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-100 rounded-md text-sm transition-colors duration-200">
                                     <option value={10}>10</option>
                                     <option value={20}>20</option>
                                     <option value={50}>50</option>
@@ -507,53 +507,53 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             </div>
 
             {/* Desktop Tablo */}
-            <div className="hidden lg:block bg-white shadow-lg rounded-xl border border-gray-200 overflow-x-auto">
+            <div className="hidden lg:block bg-white dark:bg-slate-900/90 shadow-lg rounded-xl border border-gray-200 dark:border-slate-700 overflow-x-auto transition-colors duration-200">
                 <div>
                     <table className="w-full min-w-[1200px] xl:min-w-[1360px] table-auto">
                         <thead>
-                            <tr className="bg-gradient-to-r from-gray-50 to-gray-100">
-                                <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-28">
+                            <tr className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-900 transition-colors duration-200">
+                                <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wider w-28">
                                     Voucher
                                 </th>
-                                <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-28">
+                                <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wider w-28">
                                     Tip
                                 </th>
-                                <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-32">
+                                <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wider w-32">
                                     Tarih
                                 </th>
-                                <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wider">
                                     Güzergah
                                 </th>
-                                <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wider">
                                     Müşteri
                                 </th>
                                 {user?.role === 'SUPERUSER' && (
-                                    <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-32">
+                                    <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wider w-32">
                                         Acente
                                     </th>
                                 )}
                                 {(user?.role === 'SUPERUSER' || user?.role === 'AGENCY_ADMIN') && (
-                                    <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-32">
+                                    <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wider w-32">
                                         Kullanıcı
                                     </th>
                                 )}
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-24">
+                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wider w-24">
                                     Fiyat
                                 </th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-36">
+                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wider w-36">
                                     Şoför
                                 </th>
                                 {/* Uçuş Durumu sütunu kaldırıldı */}
                                 {/* Durum sütunu kaldırıldı */}
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-32">
+                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wider w-32">
                                     Ödeme
                                 </th>
-                                <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider w-44">
+                                <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wider w-44">
                                     İşlem
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-100">
+                        <tbody className="bg-white dark:bg-slate-900/90 divide-y divide-gray-100 dark:divide-slate-800 transition-colors duration-200">
                             {filteredReservations.length === 0 ? (
                                 <tr>
                                     <td colSpan={
@@ -563,7 +563,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                         1 + // Şoför
                                         0 + // Uçuş Durumu kaldırıldı
                                         2 // Ödeme, İşlem (Durum kaldırıldı)
-                                    } className="px-3 py-4 text-center text-gray-500">
+                                    } className="px-3 py-4 text-center text-gray-500 dark:text-slate-400">
                                         Rezervasyon bulunamadı
                                     </td>
                                 </tr>
@@ -607,20 +607,20 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                 }
                                             }}
                                             className={`transition-all duration-200 cursor-pointer ${isUrgent
-                                                    ? 'bg-red-50 hover:bg-red-100 border-l-4 border-red-500'
+                                                    ? 'bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-950/40 border-l-4 border-red-500'
                                                     : isPast
-                                                        ? 'bg-gray-100 hover:bg-gray-200'
-                                                        : 'hover:bg-gray-50 hover:shadow-sm'
+                                                        ? 'bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700'
+                                                        : 'hover:bg-gray-50 dark:hover:bg-slate-800 hover:shadow-sm'
                                                 }`}>
-                                            <td className="px-6 py-4 text-sm font-bold align-middle">
-                                                <div className="font-mono text-xs px-2 py-1 rounded border inline-block whitespace-nowrap text-gray-700 bg-gray-100 border-gray-200">
+                                            <td className="px-6 py-4 text-sm font-bold align-middle text-gray-900 dark:text-slate-100">
+                                                <div className="font-mono text-xs px-2 py-1 rounded border inline-block whitespace-nowrap text-gray-700 bg-gray-100 border-gray-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700">
                                                     {reservation.voucherNumber.startsWith('TUR-')
                                                         ? `TUR${new Date(reservation.date).toISOString().slice(2, 10).replace(/-/g, '')}-${Math.floor(Math.random() * 9) + 1}`
                                                         : reservation.voucherNumber
                                                     }
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 align-middle">
+                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-slate-100 align-middle">
                                                 <div className="flex flex-col gap-2">
                                                     <div className="flex flex-col gap-1">
                                                         <span className={`inline-flex items-center justify-center px-4 py-2 rounded-full text-xs font-semibold min-w-[80px] whitespace-nowrap ${reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')
@@ -646,7 +646,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                         </span>
                                                         {/* Rezervasyon kaynağı badge'i */}
                                                         {reservation.source === 'website' && (
-                                                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800 border border-cyan-200">
+                                                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800 border border-cyan-200 dark:bg-cyan-500/15 dark:text-cyan-300 dark:border-cyan-500/30 transition-colors duration-200">
                                                                 🌐 Website
                                                             </span>
                                                         )}
@@ -654,24 +654,24 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 align-middle">
+                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-slate-100 align-middle">
                                                 {new Date(reservation.date).toLocaleDateString('tr-TR')}
-                                                <div className={`text-xs ${isUrgent ? 'text-red-600 font-medium animate-pulse' : 'text-gray-500'}`}>
+                                                <div className={`text-xs ${isUrgent ? 'text-red-600 dark:text-red-400 font-medium animate-pulse' : 'text-gray-500 dark:text-slate-400'}`}>
                                                     {reservation.time}
                                                     {isUrgent && ' ⚠️'}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 whitespace-normal break-words align-top">
+                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-slate-100 whitespace-normal break-words align-top">
                                                 <div className="flex flex-col space-y-2">
                                                     {/* Güzergah Bilgisi - Temiz ve Düzenli */}
                                                     <div className="flex items-start">
                                                         <div className="flex flex-col flex-1">
-                                                            <div className="text-sm font-medium text-gray-900 whitespace-normal break-words leading-tight" title={formattedFrom}>
+                                                            <div className="text-sm font-medium text-gray-900 dark:text-slate-100 whitespace-normal break-words leading-tight" title={formattedFrom}>
                                                                 {formattedFrom}
                                                             </div>
                                                         </div>
                                                         <div className="flex items-center justify-center w-8 px-1">
-                                                            <span className="text-gray-400 text-lg">→</span>
+                                                            <span className="text-gray-400 dark:text-slate-500 text-lg">→</span>
                                                         </div>
                                                         <div className="flex flex-col flex-1">
                                                             <div className="text-sm font-medium text-gray-900 whitespace-normal break-words leading-tight" title={formattedTo}>
@@ -682,10 +682,10 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
 
                                                     {/* Uçuş Kodu - Ayrı Bir Bölümde */}
                                                     {reservation.flightCode && (
-                                                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-2">
+                                                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 dark:bg-blue-500/10 dark:border-blue-500/20 transition-colors duration-200">
                                                             <div className="flex items-center space-x-2">
-                                                                <span className="text-blue-600 text-xs font-medium">✈️ Uçuş:</span>
-                                                                <span className="text-blue-800 text-xs font-mono bg-blue-100 px-2 py-1 rounded">
+                                                                <span className="text-blue-600 dark:text-blue-300 text-xs font-medium">✈️ Uçuş:</span>
+                                                                <span className="text-blue-800 dark:text-blue-200 text-xs font-mono bg-blue-100 dark:bg-blue-500/15 px-2 py-1 rounded transition-colors duration-200">
                                                                     {reservation.flightCode.toUpperCase()}
                                                                 </span>
                                                             </div>
@@ -706,7 +706,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                 </div>
                                             </td>
                                             {user?.role === 'SUPERUSER' && (
-                                                <td className="px-6 py-4 text-sm text-gray-900 align-middle">
+                                                <td className="px-6 py-4 text-sm text-gray-900 dark:text-slate-100 align-middle">
                                                     <div className="font-medium text-blue-600">
                                                         {reservation.tenant?.companyName ||
                                                             (selectedTenantId ? tenants.find(t => t.id === selectedTenantId)?.companyName : 'Bilinmiyor')}
@@ -718,7 +718,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                 </td>
                                             )}
                                             {(user?.role === 'SUPERUSER' || user?.role === 'AGENCY_ADMIN') && (
-                                                <td className="px-6 py-4 text-sm text-gray-900 align-middle">
+                                                <td className="px-6 py-4 text-sm text-gray-900 dark:text-slate-100 align-middle">
                                                     <div className="font-medium text-green-600">
                                                         {reservation.user?.name || reservation.user?.username || 'Bilinmiyor'}
                                                     </div>
@@ -727,7 +727,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     </div>
                                                 </td>
                                             )}
-                                            <td className="px-6 py-4 text-sm text-gray-900 align-middle">
+                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-slate-100 align-middle">
                                                 <div className="font-semibold text-green-600">{reservation.price} {reservation.currency}</div>
                                                 {reservation.distanceKm && (
                                                     <div className="text-xs text-gray-500">
@@ -735,7 +735,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     </div>
                                                 )}
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 align-middle">
+                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-slate-100 align-middle">
                                                 {reservation.driver ? (
                                                     <div>
                                                         <div className="font-medium">{reservation.driver.name}</div>
@@ -806,7 +806,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                             </button>
                                                             <button
                                                                 onClick={() => setReturnTransferModal({ isOpen: true, reservation })}
-                                                                className="w-8 h-8 flex items-center justify-center border border-transparent text-lg font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 shadow-sm transition-colors"
+                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 dark:border-slate-600 text-lg font-medium rounded-lg text-gray-700 dark:text-slate-200 bg-white dark:bg-white hover:bg-gray-50 dark:hover:bg-gray-100 shadow-sm transition-colors"
                                                                 title="Dönüş Transferi Ekle"
                                                             >
                                                                 🔄
@@ -816,7 +816,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                                     ? `/admin/tour/reservations/${reservation.id}/driver-voucher`
                                                                     : `/admin/reservations/${reservation.voucherNumber}/driver-voucher`
                                                                 }
-                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
+                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 dark:border-slate-600 text-xl font-medium rounded-lg text-gray-700 dark:text-slate-200 bg-white dark:bg-white hover:bg-gray-50 dark:hover:bg-gray-100 shadow-sm transition-colors"
                                                                 title="Şoför Voucherı"
                                                             >
                                                                 👨‍✈️
@@ -826,14 +826,14 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                                     ? `/admin/tour/reservations/${reservation.id}/customer-voucher`
                                                                     : `/admin/reservations/${reservation.voucherNumber}/customer-voucher`
                                                                 }
-                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
+                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 dark:border-slate-600 text-xl font-medium rounded-lg text-gray-700 dark:text-slate-200 bg-white dark:bg-white hover:bg-gray-50 dark:hover:bg-gray-100 shadow-sm transition-colors"
                                                                 title="Müşteri Voucherı"
                                                             >
                                                                 🎫
                                                             </Link>
                                                             <Link
                                                                 href={`/admin/reservations/${reservation.voucherNumber}/edit`}
-                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
+                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 dark:border-slate-600 text-xl font-medium rounded-lg text-gray-700 dark:text-slate-200 bg-white dark:bg-white hover:bg-gray-50 dark:hover:bg-gray-100 shadow-sm transition-colors"
                                                                 title="Rezervasyonu Düzenle"
                                                             >
                                                                 ✏️
@@ -843,7 +843,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                         <div className="flex space-x-1">
                                                             <button
                                                                 onClick={() => setReturnTransferModal({ isOpen: true, reservation })}
-                                                                className="w-8 h-8 flex items-center justify-center border border-transparent text-lg font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 shadow-sm transition-colors"
+                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 dark:border-slate-600 text-lg font-medium rounded-lg text-gray-700 dark:text-slate-200 bg-white dark:bg-white hover:bg-gray-50 dark:hover:bg-gray-100 shadow-sm transition-colors"
                                                                 title="Dönüş Transferi Ekle"
                                                             >
                                                                 🔄
@@ -853,7 +853,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                                     ? `/admin/tour/reservations/${reservation.id}/driver-voucher`
                                                                     : `/admin/reservations/${reservation.voucherNumber}/driver-voucher`
                                                                 }
-                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
+                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 dark:border-slate-600 text-xl font-medium rounded-lg text-gray-700 dark:text-slate-200 bg-white dark:bg-white hover:bg-gray-50 dark:hover:bg-gray-100 shadow-sm transition-colors"
                                                                 title="Şoför Voucherı"
                                                             >
                                                                 👨‍✈️
@@ -863,14 +863,14 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                                     ? `/admin/tour/reservations/${reservation.id}/customer-voucher`
                                                                     : `/admin/reservations/${reservation.voucherNumber}/customer-voucher`
                                                                 }
-                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
+                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 dark:border-slate-600 text-xl font-medium rounded-lg text-gray-700 dark:text-slate-200 bg-white dark:bg-white hover:bg-gray-50 dark:hover:bg-gray-100 shadow-sm transition-colors"
                                                                 title="Müşteri Voucherı"
                                                             >
                                                                 🎫
                                                             </Link>
                                                             <Link
                                                                 href={`/admin/reservations/${reservation.voucherNumber}/edit`}
-                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 text-xl font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors"
+                                                                className="w-8 h-8 flex items-center justify-center border border-gray-300 dark:border-slate-600 text-xl font-medium rounded-lg text-gray-700 dark:text-slate-200 bg-white dark:bg-white hover:bg-gray-50 dark:hover:bg-gray-100 shadow-sm transition-colors"
                                                                 title="Rezervasyonu Düzenle"
                                                             >
                                                                 ✏️
@@ -891,7 +891,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             {/* Mobil Card Listesi */}
             <div className="lg:hidden space-y-4">
                 {filteredReservations.length === 0 ? (
-                    <div className="bg-white p-4 rounded-lg shadow text-center text-gray-500">
+                    <div className="bg-white dark:bg-slate-900/90 p-4 rounded-lg shadow text-center text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-slate-700 transition-colors duration-200">
                         Rezervasyon bulunamadı
                     </div>
                 ) : (
@@ -924,21 +924,21 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                         window.location.href = `/admin/reservations/${reservation.voucherNumber}`;
                                     }
                                 }}
-                                className={`bg-white rounded-lg shadow-sm border p-4 cursor-pointer transition-colors duration-150 ${isUrgent ? 'border-red-200 bg-red-50' : 'border-gray-200 hover:bg-gray-50'
+                                className={`bg-white dark:bg-slate-900/90 rounded-lg shadow-sm border p-4 cursor-pointer transition-colors duration-150 ${isUrgent ? 'border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-950/25' : 'border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800/70'
                                     }`}
                             >
                                 {/* Header */}
                                 <div className="flex justify-between items-start mb-3">
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-sm font-medium text-blue-600">
+                                            <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
                                                 {reservation.voucherNumber}
                                             </span>
                                             <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${reservation.from.includes('IST') || reservation.from.includes('SAW')
-                                                    ? 'bg-blue-100 text-blue-800'
+                                                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-300'
                                                     : reservation.to.includes('IST') || reservation.to.includes('SAW')
-                                                        ? 'bg-orange-100 text-orange-800'
-                                                        : 'bg-purple-100 text-purple-800'
+                                                        ? 'bg-orange-100 text-orange-800 dark:bg-orange-500/15 dark:text-orange-300'
+                                                        : 'bg-purple-100 text-purple-800 dark:bg-violet-500/15 dark:text-violet-300'
                                                 }`}>
                                                 {reservation.from.includes('IST') || reservation.from.includes('SAW')
                                                     ? 'Karşılama'
@@ -948,7 +948,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                 }
                                             </span>
                                         </div>
-                                        <div className={`text-sm ${isUrgent ? 'text-red-600 font-medium' : 'text-gray-900'}`}>
+                                        <div className={`text-sm ${isUrgent ? 'text-red-600 dark:text-red-400 font-medium' : 'text-gray-900 dark:text-slate-100'}`}>
                                             {new Date(reservation.date).toLocaleDateString('tr-TR')} {reservation.time}
                                             {isUrgent && ' ⚠️'}
                                         </div>
@@ -960,15 +960,15 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
 
                                 {/* Güzergah */}
                                 <div className="mb-3">
-                                    <div className="text-sm text-gray-600 mb-1">Güzergah:</div>
-                                    <div className="text-sm">
+                                    <div className="text-sm text-gray-600 dark:text-slate-400 mb-1">Güzergah:</div>
+                                    <div className="text-sm text-gray-900 dark:text-slate-100">
                                         <div className="flex items-center gap-2">
                                             <span className="flex-1">{formattedFrom}</span>
-                                            <span className="text-gray-400">→</span>
+                                            <span className="text-gray-400 dark:text-slate-500">→</span>
                                             <span className="flex-1">{formattedTo}</span>
                                         </div>
                                         {reservation.flightCode && (
-                                            <div className="mt-1 text-xs text-blue-600 font-medium bg-blue-50 px-2 py-1 rounded border border-blue-200">
+                                            <div className="mt-1 text-xs text-blue-600 dark:text-blue-300 font-medium bg-blue-50 dark:bg-blue-500/10 px-2 py-1 rounded border border-blue-200 dark:border-blue-500/20 transition-colors duration-200">
                                                 ✈️ {reservation.flightCode.toUpperCase()}
                                             </div>
                                         )}
@@ -977,10 +977,10 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
 
                                 {/* Müşteri */}
                                 <div className="mb-3">
-                                    <div className="text-sm text-gray-600 mb-1">Müşteri:</div>
-                                    <div className="text-sm font-medium">{formattedPassengerNames.join(', ')}</div>
+                                    <div className="text-sm text-gray-600 dark:text-slate-400 mb-1">Müşteri:</div>
+                                    <div className="text-sm font-medium text-gray-900 dark:text-slate-100">{formattedPassengerNames.join(', ')}</div>
                                     {reservation.phoneNumber && (
-                                        <div className="text-xs text-gray-500">
+                                        <div className="text-xs text-gray-500 dark:text-slate-400">
                                             {formatPhoneNumber(reservation.phoneNumber)}
                                         </div>
                                     )}
@@ -989,12 +989,12 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 {/* Acente (SUPERUSER için) */}
                                 {user?.role === 'SUPERUSER' && (
                                     <div className="mb-3">
-                                        <div className="text-sm text-gray-600 mb-1">Acente:</div>
-                                        <div className="text-sm font-medium text-blue-600">
+                                        <div className="text-sm text-gray-600 dark:text-slate-400 mb-1">Acente:</div>
+                                        <div className="text-sm font-medium text-blue-600 dark:text-blue-400">
                                             {reservation.tenant?.companyName ||
                                                 (selectedTenantId ? tenants.find(t => t.id === selectedTenantId)?.companyName : 'Bilinmiyor')}
                                         </div>
-                                        <div className="text-xs text-gray-500">
+                                        <div className="text-xs text-gray-500 dark:text-slate-400">
                                             {reservation.tenant?.subdomain ||
                                                 (selectedTenantId ? tenants.find(t => t.id === selectedTenantId)?.subdomain : 'N/A')}
                                         </div>
@@ -1004,18 +1004,18 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 {/* Şoför ve Durum */}
                                 <div className="flex justify-between items-center mb-3">
                                     <div>
-                                        <div className="text-sm text-gray-600 mb-1">Şoför:</div>
+                                        <div className="text-sm text-gray-600 dark:text-slate-400 mb-1">Şoför:</div>
                                         {reservation.driver ? (
                                             <div className="text-sm">
-                                                <div className="font-medium">{reservation.driver.name}</div>
-                                                <div className="text-xs text-gray-500">{reservation.driver.phoneNumber}</div>
+                                                <div className="font-medium text-gray-900 dark:text-slate-100">{reservation.driver.name}</div>
+                                                <div className="text-xs text-gray-500 dark:text-slate-400">{reservation.driver.phoneNumber}</div>
                                             </div>
                                         ) : (
-                                            <span className="text-sm text-gray-400">-</span>
+                                            <span className="text-sm text-gray-400 dark:text-slate-500">-</span>
                                         )}
                                     </div>
                                     <div className="text-right">
-                                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${reservation.driver ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${reservation.driver ? 'bg-green-100 text-green-800 dark:bg-emerald-500/15 dark:text-emerald-300' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-500/15 dark:text-yellow-300'
                                             }`}>
                                             {reservation.driver ? 'Atandı' : 'Bekliyor'}
                                         </span>
@@ -1025,10 +1025,10 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 {/* Ödeme Durumu */}
                                 <div className="flex justify-between items-center mb-3">
                                     <div>
-                                        <div className="text-sm text-gray-600 mb-1">Ödeme:</div>
-                                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${reservation.paymentStatus === 'PAID' ? 'bg-green-100 text-green-800' :
-                                                reservation.paymentStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                                                    'bg-red-100 text-red-800'
+                                        <div className="text-sm text-gray-600 dark:text-slate-400 mb-1">Ödeme:</div>
+                                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${reservation.paymentStatus === 'PAID' ? 'bg-green-100 text-green-800 dark:bg-emerald-500/15 dark:text-emerald-300' :
+                                                reservation.paymentStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-500/15 dark:text-yellow-300' :
+                                                    'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300'
                                             }`}>
                                             {reservation.paymentStatus === 'PAID' ? 'Ödendi' :
                                                 reservation.paymentStatus === 'PENDING' ? 'Bekliyor' : 'Ödenmedi'}
@@ -1058,7 +1058,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     const newStatus = reservation.paymentStatus === 'PAID' ? 'UNPAID' : 'PAID';
                                                     handlePaymentStatusUpdate(reservation.voucherNumber, newStatus);
                                                 }}
-                                                className="text-xs text-gray-500 hover:text-gray-700 p-1"
+                                                className="text-xs text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 p-1 transition-colors"
                                                 disabled={updateLoading === reservation.voucherNumber}
                                             >
                                                 {reservation.paymentStatus === 'PAID' ? '✗' : '✓'}
@@ -1071,7 +1071,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                 </div>
 
                                 {/* Aksiyon Butonları */}
-                                <div className="flex justify-end gap-2 pt-2 border-t border-gray-100">
+                                <div className="flex justify-end gap-2 pt-2 border-t border-gray-100 dark:border-slate-800">
                                     {!reservation.driver ? (
                                         <>
                                             <button
@@ -1104,13 +1104,13 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     ? `/admin/tour/reservations/${reservation.id}/customer-voucher`
                                                     : `/admin/reservations/${reservation.voucherNumber}/customer-voucher`
                                                 }
-                                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
+                                                className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-slate-600 text-sm font-medium rounded text-gray-700 dark:text-slate-200 bg-white dark:bg-white hover:bg-gray-50 dark:hover:bg-gray-100 transition-colors"
                                             >
                                                 Müşteri
                                             </Link>
                                             <Link
                                                 href={`/admin/reservations/${reservation.voucherNumber}/edit`}
-                                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
+                                                className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-slate-600 text-sm font-medium rounded text-gray-700 dark:text-slate-200 bg-white dark:bg-white hover:bg-gray-50 dark:hover:bg-gray-100 transition-colors"
                                             >
                                                 Düzenle
                                             </Link>
@@ -1128,7 +1128,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     ? `/admin/tour/reservations/${reservation.id}/driver-voucher`
                                                     : `/admin/reservations/${reservation.voucherNumber}/driver-voucher`
                                                 }
-                                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
+                                                className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-slate-600 text-sm font-medium rounded text-gray-700 dark:text-slate-200 bg-white dark:bg-white hover:bg-gray-50 dark:hover:bg-gray-100 transition-colors"
                                             >
                                                 Şoför
                                             </Link>
@@ -1137,13 +1137,13 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     ? `/admin/tour/reservations/${reservation.id}/customer-voucher`
                                                     : `/admin/reservations/${reservation.voucherNumber}/customer-voucher`
                                                 }
-                                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
+                                                className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-slate-600 text-sm font-medium rounded text-gray-700 dark:text-slate-200 bg-white dark:bg-white hover:bg-gray-50 dark:hover:bg-gray-100 transition-colors"
                                             >
                                                 Müşteri
                                             </Link>
                                             <Link
                                                 href={`/admin/reservations/${reservation.voucherNumber}/edit`}
-                                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
+                                                className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-slate-600 text-sm font-medium rounded text-gray-700 dark:text-slate-200 bg-white dark:bg-white hover:bg-gray-50 dark:hover:bg-gray-100 transition-colors"
                                             >
                                                 Düzenle
                                             </Link>
@@ -1159,13 +1159,13 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
             <div className="mt-6 flex items-center justify-between">
                 <button
                     onClick={() => { if (page > 1) { setPage(page - 1); fetchReservations(); } }}
-                    className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50 disabled:opacity-50"
+                    className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white dark:bg-slate-900/90 hover:bg-gray-50 disabled:opacity-50"
                     disabled={page === 1}
                 >Önceki</button>
                 <div className="text-sm text-gray-600">Sayfa {page}</div>
                 <button
                     onClick={() => { setPage(page + 1); fetchReservations(); }}
-                    className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50"
+                    className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white dark:bg-slate-900/90 hover:bg-gray-50"
                 >Sonraki</button>
             </div>
         </div>

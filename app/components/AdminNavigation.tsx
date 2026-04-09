@@ -307,14 +307,14 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
   }));
 
   return (
-    <div className="bg-white shadow-lg border-r border-gray-200 h-full w-64 flex flex-col overflow-hidden">
+    <div className="bg-white dark:bg-slate-950 shadow-lg border-r border-gray-200 dark:border-slate-800 h-full w-64 flex flex-col overflow-hidden transition-colors duration-200">
       {/* Mobile Close Button */}
-      <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200">
-        <span className="text-lg font-semibold text-gray-900">ProTransfer</span>
+      <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-800 transition-colors duration-200">
+        <span className="text-lg font-semibold text-gray-900 dark:text-white">ProTransfer</span>
         <button
           onClick={onClose}
           title="Menüyü kapat"
-          className="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+          className="p-2 rounded-lg text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
         >
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -323,12 +323,12 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
       </div>
 
       {/* Navigation */}
-      <nav className="p-4 space-y-2 pt-6 flex-1 overflow-y-auto pb-4">
+      <nav className="p-4 space-y-2 pt-6 flex-1 overflow-y-auto pb-4 text-gray-900 dark:text-slate-100 transition-colors duration-200 bg-white dark:bg-slate-950">
         {user?.role === 'SUPERUSER' && (
-          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-            <div className="text-xs text-amber-700 mb-2">Tenant Seçimi (Sadece SUPERUSER)</div>
+          <div className="mb-4 p-3 bg-amber-50 dark:bg-slate-900/90 border border-amber-200 dark:border-slate-700 rounded-lg transition-colors duration-200">
+            <div className="text-xs text-amber-700 dark:text-amber-300 mb-2">Tenant Seçimi (Sadece SUPERUSER)</div>
             <select
-              className="w-full border border-amber-300 rounded-md text-sm px-2 py-1 bg-white"
+              className="w-full border border-amber-300 dark:border-slate-700 rounded-md text-sm px-2 py-1 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 transition-colors duration-200"
               value={selectedTenantId || ''}
               onChange={(e) => setSelectedTenantId(e.target.value || null)}
               title="Tenant seçimi"
@@ -455,14 +455,14 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               key={item.name}
               href={item.href}
               onClick={() => onClose && onClose()}
-              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
+              className="flex items-center space-x-3 p-3 rounded-lg border border-transparent hover:bg-gray-50 dark:hover:bg-slate-800/80 hover:border-gray-200 dark:hover:border-slate-700 transition-colors group"
             >
               <span className="text-2xl">{isClient && emojisEnabled ? item.icon : ''}</span>
               <div className="flex-1">
-                <div className="text-sm font-medium text-gray-900 group-hover:text-gray-700">
+                <div className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-gray-700 dark:group-hover:text-slate-200">
                   {item.name}
                 </div>
-                <div className="text-xs text-gray-500 group-hover:text-gray-400">
+                <div className="text-xs text-gray-500 dark:text-slate-400 group-hover:text-gray-400 dark:group-hover:text-slate-500">
                   {item.description}
                 </div>
               </div>
@@ -472,20 +472,20 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
       </nav>
 
       {/* User Info & Logout */}
-      <div className="p-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">
+      <div className="p-4 border-t border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950/80 flex-shrink-0 transition-colors duration-200">
         {user ? (
           <>
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                <span className="text-gray-600 text-sm font-medium">
+              <div className="w-8 h-8 bg-gray-300 dark:bg-slate-700 rounded-full flex items-center justify-center transition-colors duration-200">
+                <span className="text-gray-600 dark:text-slate-200 text-sm font-medium">
                   {user?.name?.charAt(0) || 'A'}
                 </span>
               </div>
               <div className="flex-1">
-                <div className="text-sm font-medium text-gray-900">
+                <div className="text-sm font-medium text-gray-900 dark:text-slate-100">
                   {user?.name || 'Admin User'}
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-gray-500 dark:text-slate-400">
                   {user?.email || 'admin@protransfer.com'}
                 </div>
               </div>
@@ -493,7 +493,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
           </>
         ) : (
           <div className="text-center">
-            <div className="text-sm text-gray-500 mb-3">
+            <div className="text-sm text-gray-500 dark:text-slate-400 mb-3">
               Giriş yapmamışsınız
             </div>
             <a
