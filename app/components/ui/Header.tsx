@@ -119,7 +119,7 @@ export default function Header({ onSidebarToggle, showSidebarToggle = false }: H
                                         <button
                                             type="button"
                                             onClick={logout}
-                                            className="bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700 transition-colors"
+                                            className="bg-[#1E293B] text-[#F8FAFC] px-3 py-1 rounded-md text-sm hover:bg-[#7F1D1D] hover:text-white transition-colors"
                                         >
                                             {emojisEnabled ? '🚪 ' : ''}Çıkış
                                         </button>
@@ -208,7 +208,7 @@ export default function Header({ onSidebarToggle, showSidebarToggle = false }: H
                                             logout();
                                             setMobileMenuOpen(false);
                                         }}
-                                        className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-300 transition-colors"
+                                        className="w-full text-left px-3 py-2 rounded-md text-base font-medium bg-[#1E293B] text-[#F8FAFC] hover:bg-[#7F1D1D] hover:text-white transition-colors"
                                     >
                                         {emojisEnabled ? '🚪 ' : ''}Çıkış
                                     </button>

@@ -315,7 +315,13 @@ async function syncChat(userId: string, tenantId: string, chat: any) {
             } catch (e) {}
         }
 
-        const isArchived = chat.archive !== undefined ? !!chat.archive : (chat.archived !== undefined ? !!chat.archived : false);
+        const existingChat = await prisma.whatsAppChat.findUnique({
+            where: { userId_chatId: { userId, chatId } }
+        });
+        const hasArchiveFlag = chat.archive !== undefined || chat.archived !== undefined;
+        const isArchived = hasArchiveFlag
+            ? (chat.archive !== undefined ? !!chat.archive : !!chat.archived)
+            : (existingChat?.archived ?? false);
         const isPinned = chat.pin !== undefined && chat.pin !== null ? !!chat.pin && chat.pin !== 0 : !!chat.pinned;
         const finalName = pickDisplayName({ ...chat, name: resolvedName }, phone);
 

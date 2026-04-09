@@ -149,7 +149,7 @@ export default function FlightStatusPage() {
   // Chrome eklentisi için DOM hazır olana kadar bekle
   if (!isClient) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center transition-colors duration-200">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Yükleniyor...</p>
@@ -160,7 +160,7 @@ export default function FlightStatusPage() {
 
   if (moduleLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center transition-colors duration-200">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Yükleniyor...</p>
@@ -175,7 +175,7 @@ export default function FlightStatusPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center transition-colors duration-200">
         <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div>
       </div>
     );
@@ -183,10 +183,10 @@ export default function FlightStatusPage() {
 
   if (error === 'UNAUTHORIZED') {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Yetkisiz Erişim</h1>
-          <p className="text-gray-600">Bu sayfaya erişim yetkiniz bulunmamaktadır.</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 transition-colors duration-200">
+        <div className="max-w-2xl mx-auto p-6 bg-white dark:bg-slate-900 rounded-lg shadow dark:shadow-none border border-gray-200 dark:border-slate-800 transition-colors duration-200">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-slate-100 mb-4">Yetkisiz Erişim</h1>
+          <p className="text-gray-600 dark:text-slate-400">Bu sayfaya erişim yetkiniz bulunmamaktadır.</p>
         </div>
       </div>
     );
@@ -194,15 +194,15 @@ export default function FlightStatusPage() {
 
   if (error === 'MODULE_DISABLED') {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 transition-colors duration-200">
+        <div className="max-w-2xl mx-auto p-6 bg-white dark:bg-slate-900 rounded-lg shadow dark:shadow-none border border-gray-200 dark:border-slate-800 transition-colors duration-200">
           <div className="text-center">
             <div className="text-6xl mb-4">✈️</div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">Uçuş Modülü Kapalı</h1>
-            <p className="text-gray-600 mb-6">
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-slate-100 mb-4">Uçuş Modülü Kapalı</h1>
+            <p className="text-gray-600 dark:text-slate-400 mb-6">
               Uçuş Durumu takibi özelliği şu anda devre dışı bırakılmıştır.
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-slate-400">
               Bu özelliği kullanmak için Modül Yönetimi'nden Uçuş Yönetimi modülünü aktifleştirin.
             </p>
           </div>
@@ -212,14 +212,14 @@ export default function FlightStatusPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8" id="flight-status-page">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 transition-colors duration-200" id="flight-status-page">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-gray-900 dark:text-slate-100 transition-colors duration-200">
         {/* Header */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Uçuş Durumu Takibi</h1>
-              <p className="mt-2 text-sm text-gray-600">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Uçuş Durumu Takibi</h1>
+              <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">
                 Rezervasyonlarınızdaki uçuşların gerçek zamanlı durumunu takip edin
               </p>
             </div>
@@ -232,12 +232,12 @@ export default function FlightStatusPage() {
           </div>
 
           {/* Arama Kutusu */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 p-4 transition-colors duration-200">
             <div className="space-y-4">
               {/* Rezervasyon Arama */}
               <div className="flex items-center space-x-4">
                 <div className="flex-1">
-                  <label htmlFor="flight-search" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="flight-search" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     Rezervasyonlarda Ara
                   </label>
                   <input
@@ -246,17 +246,17 @@ export default function FlightStatusPage() {
                     placeholder="Uçuş kodu, voucher numarası, yolcu adı veya güzergah ara..."
                     value={searchTerm}
                     onChange={(e) => handleSearch(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
                   />
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-500 dark:text-slate-400">
                     {filteredFlights.length} / {flights.length} uçuş
                   </span>
                   {searchTerm && (
                     <button
                       onClick={() => handleSearch('')}
-                      className="text-gray-400 hover:text-gray-600"
+                      className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition-colors"
                       title="Temizle"
                     >
                       ✕
@@ -269,7 +269,7 @@ export default function FlightStatusPage() {
               <div className="border-t pt-4">
                 <div className="flex items-center space-x-4">
                   <div className="flex-1">
-                    <label htmlFor="flight-lookup" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="flight-lookup" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                       Uçuş Çağır
                     </label>
                     <div className="flex space-x-2">
@@ -279,12 +279,12 @@ export default function FlightStatusPage() {
                         placeholder="Uçuş kodu girin (örn: TK123)"
                         value={lookupFlightCode}
                         onChange={(e) => setLookupFlightCode(e.target.value)}
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="flex-1 px-4 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                       />
                       <button
                         onClick={handleFlightLookup}
                         disabled={!lookupFlightCode || lookupLoading}
-                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center space-x-2"
+                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 dark:disabled:bg-slate-700 disabled:cursor-not-allowed flex items-center space-x-2 transition-colors duration-200"
                       >
                         {lookupLoading ? (
                           <>
@@ -307,7 +307,7 @@ export default function FlightStatusPage() {
         </div>
 
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="mb-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-lg p-4 transition-colors duration-200">
             <div className="flex">
               <div className="text-red-400">⚠️</div>
               <div className="ml-3">
@@ -320,7 +320,7 @@ export default function FlightStatusPage() {
 
         {/* Uçuş Çağırma Sonuçları */}
         {lookupError && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="mb-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-lg p-4 transition-colors duration-200">
             <div className="flex">
               <div className="text-red-400">⚠️</div>
               <div className="ml-3">

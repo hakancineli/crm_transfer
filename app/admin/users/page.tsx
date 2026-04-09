@@ -211,13 +211,13 @@ export default function UsersPage() {
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'SUPERUSER': return 'bg-red-100 text-red-800';
-      case 'AGENCY_ADMIN': return 'bg-indigo-100 text-indigo-800';
-      case 'AGENCY_USER': return 'bg-teal-100 text-teal-800';
-      case 'OPERATION': return 'bg-blue-100 text-blue-800';
-      case 'SELLER': return 'bg-green-100 text-green-800';
-      case 'ACCOUNTANT': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'SUPERUSER': return 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300';
+      case 'AGENCY_ADMIN': return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-500/15 dark:text-indigo-300';
+      case 'AGENCY_USER': return 'bg-teal-100 text-teal-800 dark:bg-teal-500/15 dark:text-teal-300';
+      case 'OPERATION': return 'bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-300';
+      case 'SELLER': return 'bg-green-100 text-green-800 dark:bg-emerald-500/15 dark:text-emerald-300';
+      case 'ACCOUNTANT': return 'bg-purple-100 text-purple-800 dark:bg-purple-500/15 dark:text-purple-300';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-slate-300';
     }
   };
 
@@ -230,10 +230,10 @@ export default function UsersPage() {
   // Chrome eklentisi için DOM hazır olana kadar bekle
   if (!isClient) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center transition-colors duration-200">
+        <div className="text-center text-gray-900 dark:text-slate-100">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Yükleniyor...</p>
+          <p className="text-gray-600 dark:text-slate-400">Yükleniyor...</p>
         </div>
       </div>
     );
@@ -241,10 +241,10 @@ export default function UsersPage() {
 
   if (moduleLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center transition-colors duration-200">
+        <div className="text-center text-gray-900 dark:text-slate-100">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Yükleniyor...</p>
+          <p className="text-gray-600 dark:text-slate-400">Yükleniyor...</p>
         </div>
       </div>
     );
@@ -256,8 +256,8 @@ export default function UsersPage() {
 
   if (currentUser && !canManageUsers(currentUser.role) && !hasManageUsersPermission) {
     return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div className="p-6 min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-200">
+        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-lg p-4 transition-colors duration-200">
           <div className="flex">
             <div className="flex-shrink-0">
               <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -280,12 +280,12 @@ export default function UsersPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="p-6">
+      <div className="p-6 min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-200">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+          <div className="h-8 bg-gray-200 dark:bg-slate-800 rounded w-1/4 mb-4 transition-colors duration-200"></div>
           <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-16 bg-gray-200 rounded"></div>
+              <div key={i} className="h-16 bg-gray-200 dark:bg-slate-800 rounded transition-colors duration-200"></div>
             ))}
           </div>
         </div>
@@ -294,9 +294,9 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="p-4 lg:p-6" id="users-page">
+    <div className="p-4 lg:p-6 text-gray-900 dark:text-slate-100 transition-colors duration-200" id="users-page">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Kullanıcı Yönetimi</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Kullanıcı Yönetimi</h1>
         <button
           onClick={() => setShowCreateForm(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm lg:text-base"

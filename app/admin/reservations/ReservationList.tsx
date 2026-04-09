@@ -404,8 +404,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                             <button
                                 onClick={() => handleFilter('karsilama')}
                                 className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${activeFilter === 'karsilama'
-                                        ? 'bg-green-600 text-white border-green-600'
-                                        : 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30 dark:hover:bg-emerald-500/25'
+                                        ? 'bg-[#16A34A] text-white border-[#16A34A]'
+                                        : 'bg-[#1E293B] text-[#E2E8F0] border-[#334155] hover:bg-[#273449]'
                                     }`}
                             >
                                 {karsilamaCount} Karşılama
@@ -413,8 +413,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                             <button
                                 onClick={() => handleFilter('cikis')}
                                 className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${activeFilter === 'cikis'
-                                        ? 'bg-orange-600 text-white border-orange-600'
-                                        : 'bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200 dark:bg-orange-500/15 dark:text-orange-300 dark:border-orange-500/30 dark:hover:bg-orange-500/25'
+                                        ? 'bg-[#16A34A] text-white border-[#16A34A]'
+                                        : 'bg-[#1E293B] text-[#E2E8F0] border-[#334155] hover:bg-[#273449]'
                                     }`}
                             >
                                 {cikisCount} Çıkış
@@ -422,8 +422,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                             <button
                                 onClick={() => handleFilter('araTransfer')}
                                 className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors whitespace-nowrap ${activeFilter === 'araTransfer'
-                                        ? 'bg-purple-600 text-white border-purple-600'
-                                        : 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200 dark:bg-violet-500/15 dark:text-violet-300 dark:border-violet-500/30 dark:hover:bg-violet-500/25'
+                                        ? 'bg-[#16A34A] text-white border-[#16A34A]'
+                                        : 'bg-[#1E293B] text-[#E2E8F0] border-[#334155] hover:bg-[#273449]'
                                     }`}
                             >
                                 {araTransferCount} Ara Transfer
@@ -431,8 +431,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                             <button
                                 onClick={() => handleFilter('tur')}
                                 className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${activeFilter === 'tur'
-                                        ? 'bg-blue-600 text-white border-blue-600'
-                                        : 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200'
+                                        ? 'bg-[#16A34A] text-white border-[#16A34A]'
+                                        : 'bg-[#1E293B] text-[#E2E8F0] border-[#334155] hover:bg-[#273449]'
                                     }`}
                             >
                                 {turCount} Tur
@@ -440,8 +440,8 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                             <button
                                 onClick={() => handleFilter('all')}
                                 className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${activeFilter === 'all'
-                                        ? 'bg-green-600 text-white border-green-600'
-                                        : 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30 dark:hover:bg-emerald-500/25'
+                                        ? 'bg-[#16A34A] text-white border-[#16A34A]'
+                                        : 'bg-[#1E293B] text-[#E2E8F0] border-[#334155] hover:bg-[#273449]'
                                     }`}
                             >
                                 Tümü
@@ -623,15 +623,15 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             <td className="px-6 py-4 text-sm text-gray-900 dark:text-slate-100 align-middle">
                                                 <div className="flex flex-col gap-2">
                                                     <div className="flex flex-col gap-1">
-                                                        <span className={`inline-flex items-center justify-center px-4 py-2 rounded-full text-xs font-semibold min-w-[80px] whitespace-nowrap ${reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')
-                                                                ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                                                        <span className={`inline-flex items-center justify-center px-4 py-2 rounded-full text-xs font-semibold min-w-[80px] whitespace-nowrap border ${reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')
+                                                                ? 'bg-blue-500/12 text-blue-300 border-blue-500/25'
                                                                 : reservation.type === 'Konaklama' || reservation.voucherNumber.startsWith('HOTEL-')
-                                                                    ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                                                                    ? 'bg-fuchsia-500/12 text-fuchsia-300 border-fuchsia-500/25'
                                                                     : reservation.from.includes('IST') || reservation.from.includes('SAW')
-                                                                        ? 'bg-green-100 text-green-800 border border-green-200'
+                                                                        ? 'bg-emerald-500/12 text-emerald-300 border-emerald-500/25'
                                                                         : reservation.to.includes('IST') || reservation.to.includes('SAW')
-                                                                            ? 'bg-orange-100 text-orange-800 border border-orange-200'
-                                                                            : 'bg-purple-100 text-purple-800 border border-purple-200'
+                                                                            ? 'bg-amber-500/12 text-amber-300 border-amber-500/25'
+                                                                            : 'bg-violet-500/12 text-violet-300 border-violet-500/25'
                                                             }`}>
                                                             {reservation.type === 'tur' || reservation.voucherNumber.startsWith('TUR-')
                                                                 ? 'Tur'
@@ -693,13 +693,13 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 align-top max-w-[200px]">
+                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-slate-100 align-top max-w-[200px]">
                                                 <div className="flex flex-col">
-                                                    <div className="font-medium line-clamp-2 leading-tight" title={formattedPassengerNames.join(', ')}>
+                                                    <div className="font-medium text-[#FFFFFF] line-clamp-2 leading-tight" title={formattedPassengerNames.join(', ')}>
                                                         {formattedPassengerNames.join(', ')}
                                                     </div>
                                                     {reservation.phoneNumber && (
-                                                        <div className="text-xs text-gray-500 mt-1 truncate" title={formatPhoneNumber(reservation.phoneNumber)}>
+                                                        <div className="text-xs text-[#94A3B8] mt-1 truncate" title={formatPhoneNumber(reservation.phoneNumber)}>
                                                             {formatPhoneNumber(reservation.phoneNumber)}
                                                         </div>
                                                     )}
@@ -707,11 +707,11 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             </td>
                                             {user?.role === 'SUPERUSER' && (
                                                 <td className="px-6 py-4 text-sm text-gray-900 dark:text-slate-100 align-middle">
-                                                    <div className="font-medium text-blue-600">
+                                                    <div className="font-medium text-[#60A5FA] hover:text-[#93C5FD] transition-colors">
                                                         {reservation.tenant?.companyName ||
                                                             (selectedTenantId ? tenants.find(t => t.id === selectedTenantId)?.companyName : 'Bilinmiyor')}
                                                     </div>
-                                                    <div className="text-xs text-gray-500">
+                                                    <div className="text-xs text-[#94A3B8]">
                                                         {reservation.tenant?.subdomain ||
                                                             (selectedTenantId ? tenants.find(t => t.id === selectedTenantId)?.subdomain : 'N/A')}
                                                     </div>
@@ -719,18 +719,18 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             )}
                                             {(user?.role === 'SUPERUSER' || user?.role === 'AGENCY_ADMIN') && (
                                                 <td className="px-6 py-4 text-sm text-gray-900 dark:text-slate-100 align-middle">
-                                                    <div className="font-medium text-green-600">
+                                                    <div className="font-medium text-[#FFFFFF]">
                                                         {reservation.user?.name || reservation.user?.username || 'Bilinmiyor'}
                                                     </div>
-                                                    <div className="text-xs text-gray-500">
+                                                    <div className="text-xs text-[#94A3B8]">
                                                         {reservation.user?.username || 'N/A'}
                                                     </div>
                                                 </td>
                                             )}
                                             <td className="px-6 py-4 text-sm text-gray-900 dark:text-slate-100 align-middle">
-                                                <div className="font-semibold text-green-600">{reservation.price} {reservation.currency}</div>
+                                                <div className="font-semibold text-[#16A34A]">{reservation.price} {reservation.currency}</div>
                                                 {reservation.distanceKm && (
-                                                    <div className="text-xs text-gray-500">
+                                                    <div className="text-xs text-[#94A3B8]">
                                                         {reservation.distanceKm.toFixed(1)} km
                                                     </div>
                                                 )}
@@ -747,9 +747,9 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                             </td>
                                             <td className="px-6 py-4 text-sm align-middle">
                                                 <div className="flex items-center gap-2">
-                                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${reservation.paymentStatus === 'PAID' ? 'bg-green-100 text-green-800 border border-green-200' :
-                                                            reservation.paymentStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' :
-                                                                'bg-red-100 text-red-800 border border-red-200'
+                                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${reservation.paymentStatus === 'PAID' ? 'bg-emerald-500/12 text-emerald-300 border-emerald-500/25' :
+                                                            reservation.paymentStatus === 'PENDING' ? 'bg-amber-500/12 text-amber-300 border-amber-500/25' :
+                                                                'bg-red-500/12 text-red-300 border-red-500/25'
                                                         }`}>
                                                         {reservation.paymentStatus === 'PAID' ? 'Ödendi' :
                                                             reservation.paymentStatus === 'PENDING' ? 'Bekliyor' : 'Ödenmedi'}

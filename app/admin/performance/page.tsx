@@ -135,15 +135,15 @@ export default function PerformancePage() {
 
   const getRoleColor = (role: string) => {
     const roleColors: { [key: string]: string } = {
-      'SUPERUSER': 'bg-purple-100 text-purple-800',
-      'MANAGER': 'bg-blue-100 text-blue-800',
-      'OPERATION': 'bg-green-100 text-green-800',
-      'SELLER': 'bg-yellow-100 text-yellow-800',
-      'ACCOUNTANT': 'bg-red-100 text-red-800',
-      'CUSTOMER_SERVICE': 'bg-indigo-100 text-indigo-800',
-      'FINANCE': 'bg-pink-100 text-pink-800'
+      'SUPERUSER': 'bg-purple-100 text-purple-800 dark:bg-purple-500/15 dark:text-purple-300',
+      'MANAGER': 'bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-300',
+      'OPERATION': 'bg-green-100 text-green-800 dark:bg-emerald-500/15 dark:text-emerald-300',
+      'SELLER': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-500/15 dark:text-yellow-300',
+      'ACCOUNTANT': 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300',
+      'CUSTOMER_SERVICE': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-500/15 dark:text-indigo-300',
+      'FINANCE': 'bg-pink-100 text-pink-800 dark:bg-pink-500/15 dark:text-pink-300'
     };
-    return roleColors[role] || 'bg-gray-100 text-gray-800';
+    return roleColors[role] || 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-slate-300';
   };
 
   const sortedPerformance = [...performance]
@@ -169,7 +169,7 @@ export default function PerformancePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center transition-colors duration-200">
         <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div>
       </div>
     );
@@ -177,9 +177,9 @@ export default function PerformancePage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-lg p-6 transition-colors duration-200">
             <div className="flex">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -202,18 +202,18 @@ export default function PerformancePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 transition-colors duration-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-gray-900 dark:text-slate-100 transition-colors duration-200">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Personel Performansı</h1>
-          <p className="text-gray-600 mt-1">Kullanıcı performans metrikleri ve istatistikleri</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Personel Performansı</h1>
+          <p className="text-gray-600 dark:text-slate-400 mt-1">Kullanıcı performans metrikleri ve istatistikleri</p>
         </div>
 
         {/* Stats Cards */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 p-6 transition-colors duration-200">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -221,13 +221,13 @@ export default function PerformancePage() {
                   </div>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Toplam Kullanıcı</p>
-                  <p className="text-2xl font-semibold text-gray-900">{stats.totalUsers}</p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Toplam Kullanıcı</p>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-slate-100">{stats.totalUsers}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 p-6 transition-colors duration-200">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -235,13 +235,13 @@ export default function PerformancePage() {
                   </div>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Aktif Kullanıcı</p>
-                  <p className="text-2xl font-semibold text-gray-900">{stats.activeUsers}</p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Aktif Kullanıcı</p>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-slate-100">{stats.activeUsers}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 p-6 transition-colors duration-200">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
@@ -249,13 +249,13 @@ export default function PerformancePage() {
                   </div>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Toplam Rezervasyon</p>
-                  <p className="text-2xl font-semibold text-gray-900">{stats.totalReservations}</p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Toplam Rezervasyon</p>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-slate-100">{stats.totalReservations}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 p-6 transition-colors duration-200">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
@@ -263,8 +263,8 @@ export default function PerformancePage() {
                   </div>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Toplam Gelir</p>
-                  <p className="text-2xl font-semibold text-gray-900">{formatCurrency(stats.totalRevenue)}</p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Toplam Gelir</p>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-slate-100">{formatCurrency(stats.totalRevenue)}</p>
                 </div>
               </div>
             </div>
@@ -272,17 +272,17 @@ export default function PerformancePage() {
         )}
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 p-6 mb-8 transition-colors duration-200">
           <div className="space-y-4">
             {/* First row - Sorting and Role filters */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
               <div className="flex flex-wrap gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Sıralama</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Sıralama</label>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as any)}
-                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                   >
                     <option value="revenue">Toplam Gelire Göre</option>
                     <option value="salesRevenue">Satış Gelirine Göre</option>
@@ -293,11 +293,11 @@ export default function PerformancePage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Rol Filtresi</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Rol Filtresi</label>
                   <select
                     value={filterRole}
                     onChange={(e) => setFilterRole(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                   >
                     <option value="all">Tüm Roller</option>
                     <option value="SELLER">Satış</option>
@@ -307,11 +307,11 @@ export default function PerformancePage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Kullanıcı Seçimi</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Kullanıcı Seçimi</label>
                   <select
                     value={selectedUser}
                     onChange={(e) => setSelectedUser(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                   >
                     <option value="all">Tüm Kullanıcılar</option>
                     {performance.map((user) => (
@@ -333,7 +333,7 @@ export default function PerformancePage() {
             {/* Second row - Date filters */}
             <div className="flex flex-wrap gap-4 items-end">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Başlangıç Tarihi</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Başlangıç Tarihi</label>
                 <input
                   type="date"
                   value={fromDate}
@@ -342,7 +342,7 @@ export default function PerformancePage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Bitiş Tarihi</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Bitiş Tarihi</label>
                 <input
                   type="date"
                   value={toDate}
@@ -366,7 +366,7 @@ export default function PerformancePage() {
         </div>
 
         {/* Performance Table */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 transition-colors duration-200">
           <div className="px-6 py-4 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900">Performans Tablosu</h3>
             <p className="text-sm text-gray-600 mt-1">
