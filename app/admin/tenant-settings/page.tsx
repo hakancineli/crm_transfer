@@ -214,10 +214,10 @@ export default function TenantSettingsPage() {
   // Chrome eklentisi için DOM hazır olana kadar bekle
   if (!isClient) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center transition-colors duration-200">
+        <div className="text-center text-gray-900 dark:text-slate-100">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Yükleniyor...</p>
+          <p className="text-gray-600 dark:text-slate-400">Yükleniyor...</p>
         </div>
       </div>
     );
@@ -234,15 +234,15 @@ export default function TenantSettingsPage() {
   const selectedTenant = tenants.find(t => t.id === selectedTenantId);
 
   return (
-    <div className="min-h-screen bg-gray-50" id="tenant-settings-page">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white shadow rounded-lg">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-200" id="tenant-settings-page">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-gray-900 dark:text-slate-100 transition-colors duration-200">
+        <div className="bg-white dark:bg-slate-900/90 shadow dark:shadow-none rounded-lg border border-gray-200 dark:border-slate-700 transition-colors duration-200">
           {/* Header */}
-          <div className="px-6 py-4 border-b border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 transition-colors duration-200">
             <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Acente Ayarları</h1>
-                <p className="text-gray-600 mt-1">Acente bilgilerinizi ve sistem ayarlarınızı yönetin</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Acente Ayarları</h1>
+                <p className="text-gray-600 dark:text-slate-400 mt-1">Acente bilgilerinizi ve sistem ayarlarınızı yönetin</p>
               </div>
               <div className="flex items-center gap-3">
                 {user?.role === 'SUPERUSER' && tenants.length > 0 && (

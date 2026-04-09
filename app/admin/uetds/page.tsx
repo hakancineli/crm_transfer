@@ -206,10 +206,10 @@ export default function UetdsPage() {
 
   if (!isClient) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center transition-colors duration-200">
+        <div className="text-center text-gray-900 dark:text-slate-100">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Yükleniyor...</p>
+          <p className="text-gray-600 dark:text-slate-400">Yükleniyor...</p>
         </div>
       </div>
     );
@@ -217,10 +217,10 @@ export default function UetdsPage() {
 
   if (moduleLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center transition-colors duration-200">
+        <div className="text-center text-gray-900 dark:text-slate-100">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Yükleniyor...</p>
+          <p className="text-gray-600 dark:text-slate-400">Yükleniyor...</p>
         </div>
       </div>
     );
@@ -231,10 +231,10 @@ export default function UetdsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8" id="uetds-page">
+    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-gray-900 dark:text-slate-100 transition-colors duration-200" id="uetds-page">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">U-ETDS Yönetimi</h1>
-        <p className="mt-2 text-sm text-gray-600">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-slate-100">U-ETDS Yönetimi</h1>
+        <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">
           Ulaştırma Elektronik Takip Denetim Sistemi
         </p>
       </div>
@@ -259,7 +259,7 @@ export default function UetdsPage() {
         </button>
 
         {testResult && (
-          <div className={`mt-3 p-3 rounded-md ${testResult.success ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+          <div className={`mt-3 p-3 rounded-md transition-colors duration-200 ${testResult.success ? 'bg-green-50 dark:bg-emerald-500/10 text-green-700 dark:text-emerald-300' : 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300'}`}>
             <p className="text-sm font-medium">
               {testResult.success ? '✅' : '❌'} {testResult.message}
             </p>
@@ -268,14 +268,14 @@ export default function UetdsPage() {
       </div>
 
       {/* Tab Navigation */}
-      <div className="border-b border-gray-200 mb-6">
+      <div className="border-b border-gray-200 dark:border-slate-700 mb-6 transition-colors duration-200">
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab('seferler')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'seferler'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:border-gray-300 dark:hover:border-slate-600'
             }`}
           >
             🚌 Seferler ({seferler.length})
@@ -284,8 +284,8 @@ export default function UetdsPage() {
             onClick={() => setActiveTab('logs')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'logs'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:border-gray-300 dark:hover:border-slate-600'
             }`}
           >
             📋 İşlem Logları ({logs.length})
@@ -294,8 +294,8 @@ export default function UetdsPage() {
             onClick={() => setActiveTab('ayarlar')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'ayarlar'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:border-gray-300 dark:hover:border-slate-600'
             }`}
           >
             ⚙️ U-ETDS Ayarları
@@ -305,9 +305,9 @@ export default function UetdsPage() {
 
       {/* Seferler Tab */}
       {activeTab === 'seferler' && (
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">U-ETDS Seferleri</h2>
+        <div className="bg-white dark:bg-slate-900/90 shadow dark:shadow-none rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700 transition-colors duration-200">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 transition-colors duration-200">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">U-ETDS Seferleri</h2>
           </div>
 
           {loading ? (
@@ -322,13 +322,13 @@ export default function UetdsPage() {
               </div>
             </div>
           ) : seferler.length === 0 ? (
-            <div className="p-6 text-center text-gray-500">
+            <div className="p-6 text-center text-gray-500 dark:text-slate-400 transition-colors duration-200">
               <p>Henüz U-ETDS seferi bulunmuyor.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800 transition-colors duration-200">
+                <thead className="bg-gray-50 dark:bg-slate-950/70 transition-colors duration-200">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Sefer Bilgileri
@@ -350,28 +350,28 @@ export default function UetdsPage() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-slate-900/90 divide-y divide-gray-200 dark:divide-slate-800 transition-colors duration-200">
                   {seferler.map((sefer) => (
-                    <tr key={sefer.id} className="hover:bg-gray-50">
+                    <tr key={sefer.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/70 transition-colors duration-150">
                       <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-gray-900 dark:text-slate-100">
                           {sefer.reservation?.voucherNumber || 'Manuel Sefer'}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-gray-500 dark:text-slate-400">
                           {new Date(sefer.hareketTarihi).toLocaleDateString('tr-TR')} {sefer.hareketSaati}
                         </div>
                         {sefer.reservation && (
-                          <div className="text-xs text-gray-400">
+                          <div className="text-xs text-gray-400 dark:text-slate-500">
                             {sefer.reservation.from} → {sefer.reservation.to}
                           </div>
                         )}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-gray-900 dark:text-slate-100">
                           {sefer.aracPlaka}
                         </div>
                         {sefer.seferAciklama && (
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 dark:text-slate-400">
                             {sefer.seferAciklama}
                           </div>
                         )}
@@ -424,19 +424,19 @@ export default function UetdsPage() {
 
       {/* Logs Tab */}
       {activeTab === 'logs' && (
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">U-ETDS İşlem Logları</h2>
+        <div className="bg-white dark:bg-slate-900/90 shadow dark:shadow-none rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700 transition-colors duration-200">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 transition-colors duration-200">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">U-ETDS İşlem Logları</h2>
           </div>
 
           {logs.length === 0 ? (
-            <div className="p-6 text-center text-gray-500">
+            <div className="p-6 text-center text-gray-500 dark:text-slate-400 transition-colors duration-200">
               <p>Henüz işlem logu bulunmuyor.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800 transition-colors duration-200">
+                <thead className="bg-gray-50 dark:bg-slate-950/70 transition-colors duration-200">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Zaman

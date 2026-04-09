@@ -81,31 +81,31 @@ export default function ActivitiesPage() {
 
   const getActionColor = (action: string) => {
     switch (action) {
-      case 'CREATE': return 'bg-green-100 text-green-800';
-      case 'UPDATE': return 'bg-blue-100 text-blue-800';
-      case 'DELETE': return 'bg-red-100 text-red-800';
-      case 'LOGIN': return 'bg-purple-100 text-purple-800';
-      case 'LOGOUT': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'CREATE': return 'bg-green-100 text-green-800 dark:bg-emerald-500/15 dark:text-emerald-300';
+      case 'UPDATE': return 'bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-300';
+      case 'DELETE': return 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300';
+      case 'LOGIN': return 'bg-purple-100 text-purple-800 dark:bg-purple-500/15 dark:text-purple-300';
+      case 'LOGOUT': return 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-slate-300';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-slate-300';
     }
   };
 
   const getEntityTypeColor = (entityType: string) => {
     switch (entityType) {
-      case 'USER': return 'bg-blue-50 text-blue-700 border-blue-200';
-      case 'RESERVATION': return 'bg-green-50 text-green-700 border-green-200';
-      case 'DRIVER': return 'bg-orange-50 text-orange-700 border-orange-200';
-      case 'SYSTEM': return 'bg-purple-50 text-purple-700 border-purple-200';
-      default: return 'bg-gray-50 text-gray-700 border-gray-200';
+      case 'USER': return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-300 dark:border-blue-500/20';
+      case 'RESERVATION': return 'bg-green-50 text-green-700 border-green-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:border-emerald-500/20';
+      case 'DRIVER': return 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-500/10 dark:text-orange-300 dark:border-orange-500/20';
+      case 'SYSTEM': return 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-500/10 dark:text-purple-300 dark:border-purple-500/20';
+      default: return 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700';
     }
   };
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'SUPERUSER': return 'bg-red-100 text-red-800';
-      case 'OPERATION': return 'bg-blue-100 text-blue-800';
-      case 'SELLER': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'SUPERUSER': return 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300';
+      case 'OPERATION': return 'bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-300';
+      case 'SELLER': return 'bg-green-100 text-green-800 dark:bg-emerald-500/15 dark:text-emerald-300';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-slate-300';
     }
   };
 
@@ -126,10 +126,10 @@ export default function ActivitiesPage() {
   // Chrome eklentisi için DOM hazır olana kadar bekle
   if (!isClient) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center transition-colors duration-200">
+        <div className="text-center text-gray-900 dark:text-slate-100">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Yükleniyor...</p>
+          <p className="text-gray-600 dark:text-slate-400">Yükleniyor...</p>
         </div>
       </div>
     );
@@ -137,10 +137,10 @@ export default function ActivitiesPage() {
 
   if (moduleLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center transition-colors duration-200">
+        <div className="text-center text-gray-900 dark:text-slate-100">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Yükleniyor...</p>
+          <p className="text-gray-600 dark:text-slate-400">Yükleniyor...</p>
         </div>
       </div>
     );
@@ -157,8 +157,8 @@ export default function ActivitiesPage() {
   
   if (user && !hasManageActivitiesPermission) {
     return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div className="p-6 min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-200">
+        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-lg p-4 transition-colors duration-200">
           <div className="flex">
             <div className="flex-shrink-0">
               <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -181,12 +181,12 @@ export default function ActivitiesPage() {
 
   if (loading) {
     return (
-      <div className="p-6">
+      <div className="p-6 min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-200">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+          <div className="h-8 bg-gray-200 dark:bg-slate-800 rounded w-1/4 mb-4 transition-colors duration-200"></div>
           <div className="space-y-3">
             {[...Array(10)].map((_, i) => (
-              <div key={i} className="h-20 bg-gray-200 rounded"></div>
+              <div key={i} className="h-20 bg-gray-200 dark:bg-slate-800 rounded transition-colors duration-200"></div>
             ))}
           </div>
         </div>
@@ -195,13 +195,13 @@ export default function ActivitiesPage() {
   }
 
   return (
-    <div className="p-6" id="activities-page">
+    <div className="p-6 min-h-screen bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-slate-100 transition-colors duration-200" id="activities-page">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center space-x-4">
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
           >
             <option value="all">Tüm Aktiviteler</option>
             <option value="CREATE">Oluşturma</option>
@@ -219,9 +219,9 @@ export default function ActivitiesPage() {
         </div>
       </div>
 
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">
+      <div className="bg-white dark:bg-slate-900/90 shadow dark:shadow-none rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700 transition-colors duration-200">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 transition-colors duration-200">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
             Sistem Logları ({filteredActivities.length} aktivite)
           </h2>
         </div>
@@ -229,18 +229,18 @@ export default function ActivitiesPage() {
         <div className="divide-y divide-gray-200">
           {filteredActivities.length === 0 ? (
             <div className="px-6 py-12 text-center">
-              <div className="text-gray-400 text-6xl mb-4">📝</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Aktivite Bulunamadı</h3>
-              <p className="text-gray-500">
+              <div className="text-gray-400 dark:text-slate-500 text-6xl mb-4">📝</div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-2">Aktivite Bulunamadı</h3>
+              <p className="text-gray-500 dark:text-slate-400">
                 {filter === 'all' ? 'Henüz hiç aktivite kaydedilmemiş.' : 'Bu filtre için aktivite bulunamadı.'}
               </p>
             </div>
           ) : (
             filteredActivities.map((activity) => (
-              <div key={activity.id} className="px-6 py-4 hover:bg-gray-50">
+              <div key={activity.id} className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-800/70 transition-colors duration-150">
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0">
-                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-gray-100 dark:bg-slate-800 rounded-full flex items-center justify-center transition-colors duration-200">
                       <span className="text-lg">{getActionIcon(activity.action)}</span>
                     </div>
                   </div>
@@ -258,15 +258,15 @@ export default function ActivitiesPage() {
                       </span>
                     </div>
                     
-                    <p className="text-sm text-gray-900 mb-1">
+                    <p className="text-sm text-gray-900 dark:text-slate-100 mb-1">
                       <span className="font-medium">{activity.user.name}</span> ({activity.user.username})
                     </p>
                     
-                    <p className="text-sm text-gray-600 mb-2">
+                    <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">
                       {activity.description}
                     </p>
                     
-                    <div className="flex items-center space-x-4 text-xs text-gray-500">
+                    <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-slate-400">
                       <span>
                         {new Date(activity.createdAt).toLocaleString('tr-TR')}
                       </span>
