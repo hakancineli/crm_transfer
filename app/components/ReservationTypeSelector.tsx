@@ -96,14 +96,14 @@ const ReservationTypeSelector = ({ onClose, variant = 'default' }: ReservationTy
     return (
       <Link
         href="/admin/new-reservation"
-        className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
+        className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800/80 transition-colors group"
       >
         <span className="text-2xl">➕</span>
         <div className="flex-1">
-          <div className="text-sm font-medium text-gray-900 group-hover:text-gray-700">
+          <div className="text-sm font-medium text-gray-900 dark:text-slate-100 group-hover:text-gray-700 dark:group-hover:text-slate-200">
             Yeni Rezervasyon
           </div>
-          <div className="text-xs text-gray-500 group-hover:text-gray-400">
+          <div className="text-xs text-gray-500 dark:text-slate-400 group-hover:text-gray-400 dark:group-hover:text-slate-500">
             Yeni rezervasyon oluştur
           </div>
         </div>
@@ -129,14 +129,14 @@ const ReservationTypeSelector = ({ onClose, variant = 'default' }: ReservationTy
       <Link
         href={availableTypes[0].href}
         onClick={handleTypeSelect}
-        className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
+        className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800/80 transition-colors group"
       >
         <span className="text-2xl">{emojisEnabled ? availableTypes[0].icon : '➕'}</span>
         <div className="flex-1">
-          <div className="text-sm font-medium text-gray-900 group-hover:text-gray-700">
+          <div className="text-sm font-medium text-gray-900 dark:text-slate-100 group-hover:text-gray-700 dark:group-hover:text-slate-200">
             Yeni Rezervasyon
           </div>
-          <div className="text-xs text-gray-500 group-hover:text-gray-400">
+          <div className="text-xs text-gray-500 dark:text-slate-400 group-hover:text-gray-400 dark:group-hover:text-slate-500">
             {availableTypes[0].description}
           </div>
         </div>
@@ -194,19 +194,19 @@ const ReservationTypeSelector = ({ onClose, variant = 'default' }: ReservationTy
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group w-full text-left"
+        className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800/80 transition-colors group w-full text-left"
       >
         <span className="text-2xl">{emojisEnabled ? '➕' : '➕'}</span>
         <div className="flex-1">
-          <div className="text-sm font-medium text-gray-900 group-hover:text-gray-700">
+          <div className="text-sm font-medium text-gray-900 dark:text-slate-100 group-hover:text-gray-700 dark:group-hover:text-slate-200">
             Yeni Rezervasyon
           </div>
-          <div className="text-xs text-gray-500 group-hover:text-gray-400">
+          <div className="text-xs text-gray-500 dark:text-slate-400 group-hover:text-gray-400 dark:group-hover:text-slate-500">
             Rezervasyon tipi seçin
           </div>
         </div>
-        <svg 
-          className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
+        <svg
+          className={`w-4 h-4 text-gray-400 dark:text-slate-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none" 
           stroke="currentColor" 
           viewBox="0 0 24 24"

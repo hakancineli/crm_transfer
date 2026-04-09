@@ -135,11 +135,19 @@ export default function Header({ onSidebarToggle, showSidebarToggle = false }: H
                             </div>
                         )}
                         
-                        <div className="md:hidden flex items-center">
+                        <div className="md:hidden flex items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={toggleTheme}
+                                className="inline-flex items-center justify-center w-10 h-10 rounded-xl border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors"
+                                title={theme === 'dark' ? 'Açık moda geç' : 'Koyu moda geç'}
+                            >
+                                {theme === 'dark' ? '☀️' : '🌙'}
+                            </button>
                             <button
                                 type="button"
                                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500"
+                                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-slate-300 hover:text-gray-500 dark:hover:text-slate-100 hover:bg-gray-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500 transition-colors"
                             >
                                 <span className="sr-only">Menüyü aç</span>
                                 {mobileMenuOpen ? (
@@ -158,7 +166,7 @@ export default function Header({ onSidebarToggle, showSidebarToggle = false }: H
 
                 {mobileMenuOpen && (
                     <div className="md:hidden">
-                        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
+                        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-slate-950 border-t border-gray-200 dark:border-slate-800 transition-colors duration-200">
                             {navigation.map((item) => {
                                 // Özel component kullanılacak öğeler için
                                 if ((item as any).isSpecial) {
@@ -176,10 +184,10 @@ export default function Header({ onSidebarToggle, showSidebarToggle = false }: H
                                         href={item.href}
                                         onClick={() => setMobileMenuOpen(false)}
                                         className={cn(
-                                            'block px-3 py-2 rounded-md text-base font-medium',
+                                            'block px-3 py-2 rounded-md text-base font-medium transition-colors',
                                             pathname === item.href
-                                                ? 'bg-green-50 text-green-700 border-l-4 border-green-500'
-                                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                                ? 'bg-green-50 dark:bg-emerald-500/10 text-green-700 dark:text-emerald-300 border-l-4 border-green-500'
+                                                : 'text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-900 hover:text-gray-900 dark:hover:text-slate-100'
                                         )}
                                     >
                                         {item.name}
@@ -189,10 +197,10 @@ export default function Header({ onSidebarToggle, showSidebarToggle = false }: H
                             
                             {/* Mobil çıkış butonu */}
                             {isAuthenticated && user && !isCustomerContext && (
-                                <div className="border-t border-gray-200 pt-2 mt-2">
-                                    <div className="px-3 py-2 text-sm text-gray-600">
+                                <div className="border-t border-gray-200 dark:border-slate-800 pt-2 mt-2 transition-colors duration-200">
+                                    <div className="px-3 py-2 text-sm text-gray-600 dark:text-slate-300">
                                         <span className="font-medium">{user.name}</span>
-                                        <span className="text-gray-400 ml-1">({user.email})</span>
+                                        <span className="text-gray-400 dark:text-slate-500 ml-1">({user.email})</span>
                                     </div>
                                     <button
                                         type="button"
@@ -200,10 +208,22 @@ export default function Header({ onSidebarToggle, showSidebarToggle = false }: H
                                             logout();
                                             setMobileMenuOpen(false);
                                         }}
-                                        className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50 hover:text-red-700"
+                                        className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-300 transition-colors"
                                     >
                                         {emojisEnabled ? '🚪 ' : ''}Çıkış
                                     </button>
+                                </div>
+                            )}
+
+                            {!isAuthenticated && !isCustomerContext && (
+                                <div className="border-t border-gray-200 dark:border-slate-800 pt-2 mt-2 transition-colors duration-200">
+                                    <Link
+                                        href="/admin-login"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="block px-3 py-2 rounded-md text-base font-medium bg-green-600 text-white hover:bg-green-700 transition-colors"
+                                    >
+                                        {emojisEnabled ? '🔑 ' : ''}Giriş
+                                    </Link>
                                 </div>
                             )}
                         </div>
