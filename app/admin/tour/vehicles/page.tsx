@@ -178,13 +178,13 @@ export default function TourVehiclesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 transition-colors duration-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-gray-900 dark:text-slate-100 transition-colors duration-200">
         <div className="mb-8">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Araç Yönetimi</h1>
-              <p className="mt-2 text-gray-600">Tur araçlarını yönetin ve yenilerini ekleyin</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Araç Yönetimi</h1>
+              <p className="mt-2 text-gray-600 dark:text-slate-400">Tur araçlarını yönetin ve yenilerini ekleyin</p>
             </div>
             <button
               onClick={() => setShowAddForm(!showAddForm)}

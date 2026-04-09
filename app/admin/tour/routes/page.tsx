@@ -136,14 +136,14 @@ export default function TourRoutesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 transition-colors duration-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-gray-900 dark:text-slate-100 transition-colors duration-200">
         {/* Header */}
         <div className="mb-8">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Tur Rotaları</h1>
-              <p className="mt-2 text-gray-600">Mevcut tur rotalarını yönetin ve yenilerini ekleyin</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Tur Rotaları</h1>
+              <p className="mt-2 text-gray-600 dark:text-slate-400">Mevcut tur rotalarını yönetin ve yenilerini ekleyin</p>
             </div>
             <button
               onClick={() => setShowAddForm(!showAddForm)}
@@ -156,8 +156,8 @@ export default function TourRoutesPage() {
 
         {/* Add Route Form */}
         {showAddForm && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Yeni Tur Rotası</h2>
+          <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 p-6 mb-8 transition-colors duration-200">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Yeni Tur Rotası</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -242,7 +242,7 @@ export default function TourRoutesPage() {
         {/* Routes Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {routes.map((route) => (
-            <div key={route.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div key={route.id} className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 p-6 transition-colors duration-200">
               <div className="flex justify-between items-start mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">{route.name}</h3>
                 <div className="flex space-x-2">

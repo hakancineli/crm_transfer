@@ -114,14 +114,14 @@ export default function TourReservationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 transition-colors duration-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-gray-900 dark:text-slate-100 transition-colors duration-200">
         {/* Header */}
         <div className="mb-8">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Tur Rezervasyonları</h1>
-              <p className="mt-2 text-gray-600">Tüm tur rezervasyonlarını görüntüleyin ve yönetin</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Tur Rezervasyonları</h1>
+              <p className="mt-2 text-gray-600 dark:text-slate-400">Tüm tur rezervasyonlarını görüntüleyin ve yönetin</p>
             </div>
             <Link
               href="/admin/tour/reservations/new"
@@ -134,23 +134,23 @@ export default function TourReservationsPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-900/90 p-6 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 transition-colors duration-200">
             <div className="text-2xl font-bold text-gray-900">{bookings.length}</div>
             <div className="text-sm text-gray-600">Toplam Rezervasyon</div>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-900/90 p-6 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 transition-colors duration-200">
             <div className="text-2xl font-bold text-green-600">
               {bookings.filter(b => b.status === 'CONFIRMED').length}
             </div>
             <div className="text-sm text-gray-600">Onaylanan</div>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-900/90 p-6 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 transition-colors duration-200">
             <div className="text-2xl font-bold text-yellow-600">
               {bookings.filter(b => b.status === 'PENDING').length}
             </div>
             <div className="text-sm text-gray-600">Beklemede</div>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-900/90 p-6 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 transition-colors duration-200">
             <div className="text-2xl font-bold text-blue-600">
               {bookings.reduce((sum, b) => sum + b.groupSize, 0)}
             </div>
@@ -159,9 +159,9 @@ export default function TourReservationsPage() {
         </div>
 
         {/* Bookings Table */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">Rezervasyon Listesi</h2>
+        <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 transition-colors duration-200">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 transition-colors duration-200">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-slate-100">Rezervasyon Listesi</h2>
           </div>
 
           {bookings.length === 0 ? (

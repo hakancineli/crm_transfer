@@ -35,18 +35,18 @@ export default function TourPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 transition-colors duration-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-gray-900 dark:text-slate-100 transition-colors duration-200">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Tur Yönetimi</h1>
-          <p className="mt-2 text-gray-600">Grup turları ve turizm acenteleri için özel yönetim</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Tur Yönetimi</h1>
+          <p className="mt-2 text-gray-600 dark:text-slate-400">Grup turları ve turizm acenteleri için özel yönetim</p>
         </div>
 
         {/* Hızlı İşlemler */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Link
             href="/admin/tour/reservations"
-            className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+            className="bg-white dark:bg-slate-900/90 p-6 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 hover:shadow-md dark:hover:bg-slate-800/80 transition-colors duration-200"
           >
             <div className="text-center">
               <div className="text-3xl mb-2">🚌</div>
@@ -57,7 +57,7 @@ export default function TourPage() {
 
           <Link
             href="/admin/tour/routes"
-            className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+            className="bg-white dark:bg-slate-900/90 p-6 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 hover:shadow-md dark:hover:bg-slate-800/80 transition-colors duration-200"
           >
             <div className="text-center">
               <div className="text-3xl mb-2">🗺️</div>
@@ -68,7 +68,7 @@ export default function TourPage() {
 
           <Link
             href="/admin/tour/vehicles"
-            className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+            className="bg-white dark:bg-slate-900/90 p-6 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 hover:shadow-md dark:hover:bg-slate-800/80 transition-colors duration-200"
           >
             <div className="text-center">
               <div className="text-3xl mb-2">🚐</div>
@@ -79,7 +79,7 @@ export default function TourPage() {
 
           <Link
             href="/admin/tour/reports"
-            className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+            className="bg-white dark:bg-slate-900/90 p-6 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 hover:shadow-md dark:hover:bg-slate-800/80 transition-colors duration-200"
           >
             <div className="text-center">
               <div className="text-3xl mb-2">📊</div>
@@ -90,14 +90,14 @@ export default function TourPage() {
         </div>
 
         {/* Son Turlar */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">Son Turlar</h2>
+        <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 transition-colors duration-200">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 transition-colors duration-200">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-slate-100">Son Turlar</h2>
           </div>
           <div className="p-6">
             <div className="text-center py-8">
               <div className="text-4xl mb-4">🚌</div>
-              <p className="text-gray-500">Henüz tur rezervasyonu bulunmuyor</p>
+              <p className="text-gray-500 dark:text-slate-400">Henüz tur rezervasyonu bulunmuyor</p>
               <Link 
                 href="/admin/tour/reservations"
                 className="mt-4 inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
