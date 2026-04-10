@@ -602,7 +602,7 @@ export default function NewTourReservationPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Tur Rotası */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   Tur Rotası *
                 </label>
                 <select
@@ -641,7 +641,7 @@ export default function NewTourReservationPage() {
 
               {/* Araç Tipi */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   Araç Tipi *
                 </label>
                 <select
@@ -662,7 +662,7 @@ export default function NewTourReservationPage() {
 
               {/* Tur Tarihi & Saati */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   Tur Tarihi *
                 </label>
                 <input
@@ -676,7 +676,7 @@ export default function NewTourReservationPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   Tur Saati *
                 </label>
                 <input

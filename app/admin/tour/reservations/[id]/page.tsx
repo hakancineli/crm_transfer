@@ -215,12 +215,12 @@ export default function TourBookingDetailPage() {
                             <div className="p-6">
                                 <div className="space-y-4">
                                     {(booking.passengerDetails || []).map((passenger) => (
-                                        <div key={passenger.seatNumber} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-lg bg-gray-50 border border-gray-100">
+                                        <div key={passenger.seatNumber} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-lg bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 transition-colors duration-200">
                                             <div className="w-10 h-10 flex items-center justify-center bg-blue-600 text-white font-bold rounded-full shadow-sm flex-shrink-0">
                                                 {passenger.seatNumber}
                                             </div>
                                             <div className="flex-grow">
-                                                <div className="font-bold text-gray-900 text-lg uppercase">{passenger.name} {passenger.surname}</div>
+                                                <div className="font-bold text-[rgb(255,255,255)] text-lg uppercase">{passenger.name} {passenger.surname}</div>
                                                 <div className="flex items-center gap-4 mt-1 text-sm">
                                                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${passenger.paymentStatus === 'PAID' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                                                         }`}>
@@ -255,9 +255,9 @@ export default function TourBookingDetailPage() {
                                         </div>
                                     ))}
                                     {(!booking.passengerDetails || booking.passengerDetails.length === 0) && (
-                                        <div className="text-center py-8 text-gray-500">
+                                        <div className="text-center py-8 text-gray-500 dark:text-slate-400">
                                             Yolcu detayları bulunmuyor.
-                                            <div className="text-xs mt-2">
+                                            <div className="text-xs mt-2 text-slate-400">
                                                 {booking.passengerNames?.join(', ')}
                                             </div>
                                         </div>
@@ -272,7 +272,7 @@ export default function TourBookingDetailPage() {
                                 <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
                                     <h2 className="text-lg font-semibold text-gray-900">Notlar</h2>
                                 </div>
-                                <div className="p-6 text-gray-700 whitespace-pre-wrap">
+                                <div className="p-6 text-gray-700 dark:text-slate-300 whitespace-pre-wrap transition-colors duration-200">
                                     {booking.notes}
                                 </div>
                             </div>
@@ -282,9 +282,9 @@ export default function TourBookingDetailPage() {
                     {/* Sidebar */}
                     <div className="space-y-8">
                         {/* Seat Map Preview */}
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-                                <h2 className="text-lg font-semibold text-gray-900">Koltuk Yerleşimi</h2>
+                        <div className="bg-white dark:bg-slate-900/90 rounded-xl shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 overflow-hidden transition-colors duration-200">
+                            <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-950/70 transition-colors duration-200">
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Koltuk Yerleşimi</h2>
                             </div>
                             <div className="p-6 flex flex-col items-center">
                                 <div className="scale-75 origin-top mb-4">
@@ -302,17 +302,17 @@ export default function TourBookingDetailPage() {
                                         <span>Dolu Koltuk</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 bg-white border border-gray-300 rounded"></div>
-                                        <span>Boş Koltuk</span>
+                                        <div className="w-4 h-4 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded transition-colors duration-200"></div>
+                                        <span className="text-gray-700 dark:text-slate-300">Boş Koltuk</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         {/* Payment Summary */}
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-                                <h2 className="text-lg font-semibold text-gray-900">Ödeme Özeti</h2>
+                        <div className="bg-white dark:bg-slate-900/90 rounded-xl shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 overflow-hidden transition-colors duration-200">
+                            <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-950/70 transition-colors duration-200">
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Ödeme Özeti</h2>
                             </div>
                             <div className="p-6 space-y-4">
                                 <div className="flex justify-between items-center text-lg font-bold">
