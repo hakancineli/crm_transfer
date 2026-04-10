@@ -163,7 +163,7 @@ export default function EditHotelBookingModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-slate-900 rounded-lg shadow-xl dark:shadow-none max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-slate-700 transition-colors duration-200">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900">
@@ -179,7 +179,7 @@ export default function EditHotelBookingModal({
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Voucher Bilgileri */}
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg transition-colors duration-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
                 📋 Rezervasyon Bilgileri
               </h3>
@@ -210,7 +210,7 @@ export default function EditHotelBookingModal({
             </div>
 
             {/* Otel Bilgileri */}
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg transition-colors duration-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
                 🏨 Otel Bilgileri
               </h3>
@@ -274,7 +274,7 @@ export default function EditHotelBookingModal({
             </div>
 
             {/* Tarih ve Misafir Bilgileri */}
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg transition-colors duration-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
                 📅 Tarih ve Misafir Bilgileri
               </h3>
@@ -365,7 +365,7 @@ export default function EditHotelBookingModal({
             </div>
 
             {/* Müşteri Bilgileri */}
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg transition-colors duration-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
                 👤 Müşteri Bilgileri
               </h3>
@@ -413,7 +413,7 @@ export default function EditHotelBookingModal({
             </div>
 
             {/* Özel İstekler */}
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg transition-colors duration-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
                 💬 Özel İstekler
               </h3>

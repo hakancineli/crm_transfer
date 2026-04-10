@@ -252,7 +252,7 @@ export default function HotelReportsPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none p-6 mb-6 border border-gray-200 dark:border-slate-700 transition-colors duration-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">🔍 Filtreler</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
@@ -310,25 +310,25 @@ export default function HotelReportsPage() {
 
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none p-6 border border-gray-200 dark:border-slate-700 transition-colors duration-200">
             <div className="text-2xl font-bold text-blue-600">
               {stats.totalBookings}
             </div>
             <div className="text-sm text-gray-600">Toplam Rezervasyon</div>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none p-6 border border-gray-200 dark:border-slate-700 transition-colors duration-200">
             <div className="text-2xl font-bold text-green-600">
               €{stats.totalRevenue.toFixed(2)}
             </div>
             <div className="text-sm text-gray-600">Toplam Gelir</div>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none p-6 border border-gray-200 dark:border-slate-700 transition-colors duration-200">
             <div className="text-2xl font-bold text-purple-600">
               €{stats.averageBookingValue.toFixed(2)}
             </div>
             <div className="text-sm text-gray-600">Ortalama Değer</div>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none p-6 border border-gray-200 dark:border-slate-700 transition-colors duration-200">
             <div className="text-2xl font-bold text-orange-600">
               {Object.keys(stats.hotelStats).length}
             </div>
@@ -339,7 +339,7 @@ export default function HotelReportsPage() {
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Status Distribution */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none p-6 border border-gray-200 dark:border-slate-700 transition-colors duration-200">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">📊 Durum Dağılımı</h3>
             <div className="space-y-3">
               {Object.entries(stats.statusCounts).map(([status, count]) => {
@@ -373,7 +373,7 @@ export default function HotelReportsPage() {
           </div>
 
           {/* Monthly Revenue */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none p-6 border border-gray-200 dark:border-slate-700 transition-colors duration-200">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">📈 Aylık Gelir</h3>
             <div className="space-y-3">
               {Object.entries(stats.monthlyData)
@@ -392,11 +392,11 @@ export default function HotelReportsPage() {
         </div>
 
         {/* Hotel Performance */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">🏨 Otel Performansı</h3>
+        <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none p-6 mb-8 border border-gray-200 dark:border-slate-700 transition-colors duration-200">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">🏨 Otel Performansı</h3>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800 transition-colors duration-200">
+              <thead className="bg-gray-50 dark:bg-slate-950/70 transition-colors duration-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Otel Adı
@@ -412,11 +412,11 @@ export default function HotelReportsPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-slate-900/90 divide-y divide-gray-200 dark:divide-slate-800 transition-colors duration-200">
                 {Object.entries(stats.hotelStats)
                   .sort(([, a], [, b]) => b.revenue - a.revenue)
                   .map(([hotelName, data]) => (
-                    <tr key={hotelName}>
+                    <tr key={hotelName} className="hover:bg-gray-50 dark:hover:bg-slate-800/70 transition-colors duration-150">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {hotelName}
                       </td>
@@ -437,16 +437,16 @@ export default function HotelReportsPage() {
         </div>
 
         {/* Detailed Report */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">📋 Detaylı Rapor</h3>
-            <p className="text-sm text-gray-600">
+        <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none overflow-hidden border border-gray-200 dark:border-slate-700 transition-colors duration-200">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 transition-colors duration-200">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">📋 Detaylı Rapor</h3>
+            <p className="text-sm text-gray-600 dark:text-slate-400">
               {filteredBookings.length} rezervasyon bulundu
             </p>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800 transition-colors duration-200">
+              <thead className="bg-gray-50 dark:bg-slate-950/70 transition-colors duration-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Voucher

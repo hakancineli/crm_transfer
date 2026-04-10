@@ -101,7 +101,7 @@ export default function HotelBookingStats({ bookings }: HotelBookingStatsProps) 
     color: string;
     trend?: number;
   }) => (
-    <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+    <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none p-6 border border-gray-200 dark:border-slate-700 transition-colors duration-200">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-gray-600">{title}</p>
@@ -181,7 +181,7 @@ export default function HotelBookingStats({ bookings }: HotelBookingStatsProps) 
 
       {/* Aylık Karşılaştırma */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none p-6 border border-gray-200 dark:border-slate-700 transition-colors duration-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">📈 Aylık Büyüme</h3>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
@@ -205,7 +205,7 @@ export default function HotelBookingStats({ bookings }: HotelBookingStatsProps) 
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none p-6 border border-gray-200 dark:border-slate-700 transition-colors duration-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">📊 Durum Dağılımı</h3>
           <div className="space-y-3">
             {[

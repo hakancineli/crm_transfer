@@ -144,7 +144,7 @@ export default function HotelSearchResults({
 
   if (selectedHotel) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl mx-auto">
+      <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg dark:shadow-none p-6 max-w-4xl mx-auto border border-gray-200 dark:border-slate-700 transition-colors duration-200">
         <div className="mb-6">
           <button
             onClick={() => setSelectedHotel(null)}

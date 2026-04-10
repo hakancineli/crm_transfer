@@ -340,7 +340,7 @@ export default function HotelPricePoolPage() {
         </div>
 
         {/* Price Pool List */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none overflow-hidden border border-gray-200 dark:border-slate-700 transition-colors duration-200">
           {pricePool.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">{emojisEnabled ? '🏨' : ''}</div>
@@ -359,8 +359,8 @@ export default function HotelPricePoolPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800 transition-colors duration-200">
+                <thead className="bg-gray-50 dark:bg-slate-950/70 transition-colors duration-200">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Otel
@@ -382,9 +382,9 @@ export default function HotelPricePoolPage() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-slate-900/90 divide-y divide-gray-200 dark:divide-slate-800 transition-colors duration-200">
                   {pricePool.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50">
+                    <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/70 transition-colors duration-150">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-12 w-12">

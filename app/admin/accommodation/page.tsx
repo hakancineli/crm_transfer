@@ -227,14 +227,14 @@ export default function AccommodationPage() {
   console.log('Rendering accommodation page...');
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8" id="accommodation-page">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 transition-colors duration-200" id="accommodation-page">
+      <div className="container mx-auto px-4 text-gray-900 dark:text-slate-100 transition-colors duration-200">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-slate-100 mb-4">
             {emojisEnabled ? '🏨 ' : ''}Konaklama Yönetimi
           </h1>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 dark:text-slate-400 mb-6">
             Müşterileriniz için en uygun otelleri bulun ve rezervasyon yapın
           </p>
           <div className="flex justify-center space-x-4">
@@ -250,7 +250,7 @@ export default function AccommodationPage() {
         {/* Progress Indicator */}
         <div className="flex justify-center mb-8">
           <div className="flex items-center space-x-4">
-            <div className={`flex items-center ${currentStep === 'form' ? 'text-blue-600' : currentStep === 'search' || currentStep === 'booking' ? 'text-green-600' : 'text-gray-400'}`}>
+            <div className={`flex items-center ${currentStep === 'form' ? 'text-blue-600 dark:text-blue-400' : currentStep === 'search' || currentStep === 'booking' ? 'text-green-600 dark:text-emerald-400' : 'text-gray-400 dark:text-slate-500'}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 'form' ? 'bg-blue-600 text-white' : currentStep === 'search' || currentStep === 'booking' ? 'bg-green-600 text-white' : 'bg-gray-300 text-gray-600'}`}>
                 1
               </div>
