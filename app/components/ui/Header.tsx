@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -59,10 +60,15 @@ export default function Header({ onSidebarToggle, showSidebarToggle = false }: H
                             </button>
                         )}
                         <div className="flex-shrink-0">
-                            <Link href={logoHref} className="flex items-center space-x-2">
-                                <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                                    <span className="text-white font-bold text-lg">P</span>
-                                </div>
+                            <Link href={logoHref} className="flex items-center space-x-3">
+                                <Image
+                                    src="/crmlogo/proAcentelogo.png"
+                                    alt="Pro Acente logo"
+                                    width={38}
+                                    height={38}
+                                    className="h-9 w-9 rounded-lg object-contain"
+                                    priority
+                                />
                                 <span className="text-xl font-bold text-green-600 dark:text-green-400">Pro Acente</span>
                             </Link>
                         </div>

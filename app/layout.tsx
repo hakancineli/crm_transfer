@@ -65,8 +65,8 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <head>
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/logo.svg" />
+        <link rel="icon" href="/crmlogo/proAcentelogo.png" />
+        <link rel="apple-touch-icon" href="/crmlogo/proAcentelogo.png" />
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#16a34a" />
         <meta name="referrer" content="no-referrer-when-downgrade" />

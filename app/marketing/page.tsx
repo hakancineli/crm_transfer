@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import Script from 'next/script';
 import { useState, useRef, useEffect } from 'react';
@@ -135,10 +136,15 @@ export default function MarketingPage() {
       {/* Header */}
   <header className="sticky top-0 bg-white/92 dark:bg-slate-950/92 backdrop-blur-xl z-40 border-b border-slate-200/80 dark:border-slate-800 shadow-[0_12px_40px_rgba(15,23,42,0.05)] dark:shadow-none transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">P</span>
-            </div>
+          <Link href="/" className="flex items-center space-x-3">
+            <Image
+              src="/crmlogo/proAcentelogo.png"
+              alt="Pro Acente logo"
+              width={38}
+              height={38}
+              className="h-9 w-9 rounded-lg object-contain"
+              priority
+            />
             <span className="text-xl font-bold text-gray-900 dark:text-slate-100">Pro Acente</span>
           </Link>
           <div className="flex items-center gap-3 lg:gap-5 text-sm">
