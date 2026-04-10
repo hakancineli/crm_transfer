@@ -477,7 +477,7 @@ export default function FlightStatusPage() {
         {/* Flight Status Cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredFlights.map((flight) => (
-            <div key={flight.voucherNumber} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div key={flight.voucherNumber} className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 p-6 transition-colors duration-200">
               {/* Flight Header */}
               <div className="flex justify-between items-start mb-4">
                 <div>

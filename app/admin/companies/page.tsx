@@ -391,17 +391,17 @@ export default function CompaniesPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Şirket Listesi */}
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">Şirketler</h2>
+        <div className="bg-white dark:bg-slate-900/90 shadow dark:shadow-none rounded-lg border border-gray-200 dark:border-slate-700 transition-colors duration-200">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 transition-colors duration-200">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-slate-100">Şirketler</h2>
           </div>
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y divide-gray-200 dark:divide-slate-800 transition-colors duration-200">
             {tenants.map((tenant) => (
               <div
                 key={tenant.id}
                 onClick={() => handleTenantSelect(tenant)}
-                className={`p-4 cursor-pointer hover:bg-gray-50 ${
-                  selectedTenant?.id === tenant.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                className={`p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/70 transition-colors duration-150 ${
+                  selectedTenant?.id === tenant.id ? 'bg-blue-50 dark:bg-blue-500/10 border-l-4 border-blue-500' : ''
                 }`}
               >
                 <div className="flex justify-between items-center">
@@ -438,8 +438,8 @@ export default function CompaniesPage() {
         </div>
 
         {/* Seçili Şirketin Detayları */}
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-6 py-4 border-b border-gray-200">
+        <div className="bg-white dark:bg-slate-900/90 shadow dark:shadow-none rounded-lg border border-gray-200 dark:border-slate-700 transition-colors duration-200">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 transition-colors duration-200">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-medium text-gray-900 flex items-center gap-2">
                 {selectedTenant?.logoUrl && (
