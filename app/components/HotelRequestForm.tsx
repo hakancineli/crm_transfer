@@ -233,7 +233,7 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Yetişkin Sayısı *
               </label>
               <input
@@ -243,8 +243,8 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
                 onChange={handleInputChange}
                 min="1"
                 max="10"
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.adults ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 ${
+                  errors.adults ? 'border-red-500' : 'border-gray-300 dark:border-slate-700'
                 }`}
               />
               {errors.adults && (
