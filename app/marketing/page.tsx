@@ -138,11 +138,11 @@ export default function MarketingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3">
             <Image
-              src="/crmlogo/proAcentelogo.png"
+              src="/crmlogo/proAcentelogo-symbol.png"
               alt="Pro Acente logo"
-              width={38}
-              height={38}
-              className="h-9 w-9 rounded-lg object-contain"
+              width={48}
+              height={48}
+              className="h-11 w-11 object-contain"
               priority
             />
             <span className="text-xl font-bold text-gray-900 dark:text-slate-100">Pro Acente</span>

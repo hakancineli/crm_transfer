@@ -62,11 +62,11 @@ export default function Header({ onSidebarToggle, showSidebarToggle = false }: H
                         <div className="flex-shrink-0">
                             <Link href={logoHref} className="flex items-center space-x-3">
                                 <Image
-                                    src="/crmlogo/proAcentelogo.png"
+                                    src="/crmlogo/proAcentelogo-symbol.png"
                                     alt="Pro Acente logo"
-                                    width={38}
-                                    height={38}
-                                    className="h-9 w-9 rounded-lg object-contain"
+                                    width={48}
+                                    height={48}
+                                    className="h-11 w-11 object-contain"
                                     priority
                                 />
                                 <span className="text-xl font-bold text-green-600 dark:text-green-400">Pro Acente</span>
