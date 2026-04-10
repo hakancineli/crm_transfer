@@ -674,7 +674,7 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
                                                             <span className="text-gray-400 dark:text-slate-500 text-lg">→</span>
                                                         </div>
                                                         <div className="flex flex-col flex-1">
-                                                            <div className="text-sm font-medium text-gray-900 whitespace-normal break-words leading-tight" title={formattedTo}>
+                                                            <div className="text-sm font-medium text-gray-900 dark:text-slate-100 whitespace-normal break-words leading-tight" title={formattedTo}>
                                                                 {formattedTo}
                                                             </div>
                                                         </div>

@@ -670,7 +670,7 @@ export default function NewTourReservationPage() {
                   name="tourDate"
                   value={formData.tourDate}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md transition-colors duration-200"
                   required
                 />
               </div>
@@ -684,7 +684,7 @@ export default function NewTourReservationPage() {
                   name="tourTime"
                   value={formData.tourTime}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md transition-colors duration-200"
                   required
                 />
               </div>
@@ -707,7 +707,7 @@ export default function NewTourReservationPage() {
 
               {/* Fiyat */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   Tur Fiyatı (Toplam)
                 </label>
                 <div className="flex">
@@ -736,7 +736,7 @@ export default function NewTourReservationPage() {
 
               {/* Alınacak Yer */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   Alınacak Yer
                 </label>
                 <input
@@ -744,7 +744,7 @@ export default function NewTourReservationPage() {
                   name="pickupLocation"
                   value={formData.pickupLocation}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md transition-colors duration-200"
                   placeholder="Otel adı veya adres..."
                 />
               </div>
