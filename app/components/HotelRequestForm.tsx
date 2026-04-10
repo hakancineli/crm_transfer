@@ -122,19 +122,19 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl mx-auto">
+    <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg dark:shadow-none border border-gray-200 dark:border-slate-700 p-6 max-w-2xl mx-auto transition-colors duration-200">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">🏨 Otel Konaklama Talebi</h2>
-        <p className="text-gray-600">Müşteri tercihlerinizi belirtin, size en uygun otelleri bulalım</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-2">🏨 Otel Konaklama Talebi</h2>
+        <p className="text-gray-600 dark:text-slate-400">Müşteri tercihlerinizi belirtin, size en uygun otelleri bulalım</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Müşteri Bilgileri */}
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">👤 Müşteri Bilgileri</h3>
+        <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg transition-colors duration-200">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">👤 Müşteri Bilgileri</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Ad Soyad *
               </label>
               <input
@@ -142,8 +142,8 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
                 name="customerName"
                 value={formData.customerName}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.customerName ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 ${
+                  errors.customerName ? 'border-red-500' : 'border-gray-300 dark:border-slate-700'
                 }`}
                 placeholder="Müşteri adı soyadı"
               />
@@ -161,8 +161,8 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
                 name="customerEmail"
                 value={formData.customerEmail}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.customerEmail ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 ${
+                  errors.customerEmail ? 'border-red-500' : 'border-gray-300 dark:border-slate-700'
                 }`}
                 placeholder="ornek@email.com"
               />
@@ -180,8 +180,8 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
                 name="customerPhone"
                 value={formData.customerPhone}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.customerPhone ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 ${
+                  errors.customerPhone ? 'border-red-500' : 'border-gray-300 dark:border-slate-700'
                 }`}
                 placeholder="+90 555 123 45 67"
               />
@@ -193,8 +193,8 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
         </div>
 
         {/* Tarih ve Misafir Bilgileri */}
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">📅 Tarih ve Misafir Bilgileri</h3>
+        <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg transition-colors duration-200">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">📅 Tarih ve Misafir Bilgileri</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -205,8 +205,8 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
                 name="checkin"
                 value={formData.checkin}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.checkin ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 ${
+                  errors.checkin ? 'border-red-500' : 'border-gray-300 dark:border-slate-700'
                 }`}
               />
               {errors.checkin && (
@@ -223,8 +223,8 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
                 name="checkout"
                 value={formData.checkout}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.checkout ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 ${
+                  errors.checkout ? 'border-red-500' : 'border-gray-300 dark:border-slate-700'
                 }`}
               />
               {errors.checkout && (
@@ -263,7 +263,7 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
                 onChange={handleInputChange}
                 min="0"
                 max="10"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
               />
             </div>
 
@@ -278,15 +278,15 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
                 onChange={handleInputChange}
                 min="1"
                 max="5"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
               />
             </div>
           </div>
         </div>
 
         {/* Lokasyon ve Bütçe */}
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">📍 Lokasyon ve Bütçe</h3>
+        <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg transition-colors duration-200">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">📍 Lokasyon ve Bütçe</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -296,8 +296,8 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
                 name="city"
                 value={formData.city}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.city ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 ${
+                  errors.city ? 'border-red-500' : 'border-gray-300 dark:border-slate-700'
                 }`}
               >
                 <option value="">Şehir seçin</option>
@@ -321,7 +321,7 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
                 name="region"
                 value={formData.region}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                 placeholder="Örn: Sultanahmet, Lara, Goreme"
               />
             </div>
@@ -337,7 +337,7 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
                 onChange={handleInputChange}
                 min="0"
                 step="10"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                 placeholder="Örn: 100"
               />
             </div>
@@ -345,8 +345,8 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
         </div>
 
         {/* Oda Tercihleri */}
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">🛏️ Oda Tercihleri</h3>
+        <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg transition-colors duration-200">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">🛏️ Oda Tercihleri</h3>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -356,7 +356,7 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
                 name="roomType"
                 value={formData.roomType}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
               >
                 <option value="">Oda tipi seçin</option>
                 <option value="single">Tek Kişilik</option>
@@ -376,7 +376,7 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
                 onChange={handleInputChange}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <label className="ml-2 block text-sm text-gray-700">
+              <label className="ml-2 block text-sm text-gray-700 dark:text-slate-300">
                 🥐 Kahvaltı dahil
               </label>
             </div>
@@ -384,8 +384,8 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
         </div>
 
         {/* Otel Özellikleri */}
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">⭐ Otel Özellikleri</h3>
+        <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg transition-colors duration-200">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">⭐ Otel Özellikleri</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {availableAmenities.map(amenity => (
               <div key={amenity.id} className="flex items-center">
