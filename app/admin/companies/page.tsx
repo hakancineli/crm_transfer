@@ -341,13 +341,13 @@ export default function CompaniesPage() {
       </div>
 
       {user?.role === 'SUPERUSER' && (
-        <div className="bg-white shadow rounded-lg border border-gray-200 mb-6">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">Yeni Şirket Oluştur</h2>
+        <div className="bg-white dark:bg-slate-900/90 shadow dark:shadow-none rounded-lg border border-gray-200 dark:border-slate-700 mb-6 transition-colors duration-200">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 transition-colors duration-200">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-slate-100">Yeni Şirket Oluştur</h2>
           </div>
           <form onSubmit={handleCreateTenant} className="p-6 grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="md:col-span-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Şirket Adı</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Şirket Adı</label>
               <input value={newCompany.companyName} onChange={(e) => {
                 const v = e.target.value;
                 const slugify = (val: string) => val
@@ -362,7 +362,7 @@ export default function CompaniesPage() {
                   subdomain: newCompany.subdomain ? newCompany.subdomain : slugify(v),
                   adminUsername: adminUsernameTouched ? newCompany.adminUsername : v
                 });
-              }} required className="w-full px-3 py-2 border rounded-md" />
+              }} required className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md transition-colors duration-200" />
             </div>
             <div className="md:col-span-1">
               <label className="block text-sm font-medium text-gray-700 mb-1">Subdomain (opsiyonel)</label>
