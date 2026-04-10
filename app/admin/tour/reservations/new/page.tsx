@@ -495,18 +495,18 @@ export default function NewTourReservationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 transition-colors duration-200">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-gray-900 dark:text-slate-100 transition-colors duration-200">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Yeni Tur Rezervasyonu</h1>
-              <p className="mt-2 text-gray-600">Grup turu için rezervasyon oluşturun</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Yeni Tur Rezervasyonu</h1>
+              <p className="mt-2 text-gray-600 dark:text-slate-400">Grup turu için rezervasyon oluşturun</p>
             </div>
             <Link
               href="/admin/tour/reservations"
-              className="text-gray-600 hover:text-gray-900"
+              className="text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 transition-colors"
             >
               ← Geri Dön
             </Link>
@@ -516,8 +516,8 @@ export default function NewTourReservationPage() {
         <form onSubmit={handleSubmit} className="space-y-8">
 
           {/* Customer Selection Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Müşteri Seçimi</h2>
+          <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 p-6 transition-colors duration-200">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Müşteri Seçimi</h2>
             <div className="mb-4">
               <TourCustomerSelect onSelect={handleCustomerSelect} />
             </div>
@@ -534,40 +534,40 @@ export default function NewTourReservationPage() {
               </div>
             )}
             {!formData.customerId && (
-              <div className="mt-4 border-t pt-4">
-                <div className="text-sm font-medium text-gray-700 mb-3 block">
+              <div className="mt-4 border-t border-gray-200 dark:border-slate-700 pt-4 transition-colors duration-200">
+                <div className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3 block">
                   Yeni Müşteri Oluştur (Kayıtlı Müşteri Seçilmedi)
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Ad *</label>
+                    <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">Ad *</label>
                     <input
                       type="text"
                       value={formData.newCustomerName}
                       onChange={(e) => setFormData(prev => ({ ...prev, newCustomerName: e.target.value }))}
-                      className="w-full px-3 py-2 border rounded-md"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md transition-colors duration-200"
                       placeholder="Müşteri Adı"
                       required={!formData.customerId}
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Soyad *</label>
+                    <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">Soyad *</label>
                     <input
                       type="text"
                       value={formData.newCustomerSurname}
                       onChange={(e) => setFormData(prev => ({ ...prev, newCustomerSurname: e.target.value }))}
-                      className="w-full px-3 py-2 border rounded-md"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md transition-colors duration-200"
                       placeholder="Müşteri Soyadı"
                       required={!formData.customerId}
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Telefon *</label>
+                    <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">Telefon *</label>
                     <input
                       type="tel"
                       value={formData.newCustomerPhone}
                       onChange={(e) => setFormData(prev => ({ ...prev, newCustomerPhone: e.target.value }))}
-                      className="w-full px-3 py-2 border rounded-md"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md transition-colors duration-200"
                       placeholder="Telefon (5xx...)"
                       required={!formData.customerId}
                     />
@@ -577,17 +577,17 @@ export default function NewTourReservationPage() {
             )}
 
             {/* Toplam Bilgi Özeti */}
-            <div className="mt-8 pt-8 border-t border-gray-200">
-              <div className="flex justify-between items-center bg-gray-50 p-6 rounded-xl">
+            <div className="mt-8 pt-8 border-t border-gray-200 dark:border-slate-700 transition-colors duration-200">
+              <div className="flex justify-between items-center bg-gray-50 dark:bg-slate-800 p-6 rounded-xl transition-colors duration-200">
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Tahmini Toplam Tutar</h3>
-                  <div className="text-3xl font-bold text-gray-900 mt-1">
+                  <h3 className="text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Tahmini Toplam Tutar</h3>
+                  <div className="text-3xl font-bold text-[rgb(255,255,255)] mt-1">
                     {formData.price} {formData.currency}
                   </div>
                 </div>
                 <div className="text-right">
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Tahsil Edilen (Yolcu Toplamı)</h3>
-                  <div className={`text-3xl font-bold mt-1 ${Number(formData.paidAmount) >= Number(formData.price || 0) ? 'text-green-600' : 'text-blue-600'}`}>
+                  <h3 className="text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Tahsil Edilen (Yolcu Toplamı)</h3>
+                  <div className={`text-3xl font-bold mt-1 ${Number(formData.paidAmount) >= Number(formData.price || 0) ? 'text-green-600 dark:text-emerald-400' : 'text-blue-600 dark:text-blue-400'}`}>
                     {formData.paidAmount} {formData.currency}
                   </div>
                 </div>
@@ -596,8 +596,8 @@ export default function NewTourReservationPage() {
           </div>
 
           {/* Tur Bilgileri Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-6">Tur Bilgileri</h2>
+          <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 p-6 transition-colors duration-200">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-6">Tur Bilgileri</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Tur Rotası */}
@@ -609,7 +609,7 @@ export default function NewTourReservationPage() {
                   name="routeId"
                   value={formData.routeId}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                   required
                 >
                   <option value="">Rota seçin</option>
@@ -633,7 +633,7 @@ export default function NewTourReservationPage() {
                     value={formData.customRouteName}
                     onChange={handleInputChange}
                     placeholder="Örn: Pamukkale Özel Turu"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                     required
                   />
                 </div>
@@ -648,7 +648,7 @@ export default function NewTourReservationPage() {
                   name="vehicleType"
                   value={formData.vehicleType}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                   required
                 >
                   <option value="">Araç tipi seçin</option>
@@ -700,7 +700,7 @@ export default function NewTourReservationPage() {
                   value={formData.groupSize}
                   onChange={handleInputChange}
                   min="1"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                   required
                 />
               </div>
@@ -719,13 +719,13 @@ export default function NewTourReservationPage() {
                     min="0"
                     step="0.01"
                     placeholder="Fiyat girin (opsiyonel)"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                   />
                   <select
                     name="currency"
                     value={formData.currency}
                     onChange={handleInputChange}
-                    className="px-3 py-2 border border-l-0 border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-2 border border-l-0 border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-100 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                   >
                     {Object.entries(CURRENCIES).map(([key, value]) => (
                       <option key={key} value={key}>{value}</option>
@@ -751,9 +751,9 @@ export default function NewTourReservationPage() {
             </div>
 
             {/* Seating Mode Selection */}
-            <div className="mt-8 pt-8 border-t border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Koltuklama Yöntemi</h3>
-              <div className="flex flex-col sm:flex-row gap-4 mb-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
+            <div className="mt-8 pt-8 border-t border-gray-200 dark:border-slate-700 transition-colors duration-200">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Koltuklama Yöntemi</h3>
+              <div className="flex flex-col sm:flex-row gap-4 mb-6 bg-blue-50 dark:bg-blue-500/10 p-4 rounded-lg border border-blue-100 dark:border-blue-500/20 transition-colors duration-200">
                 <label className={`flex-1 flex items-center p-3 rounded-md border cursor-pointer transition-colors ${formData.seatingMode === 'AUTO' ? 'bg-white border-blue-500 shadow-sm' : 'border-gray-200 hover:border-blue-300'}`}>
                   <input
                     type="radio"
@@ -816,21 +816,21 @@ export default function NewTourReservationPage() {
           </div>
 
           {/* Yolcu Bilgileri Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 p-6 transition-colors duration-200">
             <div className="mb-6">
-              <h2 className="text-lg font-medium text-gray-900">Yolcu Bilgileri</h2>
-              <p className="text-sm text-gray-600 mt-1">
+              <h2 className="text-lg font-medium text-gray-900 dark:text-slate-100">Yolcu Bilgileri</h2>
+              <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
                 Kişi sayısını yukarıdaki "Kişi Sayısı" alanından değiştirebilirsiniz
               </p>
             </div>
 
             {/* Passenger List by Seat */}
             {formData.selectedSeats.length > 0 && (
-              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <h3 className="text-md font-semibold text-blue-900 mb-3">Yolcu & Koltuk Eşleşmesi ve Ödeme Durumu</h3>
+              <div className="bg-blue-50 dark:bg-blue-500/10 p-4 rounded-lg border border-blue-200 dark:border-blue-500/20 transition-colors duration-200">
+                <h3 className="text-md font-semibold text-blue-900 dark:text-blue-200 mb-3">Yolcu & Koltuk Eşleşmesi ve Ödeme Durumu</h3>
                 <div className="space-y-3">
                   {formData.passengerDetails.map((passenger, index) => (
-                    <div key={passenger.seatNumber} className="flex flex-col sm:flex-row gap-3 items-start sm:items-center bg-white p-3 rounded border border-blue-100 shadow-sm">
+                    <div key={passenger.seatNumber} className="flex flex-col sm:flex-row gap-3 items-start sm:items-center bg-white dark:bg-slate-900 p-3 rounded border border-blue-100 dark:border-slate-700 shadow-sm dark:shadow-none transition-colors duration-200">
                       <div className="flex items-center gap-3 w-full sm:w-auto">
                         <div className="w-10 h-10 flex items-center justify-center bg-blue-100 text-blue-800 font-bold rounded-full border-2 border-white shadow-sm flex-shrink-0">
                           {passenger.seatNumber}
@@ -906,32 +906,32 @@ export default function NewTourReservationPage() {
             )}
 
             {formData.selectedSeats.length === 0 && (
-              <div className="text-center p-8 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
-                <p className="text-gray-500">Lütfen yukarıdaki oturma planından koltuk seçiniz.</p>
+              <div className="text-center p-8 bg-gray-50 dark:bg-slate-800 border-2 border-dashed border-gray-300 dark:border-slate-700 rounded-lg transition-colors duration-200">
+                <p className="text-gray-500 dark:text-slate-400">Lütfen yukarıdaki oturma planından koltuk seçiniz.</p>
               </div>
             )}
           </div>
 
           {/* Notlar & Hatırlatıcı Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Notlar ve Ödeme Hatırlatıcı</h2>
+          <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 p-6 transition-colors duration-200">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Notlar ve Ödeme Hatırlatıcı</h2>
 
             <div className="grid grid-cols-1 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Notlar</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Notlar</label>
                 <textarea
                   name="notes"
                   value={formData.notes}
                   onChange={handleInputChange}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                   placeholder="Varsa özel notlar..."
                 />
               </div>
 
               {Number(formData.paidAmount) < Number(formData.price || 0) && (
-                <div className="bg-yellow-50 p-4 rounded-md border border-yellow-200">
-                  <h4 className="text-sm font-medium text-yellow-800 mb-2 flex items-center">
+                <div className="bg-yellow-50 dark:bg-yellow-500/10 p-4 rounded-md border border-yellow-200 dark:border-yellow-500/20 transition-colors duration-200">
+                  <h4 className="text-sm font-medium text-yellow-800 dark:text-yellow-300 mb-2 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>

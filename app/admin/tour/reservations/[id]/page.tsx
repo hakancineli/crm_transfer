@@ -106,19 +106,19 @@ export default function TourBookingDetailPage() {
     const occupiedSeats = (booking.passengerDetails || []).map(p => p.seatNumber);
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
             <div className="max-w-5xl mx-auto">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
-                            <Link href="/admin/tour/reservations" className="text-gray-500 hover:text-gray-700">
+                            <Link href="/admin/tour/reservations" className="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 transition-colors">
                                 ← Geri
                             </Link>
-                            <h1 className="text-3xl font-bold text-gray-900">Rezervasyon Detayı</h1>
+                            <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Rezervasyon Detayı</h1>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-600">
-                            <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded border">
+                        <div className="flex items-center gap-2 text-gray-600 dark:text-slate-400">
+                            <span className="font-mono text-sm bg-gray-100 dark:bg-slate-800 px-2 py-1 rounded border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-slate-100 transition-colors duration-200">
                                 {booking.voucherNumber}
                             </span>
                             <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${booking.status === 'CONFIRMED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
@@ -154,52 +154,52 @@ export default function TourBookingDetailPage() {
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-8">
                         {/* Tour & Customer Info */}
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-                                <h2 className="text-lg font-semibold text-gray-900">Tur ve Müşteri Bilgileri</h2>
+                        <div className="bg-white dark:bg-slate-900/90 rounded-xl shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 overflow-hidden transition-colors duration-200">
+                            <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-950/70 transition-colors duration-200">
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Tur ve Müşteri Bilgileri</h2>
                             </div>
                             <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Tur Detayları</h3>
+                                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Tur Detayları</h3>
                                     <div className="space-y-3">
                                         <div className="flex justify-between">
-                                            <span className="text-gray-600">Rota:</span>
-                                            <span className="font-medium text-gray-900">{booking.routeName}</span>
+                                            <span className="text-gray-600 dark:text-slate-400">Rota:</span>
+                                            <span className="font-medium text-[rgb(255,255,255)]">{booking.routeName}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-gray-600">Tarih:</span>
-                                            <span className="font-medium text-gray-900">{new Date(booking.tourDate).toLocaleDateString('tr-TR')}</span>
+                                            <span className="text-gray-600 dark:text-slate-400">Tarih:</span>
+                                            <span className="font-medium text-[rgb(255,255,255)]">{new Date(booking.tourDate).toLocaleDateString('tr-TR')}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-gray-600">Saat:</span>
-                                            <span className="font-medium text-gray-900">{booking.tourTime}</span>
+                                            <span className="text-gray-600 dark:text-slate-400">Saat:</span>
+                                            <span className="font-medium text-[rgb(255,255,255)]">{booking.tourTime}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-gray-600">Araç:</span>
-                                            <span className="font-medium text-gray-900">{booking.vehicleType}</span>
+                                            <span className="text-gray-600 dark:text-slate-400">Araç:</span>
+                                            <span className="font-medium text-[rgb(255,255,255)]">{booking.vehicleType}</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Müşteri Detayları</h3>
+                                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Müşteri Detayları</h3>
                                     <div className="space-y-3">
                                         <div className="flex justify-between">
-                                            <span className="text-gray-600">Ad Soyad:</span>
-                                            <span className="font-medium text-gray-900">
+                                            <span className="text-gray-600 dark:text-slate-400">Ad Soyad:</span>
+                                            <span className="font-medium text-[rgb(255,255,255)]">
                                                 {booking.customer ? `${booking.customer.name} ${booking.customer.surname}` : 'Belirtilmedi'}
                                             </span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-gray-600">Telefon:</span>
-                                            <span className="font-medium text-blue-600">{booking.customer?.phone || 'Belirtilmedi'}</span>
+                                            <span className="text-gray-600 dark:text-slate-400">Telefon:</span>
+                                            <span className="font-medium text-[#60A5FA]">{booking.customer?.phone || 'Belirtilmedi'}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-gray-600">Grup Boyutu:</span>
-                                            <span className="font-medium text-gray-900">{booking.groupSize} Kişi</span>
+                                            <span className="text-gray-600 dark:text-slate-400">Grup Boyutu:</span>
+                                            <span className="font-medium text-[rgb(255,255,255)]">{booking.groupSize} Kişi</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-gray-600">Alınacak Yer:</span>
-                                            <span className="font-medium text-gray-900">{booking.pickupLocation || 'Belirtilmedi'}</span>
+                                            <span className="text-gray-600 dark:text-slate-400">Alınacak Yer:</span>
+                                            <span className="font-medium text-[rgb(255,255,255)]">{booking.pickupLocation || 'Belirtilmedi'}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -207,10 +207,10 @@ export default function TourBookingDetailPage() {
                         </div>
 
                         {/* Passenger & Seating List */}
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-                                <h2 className="text-lg font-semibold text-gray-900">Yolcu ve Koltuk Listesi</h2>
-                                <span className="text-sm text-gray-500">{booking.passengerDetails?.length || 0} Yolcu</span>
+                        <div className="bg-white dark:bg-slate-900/90 rounded-xl shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 overflow-hidden transition-colors duration-200">
+                            <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-950/70 flex justify-between items-center transition-colors duration-200">
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Yolcu ve Koltuk Listesi</h2>
+                                <span className="text-sm text-gray-500 dark:text-slate-400">{booking.passengerDetails?.length || 0} Yolcu</span>
                             </div>
                             <div className="p-6">
                                 <div className="space-y-4">
