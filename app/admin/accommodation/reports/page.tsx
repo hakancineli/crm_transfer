@@ -246,45 +246,48 @@ export default function HotelReportsPage() {
               </Link>
             </div>
           </div>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-slate-400">
             Detaylı konaklama analizleri ve raporları
           </p>
         </div>
 
         {/* Filters */}
         <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none p-6 mb-6 border border-gray-200 dark:border-slate-700 transition-colors duration-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">🔍 Filtreler</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">🔍 Filtreler</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 Başlangıç Tarihi
               </label>
               <input
                 type="date"
+                title="Başlangıç Tarihi"
                 value={filters.dateFrom}
                 onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 Bitiş Tarihi
               </label>
               <input
                 type="date"
+                title="Bitiş Tarihi"
                 value={filters.dateTo}
                 onChange={(e) => handleFilterChange('dateTo', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 Durum
               </label>
               <select
+                title="Durum Filtresi"
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
               >
                 <option value="all">Tümü</option>
                 <option value="pending">Beklemede</option>
@@ -294,7 +297,7 @@ export default function HotelReportsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 Otel Adı
               </label>
               <input
@@ -302,7 +305,7 @@ export default function HotelReportsPage() {
                 placeholder="Otel adı ara..."
                 value={filters.hotelName}
                 onChange={(e) => handleFilterChange('hotelName', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
               />
             </div>
           </div>
@@ -468,9 +471,9 @@ export default function HotelReportsPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-slate-900/90 divide-y divide-gray-200 dark:divide-slate-800 transition-colors duration-200">
                 {filteredBookings.map((booking) => (
-                  <tr key={booking.id} className="hover:bg-gray-50">
+                  <tr key={booking.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/70 transition-colors duration-150">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {booking.voucherNumber}
                     </td>

@@ -452,9 +452,9 @@ export default function UetdsPage() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-slate-900/90 divide-y divide-gray-200 dark:divide-slate-800 transition-colors duration-200">
                   {logs.map((log) => (
-                    <tr key={log.id} className="hover:bg-gray-50">
+                    <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/70 transition-colors duration-150">
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {new Date(log.islemZamani).toLocaleString('tr-TR')}
                       </td>
@@ -482,20 +482,20 @@ export default function UetdsPage() {
 
       {/* U-ETDS Ayarları Tab */}
       {activeTab === 'ayarlar' && (
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">U-ETDS Entegrasyon Ayarları</h3>
-            <p className="mt-1 text-sm text-gray-500">
+        <div className="bg-white dark:bg-slate-900/90 shadow dark:shadow-none rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700 transition-colors duration-200">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 transition-colors duration-200">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">U-ETDS Entegrasyon Ayarları</h3>
+            <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
               U-ETDS sistemine bağlanmak için gerekli bilgileri girin
             </p>
           </div>
           
           <div className="p-6 space-y-6">
             {/* U-ETDS Aktif/Pasif */}
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800 rounded-lg transition-colors duration-200">
               <div>
-                <h4 className="font-medium text-gray-900">U-ETDS Entegrasyonu</h4>
-                <p className="text-sm text-gray-500">U-ETDS sistemine otomatik bildirim yap</p>
+                <h4 className="font-medium text-gray-900 dark:text-slate-100">U-ETDS Entegrasyonu</h4>
+                <p className="text-sm text-gray-500 dark:text-slate-400">U-ETDS sistemine otomatik bildirim yap</p>
               </div>
               <div className={`px-3 py-1 rounded-full text-sm font-medium ${
                 uetdsSettings.uetdsEnabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
@@ -507,7 +507,7 @@ export default function UetdsPage() {
             {/* U-ETDS Bilgileri */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   U-ETDS Kullanıcı Adı
                 </label>
                 <input
@@ -515,12 +515,12 @@ export default function UetdsPage() {
                   value={uetdsSettings.uetdsUsername}
                   onChange={(e) => setUetdsSettings(prev => ({ ...prev, uetdsUsername: e.target.value }))}
                   placeholder="U-ETDS kullanıcı adınız"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   U-ETDS Şifresi
                 </label>
                 <input
@@ -528,12 +528,12 @@ export default function UetdsPage() {
                   value={uetdsSettings.uetdsPassword}
                   onChange={(e) => setUetdsSettings(prev => ({ ...prev, uetdsPassword: e.target.value }))}
                   placeholder="U-ETDS şifreniz"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   UNET Numarası
                 </label>
                 <input
@@ -541,7 +541,7 @@ export default function UetdsPage() {
                   value={uetdsSettings.uetdsUnetNo}
                   onChange={(e) => setUetdsSettings(prev => ({ ...prev, uetdsUnetNo: e.target.value }))}
                   placeholder="UNET numaranız"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                 />
               </div>
 
@@ -550,9 +550,9 @@ export default function UetdsPage() {
                   type="checkbox"
                   checked={uetdsSettings.uetdsTestMode}
                   onChange={(e) => setUetdsSettings(prev => ({ ...prev, uetdsTestMode: e.target.checked }))}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-slate-600 rounded bg-white dark:bg-slate-950 transition-colors duration-200"
                 />
-                <label className="ml-2 text-sm text-gray-700">
+                <label className="ml-2 text-sm text-gray-700 dark:text-slate-300">
                   Test modu (geliştirme ortamı)
                 </label>
               </div>
@@ -608,8 +608,8 @@ export default function UetdsPage() {
 
             {/* Test Sonucu */}
             {testResult && (
-              <div className={`p-4 rounded-md ${
-                testResult.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+              <div className={`p-4 rounded-md transition-colors duration-200 ${
+                testResult.success ? 'bg-green-50 dark:bg-emerald-500/10 border border-green-200 dark:border-emerald-500/20' : 'bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20'
               }`}>
                 <div className="flex">
                   <div className="flex-shrink-0">
@@ -631,7 +631,7 @@ export default function UetdsPage() {
             )}
 
             {/* Bilgi Notu */}
-            <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+            <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-md p-4 transition-colors duration-200">
               <div className="flex">
                 <div className="flex-shrink-0">
                   <span className="text-blue-400">ℹ️</span>
