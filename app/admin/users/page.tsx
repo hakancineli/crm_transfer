@@ -308,13 +308,13 @@ export default function UsersPage() {
       {/* Kullanıcı Listesi - Desktop - Acente Bazlı Gruplandırma */}
       <div className="hidden lg:block space-y-6">
         {Object.entries(groupedUsers).map(([tenantName, tenantUsers]) => (
-          <div key={tenantName} className="bg-white shadow rounded-lg overflow-hidden">
-            <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">{tenantName}</h3>
-              <p className="text-sm text-gray-500">{tenantUsers.length} kullanıcı</p>
+          <div key={tenantName} className="bg-white dark:bg-slate-900/90 shadow dark:shadow-none rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700 transition-colors duration-200">
+            <div className="bg-gray-50 dark:bg-slate-950/70 px-6 py-3 border-b border-gray-200 dark:border-slate-700 transition-colors duration-200">
+              <h3 className="text-lg font-semibold text-[rgb(255,255,255)]">{tenantName}</h3>
+              <p className="text-sm text-slate-300">{tenantUsers.length} kullanıcı</p>
             </div>
-            <table className="min-w-full divide-y divide-gray-200 table-fixed">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800 table-fixed transition-colors duration-200">
+              <thead className="bg-gray-50 dark:bg-slate-950/70">
                 <tr>
                   <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Kullanıcı
@@ -336,14 +336,14 @@ export default function UsersPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-slate-900/90 divide-y divide-gray-200 dark:divide-slate-800 transition-colors duration-200">
                 {tenantUsers.map((user) => (
-              <tr key={user.id}>
+              <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/70 transition-colors duration-150">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div>
-                    <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                    <div className="text-sm text-gray-500">{user.username}</div>
-                    <div className="text-sm text-gray-500">{user.email}</div>
+                    <div className="text-sm font-medium text-[rgb(255,255,255)]">{user.name}</div>
+                    <div className="text-sm text-slate-300">{user.username}</div>
+                    <div className="text-sm text-slate-300">{user.email}</div>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -353,15 +353,15 @@ export default function UsersPage() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    user.isActive ? 'bg-green-100 text-green-800 dark:bg-emerald-500/15 dark:text-emerald-300' : 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300'
                   }`}>
                     {user.isActive ? 'Aktif' : 'Pasif'}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[rgb(255,255,255)]">
                   {user._count.reservations}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
                   {new Date(user.createdAt).toLocaleDateString('tr-TR')}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">

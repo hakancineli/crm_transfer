@@ -367,16 +367,16 @@ export default function PerformancePage() {
 
         {/* Performance Table */}
         <div className="bg-white dark:bg-slate-900/90 rounded-lg shadow-sm dark:shadow-none border border-gray-200 dark:border-slate-700 transition-colors duration-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Performans Tablosu</h3>
-            <p className="text-sm text-gray-600 mt-1">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 transition-colors duration-200">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Performans Tablosu</h3>
+            <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
               {sortedPerformance.length} kullanıcı gösteriliyor
             </p>
           </div>
           
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800 transition-colors duration-200">
+              <thead className="bg-gray-50 dark:bg-slate-950/70 transition-colors duration-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Kullanıcı
