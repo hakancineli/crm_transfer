@@ -153,7 +153,7 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 E-posta *
               </label>
               <input
@@ -172,7 +172,7 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Telefon *
               </label>
               <input
@@ -197,11 +197,12 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
           <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">📅 Tarih ve Misafir Bilgileri</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Giriş Tarihi *
               </label>
               <input
                 type="date"
+                title="Giriş Tarihi"
                 name="checkin"
                 value={formData.checkin}
                 onChange={handleInputChange}
@@ -215,11 +216,12 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Çıkış Tarihi *
               </label>
               <input
                 type="date"
+                title="Çıkış Tarihi"
                 name="checkout"
                 value={formData.checkout}
                 onChange={handleInputChange}
@@ -238,6 +240,8 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
               </label>
               <input
                 type="number"
+                title="Yetişkin Sayısı"
+                placeholder="Yetişkin sayısı"
                 name="adults"
                 value={formData.adults}
                 onChange={handleInputChange}
@@ -258,6 +262,8 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
               </label>
               <input
                 type="number"
+                title="Çocuk Sayısı"
+                placeholder="Çocuk sayısı"
                 name="children"
                 value={formData.children}
                 onChange={handleInputChange}
@@ -273,6 +279,8 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
               </label>
               <input
                 type="number"
+                title="Oda Sayısı"
+                placeholder="Oda sayısı"
                 name="rooms"
                 value={formData.rooms}
                 onChange={handleInputChange}
@@ -293,6 +301,7 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
                 Şehir *
               </label>
               <select
+                title="Şehir"
                 name="city"
                 value={formData.city}
                 onChange={handleInputChange}
@@ -332,13 +341,14 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
               </label>
               <input
                 type="number"
+                title="Bütçe"
+                placeholder="Örn: 100"
                 name="budget"
                 value={formData.budget}
                 onChange={handleInputChange}
                 min="0"
                 step="10"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                placeholder="Örn: 100"
               />
             </div>
           </div>
@@ -349,10 +359,11 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
           <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">🛏️ Oda Tercihleri</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Oda Tipi
               </label>
               <select
+                title="Oda Tipi"
                 name="roomType"
                 value={formData.roomType}
                 onChange={handleInputChange}
@@ -374,7 +385,7 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
                 name="breakfast"
                 checked={formData.breakfast}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-slate-600 rounded bg-white dark:bg-slate-950 transition-colors duration-200"
               />
               <label className="ml-2 block text-sm text-gray-700 dark:text-slate-300">
                 🥐 Kahvaltı dahil
@@ -394,9 +405,9 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
                   id={amenity.id}
                   checked={formData.amenities.includes(amenity.id)}
                   onChange={(e) => handleAmenityChange(amenity.id, e.target.checked)}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-slate-600 rounded bg-white dark:bg-slate-950 transition-colors duration-200"
                 />
-                <label htmlFor={amenity.id} className="ml-2 block text-sm text-gray-700">
+                <label htmlFor={amenity.id} className="ml-2 block text-sm text-gray-700 dark:text-slate-300">
                   {amenity.icon} {amenity.name}
                 </label>
               </div>
@@ -405,14 +416,15 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
         </div>
 
         {/* Özel İstekler */}
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">💬 Özel İstekler</h3>
+        <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg transition-colors duration-200">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">💬 Özel İstekler</h3>
           <textarea
+            title="Özel İstekler"
             name="specialRequests"
             value={formData.specialRequests}
             onChange={handleInputChange}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
             placeholder="Özel isteklerinizi buraya yazabilirsiniz..."
           />
         </div>
@@ -422,7 +434,7 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            className="px-6 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200"
           >
             İptal
           </button>
