@@ -136,15 +136,16 @@ export default function MarketingPage() {
       {/* Header */}
   <header className="sticky top-0 bg-white/92 dark:bg-slate-950/92 backdrop-blur-xl z-40 border-b border-slate-200/80 dark:border-slate-800 shadow-[0_12px_40px_rgba(15,23,42,0.05)] dark:shadow-none transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-4">
+          <Link href="/" className="flex items-center space-x-3">
             <Image
               src="/crmlogo/proAcentelogo-symbol.png"
               alt="Pro Acente logo"
-              width={88}
-              height={88}
-              className="h-16 w-16 object-contain"
+              width={64}
+              height={64}
+              className="h-12 w-12 object-contain"
               priority
             />
+            <span className="text-xl font-bold text-gray-900 dark:text-slate-100">Pro Acente</span>
           </Link>
           <div className="flex items-center gap-3 lg:gap-5 text-sm">
             <nav className="hidden xl:flex items-center gap-6 text-[15px] text-gray-600">
