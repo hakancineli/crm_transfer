@@ -47,7 +47,7 @@ export default function AdminLayout({
       </div>
 
       {/* Main Content */}
-      <main className={`${sidebarOpen ? 'lg:ml-64 ml-0' : 'ml-0'} ${isFixedViewportPage ? 'h-[calc(100vh-64px)] overflow-hidden' : 'min-h-[calc(100vh-64px)] overflow-x-hidden overflow-y-auto'} transition-all duration-700 ease-out`}>
+      <main className={`${sidebarOpen ? 'lg:ml-64 ml-0' : 'ml-0'} ${isFixedViewportPage ? 'h-[calc(100vh-64px)] overflow-hidden pt-16' : 'min-h-[calc(100vh-64px)] overflow-x-hidden overflow-y-auto'} transition-all duration-700 ease-out`}>
         {children}
       </main>
     </div>
