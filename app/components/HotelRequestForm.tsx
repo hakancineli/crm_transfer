@@ -322,7 +322,7 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Bölge (Opsiyonel)
               </label>
               <input
@@ -336,7 +336,7 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Bütçe (EUR) - Gece başına
               </label>
               <input
@@ -381,13 +381,15 @@ export default function HotelRequestForm({ onSubmit, onCancel }: HotelRequestFor
 
             <div className="flex items-center">
               <input
+                id="breakfast"
                 type="checkbox"
                 name="breakfast"
+                title="Kahvaltı dahil"
                 checked={formData.breakfast}
                 onChange={handleInputChange}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-slate-600 rounded bg-white dark:bg-slate-950 transition-colors duration-200"
               />
-              <label className="ml-2 block text-sm text-gray-700 dark:text-slate-300">
+              <label htmlFor="breakfast" className="ml-2 block text-sm text-gray-700 dark:text-slate-300">
                 🥐 Kahvaltı dahil
               </label>
             </div>
