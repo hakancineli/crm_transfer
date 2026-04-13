@@ -133,7 +133,7 @@ export default function TourVoucher({ bookingId }: TourVoucherProps) {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600 mb-4">Rezervasyon Bulunamadı</h1>
-          <p className="text-gray-600">Tur rezervasyonu bulunamadı veya erişim yetkiniz yok.</p>
+          <p className="text-gray-600 dark:text-slate-400">Tur rezervasyonu bulunamadı veya erişim yetkiniz yok.</p>
         </div>
       </div>
     );
@@ -183,7 +183,7 @@ export default function TourVoucher({ bookingId }: TourVoucherProps) {
   };
 
   return (
-    <div className="print-content bg-white p-8 print:p-4 rounded-2xl shadow-lg max-w-4xl mx-auto print:shadow-none print:max-w-full border border-gray-100">
+    <div className="print-content bg-white dark:bg-slate-900 p-8 print:p-4 rounded-2xl shadow-lg max-w-4xl mx-auto print:shadow-none print:max-w-full border border-gray-100 dark:border-slate-700 text-gray-900 dark:text-slate-100 transition-colors duration-200">
       {/* Language Selector */}
       <div className="flex justify-end mb-4 print:hidden no-print">
         <select
@@ -204,17 +204,17 @@ export default function TourVoucher({ bookingId }: TourVoucherProps) {
           {booking.tenant?.companyName?.toLowerCase().includes('protransfer') ? (
             <>
               <img
-                src="/logo.svg"
-                alt="ProTransfer"
-                className="h-16 w-16 print:h-12 print:w-12 mr-4 drop-shadow-sm"
+                src="/crmlogo/proAcentelogo-symbol.png"
+                alt="Pro Acente"
+                className="h-16 w-16 print:h-12 print:w-12 mr-4 object-contain drop-shadow-sm"
               />
-              <span className="text-4xl print:text-2xl font-bold tracking-tight bg-gradient-to-r from-gray-800 to-green-600 bg-clip-text text-transparent">
-                ProTransfer
+              <span className="text-4xl print:text-2xl font-bold tracking-tight bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
+                Pro Acente
               </span>
             </>
           ) : (
             /* Diğer şirketler için sadece şirket adı */
-            <span className="text-4xl print:text-2xl font-bold tracking-tight bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">
+            <span className="text-4xl print:text-2xl font-bold tracking-tight bg-gradient-to-r from-gray-800 to-blue-600 dark:from-slate-100 dark:to-blue-400 bg-clip-text text-transparent">
               {booking.tenant?.companyName || 'Şirket Adı'}
             </span>
           )}

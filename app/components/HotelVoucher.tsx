@@ -51,7 +51,7 @@ export default function HotelVoucher({ booking }: HotelVoucherProps) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-white p-6 print:p-4">
+    <div className="max-w-4xl mx-auto bg-white dark:bg-slate-900 p-6 print:p-4 text-gray-900 dark:text-slate-100 transition-colors duration-200">
       {/* Voucher Header */}
       <VoucherHeader 
         voucherNumber={booking.voucherNumber} 
@@ -67,56 +67,56 @@ export default function HotelVoucher({ booking }: HotelVoucherProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Otel Detayları */}
           <div className="space-y-4">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-gray-900 mb-3">Otel Bilgileri</h3>
+            <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg transition-colors duration-200">
+              <h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-3">Otel Bilgileri</h3>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Otel Adı:</span>
-                  <span className="font-medium">{booking.hotelName}</span>
+                  <span className="text-gray-600 dark:text-slate-400">Otel Adı:</span>
+                  <span className="font-medium text-gray-900 dark:text-slate-100">{booking.hotelName}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Adres:</span>
-                  <span className="font-medium text-right">{booking.hotelAddress}</span>
+                  <span className="text-gray-600 dark:text-slate-400">Adres:</span>
+                  <span className="font-medium text-right text-gray-900 dark:text-slate-100">{booking.hotelAddress}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Oda Tipi:</span>
-                  <span className="font-medium">{booking.roomType}</span>
+                  <span className="text-gray-600 dark:text-slate-400">Oda Tipi:</span>
+                  <span className="font-medium text-gray-900 dark:text-slate-100">{booking.roomType}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Rezervasyon No:</span>
-                  <span className="font-medium">{booking.bookingReference}</span>
+                  <span className="text-gray-600 dark:text-slate-400">Rezervasyon No:</span>
+                  <span className="font-medium text-gray-900 dark:text-slate-100">{booking.bookingReference}</span>
                 </div>
               </div>
             </div>
 
             {/* Rezervasyon Detayları */}
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-gray-900 mb-3">Rezervasyon Detayları</h3>
+            <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg transition-colors duration-200">
+              <h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-3">Rezervasyon Detayları</h3>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Giriş Tarihi:</span>
-                  <span className="font-medium">{formatDate(booking.checkin)}</span>
+                  <span className="text-gray-600 dark:text-slate-400">Giriş Tarihi:</span>
+                  <span className="font-medium text-gray-900 dark:text-slate-100">{formatDate(booking.checkin)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Çıkış Tarihi:</span>
-                  <span className="font-medium">{formatDate(booking.checkout)}</span>
+                  <span className="text-gray-600 dark:text-slate-400">Çıkış Tarihi:</span>
+                  <span className="font-medium text-gray-900 dark:text-slate-100">{formatDate(booking.checkout)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Gece Sayısı:</span>
-                  <span className="font-medium">{calculateNights()} gece</span>
+                  <span className="text-gray-600 dark:text-slate-400">Gece Sayısı:</span>
+                  <span className="font-medium text-gray-900 dark:text-slate-100">{calculateNights()} gece</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Oda Sayısı:</span>
-                  <span className="font-medium">{booking.rooms} oda</span>
+                  <span className="text-gray-600 dark:text-slate-400">Oda Sayısı:</span>
+                  <span className="font-medium text-gray-900 dark:text-slate-100">{booking.rooms} oda</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Yetişkin:</span>
-                  <span className="font-medium">{booking.adults} kişi</span>
+                  <span className="text-gray-600 dark:text-slate-400">Yetişkin:</span>
+                  <span className="font-medium text-gray-900 dark:text-slate-100">{booking.adults} kişi</span>
                 </div>
                 {booking.children > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Çocuk:</span>
-                    <span className="font-medium">{booking.children} kişi</span>
+                    <span className="text-gray-600 dark:text-slate-400">Çocuk:</span>
+                    <span className="font-medium text-gray-900 dark:text-slate-100">{booking.children} kişi</span>
                   </div>
                 )}
               </div>
@@ -126,20 +126,20 @@ export default function HotelVoucher({ booking }: HotelVoucherProps) {
           {/* Müşteri ve Fiyat Bilgileri */}
           <div className="space-y-4">
             {/* Müşteri Bilgileri */}
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-gray-900 mb-3">Müşteri Bilgileri</h3>
+            <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg transition-colors duration-200">
+              <h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-3">Müşteri Bilgileri</h3>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Ad Soyad:</span>
-                  <span className="font-medium">{booking.customerInfo.name}</span>
+                  <span className="text-gray-600 dark:text-slate-400">Ad Soyad:</span>
+                  <span className="font-medium text-gray-900 dark:text-slate-100">{booking.customerInfo.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">E-posta:</span>
-                  <span className="font-medium">{booking.customerInfo.email}</span>
+                  <span className="text-gray-600 dark:text-slate-400">E-posta:</span>
+                  <span className="font-medium text-gray-900 dark:text-slate-100">{booking.customerInfo.email}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Telefon:</span>
-                  <span className="font-medium">{booking.customerInfo.phone}</span>
+                  <span className="text-gray-600 dark:text-slate-400">Telefon:</span>
+                  <span className="font-medium text-gray-900 dark:text-slate-100">{booking.customerInfo.phone}</span>
                 </div>
               </div>
             </div>
@@ -180,9 +180,9 @@ export default function HotelVoucher({ booking }: HotelVoucherProps) {
       )}
 
       {/* İptal Politikası */}
-      <div className="mb-6 bg-gray-50 p-4 rounded-lg">
-        <h3 className="font-semibold text-gray-900 mb-2">İptal Politikası</h3>
-        <p className="text-gray-700 text-sm">{booking.cancellationPolicy}</p>
+      <div className="mb-6 bg-gray-50 dark:bg-slate-800 p-4 rounded-lg transition-colors duration-200">
+        <h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-2">İptal Politikası</h3>
+        <p className="text-gray-700 dark:text-slate-300 text-sm">{booking.cancellationPolicy}</p>
       </div>
 
       {/* Önemli Notlar */}
@@ -197,8 +197,8 @@ export default function HotelVoucher({ booking }: HotelVoucherProps) {
       </div>
 
       {/* İletişim Bilgileri */}
-      <div className="text-center text-sm text-gray-600 border-t pt-4">
-        <p><strong>ProTransfer</strong> - Profesyonel Transfer ve Konaklama Hizmetleri</p>
+      <div className="text-center text-sm text-gray-600 dark:text-slate-400 border-t border-gray-200 dark:border-slate-700 pt-4 transition-colors duration-200">
+        <p><strong>Pro Acente</strong> - Profesyonel Transfer ve Konaklama Hizmetleri</p>
         <p>📞 +90 555 123 45 67 | ✉️ info@protransfer.com</p>
         <p>Voucher Tarihi: {new Date().toLocaleDateString('tr-TR')}</p>
       </div>

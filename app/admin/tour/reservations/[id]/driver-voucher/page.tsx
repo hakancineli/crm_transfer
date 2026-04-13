@@ -130,16 +130,16 @@ export default function TourDriverVoucherPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 transition-colors duration-200">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Language Selector and Print Button */}
         <div className="mb-6 print:hidden flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <label className="text-sm font-medium text-gray-700">Dil:</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Dil:</label>
             <select
               value={language}
               onChange={(e) => setLanguage(e.target.value as 'tr' | 'en' | 'ar')}
-              className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
             >
               <option value="tr">Türkçe</option>
               <option value="en">English</option>
@@ -155,29 +155,29 @@ export default function TourDriverVoucherPage() {
         </div>
 
         {/* Driver Voucher */}
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-8 print:shadow-none print:border-0">
+        <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 p-8 print:shadow-none print:border-0 text-gray-900 dark:text-slate-100 transition-colors duration-200">
           {/* Header */}
-          <div className="text-center mb-8 border-b border-gray-200 pb-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{t.title}</h1>
-            <div className="text-lg text-gray-600">Voucher No: {booking.voucherNumber}</div>
-            <div className="text-sm text-gray-500 mt-2">
+          <div className="text-center mb-8 border-b border-gray-200 dark:border-slate-700 pb-6 transition-colors duration-200">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t.title}</h1>
+            <div className="text-lg text-gray-600 dark:text-slate-300">Voucher No: {booking.voucherNumber}</div>
+            <div className="text-sm text-gray-500 dark:text-slate-400 mt-2">
               {t.footerNote}
             </div>
           </div>
 
           {/* Driver Info */}
           <div className="mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">{t.driverInfo}</h3>
-            <div className="bg-blue-50 rounded-lg p-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-3">{t.driverInfo}</h3>
+            <div className="bg-blue-50 dark:bg-blue-500/10 rounded-lg p-4 transition-colors duration-200">
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">{t.driverName}:</span>
-                  <span className="font-medium">{booking.driver.name}</span>
+                  <span className="text-gray-600 dark:text-slate-400">{t.driverName}:</span>
+                  <span className="font-medium text-gray-900 dark:text-slate-100">{booking.driver.name}</span>
                 </div>
                 {booking.driver.phoneNumber && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">{t.phone}:</span>
-                    <span className="font-medium">{booking.driver.phoneNumber}</span>
+                    <span className="text-gray-600 dark:text-slate-400">{t.phone}:</span>
+                    <span className="font-medium text-gray-900 dark:text-slate-100">{booking.driver.phoneNumber}</span>
                   </div>
                 )}
               </div>
@@ -307,11 +307,11 @@ export default function TourDriverVoucherPage() {
           )}
 
           {/* Footer */}
-          <div className="border-t border-gray-200 pt-6 text-center">
-            <p className="text-sm text-gray-500">
+          <div className="border-t border-gray-200 dark:border-slate-700 pt-6 text-center transition-colors duration-200">
+            <p className="text-sm text-gray-500 dark:text-slate-400">
               {t.footerNote}
             </p>
-            <p className="text-xs text-gray-400 mt-2">
+            <p className="text-xs text-gray-400 dark:text-slate-500 mt-2">
               {t.createdDate}: {new Date().toLocaleString('tr-TR')}
             </p>
           </div>

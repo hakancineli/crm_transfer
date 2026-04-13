@@ -58,6 +58,7 @@ export default function Header({ onSidebarToggle, showSidebarToggle = false }: H
                             <button
                                 type="button"
                                 onClick={onSidebarToggle}
+                                title="Menüyü aç"
                                 className="mr-3 p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800 transition-colors"
                             >
                                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
