@@ -152,7 +152,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="h-full overflow-y-auto bg-gray-50 bg-[linear-gradient(rgba(248,250,252,0.88),rgba(248,250,252,0.92)),url('/seref-vural-tours/istanbul/istanbul.jpeg')] bg-cover bg-center bg-fixed dark:bg-[linear-gradient(rgba(2,6,23,0.88),rgba(2,6,23,0.94)),url('/seref-vural-tours/istanbul/istanbul.jpeg')] transition-colors duration-200">
+    <div className="h-full overflow-hidden bg-gray-50 bg-[linear-gradient(rgba(248,250,252,0.88),rgba(248,250,252,0.92)),url('/seref-vural-tours/istanbul/istanbul.jpeg')] bg-cover bg-center bg-fixed dark:bg-[linear-gradient(rgba(2,6,23,0.88),rgba(2,6,23,0.94)),url('/seref-vural-tours/istanbul/istanbul.jpeg')] transition-colors duration-200">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200 dark:bg-slate-900/70 dark:border-slate-800 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -170,9 +170,9 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-gray-900 dark:text-white dark:text-slate-100 transition-colors duration-200">
+      <div className="max-w-7xl mx-auto h-[calc(100%-88px)] px-4 sm:px-6 lg:px-8 py-4 text-gray-900 dark:text-white dark:text-slate-100 transition-colors duration-200 overflow-hidden">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5 mb-5">
           {/* Toplam Rezervasyonlar */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
             <div className="flex items-center">
@@ -235,7 +235,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Secondary Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5 mb-5">
           {/* Toplam Şoförler */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
             <div className="flex items-center">
@@ -298,7 +298,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
           {/* Hızlı İşlemler - Transfer */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 dark:bg-slate-900/85 dark:border-slate-700 dark:shadow-none transition-colors duration-200">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-white mb-4">{t('admin.dashboard.quickActions.transferOperations')}</h3>
