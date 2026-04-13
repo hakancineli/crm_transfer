@@ -3,6 +3,7 @@
 import AdminNavigation from '@/app/components/AdminNavigation';
 import Header from '@/app/components/ui/Header';
 import { TenantProvider } from '@/app/contexts/TenantContext';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function AdminLayout({
@@ -10,7 +11,9 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const isFixedViewportPage = pathname === '/admin' || pathname === '/admin/whatsapp';
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -44,7 +47,7 @@ export default function AdminLayout({
       </div>
 
       {/* Main Content */}
-      <main className={`${sidebarOpen ? 'lg:ml-64 ml-0' : 'ml-0'} h-[calc(100vh-64px)] overflow-hidden pt-16 transition-all duration-700 ease-out`}>
+      <main className={`${sidebarOpen ? 'lg:ml-64 ml-0' : 'ml-0'} ${isFixedViewportPage ? 'h-[calc(100vh-64px)] overflow-hidden' : 'min-h-[calc(100vh-64px)] overflow-x-hidden overflow-y-auto'} pt-16 transition-all duration-700 ease-out`}>
         {children}
       </main>
     </div>
