@@ -783,12 +783,12 @@ ${recentContext}`;
 
     // ── Render: Connected — Inbox ──────────────────────────────────────────────
     return (
-        <div className="h-[calc(100vh-37px)] flex flex-col bg-gray-100 dark:bg-slate-950 overflow-hidden -mt-9 transition-colors duration-200 text-gray-900 dark:text-slate-100">
-            <div className="flex flex-1 overflow-hidden relative pt-0 -translate-y-4">
+        <div className="h-[calc(100vh-64px)] flex flex-col bg-gray-100 dark:bg-slate-950 overflow-hidden transition-colors duration-200 text-gray-900 dark:text-slate-100">
+            <div className="flex flex-1 overflow-hidden relative pt-0">
                 {/* ── Chat List Sidebar ────────────────────────────────────────── */}
-                <div className={`${showSidebar ? 'flex' : 'hidden md:flex'} w-full md:w-80 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex-col z-20 transition-colors duration-200`}>
+                <div className={`${showSidebar ? 'flex' : 'hidden md:flex'} w-full md:w-80 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex-col z-20 min-h-0 transition-colors duration-200`}>
                     {/* Search and Toggle */}
-                    <div className="p-4 bg-gray-50 dark:bg-slate-950/80 border-b border-gray-200 dark:border-slate-800 transition-colors duration-200">
+                    <div className="p-4 bg-gray-50 dark:bg-slate-950/80 border-b border-gray-200 dark:border-slate-800 shrink-0 transition-colors duration-200">
                         <div className="mb-3 flex items-center gap-2">
                             <button
                                 type="button"
@@ -823,7 +823,7 @@ ${recentContext}`;
                         </div>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto">
+                    <div className="flex-1 min-h-0 overflow-y-auto">
                         {/* Archived Header (like mobile) */}
                         {!showArchived && chats.some(c => c.archived) && (
                             <div
