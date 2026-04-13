@@ -21,7 +21,7 @@ export default function AdminLayout({
 
   return (
     <TenantProvider>
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-200">
+    <div className="min-h-screen -mt-16 bg-gray-50 dark:bg-slate-950 transition-colors duration-200">
       {/* Global Header with sidebar toggle */}
       <Header 
         showSidebarToggle={true}
