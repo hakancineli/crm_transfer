@@ -823,7 +823,8 @@ ${recentContext}`;
                         </div>
                     </div>
 
-                    <div className="flex-1 h-full min-h-0 overflow-y-auto pb-0">
+                    <div className="flex-1 min-h-0 overflow-y-auto pb-0 h-full">
+                            <div className="h-full flex flex-col">
                         {/* Archived Header (like mobile) */}
                         {!showArchived && chats.some(c => c.archived) && (
                             <div
@@ -847,6 +848,7 @@ ${recentContext}`;
                                 {showArchived ? 'Arşivlenmiş sohbet yok' : 'Henüz mesaj yok'}
                             </div>
                         )}
+                        <div className="flex-1">
                         {filteredChats.map(chat => (
                             <div
                                 key={chat.id}
@@ -920,6 +922,8 @@ ${recentContext}`;
                                 </div>
                             </div>
                         ))}
+                        </div>
+                            </div>
                     </div>
                 </div>
 
