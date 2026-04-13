@@ -848,7 +848,8 @@ ${recentContext}`;
                                 {showArchived ? 'Arşivlenmiş sohbet yok' : 'Henüz mesaj yok'}
                             </div>
                         )}
-                        <div className="flex-1 bg-white dark:bg-slate-900/90 transition-colors duration-200">
+                        <div className="flex-1 bg-white dark:bg-slate-900/90 border-t border-gray-100 dark:border-slate-800 transition-colors duration-200">
+                            <div className="h-full bg-white dark:bg-slate-900/90 transition-colors duration-200">
                         {filteredChats.map(chat => (
                             <div
                                 key={chat.id}
@@ -922,6 +923,7 @@ ${recentContext}`;
                                 </div>
                             </div>
                         ))}
+                            </div>
                         </div>
                             </div>
                     </div>
