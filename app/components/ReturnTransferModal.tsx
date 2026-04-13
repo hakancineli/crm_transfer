@@ -82,22 +82,22 @@ export default function ReturnTransferModal({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-                <div className="px-6 py-4 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-slate-900 rounded-lg shadow-xl dark:shadow-none max-w-md w-full border border-gray-200 dark:border-slate-700 transition-colors duration-200">
+                <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 transition-colors duration-200">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                         Dönüş Transferi Ekle
                     </h3>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
                         {originalReservation.voucherNumber} için dönüş transferi
                     </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="px-6 py-4">
                     {/* Route Preview */}
-                    <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                        <div className="text-sm text-gray-600 mb-2">Güzergah:</div>
-                        <div className="text-sm font-medium">
+                    <div className="mb-4 p-3 bg-gray-50 dark:bg-slate-800 rounded-lg transition-colors duration-200">
+                        <div className="text-sm text-gray-600 dark:text-slate-400 mb-2">Güzergah:</div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-slate-100">
                             <div className="text-green-600">🔄 {originalReservation.to}</div>
                             <div className="text-blue-600">➡️ {originalReservation.from}</div>
                         </div>
@@ -106,7 +106,7 @@ export default function ReturnTransferModal({
                     {/* Date and Time Selection */}
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                                 Dönüş Tarihi *
                             </label>
                             <input
@@ -114,20 +114,20 @@ export default function ReturnTransferModal({
                                 value={returnDate}
                                 onChange={(e) => setReturnDate(e.target.value)}
                                 min={new Date().toISOString().split('T')[0]}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                                 required
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                                 Dönüş Saati *
                             </label>
                             <input
                                 type="time"
                                 value={returnTime}
                                 onChange={(e) => setReturnTime(e.target.value)}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                                 required
                             />
                         </div>
@@ -145,7 +145,7 @@ export default function ReturnTransferModal({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            className="flex-1 px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-md text-sm font-medium text-gray-700 dark:text-slate-100 bg-white dark:bg-slate-900 hover:bg-gray-50 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-slate-900 transition-colors duration-200"
                         >
                             İptal
                         </button>
