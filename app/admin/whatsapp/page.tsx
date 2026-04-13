@@ -1247,6 +1247,8 @@ ${recentContext}`;
                                     <input
                                         type="file"
                                         id="fileInput"
+                                        title="Dosya yükle"
+                                        aria-label="Dosya yükle"
                                         className="hidden"
                                         onChange={(e) => {
                                             const file = e.target.files?.[0];
