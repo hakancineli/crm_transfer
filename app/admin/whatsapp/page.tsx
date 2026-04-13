@@ -784,7 +784,7 @@ ${recentContext}`;
     // ── Render: Connected — Inbox ──────────────────────────────────────────────
     return (
         <div className="h-full flex flex-col bg-gray-100 dark:bg-slate-950 overflow-hidden pb-0 transition-colors duration-200 text-gray-900 dark:text-slate-100">
-            <div className="flex flex-1 overflow-hidden relative pt-0">
+            <div className="flex flex-1 overflow-hidden relative pt-4">
                 {/* ── Chat List Sidebar ────────────────────────────────────────── */}
                 <div className={`${showSidebar ? 'flex' : 'hidden md:flex'} w-full md:w-80 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex-col z-20 h-full min-h-0 transition-colors duration-200`}>
                     {/* Search and Toggle */}
