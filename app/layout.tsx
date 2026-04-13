@@ -177,7 +177,7 @@ export default function RootLayout({
             <ThemeProvider>
               <EmojiProvider>
                 <Header />
-                <main className="w-full pt-16 pb-6 px-4 sm:px-6 lg:px-8 print:p-0 bg-white text-gray-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200">
+                <main className="w-full pt-16 px-4 sm:px-6 lg:px-8 print:p-0 bg-white text-gray-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200">
                   {children}
                 </main>
               </EmojiProvider>
