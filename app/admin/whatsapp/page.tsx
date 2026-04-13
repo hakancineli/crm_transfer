@@ -1180,7 +1180,7 @@ ${recentContext}`;
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); translateMsg(msg.body, msg.id, true); }}
                                                             disabled={translatingId === msg.id}
-                                                            className="absolute -right-12 top-0 bg-white dark:bg-slate-900 shadow-sm border border-gray-100 dark:border-slate-700 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-blue-50 dark:hover:bg-slate-800 text-blue-500 dark:text-blue-400 disabled:opacity-50"
+                                                            className="absolute right-0 -top-8 bg-white dark:bg-slate-900 shadow-sm border border-gray-100 dark:border-slate-700 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-blue-50 dark:hover:bg-slate-800 text-blue-500 dark:text-blue-400 disabled:opacity-50 z-10"
                                                             title="Türkçeye Çevir"
                                                         >
                                                             {translatingId === msg.id ? (
