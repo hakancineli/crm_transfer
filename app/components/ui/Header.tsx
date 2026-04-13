@@ -27,6 +27,12 @@ export default function Header({ onSidebarToggle, showSidebarToggle = false }: H
 
     // Müşteri ekranlarında yönetim linklerini gizle (ana sayfa dahil)
     const isCustomerContext = pathname === '/' || pathname.startsWith('/customer-reservation') || pathname.startsWith('/customer-panel');
+    const isAdminRoute = pathname.startsWith('/admin');
+
+    if (isAdminRoute && !showSidebarToggle) {
+        return null;
+    }
+
 
     const adminNavigation = [
         { name: t('header.newReservation'), href: '/admin/new-reservation', isSpecial: true },

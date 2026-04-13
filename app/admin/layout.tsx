@@ -44,7 +44,7 @@ export default function AdminLayout({
       </div>
 
       {/* Main Content */}
-      <main className={`${sidebarOpen ? 'lg:ml-64 ml-0' : 'ml-0'} h-screen overflow-hidden pt-16 transition-all duration-700 ease-out`}>
+      <main className={`${sidebarOpen ? 'lg:ml-64 ml-0' : 'ml-0'} h-[calc(100vh-64px)] overflow-hidden transition-all duration-700 ease-out`}>
         {children}
       </main>
     </div>
