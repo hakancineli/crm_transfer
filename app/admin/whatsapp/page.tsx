@@ -783,7 +783,7 @@ ${recentContext}`;
 
     // ── Render: Connected — Inbox ──────────────────────────────────────────────
     return (
-        <div className="h-full flex flex-col bg-gray-100 dark:bg-slate-950 overflow-hidden transition-colors duration-200 text-gray-900 dark:text-slate-100">
+        <div className="h-[calc(100vh-64px)] flex flex-col bg-gray-100 dark:bg-slate-950 overflow-hidden pb-0 transition-colors duration-200 text-gray-900 dark:text-slate-100">
             <div className="flex flex-1 overflow-hidden relative pt-0">
                 {/* ── Chat List Sidebar ────────────────────────────────────────── */}
                 <div className={`${showSidebar ? 'flex' : 'hidden md:flex'} w-full md:w-80 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex-col z-20 min-h-0 transition-colors duration-200`}>
@@ -925,7 +925,7 @@ ${recentContext}`;
 
                 {/* ── Message Area ─────────────────────────────────────────────── */}
                 {selectedChat ? (
-                    <div className={`${!showSidebar ? 'flex' : 'hidden md:flex'} flex-1 flex flex-col z-10 bg-white dark:bg-slate-900 transition-colors duration-200`}>
+                    <div className={`${!showSidebar ? 'flex' : 'hidden md:flex'} flex-1 min-h-0 flex-col z-10 bg-white dark:bg-slate-900 transition-colors duration-200`}>
                         {/* Chat header */}
                         <div className="bg-white dark:bg-slate-900 px-3 md:px-5 py-2 md:py-3 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between shadow-sm transition-colors duration-200">
                             <div className="flex items-center gap-2 md:gap-3 lg:gap-4 overflow-hidden">
