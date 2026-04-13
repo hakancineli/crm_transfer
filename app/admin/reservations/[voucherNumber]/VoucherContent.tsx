@@ -374,14 +374,14 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
     const passengerNames = formatPassengerNames(reservation.passengerNames);
 
     return (
-        <div className="print-content bg-white p-8 print:p-4 rounded-2xl shadow-lg max-w-4xl mx-auto print:shadow-none print:max-w-full border border-gray-100">
+        <div className="print-content bg-white dark:bg-slate-900 p-8 print:p-4 rounded-2xl shadow-lg max-w-4xl mx-auto print:shadow-none print:max-w-full border border-gray-100 dark:border-slate-700 text-gray-900 dark:text-slate-100 transition-colors duration-200">
             {/* Language Selector */}
             <div className="flex justify-end mb-4 print:hidden no-print">
                 <select
                     value={selectedLanguage}
                     onChange={(e) => setSelectedLanguage(e.target.value)}
                     title="Dil seçimi"
-                    className="block w-24 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+                    className="block w-24 px-3 py-2 text-sm border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
                 >
                     <option value="tr">Türkçe</option>
                     <option value="en">English</option>
@@ -395,7 +395,7 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
             <div className="text-center mb-8 print:mb-4 border-b-2 border-gradient-to-r from-blue-500 to-green-500 pb-6 print:pb-3">
                 <div className="flex justify-center items-center mb-6 print:mb-3">
                     {/* Şirket Adı */}
-                    <span className="text-4xl print:text-2xl font-bold tracking-tight bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">
+                    <span className="text-4xl print:text-2xl font-bold tracking-tight bg-gradient-to-r from-gray-800 to-blue-600 dark:from-slate-100 dark:to-blue-400 bg-clip-text text-transparent">
                         {reservation.tenant?.companyName || (reservation as any).companyName || 'Şirket Adı'}
                     </span>
                 </div>
@@ -412,7 +412,7 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                         </Link>
                     </div>
                 )}
-                <div className="inline-flex items-center px-4 py-2 bg-gray-100 rounded-full text-gray-700 text-sm print:text-xs font-medium">
+                <div className="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-slate-800 rounded-full text-gray-700 dark:text-slate-200 text-sm print:text-xs font-medium transition-colors duration-200">
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
@@ -423,13 +423,13 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
             {/* U-ETDS Butonu (Sadece Şoför Voucher'ında) */}
             {isDriverVoucher && (
                 <div className="mb-6 print:hidden">
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-emerald-500/10 dark:to-green-500/10 border border-green-200 dark:border-emerald-500/20 rounded-xl p-4 transition-colors duration-200">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center">
                                 <span className="text-2xl mr-3">🚌</span>
                                 <div>
-                                    <h3 className="font-semibold text-gray-900">U-ETDS Bildirimi</h3>
-                                    <p className="text-sm text-gray-600">Transfer bilgilerini U-ETDS sistemine bildirin</p>
+                                    <h3 className="font-semibold text-gray-900 dark:text-slate-100">U-ETDS Bildirimi</h3>
+                                    <p className="text-sm text-gray-600 dark:text-slate-400">Transfer bilgilerini U-ETDS sistemine bildirin</p>
                                 </div>
                             </div>
                             <button
@@ -452,8 +452,8 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                 {/* Transfer ve Uçuş Bilgileri Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 print:gap-3">
                     {/* Transfer Bilgileri */}
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 print:p-3 rounded-2xl print:bg-white border border-blue-100 shadow-sm hover:shadow-md transition-shadow duration-200">
-                        <h2 className="text-sm font-semibold text-gray-800 mb-3 flex items-center">
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900 p-6 print:p-3 rounded-2xl print:bg-white border border-blue-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-colors duration-200">
+                        <h2 className="text-sm font-semibold text-gray-800 dark:text-slate-100 mb-3 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-green-600" viewBox="0 0 20 20" fill="currentColor">
                                 <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
                                 <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
@@ -461,19 +461,19 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                             {t.transferInfo}
                         </h2>
                         <div className="space-y-2 text-sm">
-                            <div className="flex justify-between items-center py-1 border-b border-gray-100">
-                                <span className="text-gray-600">{t.date}:</span>
-                                <span className="font-medium">{formatDate(reservation.date)}</span>
+                            <div className="flex justify-between items-center py-1 border-b border-gray-100 dark:border-slate-700">
+                                <span className="text-gray-600 dark:text-slate-400">{t.date}:</span>
+                                <span className="font-medium text-gray-900 dark:text-slate-100">{formatDate(reservation.date)}</span>
                             </div>
-                            <div className="flex justify-between items-center py-1 border-b border-gray-100">
-                                <span className="text-gray-600">{t.time}:</span>
-                                <span className="font-medium">{reservation.time}</span>
+                            <div className="flex justify-between items-center py-1 border-b border-gray-100 dark:border-slate-700">
+                                <span className="text-gray-600 dark:text-slate-400">{t.time}:</span>
+                                <span className="font-medium text-gray-900 dark:text-slate-100">{reservation.time}</span>
                             </div>
                             <div className="py-1 border-b border-gray-100">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <div className="text-gray-600">{t.from}:</div>
-                                        <div className="font-medium">
+                                        <div className="text-gray-600 dark:text-slate-400">{t.from}:</div>
+                                        <div className="font-medium text-gray-900 dark:text-slate-100">
                                             {AIRPORTS[reservation.from as keyof typeof AIRPORTS] || reservation.from}
                                         </div>
                                     </div>
@@ -491,8 +491,8 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                             <div className="py-1">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <div className="text-gray-600">{t.to}:</div>
-                                        <div className="font-medium">
+                                        <div className="text-gray-600 dark:text-slate-400">{t.to}:</div>
+                                        <div className="font-medium text-gray-900 dark:text-slate-100">
                                             {AIRPORTS[reservation.to as keyof typeof AIRPORTS] || reservation.to}
                                         </div>
                                     </div>
@@ -511,18 +511,18 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                     </div>
 
                     {/* Uçuş Bilgileri */}
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 print:p-3 rounded-2xl print:bg-white border border-green-100 shadow-sm hover:shadow-md transition-shadow duration-200">
-                        <h2 className="text-sm font-semibold text-gray-800 mb-3 flex items-center">
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-slate-800 dark:to-slate-900 p-6 print:p-3 rounded-2xl print:bg-white border border-green-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-colors duration-200">
+                        <h2 className="text-sm font-semibold text-gray-800 dark:text-slate-100 mb-3 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-green-600" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                             </svg>
                             {t.flightInfo}
                         </h2>
                         <div className="space-y-2 text-sm">
-                            <div className="flex justify-between items-center py-1 border-b border-gray-100">
-                                <span className="text-gray-600">{t.flightCode}:</span>
+                            <div className="flex justify-between items-center py-1 border-b border-gray-100 dark:border-slate-700">
+                                <span className="text-gray-600 dark:text-slate-400">{t.flightCode}:</span>
                                 <div className="flex items-center gap-2">
-                                    <span className="font-medium">{reservation.flightCode || '—'}</span>
+                                    <span className="font-medium text-gray-900 dark:text-slate-100">{reservation.flightCode || '—'}</span>
                                     {reservation.flightCode && (
                                         <a
                                             href={`https://www.google.com/search?q=${encodeURIComponent(reservation.flightCode + ' uçuş durumu')}`}
@@ -540,16 +540,16 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                                 </div>
                             </div>
                             <div className="flex justify-between items-center py-1">
-                                <span className="text-gray-600">{t.luggage}:</span>
-                                <span className="font-medium">{reservation.luggageCount}</span>
+                                <span className="text-gray-600 dark:text-slate-400">{t.luggage}:</span>
+                                <span className="font-medium text-gray-900 dark:text-slate-100">{reservation.luggageCount}</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Yolcular */}
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-6 print:p-3 rounded-2xl print:bg-white border border-purple-100 shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <h2 className="text-sm font-semibold text-gray-800 mb-3 flex items-center">
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-slate-800 dark:to-slate-900 p-6 print:p-3 rounded-2xl print:bg-white border border-purple-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-colors duration-200">
+                    <h2 className="text-sm font-semibold text-gray-800 dark:text-slate-100 mb-3 flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
@@ -565,8 +565,8 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                 </div>
 
                 {/* Yolcu Bilgileri */}
-                <div className="bg-gradient-to-br from-orange-50 to-yellow-50 p-6 print:p-3 rounded-2xl print:bg-white border border-orange-100 shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <h2 className="text-sm font-semibold text-gray-800 mb-3 flex items-center">
+                <div className="bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-slate-800 dark:to-slate-900 p-6 print:p-3 rounded-2xl print:bg-white border border-orange-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-colors duration-200">
+                    <h2 className="text-sm font-semibold text-gray-800 dark:text-slate-100 mb-3 flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
@@ -574,17 +574,17 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                     </h2>
                     <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                            <span className="text-gray-600">{t.passengerCount}:</span>
-                            <span className="font-medium">{passengerNames.length} {t.person}</span>
+                            <span className="text-gray-600 dark:text-slate-400">{t.passengerCount}:</span>
+                            <span className="font-medium text-gray-900 dark:text-slate-100">{passengerNames.length} {t.person}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-gray-600">{t.luggageCount}:</span>
-                            <span className="font-medium">{reservation.luggageCount} {t.piece}</span>
+                            <span className="text-gray-600 dark:text-slate-400">{t.luggageCount}:</span>
+                            <span className="font-medium text-gray-900 dark:text-slate-100">{reservation.luggageCount} {t.piece}</span>
                         </div>
                         {reservation.phoneNumber && (
                             <div className="flex justify-between items-center">
-                                <span className="text-gray-600">{t.contact}:</span>
-                                <span className="font-medium">{reservation.phoneNumber}</span>
+                                <span className="text-gray-600 dark:text-slate-400">{t.contact}:</span>
+                                <span className="font-medium text-gray-900 dark:text-slate-100">{reservation.phoneNumber}</span>
                             </div>
                         )}
                     </div>
@@ -594,8 +594,8 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
 
                 {/* Ödeme Bilgileri */}
                 {!isDriverVoucher && (
-                    <div className="bg-gradient-to-br from-cyan-50 to-blue-50 p-6 print:p-3 rounded-2xl print:bg-white border border-cyan-100 shadow-sm hover:shadow-md transition-shadow duration-200">
-                        <h2 className="text-sm print:text-xs font-semibold text-blue-800 mb-3 print:mb-1 flex items-center">
+                    <div className="bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-slate-800 dark:to-slate-900 p-6 print:p-3 rounded-2xl print:bg-white border border-cyan-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-colors duration-200">
+                        <h2 className="text-sm print:text-xs font-semibold text-blue-800 dark:text-blue-300 mb-3 print:mb-1 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
@@ -611,7 +611,7 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                 {/* Şoför Bilgileri */}
                 {isDriverVoucher && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:gap-2">
-                        <div className="bg-green-50 p-4 print:p-2 rounded-xl print:bg-white border border-green-100 print:border-none">
+                        <div className="bg-green-50 dark:bg-emerald-500/10 p-4 print:p-2 rounded-xl print:bg-white border border-green-100 dark:border-emerald-500/20 print:border-none transition-colors duration-200">
                             <h2 className="text-sm print:text-xs font-semibold text-green-800 mb-3 print:mb-1 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -625,7 +625,7 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                                             type="number"
                                             value={driverFee}
                                             onChange={(e)=> setDriverFee(e.target.value === '' ? '' : Number(e.target.value))}
-                                            className="px-3 py-1.5 border border-gray-300 rounded-md text-sm w-32 text-center"
+                                            className="px-3 py-1.5 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 rounded-md text-sm w-32 text-center transition-colors duration-200"
                                             placeholder="Hakediş"
                                         />
                                         <button
@@ -657,7 +657,7 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                                         </button>
                                         <button
                                             onClick={()=>{ setEditingDriverFee(false); setDriverFee(reservation.driverFee ?? ''); }}
-                                            className="px-3 py-1.5 text-xs rounded-md border border-gray-300 hover:bg-gray-50"
+                                            className="px-3 py-1.5 text-xs rounded-md border border-gray-300 dark:border-slate-700 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200"
                                         >
                                             İptal
                                         </button>
@@ -675,7 +675,7 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                                 )}
                             </div>
                         </div>
-                        <div className="bg-blue-50 p-4 print:p-2 rounded-xl print:bg-white border border-blue-100 print:border-none">
+                        <div className="bg-blue-50 dark:bg-blue-500/10 p-4 print:p-2 rounded-xl print:bg-white border border-blue-100 dark:border-blue-500/20 print:border-none transition-colors duration-200">
                             <h2 className="text-sm print:text-xs font-semibold text-blue-800 mb-3 print:mb-1 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -686,7 +686,7 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                                 {reservation.price} {CURRENCIES[reservation.currency as keyof typeof CURRENCIES]}
                             </div>
                         </div>
-                        <div className="bg-yellow-50 p-4 print:p-2 rounded-xl print:bg-white border border-yellow-100 print:border-none col-span-2">
+                        <div className="bg-yellow-50 dark:bg-amber-500/10 p-4 print:p-2 rounded-xl print:bg-white border border-yellow-100 dark:border-amber-500/20 print:border-none col-span-2 transition-colors duration-200">
                             <h2 className="text-sm print:text-xs font-semibold text-yellow-800 mb-3 print:mb-1 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -695,16 +695,16 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                             </h2>
                             <div className="space-y-2 print:space-y-1">
                                 <div className="flex flex-col">
-                                    <span className="text-gray-600 text-sm print:text-xs">{t.iban}</span>
-                                    <span className="font-medium font-mono tracking-wider print:text-sm">TR68 0006 2000 3680 0006 6673 77</span>
+                                    <span className="text-gray-600 dark:text-slate-400 text-sm print:text-xs">{t.iban}</span>
+                                    <span className="font-medium text-gray-900 dark:text-slate-100 font-mono tracking-wider print:text-sm">TR68 0006 2000 3680 0006 6673 77</span>
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-gray-600 text-sm print:text-xs">{t.accountHolder}</span>
-                                    <span className="font-medium print:text-sm">HAKAN ÇİNELİ</span>
+                                    <span className="text-gray-600 dark:text-slate-400 text-sm print:text-xs">{t.accountHolder}</span>
+                                    <span className="font-medium text-gray-900 dark:text-slate-100 print:text-sm">HAKAN ÇİNELİ</span>
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-gray-600 text-sm print:text-xs">{t.bank}</span>
-                                    <span className="font-medium print:text-sm">GARANTİ BANKASI</span>
+                                    <span className="text-gray-600 dark:text-slate-400 text-sm print:text-xs">{t.bank}</span>
+                                    <span className="font-medium text-gray-900 dark:text-slate-100 print:text-sm">GARANTİ BANKASI</span>
                                 </div>
                             </div>
                         </div>
@@ -712,10 +712,10 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                 )}
 
                 {/* Transfer Tipi Bilgisi */}
-                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 print:p-3 rounded-2xl print:bg-white border border-indigo-100 shadow-sm hover:shadow-md transition-shadow duration-200 mb-4">
+                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-slate-800 dark:to-slate-900 p-6 print:p-3 rounded-2xl print:bg-white border border-indigo-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-colors duration-200 mb-4">
                     <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-600">{t.transferType}:</span>
-                        <span className="font-medium text-gray-900">
+                        <span className="text-sm font-medium text-gray-600 dark:text-slate-400">{t.transferType}:</span>
+                        <span className="font-medium text-gray-900 dark:text-slate-100">
                             {reservation.isReturn ? (
                                 t.inbound
                             ) : (
@@ -729,8 +729,8 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
 
                 {/* İlişkili Transfer Bilgisi */}
                 {(reservation.returnTransfer || reservation.originalTransfer) && (
-                    <div className="bg-gradient-to-br from-emerald-50 to-teal-50 p-6 print:p-3 rounded-2xl print:bg-white border border-emerald-100 shadow-sm hover:shadow-md transition-shadow duration-200 mb-4">
-                        <h2 className="text-sm font-semibold text-blue-800 mb-3">
+                    <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-slate-800 dark:to-slate-900 p-6 print:p-3 rounded-2xl print:bg-white border border-emerald-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-colors duration-200 mb-4">
+                        <h2 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-3">
                             {reservation.isReturn ? t.originalTransfer : t.returnTransfer}
                         </h2>
                         <div className="space-y-2 text-sm">
@@ -739,15 +739,15 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                                 reservation.originalTransfer && (
                                     <>
                                         <div className="flex justify-between items-center">
-                                            <span className="text-gray-600">{t.date}:</span>
-                                            <span className="font-medium">{formatDate(reservation.originalTransfer.date)}</span>
+                                            <span className="text-gray-600 dark:text-slate-400">{t.date}:</span>
+                                            <span className="font-medium text-gray-900 dark:text-slate-100">{formatDate(reservation.originalTransfer.date)}</span>
                                         </div>
                                         <div className="flex justify-between items-center">
-                                            <span className="text-gray-600">{t.time}:</span>
-                                            <span className="font-medium">{reservation.originalTransfer.time}</span>
+                                            <span className="text-gray-600 dark:text-slate-400">{t.time}:</span>
+                                            <span className="font-medium text-gray-900 dark:text-slate-100">{reservation.originalTransfer.time}</span>
                                         </div>
                                         <div className="flex justify-between items-center">
-                                            <span className="text-gray-600">{t.flightCode}:</span>
+                                            <span className="text-gray-600 dark:text-slate-400">{t.flightCode}:</span>
                                             <div className="flex items-center gap-2">
                                                 <span className="font-medium">{reservation.originalTransfer.flightCode || '—'}</span>
                                                 {reservation.originalTransfer.flightCode && (
@@ -779,15 +779,15 @@ export default function VoucherContent({ reservation, isDriverVoucher }: Voucher
                                 reservation.returnTransfer && (
                                     <>
                                         <div className="flex justify-between items-center">
-                                            <span className="text-gray-600">{t.date}:</span>
-                                            <span className="font-medium">{formatDate(reservation.returnTransfer.date)}</span>
+                                            <span className="text-gray-600 dark:text-slate-400">{t.date}:</span>
+                                            <span className="font-medium text-gray-900 dark:text-slate-100">{formatDate(reservation.returnTransfer.date)}</span>
                                         </div>
                                         <div className="flex justify-between items-center">
-                                            <span className="text-gray-600">{t.time}:</span>
-                                            <span className="font-medium">{reservation.returnTransfer.time}</span>
+                                            <span className="text-gray-600 dark:text-slate-400">{t.time}:</span>
+                                            <span className="font-medium text-gray-900 dark:text-slate-100">{reservation.returnTransfer.time}</span>
                                         </div>
                                         <div className="flex justify-between items-center">
-                                            <span className="text-gray-600">{t.flightCode}:</span>
+                                            <span className="text-gray-600 dark:text-slate-400">{t.flightCode}:</span>
                                             <div className="flex items-center gap-2">
                                                 <span className="font-medium">{reservation.returnTransfer.flightCode || '—'}</span>
                                                 {reservation.returnTransfer.flightCode && (
