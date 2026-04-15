@@ -33,6 +33,25 @@ export async function middleware(request: NextRequest) {
 		return NextResponse.next();
 	}
 
+	// Desktop CRM host: always force direct CRM experience
+	if (hostname.includes('app.proacente.com')) {
+		if (pathname === '/') {
+			const url = request.nextUrl.clone();
+			url.pathname = '/admin';
+			return NextResponse.redirect(url);
+		}
+		if (
+			pathname.startsWith('/marketing') ||
+			pathname.startsWith('/protransfer') ||
+			pathname.startsWith('/website')
+		) {
+			const url = request.nextUrl.clone();
+			url.pathname = '/admin';
+			return NextResponse.redirect(url);
+		}
+		return NextResponse.next();
+	}
+
 	// Domain-specific routing
 	if (hostname.includes('proacente.com')) {
 		// Root should serve marketing page (app/page.tsx re-exports marketing)

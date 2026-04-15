@@ -14,7 +14,16 @@
     "backup:local": "BACKUP_DIR=./local-backups node scripts/backup-database.js",
     "backup:mac": "./scripts/mac-daily-backup.sh",
     "backup:setup-cron": "./scripts/setup-mac-cron.sh",
-    "backup:setup-launchagent": "./scripts/setup-mac-launchagent.sh"
+    "backup:setup-launchagent": "./scripts/setup-mac-launchagent.sh",
+    "desktop": "electron .",
+    "desktop:dev": "concurrently -k \"npm run dev\" \"wait-on http://localhost:3000 && ELECTRON_START_URL=http://localhost:3000/admin electron .\"",
+    "desktop:dist": "npm run build && electron-builder",
+    "desktop:dist:mac": "npm run build && electron-builder --mac dmg zip",
+    "desktop:dist:win": "npm run build && electron-builder --win nsis portable"
+  },
+  "main": "desktop/main.js",
+  "engines": {
+    "node": ">=20"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.10",
@@ -43,13 +52,57 @@
     "tailwindcss": "^3.4.18"
   },
   "devDependencies": {
+    "@next/swc-darwin-arm64": "^14.1.0",
     "@types/node": "20.11.20",
     "@types/react": "18.2.58",
     "@types/react-dom": "18.2.19",
+    "concurrently": "^9.2.1",
+    "electron": "^37.2.0",
+    "electron-builder": "^26.0.12",
     "eslint": "8.56.0",
     "eslint-config-next": "14.1.0",
     "prisma": "^6.16.2",
     "ts-node": "^10.9.2",
-    "typescript": "5.3.3"
+    "typescript": "5.3.3",
+    "wait-on": "^8.0.5"
+  },
+  "build": {
+    "appId": "com.proacente.crm",
+    "productName": "Pro Acente CRM",
+    "directories": {
+      "output": "dist-desktop"
+    },
+    "files": [
+      "desktop/**/*",
+      ".next/**/*",
+      "public/**/*",
+      "node_modules/**/*",
+      "package.json",
+      "next.config.js",
+      "middleware.ts",
+      "prisma/**/*"
+    ],
+    "extraMetadata": {
+      "main": "desktop/main.js"
+    },
+    "mac": {
+      "category": "public.app-category.business",
+      "icon": "public/crmlogo/proAcentelogo-symbol.icns",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "icon": "public/crmlogo/proAcentelogo-symbol.ico",
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }

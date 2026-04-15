@@ -1,0 +1,68 @@
+name: Build Desktop Apps
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'desktop/**'
+      - '.github/workflows/desktop-release.yml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'middleware.ts'
+      - 'public/crmlogo/**'
+
+jobs:
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next app
+        run: npm run build
+
+      - name: Build macOS desktop app
+        run: npm run desktop:dist:mac
+
+      - name: Upload mac artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pro-acente-crm-mac
+          path: dist-desktop/*
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next app
+        run: npm run build
+
+      - name: Build Windows desktop app
+        run: npm run desktop:dist:win
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pro-acente-crm-win
+          path: dist-desktop/*

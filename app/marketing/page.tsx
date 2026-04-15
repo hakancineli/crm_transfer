@@ -150,6 +150,7 @@ export default function MarketingPage() {
           <div className="flex items-center gap-3 lg:gap-5 text-sm">
             <nav className="hidden xl:flex items-center gap-6 text-[15px] text-gray-600">
               <Link href="#features" className="hover:text-gray-900 transition-colors">Özellikler</Link>
+              <Link href="#desktop-app" className="hover:text-gray-900 transition-colors">Masaüstü Uygulama</Link>
               <Link href="#pricing" className="hover:text-gray-900 transition-colors">Fiyatlandırma</Link>
               <Link href="#faq" className="hover:text-gray-900 transition-colors">SSS</Link>
             </nav>
@@ -865,6 +866,65 @@ export default function MarketingPage() {
                 <div className="text-gray-600 mt-2 text-sm">{s.d}</div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Masaüstü Uygulama İndir */}
+      <section className="py-16 bg-slate-950 text-white" id="desktop-app">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-10 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 text-emerald-300 text-sm font-semibold border border-emerald-400/20">Windows ve macOS için masaüstü CRM</div>
+              <h2 className="mt-5 text-3xl sm:text-4xl font-extrabold tracking-tight text-white">Web vitrini değil, doğrudan CRM açılan masaüstü uygulama</h2>
+              <p className="mt-4 text-slate-300 text-lg leading-8 max-w-3xl">Ekibiniz tarayıcı sekmeleri arasında kaybolmadan Pro Acente CRM'i masaüstünden açsın. Uygulama doğrudan admin paneline gider; oturum varsa dashboard, yoksa giriş ekranı açılır.</p>
+              <div className="mt-8 flex flex-col sm:flex-row gap-4">
+                <a
+                  href="https://github.com/hakancineli/crm_transfer/releases/latest"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 text-white hover:bg-emerald-400 font-semibold transition-colors"
+                >
+                  <span aria-hidden="true">🪟</span>
+                  Windows için indir
+                </a>
+                <a
+                  href="https://github.com/hakancineli/crm_transfer/releases/latest"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-slate-700 bg-slate-900 text-slate-100 hover:bg-slate-800 font-semibold transition-colors"
+                >
+                  <span aria-hidden="true"></span>
+                  macOS için indir
+                </a>
+              </div>
+              <p className="mt-4 text-sm text-slate-400">İndirme bağlantıları en güncel release sayfasına gider. Windows için `.exe`, macOS için `.dmg/.zip` paketleri yayınlandığında müşteriler doğrudan buradan erişebilir.</p>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {[
+                {
+                  title: 'Doğrudan CRM açılışı',
+                  desc: 'Uygulama açıldığında vitrine değil admin paneline yönlenir.',
+                },
+                {
+                  title: 'Ekibe kolay kurulum',
+                  desc: 'Operasyon, satış ve muhasebe ekipleri için tek tık kurulum akışı.',
+                },
+                {
+                  title: 'Tarayıcıdan bağımsız',
+                  desc: 'Sekme karmaşası olmadan ayrı bir CRM uygulaması gibi çalışır.',
+                },
+                {
+                  title: 'Aynı güvenli oturum akışı',
+                  desc: 'Mevcut giriş ve oturum yenileme mantığı masaüstünde de korunur.',
+                },
+              ].map((item) => (
+                <div key={item.title} className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-[0_20px_50px_rgba(2,6,23,0.35)]">
+                  <div className="text-base font-semibold text-white">{item.title}</div>
+                  <div className="mt-2 text-sm leading-6 text-slate-400">{item.desc}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
