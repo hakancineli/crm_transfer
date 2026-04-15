@@ -274,7 +274,6 @@ ${recentContext}`;
 
     const startConnection = async () => {
         console.log('🚀 Sending WA connect request...');
-        alert('Bağlantı başlatılıyor, lütfen bekleyin...');
         setConnecting(true);
         try {
             console.log('🚀 Primary connect attempt (POST)...');
@@ -747,7 +746,7 @@ ${recentContext}`;
                         disabled={connecting}
                         className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors disabled:opacity-50"
                     >
-                        {connecting ? '⏳ Bağlanıyor...' : '📱 QR Kod ile Bağlan'}
+                        {connecting ? '⏳ QR hazırlanıyor...' : '📱 QR Kod ile Bağlan'}
                     </button>
                     {session.status === 'DISCONNECTED' && (
                         <p className="mt-4 text-sm text-red-500">Bağlantı kesildi. Tekrar bağlan.</p>
@@ -763,19 +762,19 @@ ${recentContext}`;
     // ── Render: QR Pending ─────────────────────────────────────────────────────
     if (session.status === 'QR_PENDING') {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="bg-white rounded-2xl shadow-xl p-10 max-w-md w-full text-center">
-                    <h1 className="text-2xl font-bold text-gray-900 mb-2">QR Kodu Tara</h1>
-                    <p className="text-gray-500 mb-6">WhatsApp'ı aç → Bağlı Cihazlar → Cihaz Bağla → QR'ı tara</p>
+            <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center transition-colors duration-200">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl dark:shadow-none border border-gray-200 dark:border-slate-800 p-10 max-w-md w-full text-center transition-colors duration-200">
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-2">QR Kodu Tara</h1>
+                    <p className="text-gray-500 dark:text-slate-400 mb-6">WhatsApp'ı aç → Bağlı Cihazlar → Cihaz Bağla → QR'ı tara</p>
                     {session.qr ? (
                         <img src={session.qr} alt="QR Code" className="mx-auto w-64 h-64 border-4 border-green-500 rounded-xl" />
                     ) : (
-                        <div className="w-64 h-64 mx-auto bg-gray-100 rounded-xl flex items-center justify-center animate-pulse">
-                            <span className="text-gray-400">QR yükleniyor...</span>
+                        <div className="w-64 h-64 mx-auto bg-gray-100 dark:bg-slate-800 rounded-xl flex items-center justify-center animate-pulse transition-colors duration-200">
+                            <span className="text-gray-400 dark:text-slate-500">QR yükleniyor...</span>
                         </div>
                     )}
-                    <p className="mt-4 text-sm text-gray-400 animate-pulse">⏳ Taranan QR bekleniyor...</p>
-                    <button onClick={disconnect} className="mt-4 text-sm text-red-400 hover:text-red-600">İptal</button>
+                    <p className="mt-4 text-sm text-gray-400 dark:text-slate-500 animate-pulse">⏳ Taranan QR bekleniyor...</p>
+                    <button onClick={disconnect} className="mt-4 text-sm text-red-400 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors">İptal</button>
                 </div>
             </div>
         );

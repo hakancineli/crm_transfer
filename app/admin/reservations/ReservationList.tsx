@@ -369,8 +369,11 @@ export default function ReservationList({ onFilterChange }: ReservationListProps
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div>
+            <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950/60 flex items-center justify-center transition-colors duration-200">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div>
+                    <p className="text-sm text-gray-600 dark:text-slate-400">Yükleniyor...</p>
+                </div>
             </div>
         );
     }
