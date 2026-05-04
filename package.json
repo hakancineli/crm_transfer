@@ -17,9 +17,9 @@
     "backup:setup-launchagent": "./scripts/setup-mac-launchagent.sh",
     "desktop": "electron .",
     "desktop:dev": "concurrently -k \"npm run dev\" \"wait-on http://localhost:3000 && ELECTRON_START_URL=http://localhost:3000/admin electron .\"",
-    "desktop:dist": "npm run build && electron-builder",
-    "desktop:dist:mac": "npm run build && electron-builder --mac dmg zip",
-    "desktop:dist:win": "npm run build && electron-builder --win nsis portable"
+    "desktop:dist": "npm run build && electron-builder --publish never",
+    "desktop:dist:mac": "npm run build && electron-builder --mac dmg zip --publish never",
+    "desktop:dist:win": "npm run build && electron-builder --win nsis portable --publish never"
   },
   "main": "desktop/main.js",
   "engines": {
