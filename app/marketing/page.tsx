@@ -880,25 +880,14 @@ export default function MarketingPage() {
               <p className="mt-4 text-slate-300 text-lg leading-8 max-w-3xl">Ekibiniz tarayıcı sekmeleri arasında kaybolmadan Pro Acente CRM'i masaüstünden açsın. Uygulama doğrudan admin paneline gider; oturum varsa dashboard, yoksa giriş ekranı açılır.</p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4">
                 <a
-                  href="https://github.com/hakancineli/crm_transfer/releases/latest"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="https://github.com/hakancineli/crm_transfer/releases/download/desktop-v0.1.0/Pro.Acente.CRM.Setup.0.1.0.exe"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 text-white hover:bg-emerald-400 font-semibold transition-colors"
                 >
                   <span aria-hidden="true">🪟</span>
                   Windows için indir
                 </a>
-                <a
-                  href="https://github.com/hakancineli/crm_transfer/releases/latest"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-slate-700 bg-slate-900 text-slate-100 hover:bg-slate-800 font-semibold transition-colors"
-                >
-                  <span aria-hidden="true"></span>
-                  macOS için indir
-                </a>
               </div>
-              <p className="mt-4 text-sm text-slate-400">İndirme bağlantıları en güncel release sayfasına gider. Windows için `.exe`, macOS için `.dmg/.zip` paketleri yayınlandığında müşteriler doğrudan buradan erişebilir.</p>
+              <p className="mt-4 text-sm text-slate-400">Windows installer doğrudan indirilir. macOS paketi hazırlanınca ayrıca yayınlanacak.</p>
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
               {[
