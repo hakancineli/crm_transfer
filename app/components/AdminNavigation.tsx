@@ -48,12 +48,22 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
         module: 'transfer',
         order: 1
       },
-      // 1.5 WhatsApp
+      // 1.4 WhatsApp Canlı Sohbet (QR / Web)
       {
-        name: t('admin.navigation.whatsapp'),
+        name: 'WhatsApp Canlı',
         href: '/admin/whatsapp',
         icon: '💬',
-        description: 'Mesajlar ve Rezervasyonlar',
+        description: 'Canlı Müşteri Sohbetleri',
+        module: 'system',
+        order: 1.4,
+        visible: true
+      },
+      // 1.5 Resmi WhatsApp & Bot (Meta Cloud API)
+      {
+        name: 'Resmi WhatsApp & Bot',
+        href: '/admin/whatsapp-cloud',
+        icon: '⚡',
+        description: 'Meta API, Chatbot & Toplu Mesaj',
         module: 'system',
         order: 1.5,
         visible: true
@@ -418,7 +428,7 @@ const AdminNavigation = ({ onClose }: AdminNavigationProps) => {
               shouldShow = user?.role === 'AGENCY_ADMIN' || user?.role === 'SUPERUSER';
             } else if (item.name === 'Modül Yönetimi') {
               shouldShow = user?.role === 'SUPERUSER';
-            } else if (item.href === '/admin/whatsapp' || item.name === t('admin.navigation.whatsapp') || item.name === 'WhatsApp') {
+            } else if (item.href === '/admin/whatsapp' || item.href === '/admin/whatsapp-cloud' || item.name === 'WhatsApp Canlı' || item.name === 'Resmi WhatsApp & Bot' || item.name === 'WhatsApp') {
               // AGENCY_ADMIN ve SUPERUSER her zaman görsün
               shouldShow = user?.role === 'AGENCY_ADMIN' || user?.role === 'SUPERUSER' || user?.permissions?.some(p =>
                 (p.permission === 'VIEW_OWN_SALES' || p.permission === 'MANAGE_CUSTOMERS') && p.isActive
